@@ -11,5 +11,10 @@
         }
       }
     }
+  ],
+  "targets": [
+    {
+      "name": "default"
+    }
   ]
 }
