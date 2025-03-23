@@ -1,0 +1,4 @@
+/.hvigor
+/.idea
+**/build
+.clang-format

@@ -1,0 +1,59 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "D:/harmonyproject/轩铭密码智能备忘录应用/privatekey.p12",
+          "storePassword": "000000188CF43F2A9984062A8F8D9978109DDCC13C2EE6878BD8B7B6ACC06999F49CC588A38CC03B",
+          "keyAlias": "aipasswordmemohmapp-release",
+          "keyPassword": "000000199C168883BC3680EC624EC821FF636CD36F60BEB651F5E52C25185A0D7885DB234867CF94D9",
+          "signAlg": "SHA256withECDSA",
+          "profile": "D:/harmonyproject/轩铭密码智能备忘录应用/Profile.p7b",
+          "certpath": "D:/harmonyproject/轩铭密码智能备忘录应用/证书.cer"
+        }
+      },
+      {
+        "name": "develop",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\zls25\\.ohos\\config\\develop_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B9B4C68CFB88E9118B2DB00A0E76413A0C14B3CE6CA57AF33DF68A37107CFB1EB259E888056A566",
+          "profile": "C:\\Users\\zls25\\.ohos\\config\\develop_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\zls25\\.ohos\\config\\develop_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
+          "storePassword": "0000001B9B1716198F0CFB847159AE490B44A30265472F5657AB1884789FE034CB99F6ADF51E84D40BAB50"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "develop",
+        "buildOption": {
+          "arkOptions": {
+            "autoLazyImport": true,
+            "branchElimination": true
+          },
+          "strictMode": {
+            "noExternalImportByPath": true,
+            "useNormalizedOHMUrl": true,
+            "caseSensitiveCheck": true,
+            "duplicateDependencyCheck": true,
+            "harLocalDependencyCheck": true
+          }
+        },
+        "runtimeOS": "HarmonyOS",
+        "compatibleSdkVersion": "5.0.3(15)"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry"
+    }
+  ]
+}
