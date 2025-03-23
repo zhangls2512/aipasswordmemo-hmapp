@@ -10,7 +10,7 @@
           "keyAlias": "aipasswordmemohmapp-release",
           "keyPassword": "000000199C168883BC3680EC624EC821FF636CD36F60BEB651F5E52C25185A0D7885DB234867CF94D9",
           "signAlg": "SHA256withECDSA",
-          "profile": "D:/harmonyproject/轩铭密码智能备忘录应用/Profile.p7b",
+          "profile": "D:/harmonyproject/轩铭密码智能备忘录应用/profile.p7b",
           "certpath": "D:/harmonyproject/轩铭密码智能备忘录应用/证书.cer"
         }
       },
