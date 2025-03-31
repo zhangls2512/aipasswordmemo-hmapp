@@ -1,22 +1,17 @@
+import { common } from '@kit.AbilityKit'
 import { AppStorageV2 } from '@kit.ArkUI'
-import Setting from './Setting'
+import { notificationManager } from '@kit.NotificationKit'
+import { TitleBar } from './Me'
 
-export class TitleBar {
-  hide: boolean = false
+@Builder
+export function NoticeBuilder() {
+  Notice()
 }
 
 @ComponentV2
-export default struct Me {
-  @Local titleBar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
-  @Local isShowSheet: boolean = false
-
-  @Builder
-  SheetBuilder() {
-    Setting()
-      .onDisAppear(() => {
-        this.titleBar.hide = false
-      })
-  }
+export struct Notice {
+  @Local titlebar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
+  context = getContext(this) as common.UIAbilityContext
 
   build() {
     NavDestination() {
@@ -24,14 +19,7 @@ export default struct Me {
         ListItem() {
           Column() {
             Row() {
-              Image($r('app.media.setting'))
-                .fillColor($r('sys.color.icon_primary'))
-                .height(24)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .width(24)
-              Text('设置')
+              Text('通知管理')
                 .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
@@ -44,21 +32,18 @@ export default struct Me {
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_primary'))
+                .backgroundColor($r('sys.color.comp_background_list_card'))
               },
               pressed: {
-                .backgroundColor($r('sys.color.comp_background_secondary'))
+                .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
             .onClick(() => {
-              this.isShowSheet = !this.isShowSheet
-            })
-            .bindSheet($$this.isShowSheet, this.SheetBuilder(), {
-              preferType: SheetType.BOTTOM
+              notificationManager.openNotificationSettings(this.context)
             })
           }
-          .backgroundColor($r('sys.color.comp_background_primary'))
+          .backgroundColor($r('sys.color.comp_background_list_card'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
         }
@@ -71,6 +56,13 @@ export default struct Me {
         right: $r('sys.float.ohos_id_max_padding_end')
       })
     }
-    .backgroundColor($r('sys.color.background_secondary'))
+    .backgroundColor($r('app.color.sheet_background'))
+    .title('消息通知')
+    .onWillAppear(() => {
+      this.titlebar.hide = true
+    })
+    .onWillDisappear(() => {
+      this.titlebar.hide = false
+    })
   }
 }

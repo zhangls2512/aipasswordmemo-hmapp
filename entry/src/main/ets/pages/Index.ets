@@ -4,73 +4,71 @@ import Property from './Property'
 import Me from './Me'
 
 @Entry
-@Component
+@ComponentV2
 struct Index {
-  @StorageProp('bottomRectHeight')
-  bottomRectHeight: number = 0
-  @StorageProp('topRectHeight')
-  topRectHeight: number = 0
-  @State selectedIndex: number = 0
-  private tabsController: TabsController = new TabsController()
-
-  @Builder
-  tabBuilder(index: number, name: string, selectedImg: Resource, unselectedImg: Resource) {
-    Column() {
-      Image(this.selectedIndex === index ? selectedImg : unselectedImg)
-        .fillColor(this.selectedIndex === index ? $r('sys.color.icon_emphasize') : $r('sys.color.icon_tertiary'))
-        .height(24)
-        .width(24)
-      Text(name)
-        .fontColor(this.selectedIndex === index ? $r('sys.color.brand') : $r('sys.color.font_secondary'))
-        .fontSize(12)
-        .margin({
-          top: 4
-        })
-    }
-    .onClick(() => {
-      this.selectedIndex = index
-      this.tabsController.changeIndex(this.selectedIndex)
-    })
-  }
-
-  @Builder
-  tabContentBuilder(index: number, name: string, selectedImg: Resource, unselectedImg: Resource) {
-    TabContent() {
-      Column() {
-        if (this.selectedIndex === 0) {
-          Password()
-        }
-        if (this.selectedIndex === 1) {
-          Info()
-        }
-        if (this.selectedIndex === 2) {
-          Property()
-        }
-        if (this.selectedIndex === 3) {
-          Me()
-        }
-      }
-    }
-    .tabBar(this.tabBuilder(index, name, selectedImg, unselectedImg))
-  }
+  @Local name: string = 'password'
+  @Local title: string = '密码'
 
   build() {
-    Tabs({
-      barPosition: BarPosition.End,
-      controller: this.tabsController
-    }) {
-      this.tabContentBuilder(0, '密码', $r('app.media.passwordselected'), $r('app.media.password'))
-      this.tabContentBuilder(1, '信息', $r('app.media.infoselected'), $r('app.media.info'))
-      this.tabContentBuilder(2, '属性', $r('app.media.propertyselected'), $r('app.media.property'))
-      this.tabContentBuilder(3, '我的', $r('app.media.meselected'), $r('app.media.me'))
+    Navigation() {
+      if (this.name === 'password') {
+        Password()
+      }
+      if (this.name === 'info') {
+        Info()
+      }
+      if (this.name === 'property') {
+        Property()
+      }
+      if (this.name === 'me') {
+        Me()
+      }
     }
-    .backgroundColor($r('sys.color.comp_background_tertiary'))
-    .padding({
-      bottom: px2vp(this.bottomRectHeight),
-      top: px2vp(this.topRectHeight)
-    })
-    .onAnimationStart((index: number, targetIndex: number) => {
-      this.selectedIndex = targetIndex
-    })
+    .backgroundColor($r('sys.color.background_secondary'))
+    .hideBackButton(true)
+    .title(this.title)
+    .titleMode(NavigationTitleMode.Mini)
+    .toolbarConfiguration([
+      {
+        value: '密码',
+        icon: $r('app.media.password'),
+        action: (() => {
+          this.name = 'password'
+          this.title = '密码'
+        }),
+        status: this.name === 'password' ? ToolbarItemStatus.ACTIVE : ToolbarItemStatus.NORMAL,
+        activeIcon: $r('app.media.passwordselected')
+      },
+      {
+        value: '信息',
+        icon: $r('app.media.info'),
+        action: (() => {
+          this.name = 'info'
+          this.title = '信息'
+        }),
+        status: this.name === 'info' ? ToolbarItemStatus.ACTIVE : ToolbarItemStatus.NORMAL,
+        activeIcon: $r('app.media.infoselected')
+      },
+      {
+        value: '属性',
+        icon: $r('app.media.property'),
+        action: (() => {
+          this.name = 'property'
+          this.title = '属性'
+        }),
+        status: this.name === 'property' ? ToolbarItemStatus.ACTIVE : ToolbarItemStatus.NORMAL,
+        activeIcon: $r('app.media.propertyselected')
+      },
+      {
+        value: '我的',
+        icon: $r('app.media.me'),
+        action: (() => {
+          this.name = 'me'
+          this.title = '我的'
+        }),
+        status: this.name === 'me' ? ToolbarItemStatus.ACTIVE : ToolbarItemStatus.NORMAL,
+        activeIcon: $r('app.media.meselected')
+      }
+    ])
   }
 }

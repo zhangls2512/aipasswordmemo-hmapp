@@ -1,0 +1,24 @@
+{
+  "routerMap": [
+    {
+      "name": "Notice",
+      "pageSourceFile": "src/main/ets/pages/Notice.ets",
+      "buildFunction": "NoticeBuilder"
+    },
+    {
+      "name": "About",
+      "pageSourceFile": "src/main/ets/pages/About.ets",
+      "buildFunction": "AboutBuilder"
+    },
+    {
+      "name": "License",
+      "pageSourceFile": "src/main/ets/pages/License.ets",
+      "buildFunction": "LicenseBuilder"
+    },
+    {
+      "name": "Debug",
+      "pageSourceFile": "src/main/ets/pages/Debug.ets",
+      "buildFunction": "DebugBuilder"
+    }
+  ]
+}
