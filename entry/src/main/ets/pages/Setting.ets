@@ -25,7 +25,7 @@ export default struct Setting {
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_list_card'))
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
@@ -38,7 +38,7 @@ export default struct Setting {
               })
             })
           }
-          .backgroundColor($r('sys.color.comp_background_list_card'))
+          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
         }
@@ -71,7 +71,7 @@ export default struct Setting {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -86,8 +86,8 @@ export default struct Setting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Text('第三方共享信息清单')
@@ -103,7 +103,7 @@ export default struct Setting {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -118,8 +118,8 @@ export default struct Setting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Text('已收集个人信息清单')
@@ -135,7 +135,7 @@ export default struct Setting {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -150,8 +150,8 @@ export default struct Setting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Text('隐私声明摘要')
@@ -167,7 +167,7 @@ export default struct Setting {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -180,7 +180,7 @@ export default struct Setting {
                 })
               })
             }
-            .backgroundColor($r('sys.color.comp_background_primary'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -215,7 +215,7 @@ export default struct Setting {
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_list_card'))
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
@@ -230,8 +230,8 @@ export default struct Setting {
 
             Divider()
               .padding({
-                left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                right: $r('sys.float.ohos_id_corner_radius_default_l')
+                left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                right: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Row() {
               Text('服务协议与规则')
@@ -247,7 +247,7 @@ export default struct Setting {
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_list_card'))
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
@@ -260,7 +260,7 @@ export default struct Setting {
               })
             })
           }
-          .backgroundColor($r('sys.color.comp_background_list_card'))
+          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
         }

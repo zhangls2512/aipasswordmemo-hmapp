@@ -1,0 +1,17 @@
+-enable-property-obfuscation
+-enable-string-property-obfuscation
+-enable-toplevel-obfuscation
+-enable-export-obfuscation
+-enable-filename-obfuscation
+-compact
+-remove-comments
+-remove-log
+-print-namecache
+-apply-namecache
+-keep-file-name
+src/main/ets/pages/Notice.ets
+src/main/ets/pages/Faultlog.ets
+src/main/ets/pages/Debug.ets
+src/main/ets/pages/About.ets
+src/main/ets/pages/ReportQoe.ets
+src/main/ets/pages/License.ets

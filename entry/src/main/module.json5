@@ -32,6 +32,28 @@
         "startWindowBackground": "$color:start_window_background"
       }
     ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.GET_NETWORK_INFO",
+        "reason": "$string:GET_NETWORK_INFO_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_INFO",
+        "reason": "$string:GET_WIFI_INFO_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      }
+    ],
     "routerMap": "$profile:router_map"
   }
 }

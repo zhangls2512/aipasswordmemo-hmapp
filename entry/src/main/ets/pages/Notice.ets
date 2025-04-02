@@ -10,7 +10,7 @@ export function NoticeBuilder() {
 
 @ComponentV2
 export struct Notice {
-  @Local titlebar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
+  @Local titleBar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
   context = getContext(this) as common.UIAbilityContext
 
   build() {
@@ -32,7 +32,7 @@ export struct Notice {
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_list_card'))
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
@@ -43,7 +43,7 @@ export struct Notice {
               notificationManager.openNotificationSettings(this.context)
             })
           }
-          .backgroundColor($r('sys.color.comp_background_list_card'))
+          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
         }
@@ -59,10 +59,10 @@ export struct Notice {
     .backgroundColor($r('app.color.sheet_background'))
     .title('消息通知')
     .onWillAppear(() => {
-      this.titlebar.hide = true
+      this.titleBar.hide = true
     })
     .onWillDisappear(() => {
-      this.titlebar.hide = false
+      this.titleBar.hide = false
     })
   }
 }

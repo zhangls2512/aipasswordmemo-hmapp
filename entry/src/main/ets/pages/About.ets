@@ -11,10 +11,10 @@ export function AboutBuilder() {
 
 @ComponentV2
 export struct About {
-  context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
   @Local hasUpdate: number = -1
   @Local updateLoading: boolean = false
+  context = getContext(this) as common.UIAbilityContext
+  pageInfos: NavPathStack = new NavPathStack()
 
   build() {
     NavDestination() {
@@ -85,7 +85,7 @@ export struct About {
                     })
                 }
                 if (this.hasUpdate === 1) {
-                  Text('存在新版本')
+                  Text('有新版本')
                     .fontColor($r('sys.color.font_emphasize'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
@@ -107,7 +107,7 @@ export struct About {
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_list_card'))
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
@@ -132,15 +132,15 @@ export struct About {
                 this.updateLoading = false
                 this.hasUpdate = -1
                 promptAction.showToast({
-                  message: '发生异常，错误码：' + err.code + '，错误信息：' + err.message
+                  message: '检测错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
               }
             })
 
             Divider()
               .padding({
-                left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                right: $r('sys.float.ohos_id_corner_radius_default_l')
+                left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                right: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Row() {
               Column() {
@@ -166,7 +166,7 @@ export struct About {
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_list_card'))
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
@@ -180,8 +180,68 @@ export struct About {
                 }
               })
             })
+
+            Divider()
+              .padding({
+                left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                right: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Row() {
+              Text('应用详情')
+                .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                .fontWeight('medium')
+              Blank()
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
+            }
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
+            .width('100%')
+            .onClick(() => {
+              this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo')
+            })
+
+            Divider()
+              .padding({
+                left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                right: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Row() {
+              Text('评论应用')
+                .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                .fontWeight('medium')
+              Blank()
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
+            }
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
+            .width('100%')
+            .onClick(() => {
+              this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+            })
           }
-          .backgroundColor($r('sys.color.comp_background_list_card'))
+          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
         }
@@ -201,9 +261,19 @@ export struct About {
               })
             Column() {
               Row() {
-                Text('在线')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
+                Column() {
+                  Text('在线')
+                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                    .fontWeight('medium')
+                  Text('https://chatbot.weixin.qq.com/webapp/5e2JglFAERGl06z0FkTK6eWL6D1Oa5?robotName=轩铭2512产品客服')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                }
+                .alignItems(HorizontalAlign.Start)
+
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -214,7 +284,7 @@ export struct About {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -232,8 +302,8 @@ export struct About {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Column() {
@@ -259,7 +329,7 @@ export struct About {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -272,8 +342,8 @@ export struct About {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Column() {
@@ -299,7 +369,7 @@ export struct About {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -317,8 +387,8 @@ export struct About {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Column() {
@@ -344,7 +414,7 @@ export struct About {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -352,9 +422,9 @@ export struct About {
               })
               .width('100%')
               .onClick(async () => {
-                let pasteData: pasteboard.PasteData =
+                const pasteData: pasteboard.PasteData =
                   pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, 'gerenyinsi_z07x17m')
-                let systemPasteBoard: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard()
+                const systemPasteBoard: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard()
                 await systemPasteBoard.setData(pasteData)
                 promptAction.showToast({
                   message: '内容已复制到剪贴板'
@@ -363,8 +433,8 @@ export struct About {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Column() {
@@ -390,7 +460,7 @@ export struct About {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -405,7 +475,7 @@ export struct About {
                 })
               })
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -450,7 +520,7 @@ export struct About {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -467,8 +537,8 @@ export struct About {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Column() {
@@ -494,7 +564,7 @@ export struct About {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -511,8 +581,8 @@ export struct About {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Column() {
@@ -538,7 +608,7 @@ export struct About {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_list_card'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
@@ -553,7 +623,7 @@ export struct About {
                 })
               })
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }

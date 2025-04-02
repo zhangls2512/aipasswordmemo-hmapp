@@ -19,6 +19,16 @@
       "name": "Debug",
       "pageSourceFile": "src/main/ets/pages/Debug.ets",
       "buildFunction": "DebugBuilder"
+    },
+    {
+      "name": "Faultlog",
+      "pageSourceFile": "src/main/ets/pages/Faultlog.ets",
+      "buildFunction": "FaultlogBuilder"
+    },
+    {
+      "name": "ReportQoe",
+      "pageSourceFile": "src/main/ets/pages/ReportQoe.ets",
+      "buildFunction": "ReportQoeBuilder"
     }
   ]
 }

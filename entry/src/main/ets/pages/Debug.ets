@@ -1,16 +1,30 @@
+import { common } from '@kit.AbilityKit'
 import { accessibility } from '@kit.AccessibilityKit'
-import { display, window } from '@kit.ArkUI'
+import { preferences } from '@kit.ArkData'
+import { display, promptAction, window } from '@kit.ArkUI'
 import { batteryInfo, deviceInfo, power, systemLoad, thermal } from '@kit.BasicServicesKit'
+import { wifiManager } from '@kit.ConnectivityKit'
+import { storageStatistics } from '@kit.CoreFileKit'
+import { connection } from '@kit.NetworkKit'
 import { atomicService } from '@kit.ScenarioFusionKit'
+import { data } from '@kit.TelephonyKit'
 
-interface DeviceInfoElement {
+interface InfoElement {
   name: string
   value: string
 }
 
-interface SystemInfoElement {
+interface UndefinedInfoElement {
   name: string
   value: string | undefined
+}
+
+function decimalToDottedIP(decimalIP: number): string {
+  const part1 = (decimalIP >>> 24) & 0xFF
+  const part2 = (decimalIP >>> 16) & 0xFF
+  const part3 = (decimalIP >>> 8) & 0xFF
+  const part4 = decimalIP & 0xFF
+  return `${part1}.${part2}.${part3}.${part4}`
 }
 
 @Builder
@@ -20,7 +34,15 @@ export function DebugBuilder() {
 
 @ComponentV2
 export struct Debug {
-  deviceInfoArray: DeviceInfoElement[] = [
+  @Local globalErrorShowTypeIndex: number = 0
+  @Local globalErrorShowTypeValue: string = 'Toast'
+  context = getContext(this) as common.UIAbilityContext
+  pageInfos: NavPathStack = new NavPathStack()
+  debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'debugSetting'
+  })
+  deviceInfoArray: InfoElement[] = [
+    { name: '设备类型', value: deviceInfo.deviceType },
     { name: '设备厂家名称', value: deviceInfo.manufacture },
     { name: '设备品牌名称', value: deviceInfo.brand },
     { name: '外部产品系列', value: deviceInfo.marketName },
@@ -34,7 +56,7 @@ export struct Debug {
     { name: '安全补丁级别', value: deviceInfo.securityPatchTag },
     { name: '产品版本', value: deviceInfo.displayVersion },
     { name: '差异版本号', value: deviceInfo.incrementalVersion },
-    { name: '系统的发布类型', value: deviceInfo.osReleaseType },
+    { name: '系统发布类型', value: deviceInfo.osReleaseType },
     { name: '系统版本', value: deviceInfo.osFullName },
     { name: 'Major 版本号', value: String(deviceInfo.majorVersion) },
     { name: 'Senior 版本号', value: String(deviceInfo.seniorVersion) },
@@ -73,40 +95,282 @@ export struct Debug {
     'windowWidth',
     'windowHeight'
   ]
-  systemInfoArray: SystemInfoElement[] = [
+  systemInfoArray: UndefinedInfoElement[] = [
+    { name: '设备品牌名称', value: atomicService.getSystemInfoSync(this.stateArray).brand },
     { name: '设备类型', value: atomicService.getSystemInfoSync(this.stateArray).deviceModel },
-    { name: '屏幕的宽度', value: String(atomicService.getSystemInfoSync(this.stateArray).screenWidth) + ' px' },
-    { name: '屏幕的高度', value: String(atomicService.getSystemInfoSync(this.stateArray).screenHeight) + ' px' },
-    { name: '状态栏的高度', value: String(atomicService.getSystemInfoSync(this.stateArray).statusBarHeight) + ' px' },
+    { name: '屏幕宽度', value: String(atomicService.getSystemInfoSync(this.stateArray).screenWidth) + ' px' },
+    { name: '屏幕高度', value: String(atomicService.getSystemInfoSync(this.stateArray).screenHeight) + ' px' },
+    { name: '状态栏高度', value: String(atomicService.getSystemInfoSync(this.stateArray).statusBarHeight) + ' px' },
     { name: '系统语言', value: atomicService.getSystemInfoSync(this.stateArray).language },
     { name: '系统版本', value: atomicService.getSystemInfoSync(this.stateArray).osFullName },
-    { name: '显示设备逻辑像素的密度', value: String(atomicService.getSystemInfoSync(this.stateArray).fontSizeSetting) },
+    { name: '显示设备逻辑像素密度', value: String(atomicService.getSystemInfoSync(this.stateArray).fontSizeSetting) },
     { name: '系统软件 API 版本', value: String(atomicService.getSystemInfoSync(this.stateArray).sdkApiVersion) },
     {
       name: '蓝牙系统开关',
       value: atomicService.getSystemInfoSync(this.stateArray).bluetoothEnabled ? '开启' : '关闭'
     },
     {
-      name: '地理位置的系统开关',
+      name: '地理位置系统开关',
       value: atomicService.getSystemInfoSync(this.stateArray).locationEnabled ? '开启' : '关闭'
     },
-    { name: 'Wi-Fi 的系统开关', value: atomicService.getSystemInfoSync(this.stateArray).wifiEnabled ? '开启' : '关闭' },
+    { name: 'Wi-Fi 系统开关', value: atomicService.getSystemInfoSync(this.stateArray).wifiEnabled ? '开启' : '关闭' },
     { name: '设备方向', value: atomicService.getSystemInfoSync(this.stateArray).deviceOrientation },
     {
-      name: '深浅色模式',
+      name: '系统主题',
       value: atomicService.getSystemInfoSync(this.stateArray).theme === -1 ? '未设置' :
-        atomicService.getSystemInfoSync(this.stateArray).theme === 0 ? '深色模式' :
-          atomicService.getSystemInfoSync(this.stateArray).theme === 1 ? '浅色模式' :
+        atomicService.getSystemInfoSync(this.stateArray).theme === 0 ? '浅色模式' :
+          atomicService.getSystemInfoSync(this.stateArray).theme === 1 ? '深色模式' :
             'undefined'
     },
     { name: '可使用窗口宽度', value: String(atomicService.getSystemInfoSync(this.stateArray).windowWidth) + ' px' },
     { name: '可使用窗口高度', value: String(atomicService.getSystemInfoSync(this.stateArray).windowHeight) + ' px' }
   ]
+  displayInfoArray: InfoElement[] = [
+    { name: 'id 号', value: String(display.getDefaultDisplaySync().id) },
+    { name: '名称', value: display.getDefaultDisplaySync().name },
+    { name: '是否启用', value: display.getDefaultDisplaySync().alive ? '是' : '否' },
+    {
+      name: '状态',
+      value: display.getDefaultDisplaySync().state === 0 ? '未知' :
+        display.getDefaultDisplaySync().state === 1 ? '关闭' :
+          display.getDefaultDisplaySync().state === 2 ? '开启' :
+            display.getDefaultDisplaySync().state === 3 ? '低点耗模式' :
+              display.getDefaultDisplaySync().state === 4 ? '睡眠模式' :
+                display.getDefaultDisplaySync().state === 5 ? 'VR 模式' :
+                  display.getDefaultDisplaySync().state === 6 ? '开启，CPU 为挂起' :
+                    'undefined'
+    },
+    { name: '刷新率', value: String(display.getDefaultDisplaySync().refreshRate) + ' Hz' },
+    {
+      name: '顺时针旋转角度',
+      value: display.getDefaultDisplaySync().rotation === 0 ? '0°' :
+        display.getDefaultDisplaySync().rotation === 1 ? '90°' :
+          display.getDefaultDisplaySync().rotation === 2 ? '180°' :
+            display.getDefaultDisplaySync().rotation === 3 ? '270°' :
+              'undefined'
+    },
+    { name: '宽度', value: String(display.getDefaultDisplaySync().width) + ' px' },
+    { name: '高度', value: String(display.getDefaultDisplaySync().height) + ' px' },
+    { name: '物理像素密度', value: String(display.getDefaultDisplaySync().densityDPI) + ' px' },
+    {
+      name: '显示方向',
+      value: display.getDefaultDisplaySync().orientation === 0 ? '竖屏' :
+        display.getDefaultDisplaySync().orientation === 1 ? '横屏' :
+          display.getDefaultDisplaySync().orientation === 2 ? '反向竖屏' :
+            display.getDefaultDisplaySync().orientation === 3 ? '反向横屏' :
+              'undefined'
+    },
+    { name: '逻辑像素密度', value: String(display.getDefaultDisplaySync().densityPixels) },
+    { name: '显示字体缩放因子', value: String(display.getDefaultDisplaySync().scaledDensity) },
+    { name: 'x 方向中每英寸屏幕的确切物理像素值', value: String(display.getDefaultDisplaySync().xDPI) },
+    { name: 'y 方向中每英寸屏幕的确切物理像素值', value: String(display.getDefaultDisplaySync().yDPI) },
+    { name: '可用区域宽度', value: String(display.getDefaultDisplaySync().availableWidth) + ' px' },
+    { name: '可用区域高度', value: String(display.getDefaultDisplaySync().availableHeight) + ' px' },
+    { name: '设备是否可折叠', value: display.isFoldable() ? '是' : '否' },
+    { name: '是否正在截屏、投屏、录屏', value: display.isCaptured() ? '是' : '否' }
+  ]
+  windowClass: window.Window | undefined = undefined
+  windowInfoArray: UndefinedInfoElement[] = []
+  batteryInfoArray: InfoElement[] = [
+    { name: '剩余电池电量百分比', value: String(batteryInfo.batterySOC) + '%' },
+    {
+      name: '电池充电状态',
+      value: batteryInfo.chargingStatus === 0 ? '未知' :
+        batteryInfo.chargingStatus === 1 ? '使能' :
+          batteryInfo.chargingStatus === 2 ? '停止' :
+            batteryInfo.chargingStatus === 3 ? '充满' :
+              'undefined'
+    },
+    {
+      name: '电池健康状态',
+      value: batteryInfo.healthStatus === 0 ? '未知' :
+        batteryInfo.healthStatus === 1 ? '正常' :
+          batteryInfo.healthStatus === 2 ? '过热' :
+            batteryInfo.healthStatus === 3 ? '过压' :
+              batteryInfo.healthStatus === 4 ? '低温' :
+                batteryInfo.healthStatus === 5 ? '僵死' :
+                  'undefined'
+    },
+    {
+      name: '连接的充电器类型',
+      value: batteryInfo.pluggedType === 0 ? '未知' :
+        batteryInfo.pluggedType === 1 ? '交流' :
+          batteryInfo.pluggedType === 2 ? 'USB' :
+            batteryInfo.pluggedType === 3 ? '无线' :
+              'undefined'
+    },
+    { name: '电池电压', value: String(batteryInfo.voltage) + ' μV' },
+    { name: '电池技术型号', value: batteryInfo.technology },
+    { name: '电池温度', value: String((batteryInfo.batteryTemperature) / 10) + ' °C' },
+    { name: '是否支持电池或者电池是否在位', value: batteryInfo.isBatteryPresent ? '是' : '否' },
+    {
+      name: '电池电量等级',
+      value: batteryInfo.batteryCapacityLevel === 1 ? '满' :
+        batteryInfo.batteryCapacityLevel === 2 ? '高' :
+          batteryInfo.batteryCapacityLevel === 3 ? '正常' :
+            batteryInfo.batteryCapacityLevel === 4 ? '低' :
+              batteryInfo.batteryCapacityLevel === 5 ? '告警' :
+                batteryInfo.batteryCapacityLevel === 6 ? '极低' :
+                  batteryInfo.batteryCapacityLevel === 7 ? '关机' :
+                    'undefined'
+    },
+    { name: '电池电流', value: String(batteryInfo.nowCurrent) + ' mA' }
+  ]
   @Local systemLoadValue: number = -1
+  networkInfoArray: UndefinedInfoElement[] = [
+    { name: '数据网络句柄', value: String(connection.getDefaultNetSync().netId) },
+    { name: '当前网络上的数据流量使用是否被计量', value: connection.isDefaultNetMeteredSync() ? '是' : '否' },
+    { name: '默认数据网络是否被激活', value: connection.hasDefaultNetSync() ? '是' : '否' },
+    { name: 'WLAN 开关是否已使能', value: wifiManager.isWifiActive() ? '是' : '否' },
+    { name: 'WLAN 是否已连接', value: wifiManager.isConnected() ? '是' : '否' },
+    { name: 'IPV4 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().ipAddress) },
+    { name: 'IPV4 网关', value: decimalToDottedIP(wifiManager.getIpInfo().gateway) },
+    { name: 'IPV4 掩码', value: decimalToDottedIP(wifiManager.getIpInfo().netmask) },
+    { name: 'IPV4 主 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().primaryDns) },
+    { name: 'IPV4 备 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().secondDns) },
+    { name: 'IPV4 DHCP 服务端 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().serverIp) },
+    { name: 'IPV4 IP 地址租用时长', value: String(wifiManager.getIpInfo().leaseDuration) + ' s' },
+    { name: '链路 Ipv6 地址', value: wifiManager.getIpv6Info().linkIpv6Address },
+    { name: '全局 Ipv6 地址', value: wifiManager.getIpv6Info().globalIpv6Address },
+    { name: '唯一本地 Ipv6 地址', value: wifiManager.getIpv6Info().uniqueIpv6Address },
+    { name: '随机唯一本地 Ipv6 地址', value: wifiManager.getIpv6Info().randomUniqueIpv6Address },
+    { name: '网关', value: wifiManager.getIpv6Info().gateway },
+    { name: '网络掩码', value: wifiManager.getIpv6Info().netmask },
+    { name: '主 DNS 服务器 Ipv6 地址', value: wifiManager.getIpv6Info().primaryDNS },
+    { name: '备 DNS 服务器 Ipv6 地址', value: wifiManager.getIpv6Info().secondDNS },
+    { name: '国家码', value: wifiManager.getCountryCode() },
+    { name: '热点是否已使能', value: wifiManager.isHotspotActive() ? '是' : '否' },
+    { name: '蜂窝数据业务是否启用', value: data.isCellularDataEnabledSync() ? '是' : '否' }
+  ]
+  storageStatisticsInfoArray: InfoElement[] = [
+    { name: '系统总', value: String(storageStatistics.getTotalSizeSync()) + ' B' },
+    { name: '系统空闲', value: String(storageStatistics.getFreeSizeSync()) + ' B' },
+  ]
 
   build() {
     NavDestination() {
       List() {
+        ListItem() {
+          Column() {
+            Text('异常')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              Row() {
+                Text('全局异常展示方式')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Select([
+                  { value: 'Toast' },
+                  { value: 'Dialog' }
+                ])
+                  .selected($$this.globalErrorShowTypeIndex)
+                  .value($$this.globalErrorShowTypeValue)
+                  .onSelect((index: number) => {
+                    this.debugSettingDataPreferences.putSync('globalErrorShowType', index)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('故障日志')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Faultlog'
+                })
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('网络')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              Row() {
+                Text('反馈传输体验')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'ReportQoe'
+                })
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
         ListItem() {
           Column() {
             Text('设备信息')
@@ -118,30 +382,15 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              Row() {
-                Text('设备类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('35%')
-                Blank()
-                  .width('5%')
-                Text(deviceInfo.deviceType)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('60%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              ForEach(this.deviceInfoArray, (item: DeviceInfoElement) => {
+              ForEach(this.deviceInfoArray, (item: InfoElement, index: number) => {
                 if (item.value) {
-                  Divider()
-                    .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_l')
-                    })
+                  if (index !== 0 && this.deviceInfoArray[0].value) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
                   Row() {
                     Text(item.name)
                       .fontSize($r('sys.float.ohos_id_text_size_body1'))
@@ -161,7 +410,7 @@ export struct Debug {
                 }
               })
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -182,30 +431,15 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              Row() {
-                Text('设备类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('35%')
-                Blank()
-                  .width('5%')
-                Text(atomicService.getSystemInfoSync(this.stateArray).brand)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('60%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              ForEach(this.systemInfoArray, (item: SystemInfoElement) => {
+              ForEach(this.systemInfoArray, (item: UndefinedInfoElement, index: number) => {
                 if (item.value) {
-                  Divider()
-                    .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_l')
-                    })
+                  if (index !== 0 && this.systemInfoArray[0].value) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
                   Row() {
                     Text(item.name)
                       .fontSize($r('sys.float.ohos_id_text_size_body1'))
@@ -225,7 +459,7 @@ export struct Debug {
                 }
               })
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -246,416 +480,84 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              Row() {
-                Text('id 号')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().id))
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('名称')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(display.getDefaultDisplaySync().name)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('是否启用')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(display.getDefaultDisplaySync().alive ? '是' : '否')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('状态')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(display.getDefaultDisplaySync().state === 0 ? '未知' :
-                  display.getDefaultDisplaySync().state === 1 ? '关闭' :
-                    display.getDefaultDisplaySync().state === 2 ? '开启' :
-                      display.getDefaultDisplaySync().state === 3 ? '低点耗模式' :
-                        display.getDefaultDisplaySync().state === 4 ? '睡眠模式' :
-                          display.getDefaultDisplaySync().state === 5 ? 'VR 模式' :
-                            display.getDefaultDisplaySync().state === 6 ? '开启，CPU 为挂起' :
-                              'undefined'
-                )
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('刷新率')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().refreshRate) + ' Hz')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('屏幕顺时针旋转角度')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(display.getDefaultDisplaySync().rotation === 0 ? '屏幕顺时针旋转 0°' :
-                  display.getDefaultDisplaySync().rotation === 1 ? '屏幕顺时针旋转 90°' :
-                    display.getDefaultDisplaySync().rotation === 2 ? '屏幕顺时针旋转 180°' :
-                      display.getDefaultDisplaySync().rotation === 3 ? '屏幕顺时针旋转 270°' :
-                        'undefined'
-                )
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('屏幕宽度')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().width) + ' px')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('屏幕高度')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().height) + ' px')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('屏幕的物理像素密度')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().densityDPI) + ' px')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('屏幕当前显示的方向')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(display.getDefaultDisplaySync().orientation === 0 ? '竖屏' :
-                  display.getDefaultDisplaySync().orientation === 1 ? '横屏' :
-                    display.getDefaultDisplaySync().orientation === 2 ? '反向竖屏' :
-                      display.getDefaultDisplaySync().orientation === 3 ? '反向横屏' :
-                        'undefined'
-                )
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('逻辑像素的密度')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().densityPixels))
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('显示字体的缩放因子')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().scaledDensity))
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('x 方向中每英寸屏幕的确切物理像素值')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().xDPI))
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('y 方向中每英寸屏幕的确切物理像素值')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().yDPI))
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('屏幕的可用区域宽度')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().availableWidth) + ' px')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('屏幕的可用区域高度')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(display.getDefaultDisplaySync().availableHeight) + ' px')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('设备是否可折叠')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(display.isFoldable() ? '是' : '否')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('是否正在截屏、投屏、录屏')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(display.isCaptured() ? '是' : '否')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
+              ForEach(this.displayInfoArray, (item: InfoElement, index: number) => {
+                if (item.value) {
+                  if (index !== 0 && this.displayInfoArray[0].value) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('窗口信息')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              ForEach(this.windowInfoArray, (item: UndefinedInfoElement, index: number) => {
+                if (item.value) {
+                  if (index !== 0 && this.windowInfoArray[0].value) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -676,251 +578,35 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              Row() {
-                Text('剩余电池电量百分比')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(batteryInfo.batterySOC))
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('电池的充电状态')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(
-                  batteryInfo.chargingStatus === 0 ? '未知' :
-                    batteryInfo.chargingStatus === 1 ? '使能' :
-                      batteryInfo.chargingStatus === 2 ? '停止' :
-                        batteryInfo.chargingStatus === 3 ? '充满' :
-                          'undefined'
-                )
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('电池的健康状态')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(
-                  batteryInfo.healthStatus === 0 ? '未知' :
-                    batteryInfo.healthStatus === 1 ? '正常' :
-                      batteryInfo.healthStatus === 2 ? '过热' :
-                        batteryInfo.healthStatus === 3 ? '过压' :
-                          batteryInfo.healthStatus === 4 ? '低温' :
-                            batteryInfo.healthStatus === 5 ? '僵死' :
-                              'undefined'
-                )
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('连接的充电器类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(
-                  batteryInfo.pluggedType === 0 ? '未知' :
-                    batteryInfo.pluggedType === 1 ? '交流' :
-                      batteryInfo.pluggedType === 2 ? 'USB' :
-                        batteryInfo.pluggedType === 3 ? '无线' :
-                          'undefined'
-                )
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('电池的电压')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(batteryInfo.voltage) + ' μV')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('电池的技术型号')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(batteryInfo.technology)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('电池的温度')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String((batteryInfo.batteryTemperature) / 10) + ' °C')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('是否支持电池或者电池是否在位')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(batteryInfo.isBatteryPresent ? '是' : '否')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('电池电量的等级')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(
-                  batteryInfo.batteryCapacityLevel === 1 ? '满' :
-                    batteryInfo.batteryCapacityLevel === 2 ? '高' :
-                      batteryInfo.batteryCapacityLevel === 3 ? '正常' :
-                        batteryInfo.batteryCapacityLevel === 4 ? '低' :
-                          batteryInfo.batteryCapacityLevel === 5 ? '告警' :
-                            batteryInfo.batteryCapacityLevel === 6 ? '极低' :
-                              batteryInfo.batteryCapacityLevel === 7 ? '关机' :
-                                'undefined'
-                )
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
-                })
-              Row() {
-                Text('电池的电流')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(batteryInfo.nowCurrent) + ' mA')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
+              ForEach(this.batteryInfoArray, (item: InfoElement, index: number) => {
+                if (item.value) {
+                  if (index !== 0 && this.batteryInfoArray[0].value) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -960,8 +646,8 @@ export struct Debug {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Text('是否进入待机低功耗续航模式')
@@ -982,8 +668,8 @@ export struct Debug {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Text('电源模式')
@@ -1008,7 +694,7 @@ export struct Debug {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .width('100%')
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -1056,7 +742,7 @@ export struct Debug {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .width('100%')
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -1107,7 +793,56 @@ export struct Debug {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .width('100%')
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('网络信息')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              ForEach(this.networkInfoArray, (item: UndefinedInfoElement, index: number) => {
+                if (item.value) {
+                  if (index !== 0 && this.networkInfoArray[0].value) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -1147,8 +882,8 @@ export struct Debug {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_l'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_l')
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
                 Text('触摸浏览模式')
@@ -1167,7 +902,56 @@ export struct Debug {
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .width('100%')
             }
-            .backgroundColor($r('sys.color.comp_background_list_card'))
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('存储空间信息')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              ForEach(this.storageStatisticsInfoArray, (item: InfoElement, index: number) => {
+                if (item.value) {
+                  if (index !== 0 && this.storageStatisticsInfoArray[0].value) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
@@ -1185,9 +969,392 @@ export struct Debug {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('调试')
-    .onShown(() => {
+    .onReady(async (context: NavDestinationContext) => {
+      this.pageInfos = context.pathStack
+      const globalErrorShowType: preferences.ValueType =
+        this.debugSettingDataPreferences.getSync('globalErrorShowType', 0)
+      this.globalErrorShowTypeIndex = globalErrorShowType as number
+      if (globalErrorShowType === 1) {
+        this.globalErrorShowTypeValue = 'Dialog'
+      }
+      const lastWindow = await window.getLastWindow(this.context)
+      this.windowClass = lastWindow
+      this.windowInfoArray = this.windowInfoArray.concat([
+        { name: '尺寸左边界', value: String(this.windowClass?.getWindowProperties().windowRect.left) + ' px' },
+        { name: '尺寸上边界', value: String(this.windowClass?.getWindowProperties().windowRect.top) + ' px' },
+        { name: '尺寸宽度', value: String(this.windowClass?.getWindowProperties().windowRect.width) + ' px' },
+        { name: '尺寸高度', value: String(this.windowClass?.getWindowProperties().windowRect.height) + ' px' },
+        {
+          name: '可绘制区域尺寸左边界',
+          value: String(this.windowClass?.getWindowProperties().drawableRect.left) + ' px'
+        },
+        {
+          name: '可绘制区域尺寸上边界',
+          value: String(this.windowClass?.getWindowProperties().drawableRect.top) + ' px'
+        },
+        {
+          name: '可绘制区域尺寸宽度',
+          value: String(this.windowClass?.getWindowProperties().drawableRect.width) + ' px'
+        },
+        {
+          name: '可绘制区域尺寸高度',
+          value: String(this.windowClass?.getWindowProperties().drawableRect.height) + ' px'
+        },
+        {
+          name: '类型',
+          value: this.windowClass?.getWindowProperties().type === 0 ? '应用子窗口' :
+            this.windowClass?.getWindowProperties().type === 1 ? '系统告警窗口' :
+              this.windowClass?.getWindowProperties().type === 8 ? '悬浮窗' :
+                this.windowClass?.getWindowProperties().type === 16 ? '模态窗口' :
+                  'undefined'
+        },
+        { name: '是否全屏', value: this.windowClass?.getWindowProperties().isFullScreen ? '是' : '否' },
+        { name: '是否为沉浸式', value: this.windowClass?.getWindowProperties().isLayoutFullScreen ? '是' : '否' },
+        { name: '是否可聚焦', value: this.windowClass?.getWindowProperties().focusable ? '是' : '否' },
+        { name: '是否可触摸', value: this.windowClass?.getWindowProperties().touchable ? '是' : '否' },
+        { name: '屏幕亮度', value: String(this.windowClass?.getWindowProperties().brightness) },
+        { name: '屏幕是否常亮', value: this.windowClass?.getWindowProperties().isKeepScreenOn ? '是' : '否' },
+        { name: '隐私模式', value: this.windowClass?.getWindowProperties().isPrivacyMode ? '开启' : '关闭' },
+        { name: '是否透明', value: this.windowClass?.getWindowProperties().isTransparent ? '是' : '否' },
+        { name: 'ID', value: String(this.windowClass?.getWindowProperties().id) },
+        { name: '所在屏幕 ID', value: String(this.windowClass?.getWindowProperties().displayId) },
+        {
+          name: '所在屏幕的系统显示大小缩放系数',
+          value: String(this.windowClass?.getWindowDensityInfo().systemDensity)
+        },
+        {
+          name: '所在屏幕的系统默认显示大小缩放系数',
+          value: String(this.windowClass?.getWindowDensityInfo().defaultDensity)
+        },
+        { name: '自定义设置的显示大小缩放系数', value: String(this.windowClass?.getWindowDensityInfo().customDensity) },
+        {
+          name: '在屏幕上的真实显示区域距离屏幕左上角的 x 坐标',
+          value: String(this.windowClass?.getGlobalRect().left) + ' px'
+        },
+        {
+          name: '在屏幕上的真实显示区域距离屏幕左上角的 y 坐标',
+          value: String(this.windowClass?.getGlobalRect().top) + ' px'
+        },
+        {
+          name: '在屏幕上的真实显示区域宽度',
+          value: String(this.windowClass?.getGlobalRect().width) + ' px'
+        },
+        {
+          name: '在屏幕上的真实显示区域高度',
+          value: String(this.windowClass?.getGlobalRect().height) + ' px'
+        },
+        {
+          name: '系统默认内容规避区域是否可见',
+          value: this.windowClass?.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).visible ? '是' : '否'
+        },
+        {
+          name: '是否已经开启沉浸式布局',
+          value: this.windowClass?.getImmersiveModeEnabledState() ? '是' : '否'
+        },
+        {
+          name: '状态栏背景颜色',
+          value: this.windowClass?.getWindowSystemBarProperties().statusBarColor
+        },
+        {
+          name: '状态栏图标是否为高亮状态',
+          value: this.windowClass?.getWindowSystemBarProperties().isStatusBarLightIcon ? '是' : '否'
+        },
+        {
+          name: '状态栏文字颜色',
+          value: this.windowClass?.getWindowSystemBarProperties().statusBarContentColor
+        },
+        {
+          name: '导航栏背景颜色',
+          value: this.windowClass?.getWindowSystemBarProperties().navigationBarColor
+        },
+        {
+          name: '导航栏图标是否为高亮状态',
+          value: this.windowClass?.getWindowSystemBarProperties().isNavigationBarLightIcon ? '是' : '否'
+        },
+        {
+          name: '导航栏文字颜色',
+          value: this.windowClass?.getWindowSystemBarProperties().navigationBarContentColor
+        },
+        {
+          name: '是否使能状态栏属性变化时动画效果',
+          value: this.windowClass?.getWindowSystemBarProperties().enableStatusBarAnimation ? '是' : '否'
+        },
+        {
+          name: '是否使能导航栏属性变化时动画效果',
+          value: this.windowClass?.getWindowSystemBarProperties().enableNavigationBarAnimation ? '是' : '否'
+        },
+        {
+          name: '显示方向',
+          value: this.windowClass?.getPreferredOrientation() === 0 ? '未定义方向模式，由系统判定' :
+            this.windowClass?.getPreferredOrientation() === 1 ? '竖屏显示模式' :
+              this.windowClass?.getPreferredOrientation() === 2 ? '横屏显示模式' :
+                this.windowClass?.getPreferredOrientation() === 3 ? '反向竖屏显示模式' :
+                  this.windowClass?.getPreferredOrientation() === 4 ? '反向横屏显示模式' :
+                    this.windowClass?.getPreferredOrientation() === 5 ?
+                      '跟随传感器自动旋转，可以旋转到竖屏、横屏、反向竖屏、反向横屏四个方向' :
+                      this.windowClass?.getPreferredOrientation() === 6 ?
+                        '跟随传感器自动竖向旋转，可以旋转到竖屏、反向竖屏，无法旋转到横屏、反向横屏' :
+                        this.windowClass?.getPreferredOrientation() === 7 ?
+                          '跟随传感器自动横向旋转，可以旋转到横屏、反向横屏，无法旋转到竖屏、反向竖屏' :
+                          this.windowClass?.getPreferredOrientation() === 8 ?
+                            '跟随传感器自动旋转，可以旋转到竖屏、横屏、反向竖屏、反向横屏四个方向，且受控制中心的旋转开关控制' :
+                            this.windowClass?.getPreferredOrientation() === 9 ?
+                              '跟随传感器自动竖向旋转，可以旋转到竖屏、反向竖屏，无法旋转到横屏、反向横屏，且受控制中心的旋转开关控制' :
+                              this.windowClass?.getPreferredOrientation() === 10 ?
+                                '跟随传感器自动横向旋转，可以旋转到横屏、反向横屏，无法旋转到竖屏、反向竖屏，且受控制中心的旋转开关控制' :
+                                this.windowClass?.getPreferredOrientation() === 11 ? '锁定模式' :
+                                  this.windowClass?.getPreferredOrientation() === 12 ?
+                                    '跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定' :
+                                    this.windowClass?.getPreferredOrientation() === 13 ?
+                                      '调用时临时旋转到竖屏，之后跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定' :
+                                      this.windowClass?.getPreferredOrientation() === 14 ?
+                                        '调用时临时旋转到横屏，之后跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定' :
+                                        this.windowClass?.getPreferredOrientation() === 15 ?
+                                          '调用时临时旋转到反向竖屏，之后跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定'
+                                          : this.windowClass?.getPreferredOrientation() === 16 ?
+                                          '调用时临时旋转到反向横屏，之后跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定' :
+                                          this.windowClass?.getPreferredOrientation() === 17 ? '跟随桌面的旋转模式' :
+                                            'undefined'
+        },
+        { name: '是否已显示', value: this.windowClass?.isWindowShowing() ? '是' : '否' },
+        {
+          name: '色域模式',
+          value: this.windowClass?.getWindowColorSpace() === 0 ? '默认 SRGB 色域' :
+            this.windowClass?.getWindowColorSpace() === 1 ? '广色域' :
+              'undefined'
+        },
+        {
+          name: '最大宽度',
+          value: String(this.windowClass?.getWindowLimits().maxWidth) + ' px'
+        },
+        {
+          name: '最大高度',
+          value: String(this.windowClass?.getWindowLimits().maxHeight) + ' px'
+        },
+        {
+          name: '最小宽度',
+          value: String(this.windowClass?.getWindowLimits().minWidth) + ' px'
+        },
+        {
+          name: '最小高度',
+          value: String(this.windowClass?.getWindowLimits().minHeight) + ' px'
+        },
+        {
+          name: '模式',
+          value: this.windowClass?.getWindowStatus() === 0 ? '未定义' :
+            this.windowClass?.getWindowStatus() === 1 ? '全屏' :
+              this.windowClass?.getWindowStatus() === 2 ? '最大化' :
+                this.windowClass?.getWindowStatus() === 3 ? '最小化' :
+                  this.windowClass?.getWindowStatus() === 4 ? '自由悬浮形式' :
+                    this.windowClass?.getWindowStatus() === 5 ?
+                      '分屏' :
+                      'undefined'
+        },
+        { name: '是否已获焦', value: this.windowClass?.isFocused() ? '是' : '否' },
+        { name: '是否禁用返回手势功能', value: this.windowClass?.isGestureBackEnabled() ? '是' : '否' }
+      ])
+      const isWindowSupportWideGamut = await this.windowClass?.isWindowSupportWideGamut()
+      this.windowInfoArray.push({
+        name: '是否支持广色域模式',
+        value: isWindowSupportWideGamut ? '是' : '否'
+      })
       systemLoad.getLevel().then((res: systemLoad.SystemLoadLevel) => {
         this.systemLoadValue = res
+      })
+      try {
+        const connectionProperties = connection.getConnectionPropertiesSync(connection.getDefaultNetSync())
+        this.networkInfoArray.concat([
+          {
+            name: '网卡名称',
+            value: connectionProperties.interfaceName
+          },
+          { name: '域名', value: connectionProperties.domains },
+          {
+            name: '最大传输单元',
+            value: String(connectionProperties.mtu)
+          }
+        ])
+        const netCapabilities = connection.getNetCapabilitiesSync(connection.getDefaultNetSync())
+        this.networkInfoArray.concat([
+          {
+            name: '上行带宽',
+            value: String(netCapabilities.linkUpBandwidthKbps) + ' KB/s'
+          },
+          {
+            name: '下行带宽',
+            value: String(netCapabilities.linkDownBandwidthKbps) + ' KB/s'
+          },
+          {
+            name: '网络类型',
+            value: netCapabilities.bearerTypes.includes(0) ? '蜂窝' :
+              netCapabilities.bearerTypes.includes(1) ? 'Wi-Fi' :
+                netCapabilities.bearerTypes.includes(2) ? '蓝牙' :
+                  netCapabilities.bearerTypes.includes(3) ? '以太网' :
+                    netCapabilities.bearerTypes.includes(4) ? 'VPN' :
+                      'undefined'
+          }
+        ])
+      } catch (err) {
+        promptAction.showToast({
+          message: 'js 运行异常，错误码：' + err.code + '，错误信息：' + err.message
+        })
+      }
+      const wifiLinkedInfo = await wifiManager.getLinkedInfo()
+      this.networkInfoArray.push({
+        name: '热点 SSID',
+        value: wifiLinkedInfo.ssid
+      })
+      this.networkInfoArray.push({
+        name: '热点 BSSID',
+        value: wifiLinkedInfo.bssid
+      })
+      this.networkInfoArray.push({
+        name: '热点信号强度',
+        value: String(wifiLinkedInfo.rssi) + ' dBm'
+      })
+      this.networkInfoArray.push({
+        name: 'WLAN 接入点频段',
+        value: wifiLinkedInfo.band === 1 ? '2.4 GHz' :
+          wifiLinkedInfo.band === 2 ? '5 Ghz' :
+            'undefined'
+      })
+      this.networkInfoArray.push({
+        name: 'WLAN 信号强度',
+        value: String(wifiManager.getSignalLevel(wifiLinkedInfo.rssi, wifiLinkedInfo.band))
+      })
+      this.networkInfoArray.push({
+        name: 'WLAN 接入点上行速度',
+        value: String(wifiLinkedInfo.linkSpeed) + ' Mbps/s'
+      })
+      this.networkInfoArray.push({
+        name: 'WLAN 接入点下行速度',
+        value: String(wifiLinkedInfo.rxLinkSpeed) + ' Mbps/s'
+      })
+      this.networkInfoArray.push({
+        name: '当前支持的最大上行速率',
+        value: String(wifiLinkedInfo.maxSupportedTxLinkSpeed) + ' Mbps/s'
+      })
+      this.networkInfoArray.push({
+        name: '当前支持的最大下行速率',
+        value: String(wifiLinkedInfo.maxSupportedRxLinkSpeed) + ' Mbps/s'
+      })
+      this.networkInfoArray.push({
+        name: 'WLAN 接入点频率',
+        value: String(wifiLinkedInfo.frequency)
+      })
+      this.networkInfoArray.push({
+        name: 'WLAN 接入点是否是隐藏网络',
+        value: wifiLinkedInfo.isHidden ? '是' : '否'
+      })
+      this.networkInfoArray.push({
+        name: 'WLAN 接入点是否限制数据量',
+        value: wifiLinkedInfo.isRestricted ? '是' : '否'
+      })
+      this.networkInfoArray.push({
+        name: 'MAC 地址类型',
+        value: wifiLinkedInfo.macType === 0 ? '随机' :
+          wifiLinkedInfo.macType === 1 ? '设备' :
+            'undefined'
+      })
+      this.networkInfoArray.push({
+        name: 'MAC 地址',
+        value: wifiLinkedInfo.macAddress
+      })
+      this.networkInfoArray.push({
+        name: 'WLAN 连接的 IP 地址',
+        value: decimalToDottedIP(wifiLinkedInfo.ipAddress)
+      })
+      this.networkInfoArray.push({
+        name: 'WLAN 连接状态',
+        value: wifiLinkedInfo.connState === 0 ? '设备正在搜索可用的 AP' :
+          wifiLinkedInfo.connState === 1 ? '正在建立 WLAN 连接' :
+            wifiLinkedInfo.connState === 2 ? 'WLAN 连接正在认证中' :
+              wifiLinkedInfo.connState === 3 ? '正在获取 WLAN 连接的 IP 地址' :
+                wifiLinkedInfo.connState === 4 ? 'WLAN 连接已建立' :
+                  wifiLinkedInfo.connState === 5 ? 'WLAN 连接正在断开' :
+                    wifiLinkedInfo.connState === 6 ? 'WLAN 连接已断开' :
+                      wifiLinkedInfo.connState === 7 ? 'WLAN 连接建立失败' :
+                        'undefined'
+      })
+      this.networkInfoArray.push({
+        name: '当前连接热点的信道带宽',
+        value: wifiLinkedInfo.channelWidth === 0 ? '20 MHz' :
+          wifiLinkedInfo.channelWidth === 1 ? '40 MHz' :
+            wifiLinkedInfo.channelWidth === 2 ? '80 MHz' :
+              wifiLinkedInfo.channelWidth === 3 ? '160 MHz' :
+                wifiLinkedInfo.channelWidth === 4 ? '80 MHz+' :
+                  wifiLinkedInfo.channelWidth === 5 ? '无效值' :
+                    'undefined'
+      })
+      this.networkInfoArray.push({
+        name: '当前连接热点的 Wi-Fi 标准',
+        value: wifiLinkedInfo.wifiStandard === 0 ? '无效' :
+          wifiLinkedInfo.wifiStandard === 1 ? '802.11a' :
+            wifiLinkedInfo.wifiStandard === 2 ? '802.11b' :
+              wifiLinkedInfo.wifiStandard === 3 ? '802.11g' :
+                wifiLinkedInfo.wifiStandard === 4 ? '802.11n' :
+                  wifiLinkedInfo.wifiStandard === 5 ? '802.11ac' :
+                    wifiLinkedInfo.wifiStandard === 6 ? '802.11ax' :
+                      wifiLinkedInfo.wifiStandard === 7 ? '802.11ad' :
+
+                        'undefined'
+      })
+      this.networkInfoArray.push({
+        name: '热点支持的最高 Wi-Fi 级别',
+        value: wifiLinkedInfo.supportedWifiCategory === 1 ? 'Wifi6 以下' :
+          wifiLinkedInfo.supportedWifiCategory === 2 ? 'Wifi6' :
+            wifiLinkedInfo.supportedWifiCategory === 3 ? 'Wifi6+' :
+              wifiLinkedInfo.supportedWifiCategory === 4 ? 'Wifi7' :
+                wifiLinkedInfo.supportedWifiCategory === 5 ? 'Wifi7+' :
+                  'undefined'
+      })
+      this.networkInfoArray.push({
+        name: '热点是否支持 hilink',
+        value: wifiLinkedInfo.isHiLinkNetwork ? '是' : '否'
+      })
+      try {
+        const isMeteredHotspot = wifiManager.isMeteredHotspot()
+        this.networkInfoArray.push({
+          name: '设备当前连接的 Wi-Fi 是否是手机热点',
+          value: isMeteredHotspot ? '是' : '否'
+        })
+      } catch (err) {
+        promptAction.showToast({
+          message: 'js 运行异常，错误码：' + err.code + '，错误信息：' + err.message
+        })
+      }
+      const cellularDataFlowType = await data.getCellularDataFlowType()
+      this.networkInfoArray.push({
+        name: '蜂窝数据业务的上下行状态',
+        value: cellularDataFlowType === 0 ? '没有上行或下行数据' :
+          cellularDataFlowType === 1 ? '只有下行数据' :
+            cellularDataFlowType === 2 ? '只有上行数据' :
+              cellularDataFlowType === 3 ? '有上下行数据' :
+                cellularDataFlowType === 4 ? '没有上下行数据，底层链路处于休眠状态' :
+                  'undefined'
+      })
+      const cellularDataState = await data.getCellularDataState()
+      this.networkInfoArray.push({
+        name: '分组交换域 (PS 域) 的连接状态',
+        value: cellularDataState === -1 ? '未知' :
+          cellularDataState === 0 ? '断开' :
+            cellularDataState === 1 ? '正在连接' :
+              cellularDataState === 2 ? '已连接' :
+                cellularDataState === 3 ? '被挂起' :
+                  'undefined'
+      })
+      const storageStatisticsInfo = await storageStatistics.getCurrentBundleStats()
+      this.storageStatisticsInfoArray.push({
+        name: '应用安装文件',
+        value: String(storageStatisticsInfo.appSize) + ' B'
+      })
+      this.storageStatisticsInfoArray.push({
+        name: '应用缓存文件',
+        value: String(storageStatisticsInfo.cacheSize) + ' B'
+      })
+      this.storageStatisticsInfoArray.push({
+        name: '应用其他文件',
+        value: String(storageStatisticsInfo.dataSize) + ' B'
       })
     })
   }
