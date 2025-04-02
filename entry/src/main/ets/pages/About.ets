@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction } from '@kit.ArkUI'
 import { updateManager } from '@kit.AppGalleryKit'
+import { promptAction } from '@kit.ArkUI'
 import { call } from '@kit.TelephonyKit'
 import pasteboard from '@ohos.pasteboard'
 
