@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
 import { call } from '@kit.TelephonyKit'
-import pasteboard from '@ohos.pasteboard'
+import { copy } from '../common/Pasteboard'
 
 @Builder
 export function AboutBuilder() {
@@ -132,7 +132,7 @@ export struct About {
                 this.updateLoading = false
                 this.hasUpdate = -1
                 promptAction.showToast({
-                  message: '检测错误，错误码：' + err.code + '，错误信息：' + err.message
+                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
               }
             })
@@ -421,14 +421,8 @@ export struct About {
                 }
               })
               .width('100%')
-              .onClick(async () => {
-                const pasteData: pasteboard.PasteData =
-                  pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, 'gerenyinsi_z07x17m')
-                const systemPasteBoard: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard()
-                await systemPasteBoard.setData(pasteData)
-                promptAction.showToast({
-                  message: '内容已复制到剪贴板'
-                })
+              .onClick(() => {
+                copy('gerenyinsi_z07x17m')
               })
 
               Divider()

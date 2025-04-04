@@ -29,6 +29,21 @@
       "name": "ReportQoe",
       "pageSourceFile": "src/main/ets/pages/ReportQoe.ets",
       "buildFunction": "ReportQoeBuilder"
+    },
+    {
+      "name": "Networktest",
+      "pageSourceFile": "src/main/ets/pages/Networktest.ets",
+      "buildFunction": "NetworktestBuilder"
+    },
+    {
+      "name": "Commonsetting",
+      "pageSourceFile": "src/main/ets/pages/Commonsetting.ets",
+      "buildFunction": "CommonsettingBuilder"
+    },
+    {
+      "name": "Moresetting",
+      "pageSourceFile": "src/main/ets/pages/Moresetting.ets",
+      "buildFunction": "MoresettingBuilder"
     }
   ]
 }

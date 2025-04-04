@@ -36,12 +36,15 @@ export struct Faultlog {
               }
             })
         }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
 
         ForEach(this.faultLogArray, (item: FaultLogger.FaultLogInfo) => {
           ListItem() {
             Column() {
               Row() {
-                Text('进程 id')
+                Text('进程 ID')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
@@ -63,7 +66,7 @@ export struct Faultlog {
                   right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
-                Text('用户 id')
+                Text('用户 ID')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')

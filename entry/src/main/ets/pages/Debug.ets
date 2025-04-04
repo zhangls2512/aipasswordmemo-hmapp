@@ -1,22 +1,17 @@
-import { common } from '@kit.AbilityKit'
+import { abilityManager, appManager, common } from '@kit.AbilityKit'
 import { accessibility } from '@kit.AccessibilityKit'
 import { preferences } from '@kit.ArkData'
 import { display, promptAction, window } from '@kit.ArkUI'
-import { batteryInfo, deviceInfo, power, systemLoad, thermal } from '@kit.BasicServicesKit'
+import { batteryInfo, BusinessError, deviceInfo, power, systemLoad, thermal } from '@kit.BasicServicesKit'
 import { wifiManager } from '@kit.ConnectivityKit'
 import { storageStatistics } from '@kit.CoreFileKit'
 import { connection } from '@kit.NetworkKit'
 import { atomicService } from '@kit.ScenarioFusionKit'
 import { data } from '@kit.TelephonyKit'
 
-interface InfoElement {
+interface Element {
   name: string
   value: string
-}
-
-interface UndefinedInfoElement {
-  name: string
-  value: string | undefined
 }
 
 function decimalToDottedIP(decimalIP: number): string {
@@ -34,14 +29,385 @@ export function DebugBuilder() {
 
 @ComponentV2
 export struct Debug {
-  @Local globalErrorShowTypeIndex: number = 0
-  @Local globalErrorShowTypeValue: string = 'Toast'
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
-  debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'debugSetting'
-  })
-  deviceInfoArray: InfoElement[] = [
+  appInfoArray: Element[] = [
+    {
+      name: 'Ability 状态',
+      value: abilityManager.AbilityState.INITIAL ? '初始化' :
+        abilityManager.AbilityState.FOCUS ? '获焦' :
+          abilityManager.AbilityState.FOREGROUND ? '前台' :
+            abilityManager.AbilityState.BACKGROUND ? '后台' :
+              abilityManager.AbilityState.FOREGROUNDING ? '前台调度中' :
+                abilityManager.AbilityState.BACKGROUNDING ? '后台调度中' :
+                  'undefined'
+    },
+    {
+      name: '名称',
+      value: this.context.applicationInfo.name
+    },
+    {
+      name: '描述',
+      value: this.context.applicationInfo.description
+    },
+    {
+      name: '描述资源 ID',
+      value: String(this.context.applicationInfo.descriptionId)
+    },
+    {
+      name: '是否可以使用',
+      value: this.context.applicationInfo.enabled ? '是' : '否'
+    },
+    {
+      name: '名称',
+      value: this.context.applicationInfo.label
+    },
+    {
+      name: '名称资源 ID',
+      value: String(this.context.applicationInfo.labelId)
+    },
+    {
+      name: '图标',
+      value: this.context.applicationInfo.icon
+    },
+    {
+      name: '图标资源 ID',
+      value: String(this.context.applicationInfo.iconId)
+    },
+    {
+      name: '进程名称',
+      value: this.context.applicationInfo.process
+    },
+    {
+      name: '安装目录',
+      value: this.context.applicationInfo.codePath
+    },
+    {
+      name: '是否可以被移除',
+      value: this.context.applicationInfo.removable ? '是' : '否'
+    },
+    {
+      name: 'accessTokenId',
+      value: String(this.context.applicationInfo.accessTokenId)
+    },
+    {
+      name: 'uid',
+      value: String(this.context.applicationInfo.uid)
+    },
+    {
+      name: '签名证书分发类型',
+      value: this.context.applicationInfo.appDistributionType
+    },
+    {
+      name: '签名证书文件类型',
+      value: this.context.applicationInfo.appProvisionType
+    },
+    {
+      name: '是否为系统应用',
+      value: this.context.applicationInfo.systemApp ? '是' : '否'
+    },
+    {
+      name: '包类型',
+      value: this.context.applicationInfo.bundleType === 0 ? '应用' :
+        this.context.applicationInfo.bundleType === 1 ? '元服务' :
+          'undefined'
+    },
+    {
+      name: '是否处于调试模式',
+      value: this.context.applicationInfo.debug ? '是' : '否'
+    },
+    {
+      name: '数据是否可被删除',
+      value: this.context.applicationInfo.dataUnclearable ? '是' : '否'
+    },
+    {
+      name: '本地库文件路径',
+      value: this.context.applicationInfo.nativeLibraryPath
+    },
+    {
+      name: '多开最大个数',
+      value: String(this.context.applicationInfo.multiAppMode.maxCount)
+    },
+    {
+      name: '包分身索引标识',
+      value: String(this.context.applicationInfo.appIndex)
+    },
+    {
+      name: '安装来源',
+      value: this.context.applicationInfo.installSource
+    },
+    {
+      name: '打包时使用的 SDK 的发布类型',
+      value: this.context.applicationInfo.releaseType
+    },
+    {
+      name: '是否启用端云文件同步能力',
+      value: this.context.applicationInfo.cloudFileSyncEnabled ? '是' : '否'
+    },
+    {
+      name: '缓存目录',
+      value: this.context.cacheDir
+    },
+    {
+      name: '临时目录',
+      value: this.context.tempDir
+    },
+    {
+      name: '资源目录',
+      value: this.context.resourceDir
+    },
+    {
+      name: '文件目录',
+      value: this.context.filesDir
+    },
+    {
+      name: '数据库目录',
+      value: this.context.databaseDir
+    },
+    {
+      name: 'preferences 目录',
+      value: this.context.preferencesDir
+    },
+    {
+      name: '安装包目录',
+      value: this.context.bundleCodeDir
+    },
+    {
+      name: '分布式文件目录',
+      value: this.context.databaseDir
+    },
+    {
+      name: '云文件目录',
+      value: this.context.cloudFileDir
+    },
+    {
+      name: '是否是 Stage 模型',
+      value: this.context.stageMode ? '是' : '否'
+    },
+    {
+      name: 'Bundle 名称',
+      value: this.context.abilityInfo.bundleName
+    },
+    {
+      name: 'Ability 所属的 HAP 的名称',
+      value: this.context.abilityInfo.moduleName
+    },
+    {
+      name: 'Ability 名称',
+      value: this.context.abilityInfo.name
+    },
+    {
+      name: 'Ability 对用户显示的名称的资源描述符',
+      value: this.context.abilityInfo.label
+    },
+    {
+      name: 'Ability 标签资源 ID',
+      value: String(this.context.abilityInfo.labelId)
+    },
+    {
+      name: 'Ability 描述',
+      value: this.context.abilityInfo.description
+    },
+    {
+      name: 'Ability 描述资源 ID',
+      value: String(this.context.abilityInfo.descriptionId)
+    },
+    {
+      name: 'Ability 图标资源描述符',
+      value: this.context.abilityInfo.icon
+    },
+    {
+      name: 'Ability 图标资源 ID',
+      value: String(this.context.abilityInfo.iconId)
+    },
+    {
+      name: 'Ability 进程名称',
+      value: this.context.abilityInfo.process
+    },
+    {
+      name: 'Ability 是否可以被其他应用调用',
+      value: this.context.abilityInfo.exported ? '是' : '否'
+    },
+    {
+      name: 'Ability 显示模式',
+      value: this.context.abilityInfo.orientation === 0 ? '未定义，由系统判定' :
+        this.context.abilityInfo.orientation === 1 ? '横屏' :
+          this.context.abilityInfo.orientation === 2 ? '竖屏' :
+            this.context.abilityInfo.orientation === 3 ? '跟随上一个' :
+              this.context.abilityInfo.orientation === 4 ? '反向横屏' :
+                this.context.abilityInfo.orientation === 5 ? '反向竖屏' :
+                  this.context.abilityInfo.orientation === 6 ? '传感器自动旋转' :
+                    this.context.abilityInfo.orientation === 7 ? '传感器自动横向旋转' :
+                      this.context.abilityInfo.orientation === 8 ? '传感器自动竖向旋转' :
+                        this.context.abilityInfo.orientation === 9 ? '受开关控制的自动旋转' :
+                          this.context.abilityInfo.orientation === 10 ? '受开关控制的自动横向旋转' :
+                            this.context.abilityInfo.orientation === 11 ? '受开关控制的自动竖向旋转' :
+                              this.context.abilityInfo.orientation === 12 ? '锁定' :
+                                this.context.abilityInfo.orientation === 13 ? '受开关控制和由系统判定的自动旋转模式' :
+                                  this.context.abilityInfo.orientation === 14 ? '跟随桌面旋转' :
+                                    'undefined'
+    },
+    {
+      name: 'Ability 启动模式',
+      value: this.context.abilityInfo.launchType === 0 ? '单实例' :
+        this.context.abilityInfo.launchType === 1 ? '普通多实例' :
+          this.context.abilityInfo.launchType === 2 ? '该 Ability 内部根据业务自己指定多实例' :
+            'undefined'
+    },
+    {
+      name: 'Ability 是否可用',
+      value: this.context.abilityInfo.enabled ? '是' : '否'
+    },
+    {
+      name: 'Ability 自由窗口状态下窗口的最大宽高比',
+      value: String(this.context.abilityInfo.windowSize.maxWindowRatio)
+    },
+    {
+      name: 'Ability 自由窗口状态下窗口的最小宽高比',
+      value: String(this.context.abilityInfo.windowSize.minWindowRatio)
+    },
+    {
+      name: 'Ability 自由窗口状态下窗口的最大宽度',
+      value: String(this.context.abilityInfo.windowSize.maxWindowWidth) + ' vp'
+    },
+    {
+      name: 'Ability 自由窗口状态下窗口的最小宽度',
+      value: String(this.context.abilityInfo.windowSize.minWindowWidth) + ' vp'
+    },
+    {
+      name: 'Ability 自由窗口状态下窗口的最大高度',
+      value: String(this.context.abilityInfo.windowSize.maxWindowHeight) + ' vp'
+    },
+    {
+      name: 'Ability 自由窗口状态下窗口的最小高度',
+      value: String(this.context.abilityInfo.windowSize.minWindowHeight) + ' vp'
+    },
+    {
+      name: 'Ability 是否可以在 dock 区域隐藏图标',
+      value: this.context.abilityInfo.excludeFromDock ? '是' : '否'
+    },
+    {
+      name: 'Ability 显示模式资源 ID',
+      value: String(this.context.abilityInfo.orientationId)
+    },
+    {
+      name: '当前语言',
+      value: String(this.context.config.language)
+    },
+    {
+      name: '深浅色模式',
+      value: this.context.config.colorMode === -1 ? '未设置' :
+        this.context.config.colorMode === 0 ? '深色' :
+          this.context.config.colorMode === 1 ? '浅色' :
+            'undefined'
+    },
+    {
+      name: '屏幕方向',
+      value: this.context.config.direction === -1 ? '未设置' :
+        this.context.config.direction === 0 ? '垂直' :
+          this.context.config.direction === 1 ? '水平' :
+            'undefined'
+    },
+    {
+      name: '屏幕像素密度',
+      value: this.context.config.screenDensity === 0 ? '未设置' :
+        this.context.config.screenDensity === 120 ? 'SDPI' :
+          this.context.config.screenDensity === 160 ? 'MDPI' :
+            this.context.config.screenDensity === 240 ? 'LDPI' :
+              this.context.config.screenDensity === 320 ? 'XLDPI' :
+                this.context.config.screenDensity === 480 ? 'XXLDPI' :
+                  this.context.config.screenDensity === 640 ? 'XXXLDPI' :
+                    'undefined'
+    },
+    {
+      name: '所在物理屏幕 ID',
+      value: String(this.context.config.displayId)
+    },
+    {
+      name: '指针类型设备 (如键鼠、触控板等) 是否已连接',
+      value: this.context.config.hasPointerDevice ? '是' : '否'
+    },
+    {
+      name: '当前系统字体的唯一 ID',
+      value: String(this.context.config.fontId)
+    },
+    {
+      name: '字体大小缩放比例',
+      value: String(this.context.config.fontSizeScale)
+    },
+    {
+      name: '字体粗细缩放比例',
+      value: String(this.context.config.fontWeightScale)
+    },
+    {
+      name: '移动设备国家代码',
+      value: String(this.context.config.mcc)
+    },
+    {
+      name: '移动设备网络代码',
+      value: String(this.context.config.mnc)
+    },
+    {
+      name: '模块名称',
+      value: this.context.currentHapModuleInfo.name
+    },
+    {
+      name: '模块图标',
+      value: this.context.currentHapModuleInfo.icon
+    },
+    {
+      name: '模块图标资源 ID',
+      value: String(this.context.currentHapModuleInfo.iconId)
+    },
+    {
+      name: '模块标签',
+      value: this.context.currentHapModuleInfo.label
+    },
+    {
+      name: '模块标签资源 ID',
+      value: String(this.context.currentHapModuleInfo.labelId)
+    },
+    {
+      name: '模块描述',
+      value: this.context.currentHapModuleInfo.description
+    },
+    {
+      name: '模块描述资源 ID',
+      value: String(this.context.currentHapModuleInfo.descriptionId)
+    },
+    {
+      name: '入口 Ability 信息',
+      value: this.context.currentHapModuleInfo.mainElementName
+    },
+    {
+      name: '模块是否支持免安装',
+      value: this.context.currentHapModuleInfo.installationFree ? '是' : '否'
+    },
+    {
+      name: '模块 Hash 值',
+      value: this.context.currentHapModuleInfo.hashValue
+    },
+    {
+      name: '模块类型',
+      value: this.context.currentHapModuleInfo.type === 1 ? '主模块' :
+        this.context.currentHapModuleInfo.type === 2 ? '动态特性模块' :
+          this.context.currentHapModuleInfo.type === 3 ? '动态共享库模块' :
+            'undefined'
+    },
+    {
+      name: '模块文件菜单配置',
+      value: this.context.currentHapModuleInfo.fileContextMenuConfig
+    },
+    {
+      name: '模块安装路径',
+      value: this.context.currentHapModuleInfo.codePath
+    },
+    {
+      name: 'hapModule 本地库文件路径',
+      value: this.context.currentHapModuleInfo.nativeLibraryPath
+    }
+  ]
+  deviceInfoArray: Element[] = [
     { name: '设备类型', value: deviceInfo.deviceType },
     { name: '设备厂家名称', value: deviceInfo.manufacture },
     { name: '设备品牌名称', value: deviceInfo.brand },
@@ -95,14 +461,14 @@ export struct Debug {
     'windowWidth',
     'windowHeight'
   ]
-  systemInfoArray: UndefinedInfoElement[] = [
-    { name: '设备品牌名称', value: atomicService.getSystemInfoSync(this.stateArray).brand },
-    { name: '设备类型', value: atomicService.getSystemInfoSync(this.stateArray).deviceModel },
+  systemInfoArray: Element[] = [
+    { name: '设备品牌名称', value: String(atomicService.getSystemInfoSync(this.stateArray).brand) },
+    { name: '设备类型', value: String(atomicService.getSystemInfoSync(this.stateArray).deviceModel) },
     { name: '屏幕宽度', value: String(atomicService.getSystemInfoSync(this.stateArray).screenWidth) + ' px' },
     { name: '屏幕高度', value: String(atomicService.getSystemInfoSync(this.stateArray).screenHeight) + ' px' },
     { name: '状态栏高度', value: String(atomicService.getSystemInfoSync(this.stateArray).statusBarHeight) + ' px' },
-    { name: '系统语言', value: atomicService.getSystemInfoSync(this.stateArray).language },
-    { name: '系统版本', value: atomicService.getSystemInfoSync(this.stateArray).osFullName },
+    { name: '系统语言', value: String(atomicService.getSystemInfoSync(this.stateArray).language) },
+    { name: '系统版本', value: String(atomicService.getSystemInfoSync(this.stateArray).osFullName) },
     { name: '显示设备逻辑像素密度', value: String(atomicService.getSystemInfoSync(this.stateArray).fontSizeSetting) },
     { name: '系统软件 API 版本', value: String(atomicService.getSystemInfoSync(this.stateArray).sdkApiVersion) },
     {
@@ -114,7 +480,7 @@ export struct Debug {
       value: atomicService.getSystemInfoSync(this.stateArray).locationEnabled ? '开启' : '关闭'
     },
     { name: 'Wi-Fi 系统开关', value: atomicService.getSystemInfoSync(this.stateArray).wifiEnabled ? '开启' : '关闭' },
-    { name: '设备方向', value: atomicService.getSystemInfoSync(this.stateArray).deviceOrientation },
+    { name: '设备方向', value: String(atomicService.getSystemInfoSync(this.stateArray).deviceOrientation) },
     {
       name: '系统主题',
       value: atomicService.getSystemInfoSync(this.stateArray).theme === -1 ? '未设置' :
@@ -125,7 +491,7 @@ export struct Debug {
     { name: '可使用窗口宽度', value: String(atomicService.getSystemInfoSync(this.stateArray).windowWidth) + ' px' },
     { name: '可使用窗口高度', value: String(atomicService.getSystemInfoSync(this.stateArray).windowHeight) + ' px' }
   ]
-  displayInfoArray: InfoElement[] = [
+  displayInfoArray: Element[] = [
     { name: 'id 号', value: String(display.getDefaultDisplaySync().id) },
     { name: '名称', value: display.getDefaultDisplaySync().name },
     { name: '是否启用', value: display.getDefaultDisplaySync().alive ? '是' : '否' },
@@ -170,8 +536,8 @@ export struct Debug {
     { name: '是否正在截屏、投屏、录屏', value: display.isCaptured() ? '是' : '否' }
   ]
   windowClass: window.Window | undefined = undefined
-  windowInfoArray: UndefinedInfoElement[] = []
-  batteryInfoArray: InfoElement[] = [
+  windowInfoArray: Element[] = []
+  batteryInfoArray: Element[] = [
     { name: '剩余电池电量百分比', value: String(batteryInfo.batterySOC) + '%' },
     {
       name: '电池充电状态',
@@ -217,23 +583,23 @@ export struct Debug {
     { name: '电池电流', value: String(batteryInfo.nowCurrent) + ' mA' }
   ]
   @Local systemLoadValue: number = -1
-  networkInfoArray: UndefinedInfoElement[] = [
+  networkInfoArray: Element[] = [
     { name: '数据网络句柄', value: String(connection.getDefaultNetSync().netId) },
     { name: '当前网络上的数据流量使用是否被计量', value: connection.isDefaultNetMeteredSync() ? '是' : '否' },
     { name: '默认数据网络是否被激活', value: connection.hasDefaultNetSync() ? '是' : '否' },
     { name: 'WLAN 开关是否已使能', value: wifiManager.isWifiActive() ? '是' : '否' },
     { name: 'WLAN 是否已连接', value: wifiManager.isConnected() ? '是' : '否' },
-    { name: 'IPV4 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().ipAddress) },
-    { name: 'IPV4 网关', value: decimalToDottedIP(wifiManager.getIpInfo().gateway) },
-    { name: 'IPV4 掩码', value: decimalToDottedIP(wifiManager.getIpInfo().netmask) },
-    { name: 'IPV4 主 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().primaryDns) },
-    { name: 'IPV4 备 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().secondDns) },
-    { name: 'IPV4 DHCP 服务端 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().serverIp) },
-    { name: 'IPV4 IP 地址租用时长', value: String(wifiManager.getIpInfo().leaseDuration) + ' s' },
+    { name: 'Ipv4 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().ipAddress) },
+    { name: 'Ipv4 网关', value: decimalToDottedIP(wifiManager.getIpInfo().gateway) },
+    { name: 'Ipv4 掩码', value: decimalToDottedIP(wifiManager.getIpInfo().netmask) },
+    { name: 'Ipv4 主 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().primaryDns) },
+    { name: 'Ipv4 备 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().secondDns) },
+    { name: 'Ipv4 DHCP 服务端 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().serverIp) },
+    { name: 'Ipv4 IP 地址租用时长', value: String(wifiManager.getIpInfo().leaseDuration) + ' s' },
     { name: '链路 Ipv6 地址', value: wifiManager.getIpv6Info().linkIpv6Address },
     { name: '全局 Ipv6 地址', value: wifiManager.getIpv6Info().globalIpv6Address },
-    { name: '唯一本地 Ipv6 地址', value: wifiManager.getIpv6Info().uniqueIpv6Address },
-    { name: '随机唯一本地 Ipv6 地址', value: wifiManager.getIpv6Info().randomUniqueIpv6Address },
+    { name: '唯一本地 Ipv6 地址', value: String(wifiManager.getIpv6Info().uniqueIpv6Address) },
+    { name: '随机唯一本地 Ipv6 地址', value: String(wifiManager.getIpv6Info().randomUniqueIpv6Address) },
     { name: '网关', value: wifiManager.getIpv6Info().gateway },
     { name: '网络掩码', value: wifiManager.getIpv6Info().netmask },
     { name: '主 DNS 服务器 Ipv6 地址', value: wifiManager.getIpv6Info().primaryDNS },
@@ -242,17 +608,70 @@ export struct Debug {
     { name: '热点是否已使能', value: wifiManager.isHotspotActive() ? '是' : '否' },
     { name: '蜂窝数据业务是否启用', value: data.isCellularDataEnabledSync() ? '是' : '否' }
   ]
-  storageStatisticsInfoArray: InfoElement[] = [
+  storageStatisticsInfoArray: Element[] = [
     { name: '系统总', value: String(storageStatistics.getTotalSizeSync()) + ' B' },
     { name: '系统空闲', value: String(storageStatistics.getFreeSizeSync()) + ' B' },
   ]
+  @Local globalErrorShowTypeIndex: number = 0
+  @Local globalErrorShowTypeValue: string = 'Toast'
+  @Local autoUploadErrorLog: boolean = true
+  @Local showNetAvailableStatusChange: boolean = false
+  @Local showNetBlockStatusChange: boolean = false
+  @Local showNetLost: boolean = false
+  @Local showNetCapabilitiesChange: boolean = false
+  @Local showNetQosChange: boolean = false
+  @Local showNetSceneChange: boolean = false
+  @Local autoReportHighLatency: boolean = true
+  @Local highLatencyThreshold: string = '200'
+  debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'debugSetting'
+  })
+
+  getSetting() {
+    const globalErrorShowType: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('globalErrorShowType', 0)
+    this.globalErrorShowTypeIndex = globalErrorShowType as number
+    if (globalErrorShowType === 0) {
+      this.globalErrorShowTypeValue = 'Toast'
+    }
+    if (globalErrorShowType === 1) {
+      this.globalErrorShowTypeValue = 'Dialog'
+    }
+    const autoUploadErrorLog: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('autoUploadErrorLog', true)
+    this.autoUploadErrorLog = autoUploadErrorLog as boolean
+    const autoReportHighLatency: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('autoReportHighLatency', true)
+    this.autoReportHighLatency = autoReportHighLatency as boolean
+    const showNetAvailableStatusChange: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('showNetAvailableStatusChange', false)
+    this.showNetAvailableStatusChange = showNetAvailableStatusChange as boolean
+    const showNetBlockStatusChange: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('showNetBlockStatusChange', false)
+    this.showNetBlockStatusChange = showNetBlockStatusChange as boolean
+    const showNetLost: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('showNetLost', false)
+    this.showNetLost = showNetLost as boolean
+    const showNetCapabilitiesChange: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('showNetCapabilitiesChange', false)
+    this.showNetCapabilitiesChange = showNetCapabilitiesChange as boolean
+    const showNetQosChange: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('showNetQosChange', false)
+    this.showNetQosChange = showNetQosChange as boolean
+    const showNetSceneChange: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('showNetSceneChange', false)
+    this.showNetSceneChange = showNetSceneChange as boolean
+    const highLatencyThreshold: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('highLatencyThreshold', 200)
+    this.highLatencyThreshold = String(highLatencyThreshold)
+  }
 
   build() {
     NavDestination() {
       List() {
         ListItem() {
           Column() {
-            Text('异常')
+            Text('故障')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight('medium')
@@ -262,7 +681,7 @@ export struct Debug {
               })
             Column() {
               Row() {
-                Text('全局异常展示方式')
+                Text('展示方式')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
@@ -287,7 +706,30 @@ export struct Debug {
                   right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
-                Text('故障日志')
+                Text('自动上传日志')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.autoUploadErrorLog
+                })
+                  .onChange((isOn: boolean) => {
+                    this.debugSettingDataPreferences.putSync('autoUploadErrorLog', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('日志')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
@@ -335,6 +777,206 @@ export struct Debug {
               })
             Column() {
               Row() {
+                Text('可用状态变化时弹窗')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.showNetAvailableStatusChange
+                })
+                  .onChange((isOn: boolean) => {
+                    this.debugSettingDataPreferences.putSync('showNetAvailableStatusChange', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('阻塞状态变化时弹窗')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.showNetBlockStatusChange
+                })
+                  .onChange((isOn: boolean) => {
+                    this.debugSettingDataPreferences.putSync('showNetBlockStatusChange', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('丢失时弹窗')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.showNetLost
+                })
+                  .onChange((isOn: boolean) => {
+                    this.debugSettingDataPreferences.putSync('showNetLost', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('能力变化时弹窗')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.showNetCapabilitiesChange
+                })
+                  .onChange((isOn: boolean) => {
+                    this.debugSettingDataPreferences.putSync('showNetCapabilitiesChange', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('质量变化时弹窗')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.showNetQosChange
+                })
+                  .onChange((isOn: boolean) => {
+                    this.debugSettingDataPreferences.putSync('showNetQosChange', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('场景变化时弹窗')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.showNetSceneChange
+                })
+                  .onChange((isOn: boolean) => {
+                    this.debugSettingDataPreferences.putSync('showNetSceneChange', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('高时延时自动反馈传输体验')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.autoReportHighLatency
+                })
+                  .onChange((isOn: boolean) => {
+                    this.debugSettingDataPreferences.putSync('autoReportHighLatency', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('时延达到')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                TextInput({
+                  text: $$this.highLatencyThreshold
+                })
+                  .type(InputType.Number)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                  .maxLength(4)
+                  .width('25%')
+                  .onSubmit((enterKey: EnterKeyType, event: SubmitEvent) => {
+                    this.debugSettingDataPreferences.putSync('highLatencyThreshold', Number(event.text))
+                    this.debugSettingDataPreferences.flushSync()
+                    promptAction.showToast({
+                      message: '设置成功'
+                    })
+                  })
+                Text('ms 时判定为高时延')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
                 Text('反馈传输体验')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
@@ -360,6 +1002,263 @@ export struct Debug {
                   name: 'ReportQoe'
                 })
               })
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('测试')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Networktest'
+                })
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('应用')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              Row() {
+                Text('清除所有数据并退出')
+                  .fontColor($r('sys.color.warning'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(async () => {
+                const data = await promptAction.showDialog({
+                  title: '提示',
+                  message: '此操作将清除应用全部数据，同时撤销应用向用户申请的权限。确定清除？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '清除',
+                      color: $r('sys.color.warning')
+                    }
+                  ],
+                })
+                if (data.index === 1) {
+                  try {
+                    const applicationContext = this.context.getApplicationContext()
+                    applicationContext.clearUpApplicationData()
+                  } catch (err) {
+                    promptAction.showToast({
+                      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
+                      (err as BusinessError).message
+                    })
+                  }
+                }
+              })
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('终止所有进程并退出')
+                  .fontColor($r('sys.color.warning'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(async () => {
+                const data = await promptAction.showActionMenu({
+                  title: '是否清除页面堆栈？',
+                  buttons: [
+                    {
+                      text: '是',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '否',
+                      color: $r('sys.color.font_primary')
+                    }
+                  ],
+                })
+                if (data.index === 0) {
+                  try {
+                    const applicationContext = this.context.getApplicationContext()
+                    applicationContext.killAllProcesses(true)
+                  } catch (err) {
+                    promptAction.showToast({
+                      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
+                      (err as BusinessError).message
+                    })
+                  }
+                }
+                if (data.index === 1) {
+                  try {
+                    const applicationContext = this.context.getApplicationContext()
+                    applicationContext.killAllProcesses(false)
+                  } catch (err) {
+                    promptAction.showToast({
+                      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
+                      (err as BusinessError).message
+                    })
+                  }
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Button('恢复默认设置')
+            .align(Alignment.Center)
+            .onClick(async () => {
+              const data = await promptAction.showDialog({
+                title: '提示',
+                message: '此操作将恢复全部调试设置为默认。确定恢复？',
+                buttons: [
+                  {
+                    text: '取消',
+                    color: $r('sys.color.font_primary')
+                  },
+                  {
+                    text: '恢复',
+                    color: $r('sys.color.font_emphasize')
+                  }
+                ],
+              })
+              if (data.index === 1) {
+                try {
+                  this.debugSettingDataPreferences.clearSync()
+                  this.debugSettingDataPreferences.flushSync()
+                  promptAction.showToast({
+                    message: '恢复成功'
+                  })
+                  this.getSetting()
+                } catch (err) {
+                  promptAction.showToast({
+                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
+                    (err as BusinessError).message
+                  })
+                }
+              }
+            })
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+        .width('100%')
+
+        ListItem() {
+          Column() {
+            Text('应用信息')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              ForEach(this.appInfoArray, (item: Element, index: number) => {
+                if (item.value) {
+                  if (index !== 0) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -382,9 +1281,9 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.deviceInfoArray, (item: InfoElement, index: number) => {
+              ForEach(this.deviceInfoArray, (item: Element, index: number) => {
                 if (item.value) {
-                  if (index !== 0 && this.deviceInfoArray[0].value) {
+                  if (index !== 0) {
                     Divider()
                       .padding({
                         left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -431,9 +1330,9 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.systemInfoArray, (item: UndefinedInfoElement, index: number) => {
+              ForEach(this.systemInfoArray, (item: Element, index: number) => {
                 if (item.value) {
-                  if (index !== 0 && this.systemInfoArray[0].value) {
+                  if (index !== 0) {
                     Divider()
                       .padding({
                         left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -480,9 +1379,9 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.displayInfoArray, (item: InfoElement, index: number) => {
+              ForEach(this.displayInfoArray, (item: Element, index: number) => {
                 if (item.value) {
-                  if (index !== 0 && this.displayInfoArray[0].value) {
+                  if (index !== 0) {
                     Divider()
                       .padding({
                         left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -529,9 +1428,9 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.windowInfoArray, (item: UndefinedInfoElement, index: number) => {
+              ForEach(this.windowInfoArray, (item: Element, index: number) => {
                 if (item.value) {
-                  if (index !== 0 && this.windowInfoArray[0].value) {
+                  if (index !== 0) {
                     Divider()
                       .padding({
                         left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -578,9 +1477,9 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.batteryInfoArray, (item: InfoElement, index: number) => {
+              ForEach(this.batteryInfoArray, (item: Element, index: number) => {
                 if (item.value) {
-                  if (index !== 0 && this.batteryInfoArray[0].value) {
+                  if (index !== 0) {
                     Divider()
                       .padding({
                         left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -814,9 +1713,9 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.networkInfoArray, (item: UndefinedInfoElement, index: number) => {
+              ForEach(this.networkInfoArray, (item: Element, index: number) => {
                 if (item.value) {
-                  if (index !== 0 && this.networkInfoArray[0].value) {
+                  if (index !== 0) {
                     Divider()
                       .padding({
                         left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -923,9 +1822,9 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.storageStatisticsInfoArray, (item: InfoElement, index: number) => {
+              ForEach(this.storageStatisticsInfoArray, (item: Element, index: number) => {
                 if (item.value) {
-                  if (index !== 0 && this.storageStatisticsInfoArray[0].value) {
+                  if (index !== 0) {
                     Divider()
                       .padding({
                         left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -970,13 +1869,51 @@ export struct Debug {
     .backgroundColor($r('app.color.sheet_background'))
     .title('调试')
     .onReady(async (context: NavDestinationContext) => {
+      this.getSetting()
       this.pageInfos = context.pathStack
-      const globalErrorShowType: preferences.ValueType =
-        this.debugSettingDataPreferences.getSync('globalErrorShowType', 0)
-      this.globalErrorShowTypeIndex = globalErrorShowType as number
-      if (globalErrorShowType === 1) {
-        this.globalErrorShowTypeValue = 'Dialog'
-      }
+      const abilityRunningInfos = await abilityManager.getAbilityRunningInfos()
+      this.appInfoArray.push({
+        name: '进程 ID',
+        value: String(abilityRunningInfos[0].pid)
+      })
+      this.appInfoArray.push({
+        name: '用户 ID',
+        value: String(abilityRunningInfos[0].uid)
+      })
+      this.appInfoArray.push({
+        name: '进程名称',
+        value: abilityRunningInfos[0].processName
+      })
+      this.appInfoArray.push({
+        name: 'Ability 启动时间',
+        value: String(abilityRunningInfos[0].startTime)
+      })
+      const isRunningInStabilityTest = await appManager.isRunningInStabilityTest()
+      this.appInfoArray.push({
+        name: '当前是否处于稳定性测试场景',
+        value: isRunningInStabilityTest ? '是' : '否'
+      })
+      const isRamConstrainedDevice = await appManager.isRamConstrainedDevice()
+      this.appInfoArray.push({
+        name: '是否为 ram 受限设备',
+        value: isRamConstrainedDevice ? '是' : '否'
+      })
+      const memorySize = await appManager.getAppMemorySize()
+      this.appInfoArray.push({
+        name: '可用内存',
+        value: String(memorySize) + ' MB'
+      })
+      const runningProcessInformation = await appManager.getRunningProcessInformation()
+      this.appInfoArray.push({
+        name: '当前进程运行的包类型',
+        value: runningProcessInformation[0].bundleType === 0 ? '应用' :
+          runningProcessInformation[0].bundleType === 1 ? '元服务' :
+            'undefined'
+      })
+      this.appInfoArray.push({
+        name: '分身索引',
+        value: String(runningProcessInformation[0].appCloneIndex)
+      })
       const lastWindow = await window.getLastWindow(this.context)
       this.windowClass = lastWindow
       this.windowInfoArray = this.windowInfoArray.concat([
@@ -1053,7 +1990,7 @@ export struct Debug {
         },
         {
           name: '状态栏背景颜色',
-          value: this.windowClass?.getWindowSystemBarProperties().statusBarColor
+          value: String(this.windowClass?.getWindowSystemBarProperties().statusBarColor)
         },
         {
           name: '状态栏图标是否为高亮状态',
@@ -1061,11 +1998,11 @@ export struct Debug {
         },
         {
           name: '状态栏文字颜色',
-          value: this.windowClass?.getWindowSystemBarProperties().statusBarContentColor
+          value: String(this.windowClass?.getWindowSystemBarProperties().statusBarContentColor)
         },
         {
           name: '导航栏背景颜色',
-          value: this.windowClass?.getWindowSystemBarProperties().navigationBarColor
+          value: String(this.windowClass?.getWindowSystemBarProperties().navigationBarColor)
         },
         {
           name: '导航栏图标是否为高亮状态',
@@ -1073,7 +2010,7 @@ export struct Debug {
         },
         {
           name: '导航栏文字颜色',
-          value: this.windowClass?.getWindowSystemBarProperties().navigationBarContentColor
+          value: String(this.windowClass?.getWindowSystemBarProperties().navigationBarContentColor)
         },
         {
           name: '是否使能状态栏属性变化时动画效果',
@@ -1175,25 +2112,23 @@ export struct Debug {
           }
         ])
         const netCapabilities = connection.getNetCapabilitiesSync(connection.getDefaultNetSync())
-        this.networkInfoArray.concat([
-          {
-            name: '上行带宽',
-            value: String(netCapabilities.linkUpBandwidthKbps) + ' KB/s'
-          },
-          {
-            name: '下行带宽',
-            value: String(netCapabilities.linkDownBandwidthKbps) + ' KB/s'
-          },
-          {
-            name: '网络类型',
-            value: netCapabilities.bearerTypes.includes(0) ? '蜂窝' :
-              netCapabilities.bearerTypes.includes(1) ? 'Wi-Fi' :
-                netCapabilities.bearerTypes.includes(2) ? '蓝牙' :
-                  netCapabilities.bearerTypes.includes(3) ? '以太网' :
-                    netCapabilities.bearerTypes.includes(4) ? 'VPN' :
-                      'undefined'
-          }
-        ])
+        this.networkInfoArray.push({
+          name: '上行带宽',
+          value: String(netCapabilities.linkUpBandwidthKbps) + ' KB/s'
+        })
+        this.networkInfoArray.push({
+          name: '下行带宽',
+          value: String(netCapabilities.linkDownBandwidthKbps) + ' KB/s'
+        })
+        this.networkInfoArray.push({
+          name: '网络类型',
+          value: netCapabilities.bearerTypes.includes(0) ? '蜂窝' :
+            netCapabilities.bearerTypes.includes(1) ? 'Wi-Fi' :
+              netCapabilities.bearerTypes.includes(2) ? '蓝牙' :
+                netCapabilities.bearerTypes.includes(3) ? '以太网' :
+                  netCapabilities.bearerTypes.includes(4) ? 'VPN' :
+                    'undefined'
+        })
       } catch (err) {
         promptAction.showToast({
           message: 'js 运行异常，错误码：' + err.code + '，错误信息：' + err.message

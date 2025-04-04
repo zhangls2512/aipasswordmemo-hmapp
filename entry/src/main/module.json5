@@ -18,6 +18,7 @@
         "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
         "exported": true,
+        "continuable": true,
         "skills": [
           {
             "entities": [
@@ -28,11 +29,26 @@
             ]
           }
         ],
+        "backgroundModes": [
+          'dataTransfer',
+          'multiDeviceConnection'
+        ],
         "startWindowIcon": "$media:layered_image",
-        "startWindowBackground": "$color:start_window_background"
+        "startWindowBackground": "$color:start_window_background",
+        "removeMissionAfterTerminate": true
       }
     ],
     "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+        "reason": "$string:INTERNET_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
       {
         "name": "ohos.permission.GET_NETWORK_INFO",
         "reason": "$string:GET_NETWORK_INFO_reason",

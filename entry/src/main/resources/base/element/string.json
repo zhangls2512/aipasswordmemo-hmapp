@@ -5,6 +5,10 @@
       "value": "轩铭密码智能备忘录"
     },
     {
+      "name": "INTERNET_reason",
+      "value": "用于自动上传故障日志、端云同步数据等"
+    },
+    {
       "name": "GET_NETWORK_INFO_reason",
       "value": "用于在调试页面展示开发人员可能需要的网络信息"
     },
