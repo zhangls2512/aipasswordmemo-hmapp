@@ -223,20 +223,26 @@ export default class EntryAbility extends UIAbility {
       }
     })
     const checkVersionUpdate = commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
-    if (checkVersionUpdate === 1) {
-      const wifiLinkedInfo = await wifiManager.getLinkedInfo()
-      if (wifiLinkedInfo.connState === 4) {
+    try {
+      if (checkVersionUpdate === 1) {
+        const wifiLinkedInfo = await wifiManager.getLinkedInfo()
+        if (wifiLinkedInfo.connState === 4) {
+          const res = await updateManager.checkAppUpdate(this.context)
+          if (res.updateAvailable === 1) {
+            updateManager.showUpdateDialog(this.context)
+          }
+        }
+      }
+      if (checkVersionUpdate === 2) {
         const res = await updateManager.checkAppUpdate(this.context)
         if (res.updateAvailable === 1) {
           updateManager.showUpdateDialog(this.context)
         }
       }
-    }
-    if (checkVersionUpdate === 2) {
-      const res = await updateManager.checkAppUpdate(this.context)
-      if (res.updateAvailable === 1) {
-        updateManager.showUpdateDialog(this.context)
-      }
+    } catch (err) {
+      promptAction.showToast({
+        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+      })
     }
   }
 }

@@ -41,6 +41,11 @@
       "buildFunction": "CommonsettingBuilder"
     },
     {
+      "name": "Permissionsetting",
+      "pageSourceFile": "src/main/ets/pages/Permissionsetting.ets",
+      "buildFunction": "PermissionsettingBuilder"
+    },
+    {
       "name": "Moresetting",
       "pageSourceFile": "src/main/ets/pages/Moresetting.ets",
       "buildFunction": "MoresettingBuilder"

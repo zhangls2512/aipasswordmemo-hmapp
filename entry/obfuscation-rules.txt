@@ -24,3 +24,4 @@ src/main/ets/pages/About.ets
 src/main/ets/pages/ReportQoe.ets
 src/main/ets/pages/License.ets
 src/main/ets/pages/Commonsetting.ets
+src/main/ets/pages/Permissionsetting.ets

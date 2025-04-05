@@ -243,7 +243,7 @@ export struct Networktest {
                     right: $r('sys.float.ohos_id_corner_radius_default_m')
                   })
                 Row() {
-                  Text('从开始到远程主机（或代理）的 TLS 握手完成的时间')
+                  Text('从开始到远程主机 (或代理) 的 TLS 握手完成的时间')
                     .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                     .width('45%')

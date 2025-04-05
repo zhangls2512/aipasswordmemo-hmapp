@@ -13,8 +13,6 @@ export struct Commonsetting {
   @Local colorModeValue: string = '跟随系统'
   @Local checkVersionUpdateIndex: number = 1
   @Local checkVersionUpdateValue: string = '仅 WLAN 下'
-  @Local pasteBoardTypeIndex: number = 0
-  @Local pasteBoardTypeValue: string = '本设备'
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
@@ -43,15 +41,6 @@ export struct Commonsetting {
     }
     if (checkVersionUpdate === 2) {
       this.checkVersionUpdateValue = '始终'
-    }
-    const pasteBoardType: preferences.ValueType =
-      this.commonSettingDataPreferences.getSync('pasteBoardType', 0)
-    this.pasteBoardTypeIndex = pasteBoardType as number
-    if (pasteBoardType === 0) {
-      this.pasteBoardTypeValue = '本设备'
-    }
-    if (pasteBoardType === 1) {
-      this.pasteBoardTypeValue = '跨设备'
     }
   }
 
@@ -110,31 +99,6 @@ export struct Commonsetting {
                 .value($$this.checkVersionUpdateValue)
                 .onSelect((index: number) => {
                   this.commonSettingDataPreferences.putSync('checkVersionUpdate', index)
-                  this.commonSettingDataPreferences.flushSync()
-                })
-            }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-            .width('100%')
-
-            Divider()
-              .padding({
-                left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                right: $r('sys.float.ohos_id_corner_radius_default_m')
-              })
-            Row() {
-              Text('剪贴板类型')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                .fontWeight('medium')
-              Blank()
-              Select([
-                { value: '本设备' },
-                { value: '跨设备' }
-              ])
-                .selected($$this.pasteBoardTypeIndex)
-                .value($$this.pasteBoardTypeValue)
-                .onSelect((index: number) => {
-                  this.commonSettingDataPreferences.putSync('pasteBoardType', index)
                   this.commonSettingDataPreferences.flushSync()
                 })
             }

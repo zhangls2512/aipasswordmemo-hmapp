@@ -2,24 +2,43 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { pasteboard } from '@kit.BasicServicesKit'
-import Pasteboard from '@ohos.pasteboard'
 
-export async function copy(content: string) {
+export async function copy(text: string) {
   const context = getContext() as common.UIAbilityContext
-  const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'commonSetting'
+  const permissionSettingDataPreferences = preferences.getPreferencesSync(context, {
+    name: 'permissionSetting'
   })
-  const pasteBoardType = commonSettingDataPreferences.getSync('pasteBoardType', 0)
-  if (pasteBoardType === 0) {
-    const pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, content)
-    const systemPasteboard = pasteboard.getSystemPasteboard()
-    await systemPasteboard.setData(pasteData)
+  const canWritePasteBoard = permissionSettingDataPreferences.getSync('writePasteBoard', false)
+  if (canWritePasteBoard) {
+    writePasteBoard(text)
   }
-  if (pasteBoardType === 1) {
-    const pasteData: Pasteboard.PasteData = Pasteboard.createData(Pasteboard.MIMETYPE_TEXT_PLAIN, content)
-    const systemPasteBoard: Pasteboard.SystemPasteboard = Pasteboard.getSystemPasteboard()
-    await systemPasteBoard.setData(pasteData)
+  if (!canWritePasteBoard) {
+    const data = await promptAction.showDialog({
+      title: '允许“轩铭密码智能备忘录”写入剪贴板？',
+      message: $r('app.string.WRITE_PASTEBOARD_reason'),
+      buttons: [
+        {
+          text: '禁止',
+          color: $r('sys.color.warning')
+        },
+        {
+          text: '允许',
+          color: $r('sys.color.font_emphasize')
+        }
+      ]
+    })
+    if (data.index === 1) {
+      permissionSettingDataPreferences.putSync('writePasteBoard', true)
+      permissionSettingDataPreferences.flushSync()
+      writePasteBoard(text)
+    }
   }
+}
+
+async function writePasteBoard(text: string) {
+  const pasteData: pasteboard.PasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text)
+  const systemPasteboard = pasteboard.getSystemPasteboard()
+  await systemPasteboard.setData(pasteData)
   promptAction.showToast({
     message: '内容已复制到剪贴板'
   })
