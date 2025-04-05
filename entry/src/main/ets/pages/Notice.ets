@@ -10,7 +10,7 @@ export function NoticeBuilder() {
 
 @ComponentV2
 export struct Notice {
-  @Local titleBar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
+  titleBar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
   context = getContext(this) as common.UIAbilityContext
 
   build() {

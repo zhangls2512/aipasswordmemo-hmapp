@@ -7,8 +7,8 @@ export class TitleBar {
 
 @ComponentV2
 export default struct Me {
-  @Local titleBar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
   @Local isShowSheet: boolean = false
+  titleBar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
 
   @Builder
   SheetBuilder() {
