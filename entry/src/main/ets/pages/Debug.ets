@@ -181,6 +181,15 @@ export struct Debug {
       value: this.context.cloudFileDir
     },
     {
+      name: '文件分区',
+      value: this.context.area === 0 ? 'EL1' :
+        this.context.area === 1 ? 'EL2' :
+          this.context.area === 2 ? 'EL3' :
+            this.context.area === 3 ? 'EL4' :
+              this.context.area === 4 ? 'EL5' :
+                'undefined'
+    },
+    {
       name: '是否是 Stage 模型',
       value: this.context.stageMode ? '是' : '否'
     },
@@ -623,8 +632,12 @@ export struct Debug {
   @Local showNetSceneChange: boolean = false
   @Local autoReportHighLatency: boolean = true
   @Local highLatencyThreshold: string = '200'
+  @Local allService: boolean = true
   debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'debugSetting'
+  })
+  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'commonSetting'
   })
 
   getSetting() {
@@ -640,6 +653,9 @@ export struct Debug {
     const autoUploadErrorLog: preferences.ValueType =
       this.debugSettingDataPreferences.getSync('autoUploadErrorLog', true)
     this.autoUploadErrorLog = autoUploadErrorLog as boolean
+    const allService: preferences.ValueType =
+      this.commonSettingDataPreferences.getSync('allService', true)
+    this.allService = allService as boolean
     const autoReportHighLatency: preferences.ValueType =
       this.debugSettingDataPreferences.getSync('autoReportHighLatency', true)
     this.autoReportHighLatency = autoReportHighLatency as boolean
@@ -714,6 +730,7 @@ export struct Debug {
                   type: ToggleType.Switch,
                   isOn: $$this.autoUploadErrorLog
                 })
+                  .enabled(this.allService)
                   .onChange((isOn: boolean) => {
                     this.debugSettingDataPreferences.putSync('autoUploadErrorLog', isOn)
                     this.debugSettingDataPreferences.flushSync()

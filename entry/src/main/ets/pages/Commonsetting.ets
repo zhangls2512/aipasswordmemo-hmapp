@@ -8,11 +8,11 @@ export function CommonsettingBuilder() {
 
 @ComponentV2
 export struct Commonsetting {
-  context = getContext(this) as common.UIAbilityContext
   @Local colorModeIndex: number = 0
   @Local colorModeValue: string = '跟随系统'
   @Local checkVersionUpdateIndex: number = 1
   @Local checkVersionUpdateValue: string = '仅 WLAN 下'
+  context = getContext(this) as common.UIAbilityContext
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })

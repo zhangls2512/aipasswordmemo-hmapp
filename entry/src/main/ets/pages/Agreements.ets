@@ -1,13 +1,12 @@
 import { common } from '@kit.AbilityKit'
-import { notificationManager } from '@kit.NotificationKit'
 
 @Builder
-export function NoticeBuilder() {
-  Notice()
+export function AgreementsBuilder() {
+  Agreements()
 }
 
 @ComponentV2
-export struct Notice {
+export struct Agreements {
   context = getContext(this) as common.UIAbilityContext
 
   build() {
@@ -16,7 +15,7 @@ export struct Notice {
         ListItem() {
           Column() {
             Row() {
-              Text('通知管理')
+              Text('用户协议')
                 .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
@@ -37,7 +36,11 @@ export struct Notice {
             })
             .width('100%')
             .onClick(() => {
-              notificationManager.openNotificationSettings(this.context)
+              this.context.openLink('https://www.zhangls2512.cn/index', {
+                parameters: {
+                  'ohos.ability.params.showDefaultPicker': true
+                }
+              })
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -54,6 +57,6 @@ export struct Notice {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('消息通知')
+    .title('服务协议与规则')
   }
 }

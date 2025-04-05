@@ -1,3 +1,5 @@
+import { common } from '@kit.AbilityKit'
+import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
@@ -9,6 +11,24 @@ interface ErrorResponse {
 }
 
 export async function httpRequest(path: string, body: rcp.RequestContent) {
+  const context = getContext() as common.UIAbilityContext
+  const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
+    name: 'commonSetting'
+  })
+  const allService = commonSettingDataPreferences.getSync('allService', true)
+  if (!allService) {
+    promptAction.showDialog({
+      title: '全量模式未开启',
+      message: '全量模式未开启，无法使用在线功能。如需使用在线功能，请前往“我的”>“设置”>“应用服务模式”，开启全量模式。',
+      buttons: [
+        {
+          text: '确定',
+          color: $r('sys.color.font_emphasize')
+        }
+      ]
+    })
+    return
+  }
   const session = rcp.createSession()
   try {
     const response = await session.post('https://api.zhangls2512.cn' + path, body)

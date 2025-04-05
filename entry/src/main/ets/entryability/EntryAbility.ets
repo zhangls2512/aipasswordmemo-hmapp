@@ -66,7 +66,8 @@ export default class EntryAbility extends UIAbility {
         }
       ],
       onReceive: async (domain: string, appEventGroups: Array<hiAppEvent.AppEventGroup>) => {
-        if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true)) {
+        if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
+        commonSettingDataPreferences.getSync('allService', true)) {
           const promises = appEventGroups.map(async (item) => {
             const res = await httpRequest('/debug/newErrorLog', {
               key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',

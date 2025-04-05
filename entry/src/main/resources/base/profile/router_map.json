@@ -46,9 +46,19 @@
       "buildFunction": "PermissionsettingBuilder"
     },
     {
+      "name": "Servicemode",
+      "pageSourceFile": "src/main/ets/pages/Servicemode.ets",
+      "buildFunction": "ServicemodeBuilder"
+    },
+    {
       "name": "Moresetting",
       "pageSourceFile": "src/main/ets/pages/Moresetting.ets",
       "buildFunction": "MoresettingBuilder"
+    },
+    {
+      "name": "Agreements",
+      "pageSourceFile": "src/main/ets/pages/Agreements.ets",
+      "buildFunction": "AgreementsBuilder"
     }
   ]
 }

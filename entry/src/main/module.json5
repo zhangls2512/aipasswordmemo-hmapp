@@ -11,6 +11,20 @@
     "deliveryWithInstall": true,
     "installationFree": false,
     "pages": "$profile:main_pages",
+    "metadata": [
+      {
+        "name": "appgallery_privacy_hosted",
+        "value": "1"
+      },
+      {
+        "name": "appgallery_privacy_link_privacy_statement",
+        "value": "https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904"
+      },
+      {
+        "name": "appgallery_privacy_link_user_agreement",
+        "value": "https://www.zhangls2512.cn/index"
+      }
+    ],
     "abilities": [
       {
         "name": "EntryAbility",
@@ -36,6 +50,19 @@
         "startWindowIcon": "$media:layered_image",
         "startWindowBackground": "$color:start_window_background",
         "removeMissionAfterTerminate": true
+      }
+    ],
+    "extensionAbilities": [
+      {
+        "name": "BackupExtensionAbility",
+        "srcEntry": "./ets/BackupExtension/BackupExtension.ets",
+        "type": "backup",
+        "metadata": [
+          {
+            "name": "ohos.extension.backup",
+            "resource": "$profile:backup_config"
+          }
+        ]
       }
     ],
     "requestPermissions": [

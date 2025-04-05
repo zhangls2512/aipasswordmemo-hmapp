@@ -17,11 +17,13 @@ requestIp
 -keep-file-name
 src/main/ets/pages/Notice.ets
 src/main/ets/pages/Moresetting.ets
+src/main/ets/pages/Agreements.ets
 src/main/ets/pages/Faultlog.ets
 src/main/ets/pages/Networktest.ets
 src/main/ets/pages/Debug.ets
 src/main/ets/pages/About.ets
 src/main/ets/pages/ReportQoe.ets
+src/main/ets/pages/Servicemode.ets
 src/main/ets/pages/License.ets
 src/main/ets/pages/Commonsetting.ets
 src/main/ets/pages/Permissionsetting.ets

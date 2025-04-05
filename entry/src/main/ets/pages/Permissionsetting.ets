@@ -8,8 +8,8 @@ export function PermissionsettingBuilder() {
 
 @ComponentV2
 export struct Permissionsetting {
-  context = getContext(this) as common.UIAbilityContext
   @Local writePasteBoard: boolean = false
+  context = getContext(this) as common.UIAbilityContext
   permissionSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'permissionSetting'
   })
@@ -50,8 +50,7 @@ export struct Permissionsetting {
 
             Text($r('app.string.WRITE_PASTEBOARD_reason'))
               .fontColor($r('sys.color.font_secondary'))
-              .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontSize($r('sys.float.ohos_id_text_size_body3'))
               .margin({
                 top: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
