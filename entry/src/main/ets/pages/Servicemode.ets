@@ -1,5 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
+import { AppStorageV2 } from '@kit.ArkUI'
+import { AllService } from './Setting'
 
 @Builder
 export function ServicemodeBuilder() {
@@ -8,7 +10,7 @@ export function ServicemodeBuilder() {
 
 @ComponentV2
 export struct Servicemode {
-  @Local allService: boolean = false
+  @Local AllService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
   context = getContext(this) as common.UIAbilityContext
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
@@ -17,7 +19,7 @@ export struct Servicemode {
   getSetting() {
     const allService: preferences.ValueType =
       this.commonSettingDataPreferences.getSync('allService', true)
-    this.allService = allService as boolean
+    this.AllService.allService = allService as boolean
   }
 
   build() {
@@ -33,10 +35,11 @@ export struct Servicemode {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.allService
+                  isOn: this.AllService.allService
                 })
-                  .enabled(!this.allService)
+                  .enabled(!this.AllService.allService)
                   .onChange((isOn: boolean) => {
+                    this.AllService.allService = isOn
                     this.commonSettingDataPreferences.putSync('allService', isOn)
                     this.commonSettingDataPreferences.flushSync()
                   })
@@ -90,11 +93,11 @@ export struct Servicemode {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: !this.allService
+                  isOn: !this.AllService.allService
                 })
-                  .enabled(this.allService)
+                  .enabled(this.AllService.allService)
                   .onChange((isOn: boolean) => {
-                    this.allService = !isOn
+                    this.AllService.allService = !isOn
                     this.commonSettingDataPreferences.putSync('allService', !isOn)
                     this.commonSettingDataPreferences.flushSync()
                   })

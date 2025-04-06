@@ -1,21 +1,12 @@
-import { AppStorageV2 } from '@kit.ArkUI'
 import Setting from './Setting'
-
-export class TitleBar {
-  hide: boolean = false
-}
 
 @ComponentV2
 export default struct Me {
   @Local isShowSheet: boolean = false
-  titleBar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
 
   @Builder
   SheetBuilder() {
     Setting()
-      .onDisAppear(() => {
-        this.titleBar.hide = false
-      })
   }
 
   build() {

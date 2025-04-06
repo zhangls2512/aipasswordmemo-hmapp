@@ -15,7 +15,7 @@ export struct Agreements {
         ListItem() {
           Column() {
             Row() {
-              Text('用户协议')
+              Text('用户服务条款与条件')
                 .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()

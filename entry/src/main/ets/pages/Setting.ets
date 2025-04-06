@@ -2,13 +2,16 @@ import { common } from '@kit.AbilityKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { AppStorageV2, promptAction } from '@kit.ArkUI'
-import { TitleBar } from './Me'
+
+@ObservedV2
+export class AllService {
+  @Trace allService: boolean = true
+}
 
 @ComponentV2
 export default struct Setting {
-  @Local titleBar: TitleBar = AppStorageV2.connect(TitleBar, () => new TitleBar())!
+  @Local AllService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
   @Local agreedPrivacyAgreement: boolean = false
-  @Local allService: boolean = false
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
   permissionSettingDataPreferences = preferences.getPreferencesSync(this.context, {
@@ -17,7 +20,7 @@ export default struct Setting {
 
   getSetting() {
     const allService: preferences.ValueType = this.permissionSettingDataPreferences.getSync('allService', true)
-    this.allService = allService as boolean
+    this.AllService.allService = allService as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
       const appPrivacyResult = appPrivacyResults.find(item => item.type === 1)
@@ -394,7 +397,7 @@ export default struct Setting {
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
-                Text(this.allService ? '全量模式' : '基本模式')
+                Text(this.AllService.allService ? '全量模式' : '基本模式')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -555,7 +558,6 @@ export default struct Setting {
     .backgroundColor($r('app.color.sheet_background'))
     .height('100%')
     .hideBackButton(true)
-    .hideTitleBar(this.titleBar.hide, true)
     .padding({
       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
     })
