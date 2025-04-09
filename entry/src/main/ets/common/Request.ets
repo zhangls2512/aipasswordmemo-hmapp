@@ -27,7 +27,7 @@ export async function httpRequest(path: string, body: rcp.RequestContent) {
         }
       ]
     })
-    return
+    return 'fail'
   }
   const session = rcp.createSession()
   try {

@@ -59,6 +59,11 @@
       "name": "Agreements",
       "pageSourceFile": "src/main/ets/pages/Agreements.ets",
       "buildFunction": "AgreementsBuilder"
+    },
+    {
+      "name": "Huaweiaccount",
+      "pageSourceFile": "src/main/ets/pages/Huaweiaccount.ets",
+      "buildFunction": "HuaweiaccountBuilder"
     }
   ]
 }

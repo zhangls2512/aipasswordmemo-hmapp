@@ -7,6 +7,7 @@ import { wifiManager } from '@kit.ConnectivityKit'
 import { connection } from '@kit.NetworkKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
+import { remove } from '../common/Accesstoken'
 import { httpRequest } from '../common/Request'
 
 export default class EntryAbility extends UIAbility {
@@ -25,6 +26,14 @@ export default class EntryAbility extends UIAbility {
     }
     if (colorMode === 2) {
       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
+    }
+    const loginEndDate = commonSettingDataPreferences.getSync('loginEndDate', 0)
+    if (loginEndDate !== 0 && loginEndDate < Date.now()) {
+      remove()
+      commonSettingDataPreferences.deleteSync('loginEndDate')
+      promptAction.showToast({
+        message: '登录态过期，请重新登录'
+      })
     }
     const debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'debugSetting'

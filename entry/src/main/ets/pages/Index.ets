@@ -1,6 +1,6 @@
 import Password from './Password'
 import Info from './Info'
-import Property from './Property'
+import Tag from './Tag'
 import Me from './Me'
 
 @Entry
@@ -17,8 +17,8 @@ struct Index {
       if (this.name === 'info') {
         Info()
       }
-      if (this.name === 'property') {
-        Property()
+      if (this.name === 'tag') {
+        Tag()
       }
       if (this.name === 'me') {
         Me()
@@ -50,14 +50,14 @@ struct Index {
         activeIcon: $r('app.media.infoselected')
       },
       {
-        value: '属性',
-        icon: $r('app.media.property'),
+        value: '标签',
+        icon: $r('app.media.tag'),
         action: (() => {
-          this.name = 'property'
-          this.title = '属性'
+          this.name = 'tag'
+          this.title = '标签'
         }),
-        status: this.name === 'property' ? ToolbarItemStatus.ACTIVE : ToolbarItemStatus.NORMAL,
-        activeIcon: $r('app.media.propertyselected')
+        status: this.name === 'tag' ? ToolbarItemStatus.ACTIVE : ToolbarItemStatus.NORMAL,
+        activeIcon: $r('app.media.tagselected')
       },
       {
         value: '我的',

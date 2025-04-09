@@ -5,16 +5,24 @@
       "value": "轩铭密码智能备忘录"
     },
     {
-      "name": "INTERNET_reason",
-      "value": "用于自动上传故障日志、端云同步数据等。"
-    },
-    {
       "name": "GET_NETWORK_INFO_reason",
       "value": "用于在调试页面展示开发人员可能需要的网络信息。"
     },
     {
       "name": "GET_WIFI_INFO_reason",
       "value": "用于在调试页面展示开发人员可能需要的 Wi-fi 信息。"
+    },
+    {
+      "name": "INTERNET_reason",
+      "value": "用于端云数据同步、自动上传故障日志等。"
+    },
+    {
+      "name": "PRIVACY_WINDOW_reason",
+      "value": "用于禁止截屏/录屏含有敏感信息的页面。"
+    },
+    {
+      "name": "VIBRATE_reason",
+      "value": "用于触控反馈。"
     },
     {
       "name": "WRITE_PASTEBOARD_reason",

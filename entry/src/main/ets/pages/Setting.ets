@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { AppStorageV2, promptAction } from '@kit.ArkUI'
+import { get } from '../common/Accesstoken'
 
 @ObservedV2
 export class AllService {
@@ -17,6 +18,7 @@ export default struct Setting {
   permissionSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
+  accessToken: string = get()
 
   getSetting() {
     const allService: preferences.ValueType = this.permissionSettingDataPreferences.getSync('allService', true)
@@ -39,6 +41,55 @@ export default struct Setting {
   build() {
     Navigation(this.pageInfos) {
       List() {
+        if (this.accessToken) {
+          ListItem() {
+            Column() {
+              Text('账号')
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .fontWeight('medium')
+                .margin({
+                  bottom: 6,
+                  left: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Column() {
+                Row() {
+                  Text('绑定华为账号')
+                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                    .fontWeight('medium')
+                  Blank()
+                  Image($r('app.media.right'))
+                    .fillColor($r('sys.color.icon_fourth'))
+                    .height(12)
+                    .width(12)
+                }
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .stateStyles({
+                  normal: {
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  pressed: {
+                    .backgroundColor($r('sys.color.interactive_pressed'))
+                  }
+                })
+                .width('100%')
+                .onClick(() => {
+                  this.pageInfos.pushPath({
+                    name: 'Huaweiaccount'
+                  })
+                })
+              }
+              .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .padding($r('sys.float.ohos_id_corner_radius_mark'))
+            }
+            .alignItems(HorizontalAlign.Start)
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
+        }
         ListItem() {
           Column() {
             Row() {

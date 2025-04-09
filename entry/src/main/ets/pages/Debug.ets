@@ -1108,7 +1108,7 @@ export struct Debug {
                       text: '清除',
                       color: $r('sys.color.warning')
                     }
-                  ],
+                  ]
                 })
                 if (data.index === 1) {
                   try {
@@ -1162,7 +1162,7 @@ export struct Debug {
                       text: '否',
                       color: $r('sys.color.font_primary')
                     }
-                  ],
+                  ]
                 })
                 if (data.index === 0) {
                   try {
@@ -1214,7 +1214,7 @@ export struct Debug {
                     text: '恢复',
                     color: $r('sys.color.font_emphasize')
                   }
-                ],
+                ]
               })
               if (data.index === 1) {
                 try {

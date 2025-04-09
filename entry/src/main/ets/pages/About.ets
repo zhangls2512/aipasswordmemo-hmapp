@@ -99,8 +99,8 @@ export struct About {
               }
               if (this.updateLoading) {
                 LoadingProgress()
-                  .height(12)
-                  .width(12)
+                  .height(20)
+                  .width(20)
               }
             }
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))

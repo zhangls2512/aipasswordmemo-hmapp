@@ -13,6 +13,10 @@
     "pages": "$profile:main_pages",
     "metadata": [
       {
+        "name": "client_id",
+        "value": "6917568345502278703"
+      },
+      {
         "name": "appgallery_privacy_hosted",
         "value": "1"
       },
@@ -67,16 +71,6 @@
     ],
     "requestPermissions": [
       {
-        "name": "ohos.permission.INTERNET",
-        "reason": "$string:INTERNET_reason",
-        "usedScene": {
-          "abilities": [
-            "EntryAbility"
-          ],
-          "when": "inuse"
-        }
-      },
-      {
         "name": "ohos.permission.GET_NETWORK_INFO",
         "reason": "$string:GET_NETWORK_INFO_reason",
         "usedScene": {
@@ -89,6 +83,36 @@
       {
         "name": "ohos.permission.GET_WIFI_INFO",
         "reason": "$string:GET_WIFI_INFO_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.INTERNET",
+        "reason": "$string:INTERNET_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.PRIVACY_WINDOW",
+        "reason": "$string:PRIVACY_WINDOW_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.VIBRATE",
+        "reason": "$string:VIBRATE_reason",
         "usedScene": {
           "abilities": [
             "EntryAbility"
