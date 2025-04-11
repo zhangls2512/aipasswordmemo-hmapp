@@ -624,6 +624,7 @@ export struct Debug {
   @Local globalErrorShowTypeIndex: number = 0
   @Local globalErrorShowTypeValue: string = 'Toast'
   @Local autoUploadErrorLog: boolean = true
+  @Local showMemoryLevelChange: boolean = false
   @Local showNetAvailableStatusChange: boolean = false
   @Local showNetBlockStatusChange: boolean = false
   @Local showNetLost: boolean = false
@@ -656,6 +657,10 @@ export struct Debug {
     const allService: preferences.ValueType =
       this.commonSettingDataPreferences.getSync('allService', true)
     this.allService = allService as boolean
+    const showMemoryLevelChange: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
+    this.showMemoryLevelChange = showMemoryLevelChange as boolean
+    this.autoUploadErrorLog = autoUploadErrorLog as boolean
     const autoReportHighLatency: preferences.ValueType =
       this.debugSettingDataPreferences.getSync('autoReportHighLatency', true)
     this.autoReportHighLatency = autoReportHighLatency as boolean
@@ -687,7 +692,7 @@ export struct Debug {
       List() {
         ListItem() {
           Column() {
-            Text('故障')
+            Text('基础')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight('medium')
@@ -697,7 +702,7 @@ export struct Debug {
               })
             Column() {
               Row() {
-                Text('展示方式')
+                Text('故障展示方式')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
@@ -722,7 +727,7 @@ export struct Debug {
                   right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
-                Text('自动上传日志')
+                Text('自动上传故障日志')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
@@ -746,7 +751,7 @@ export struct Debug {
                   right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
-                Text('日志')
+                Text('故障日志')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
@@ -771,6 +776,29 @@ export struct Debug {
                   name: 'Faultlog'
                 })
               })
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('内存占用级别变化时弹窗')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.showMemoryLevelChange
+                })
+                  .onChange((isOn: boolean) => {
+                    this.debugSettingDataPreferences.putSync('showMemoryLevelChange', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))

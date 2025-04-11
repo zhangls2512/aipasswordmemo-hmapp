@@ -1,6 +1,6 @@
 @ComponentV2
 export default struct Info {
   build() {
-    Text('信息')
+    Text('常用信息')
   }
 }

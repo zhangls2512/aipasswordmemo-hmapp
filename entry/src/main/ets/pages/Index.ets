@@ -40,11 +40,11 @@ struct Index {
         activeIcon: $r('app.media.passwordselected')
       },
       {
-        value: '信息',
+        value: '常用信息',
         icon: $r('app.media.info'),
         action: (() => {
           this.name = 'info'
-          this.title = '信息'
+          this.title = '常用信息'
         }),
         status: this.name === 'info' ? ToolbarItemStatus.ACTIVE : ToolbarItemStatus.NORMAL,
         activeIcon: $r('app.media.infoselected')

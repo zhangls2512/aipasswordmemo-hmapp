@@ -1,4 +1,4 @@
-import { ConfigurationConstant, errorManager, UIAbility } from '@kit.AbilityKit'
+import { AbilityConstant, ConfigurationConstant, errorManager, UIAbility } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
@@ -252,6 +252,28 @@ export default class EntryAbility extends UIAbility {
     } catch (err) {
       promptAction.showToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+      })
+    }
+  }
+
+  onMemoryLevel(level: AbilityConstant.MemoryLevel) {
+    const debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'debugSetting'
+    })
+    const showMemoryLevelChange = debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
+    if (showMemoryLevelChange) {
+      let memoryLevel: string = ''
+      if (level === 0) {
+        memoryLevel = '适中'
+      }
+      if (level === 1) {
+        memoryLevel = '低'
+      }
+      if (level === 2) {
+        memoryLevel = '高'
+      }
+      promptAction.showToast({
+        message: '当前内存占用' + memoryLevel
       })
     }
   }

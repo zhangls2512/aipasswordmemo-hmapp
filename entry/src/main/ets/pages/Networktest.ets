@@ -41,10 +41,6 @@ export struct Networktest {
             }
             if (!this.loading) {
               Button('测试')
-                .enabled(!this.loading)
-                .margin({
-                  top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-                })
                 .onClick(async () => {
                   this.loading = true
                   const session = rcp.createSession()
