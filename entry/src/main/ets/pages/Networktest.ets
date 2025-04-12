@@ -351,16 +351,16 @@ export struct Networktest {
               .padding($r('sys.float.ohos_id_corner_radius_mark'))
             }
           }
-          .padding({
-            bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-            left: $r('sys.float.ohos_id_max_padding_start'),
-            right: $r('sys.float.ohos_id_max_padding_end')
-          })
           .width('100%')
         }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
       }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+      .padding({
+        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
+        left: $r('sys.float.ohos_id_max_padding_start'),
+        right: $r('sys.float.ohos_id_max_padding_end')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))

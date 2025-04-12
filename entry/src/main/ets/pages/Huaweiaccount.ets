@@ -151,9 +151,6 @@ export struct Huaweiaccount {
                 }
                 .width('80%')
               }
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-              })
 
               if (this.type === 'mfa') {
                 Row() {
@@ -327,18 +324,19 @@ export struct Huaweiaccount {
                 })
               }
             }
-            .height('100%')
           }
-          .align(Alignment.Top)
-          .height('100%')
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
         }
         if (this.loading) {
           ListItem() {
             LoadingProgress()
-              .height('50%')
               .width('50%')
           }
-          .height('100%')
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
           .width('100%')
         }
       }
@@ -346,8 +344,7 @@ export struct Huaweiaccount {
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end'),
-        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        right: $r('sys.float.ohos_id_max_padding_end')
       })
       .onAppear(() => {
         this.refresh()

@@ -59,6 +59,7 @@ export struct License {
         })
       }
       .padding({
+        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_max_padding_start'),
         right: $r('sys.float.ohos_id_max_padding_end')
       })

@@ -607,7 +607,6 @@ export default struct Setting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .height('100%')
     .hideBackButton(true)
     .padding({
       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
