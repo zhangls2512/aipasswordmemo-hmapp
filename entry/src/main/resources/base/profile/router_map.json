@@ -64,6 +64,11 @@
       "name": "Huaweiaccount",
       "pageSourceFile": "src/main/ets/pages/Huaweiaccount.ets",
       "buildFunction": "HuaweiaccountBuilder"
+    },
+    {
+      "name": "Feedback",
+      "pageSourceFile": "src/main/ets/pages/Feedback.ets",
+      "buildFunction": "FeedbackBuilder"
     }
   ]
 }

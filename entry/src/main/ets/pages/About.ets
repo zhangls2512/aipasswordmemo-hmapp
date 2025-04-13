@@ -240,6 +240,38 @@ export struct About {
             .onClick(() => {
               this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
             })
+
+            Divider()
+              .padding({
+                left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                right: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Row() {
+              Text('意见反馈')
+                .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                .fontWeight('medium')
+              Blank()
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
+            }
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
+            .width('100%')
+            .onClick(() => {
+              this.pageInfos.pushPath({
+                name: 'Feedback'
+              })
+            })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
