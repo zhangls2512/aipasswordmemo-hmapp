@@ -12,6 +12,8 @@ export struct Commonsetting {
   @Local colorModeValue: string = '跟随系统'
   @Local checkVersionUpdateIndex: number = 1
   @Local checkVersionUpdateValue: string = '仅 WLAN 下'
+  @Local openLinkTypeIndex: number = 0
+  @Local openLinkTypeValue: string = '系统默认'
   context = getContext(this) as common.UIAbilityContext
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
@@ -42,6 +44,15 @@ export struct Commonsetting {
     if (checkVersionUpdate === 2) {
       this.checkVersionUpdateValue = '始终'
     }
+    const openLinkType: preferences.ValueType =
+      this.commonSettingDataPreferences.getSync('openLinkType', 0)
+    this.openLinkTypeIndex = openLinkType as number
+    if (openLinkType === 0) {
+      this.openLinkTypeValue = '系统默认'
+    }
+    if (openLinkType === 1) {
+      this.openLinkTypeValue = '自行选择'
+    }
   }
 
   build() {
@@ -50,7 +61,7 @@ export struct Commonsetting {
         ListItem() {
           Column() {
             Row() {
-              Text('颜色模式')
+              Text('深色模式')
                 .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
@@ -100,6 +111,42 @@ export struct Commonsetting {
                 .onSelect((index: number) => {
                   this.commonSettingDataPreferences.putSync('checkVersionUpdate', index)
                   this.commonSettingDataPreferences.flushSync()
+                })
+            }
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .width('100%')
+
+            Divider()
+              .padding({
+                left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                right: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Row() {
+              Text('使用')
+                .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                .fontWeight('medium')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Select([
+                { value: '系统默认' },
+                { value: '自行选择' }
+              ])
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+                .selected($$this.openLinkTypeIndex)
+                .value($$this.openLinkTypeValue)
+                .onSelect((index: number) => {
+                  this.commonSettingDataPreferences.putSync('openLinkType', index)
+                  this.commonSettingDataPreferences.flushSync()
+                })
+              Text('浏览器打开链接')
+                .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                .fontWeight('medium')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
             }
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))

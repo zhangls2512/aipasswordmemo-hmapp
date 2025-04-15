@@ -236,7 +236,7 @@ export struct Faultlog {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('故障日志')
-    .onShown(async () => {
+    .onReady(async () => {
       this.faultLogArray = await FaultLogger.query(FaultLogger.FaultType.NO_SPECIFIC)
     })
   }

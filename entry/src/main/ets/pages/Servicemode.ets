@@ -15,11 +15,19 @@ export struct Servicemode {
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
+  openLinkType: boolean = false
 
   getSetting() {
     const allService: preferences.ValueType =
       this.commonSettingDataPreferences.getSync('allService', true)
     this.AllService.allService = allService as boolean
+    const openLinkType: preferences.ValueType = this.commonSettingDataPreferences.getSync('openLinkType', 0)
+    if (openLinkType === 0) {
+      this.openLinkType = false
+    }
+    if (openLinkType === 1) {
+      this.openLinkType = true
+    }
   }
 
   build() {
@@ -64,7 +72,7 @@ export struct Servicemode {
                   this.context.openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904',
                     {
                       parameters: {
-                        'ohos.ability.params.showDefaultPicker': true
+                        'ohos.ability.params.showDefaultPicker': this.openLinkType
                       }
                     })
                 })

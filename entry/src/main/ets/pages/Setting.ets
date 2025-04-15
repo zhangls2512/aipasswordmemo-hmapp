@@ -12,25 +12,28 @@ export class AllService {
 @ComponentV2
 export default struct Setting {
   @Local AllService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
-  @Local agreedPrivacyAgreement: boolean = false
+  @Local agreedPrivacyAgreement: number | undefined = 0
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
-  permissionSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
+  openLinkType: boolean = false
   accessToken: string = get()
 
   getSetting() {
-    const allService: preferences.ValueType = this.permissionSettingDataPreferences.getSync('allService', true)
+    const allService: preferences.ValueType = this.commonSettingDataPreferences.getSync('allService', true)
     this.AllService.allService = allService as boolean
+    const openLinkType: preferences.ValueType = this.commonSettingDataPreferences.getSync('openLinkType', 0)
+    if (openLinkType === 0) {
+      this.openLinkType = false
+    }
+    if (openLinkType === 1) {
+      this.openLinkType = true
+    }
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
-      const appPrivacyResult = appPrivacyResults.find(item => item.type === 1)
-      if (appPrivacyResult?.result === 1) {
-        this.agreedPrivacyAgreement = true
-      } else {
-        this.agreedPrivacyAgreement = false
-      }
+      this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
     } catch (err) {
       promptAction.showToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
@@ -207,11 +210,20 @@ export default struct Setting {
                   left: $r('sys.float.ohos_id_corner_radius_default_m'),
                   right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
-              if (!this.agreedPrivacyAgreement) {
+              if (this.agreedPrivacyAgreement === 0 || this.agreedPrivacyAgreement === 2) {
                 Row() {
                   Text('阅读并签署隐私协议')
                     .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
+                  if (this.agreedPrivacyAgreement === 2) {
+                    Badge({
+                      value: '',
+                      style: {}
+                    })
+                      .margin({
+                        left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
+                  }
                   Blank()
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
@@ -321,7 +333,7 @@ export default struct Setting {
                 this.context.openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904',
                   {
                     parameters: {
-                      'ohos.ability.params.showDefaultPicker': true
+                      'ohos.ability.params.showDefaultPicker': this.openLinkType
                     }
                   })
               })

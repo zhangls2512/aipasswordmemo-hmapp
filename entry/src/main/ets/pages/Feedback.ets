@@ -39,6 +39,7 @@ export struct Feedback {
                     key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
                     content: this.content
                   })
+                  this.loading = false
                   if (res !== 'fail') {
                     promptAction.showToast({
                       message: '提交成功'

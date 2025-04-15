@@ -1,6 +1,8 @@
 import { common } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
+import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
+import { BusinessError } from '@kit.BasicServicesKit'
 import { call } from '@kit.TelephonyKit'
 import { copy } from '../common/Pasteboard'
 
@@ -15,6 +17,7 @@ export struct About {
   @Local updateLoading: boolean = false
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
+  openLinkType: boolean = false
 
   build() {
     NavDestination() {
@@ -176,7 +179,7 @@ export struct About {
             .onClick(() => {
               this.context.openLink('https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp', {
                 parameters: {
-                  'ohos.ability.params.showDefaultPicker': true
+                  'ohos.ability.params.showDefaultPicker': this.openLinkType
                 }
               })
             })
@@ -327,7 +330,7 @@ export struct About {
                 this.context.openLink('https://chatbot.weixin.qq.com/webapp/5e2JglFAERGl06z0FkTK6eWL6D1Oa5?robotName=轩铭2512产品客服',
                   {
                     parameters: {
-                      'ohos.ability.params.showDefaultPicker': true
+                      'ohos.ability.params.showDefaultPicker': this.openLinkType
                     }
                   })
               })
@@ -369,7 +372,13 @@ export struct About {
               })
               .width('100%')
               .onClick(() => {
-                call.makeCall('18846496985')
+                call.makeCall('18846496985', (err: BusinessError) => {
+                  if (err) {
+                    promptAction.showToast({
+                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                    })
+                  }
+                })
               })
 
               Divider()
@@ -496,7 +505,7 @@ export struct About {
               .onClick(() => {
                 this.context.openLink('https://pd.qq.com/s/cnx7f1zdm', {
                   parameters: {
-                    'ohos.ability.params.showDefaultPicker': true
+                    'ohos.ability.params.showDefaultPicker': this.openLinkType
                   }
                 })
               })
@@ -556,7 +565,7 @@ export struct About {
               .onClick(() => {
                 this.context.openLink('https://www.zhangls2512.cn/index', {
                   parameters: {
-                    'ohos.ability.params.showDefaultPicker': true
+                    'ohos.ability.params.showDefaultPicker': this.openLinkType
                   }
                 })
               })
@@ -600,7 +609,7 @@ export struct About {
               .onClick(() => {
                 this.context.openLink('https://space.bilibili.com/448824492', {
                   parameters: {
-                    'ohos.ability.params.showDefaultPicker': true
+                    'ohos.ability.params.showDefaultPicker': this.openLinkType
                   }
                 })
               })
@@ -644,7 +653,7 @@ export struct About {
               .onClick(() => {
                 this.context.openLink('https://gitcode.com/zhangls2512/aipasswordmemo-hmapp', {
                   parameters: {
-                    'ohos.ability.params.showDefaultPicker': true
+                    'ohos.ability.params.showDefaultPicker': this.openLinkType
                   }
                 })
               })
@@ -694,6 +703,16 @@ export struct About {
     .title('关于')
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const openLinkType: preferences.ValueType = commonSettingDataPreferences.getSync('openLinkType', 0)
+      if (openLinkType === 0) {
+        this.openLinkType = false
+      }
+      if (openLinkType === 1) {
+        this.openLinkType = true
+      }
     })
   }
 }

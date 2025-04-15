@@ -15,25 +15,16 @@ export default struct Me {
   context = getContext(this) as common.UIAbilityContext
 
   async getEmail() {
-    this.loading = true
-    try {
-      const accessToken = get()
-      if (accessToken) {
-        const res = await httpRequest('/account/getAccountInfo', {
-          accessToken: accessToken
-        })
-        this.loading = false
-        if (res !== 'fail') {
-          this.email = JSON.parse(res).data.email as string
-        }
-      } else {
-        this.loading = false
-      }
-    } catch (err) {
-      this.loading = false
-      promptAction.showToast({
-        message: '发生错误，错误码：' + err.errCode + '，错误信息：' + err.errMsg
+    const accessToken = get()
+    if (accessToken) {
+      this.loading = true
+      const res = await httpRequest('/account/getAccountInfo', {
+        accessToken: accessToken
       })
+      this.loading = false
+      if (res !== 'fail') {
+        this.email = JSON.parse(res).data.email as string
+      }
     }
   }
 

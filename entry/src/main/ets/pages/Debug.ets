@@ -1,6 +1,7 @@
 import { abilityManager, appManager, common } from '@kit.AbilityKit'
 import { accessibility } from '@kit.AccessibilityKit'
 import { preferences } from '@kit.ArkData'
+import { process } from '@kit.ArkTS'
 import { display, promptAction, window } from '@kit.ArkUI'
 import { batteryInfo, BusinessError, deviceInfo, power, systemLoad, thermal } from '@kit.BasicServicesKit'
 import { wifiManager } from '@kit.ConnectivityKit'
@@ -619,7 +620,13 @@ export struct Debug {
   ]
   storageStatisticsInfoArray: Element[] = [
     { name: '系统总', value: String(storageStatistics.getTotalSizeSync()) + ' B' },
-    { name: '系统空闲', value: String(storageStatistics.getFreeSizeSync()) + ' B' },
+    { name: '系统空闲', value: String(storageStatistics.getFreeSizeSync()) + ' B' }
+  ]
+  processInfoArray: Element[] = [
+    { name: '是否被隔离', value: process.isIsolatedProcess() ? '是' : '否' },
+    { name: '运行环境是否是 64 位', value: process.is64Bit() ? '是' : '否' },
+    { name: '从系统启动到进程启动所经过的时间', value: String(process.getStartRealtime()) + ' ms' },
+    { name: '进程启动到当前时间的 CPU 时间', value: String(process.getPastCpuTime()) + ' ms' }
   ]
   @Local globalErrorShowTypeIndex: number = 0
   @Local globalErrorShowTypeValue: string = 'Toast'
@@ -1868,6 +1875,55 @@ export struct Debug {
               })
             Column() {
               ForEach(this.storageStatisticsInfoArray, (item: Element, index: number) => {
+                if (item.value) {
+                  if (index !== 0) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('进程信息')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              ForEach(this.processInfoArray, (item: Element, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()

@@ -1,4 +1,6 @@
 import { common } from '@kit.AbilityKit'
+import { privacyManager } from '@kit.AppGalleryKit'
+import { promptAction } from '@kit.ArkUI'
 
 @Builder
 export function AgreementsBuilder() {
@@ -7,7 +9,19 @@ export function AgreementsBuilder() {
 
 @ComponentV2
 export struct Agreements {
+  @Local agreedUserAgreement: number | undefined = 0
   context = getContext(this) as common.UIAbilityContext
+
+  getSetting() {
+    try {
+      const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
+      this.agreedUserAgreement = appPrivacyResults.find(item => item.type === 2)?.result
+    } catch (err) {
+      promptAction.showToast({
+        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+      })
+    }
+  }
 
   build() {
     NavDestination() {
@@ -18,6 +32,15 @@ export struct Agreements {
               Text('用户服务条款与条件')
                 .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
+              if (this.agreedUserAgreement === 2) {
+                Badge({
+                  value: '',
+                  style: {}
+                })
+                  .margin({
+                    left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+              }
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -35,12 +58,15 @@ export struct Agreements {
               }
             })
             .width('100%')
-            .onClick(() => {
-              this.context.openLink('https://www.zhangls2512.cn/index', {
-                parameters: {
-                  'ohos.ability.params.showDefaultPicker': true
-                }
-              })
+            .onClick(async () => {
+              try {
+                await privacyManager.requestAppPrivacyConsent(this.context)
+                this.getSetting()
+              } catch (err) {
+                promptAction.showToast({
+                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                })
+              }
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -59,5 +85,8 @@ export struct Agreements {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('服务协议与规则')
+    .onReady(() => {
+      this.getSetting()
+    })
   }
 }

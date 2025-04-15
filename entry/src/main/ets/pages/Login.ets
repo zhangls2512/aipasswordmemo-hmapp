@@ -19,9 +19,10 @@ export default struct Login {
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   context = getContext(this) as common.UIAbilityContext
+  openLinkType: boolean = false
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      .onClickLoginWithHuaweiIDButton(async (error: BusinessError,
+      .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
         response: loginComponentManager.HuaweiIDCredential) => {
         if (response) {
           this.loading = true
@@ -46,9 +47,9 @@ export default struct Login {
             this.isShowLoginSheet = false
           }
         }
-        if (error) {
+        if (err) {
           promptAction.showToast({
-            message: '发生错误，错误码：' + error.code + '，错误信息：' + error.message
+            message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
           })
         }
       })
@@ -330,7 +331,7 @@ export default struct Login {
               .onClick(() => {
                 this.context.openLink('https://www.zhangls2512.cn/product/account/register', {
                   parameters: {
-                    'ohos.ability.params.showDefaultPicker': true
+                    'ohos.ability.params.showDefaultPicker': this.openLinkType
                   }
                 })
               })
@@ -357,7 +358,7 @@ export default struct Login {
                   .onClick(() => {
                     this.context.openLink('https://www.zhangls2512.cn/index', {
                       parameters: {
-                        'ohos.ability.params.showDefaultPicker': true
+                        'ohos.ability.params.showDefaultPicker': this.openLinkType
                       }
                     })
                   })
@@ -367,7 +368,7 @@ export default struct Login {
                     this.context.openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904',
                       {
                         parameters: {
-                          'ohos.ability.params.showDefaultPicker': true
+                          'ohos.ability.params.showDefaultPicker': this.openLinkType
                         }
                       })
                   })
@@ -378,7 +379,7 @@ export default struct Login {
                     this.context.openLink('https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN',
                       {
                         parameters: {
-                          'ohos.ability.params.showDefaultPicker': true
+                          'ohos.ability.params.showDefaultPicker': this.openLinkType
                         }
                       })
                   })
@@ -416,6 +417,16 @@ export default struct Login {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(() => {
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const openLinkType: preferences.ValueType = commonSettingDataPreferences.getSync('openLinkType', 0)
+      if (openLinkType === 0) {
+        this.openLinkType = false
+      }
+      if (openLinkType === 1) {
+        this.openLinkType = true
+      }
       this.controller.setEnabled(false)
     })
   }
