@@ -1,4 +1,4 @@
-import { abilityManager, appManager, common } from '@kit.AbilityKit'
+import { abilityManager, appManager, bundleManager, common } from '@kit.AbilityKit'
 import { accessibility } from '@kit.AccessibilityKit'
 import { preferences } from '@kit.ArkData'
 import { process } from '@kit.ArkTS'
@@ -32,17 +32,7 @@ export function DebugBuilder() {
 export struct Debug {
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
-  appInfoArray: Element[] = [
-    {
-      name: 'Ability 状态',
-      value: abilityManager.AbilityState.INITIAL ? '初始化' :
-        abilityManager.AbilityState.FOCUS ? '获焦' :
-          abilityManager.AbilityState.FOREGROUND ? '前台' :
-            abilityManager.AbilityState.BACKGROUND ? '后台' :
-              abilityManager.AbilityState.FOREGROUNDING ? '前台调度中' :
-                abilityManager.AbilityState.BACKGROUNDING ? '后台调度中' :
-                  'undefined'
-    },
+  applicationInfoArray: Element[] = [
     {
       name: '名称',
       value: this.context.applicationInfo.name
@@ -60,7 +50,7 @@ export struct Debug {
       value: this.context.applicationInfo.enabled ? '是' : '否'
     },
     {
-      name: '名称',
+      name: '标识名称',
       value: this.context.applicationInfo.label
     },
     {
@@ -195,112 +185,6 @@ export struct Debug {
       value: this.context.stageMode ? '是' : '否'
     },
     {
-      name: 'Bundle 名称',
-      value: this.context.abilityInfo.bundleName
-    },
-    {
-      name: 'Ability 所属的 HAP 的名称',
-      value: this.context.abilityInfo.moduleName
-    },
-    {
-      name: 'Ability 名称',
-      value: this.context.abilityInfo.name
-    },
-    {
-      name: 'Ability 对用户显示的名称的资源描述符',
-      value: this.context.abilityInfo.label
-    },
-    {
-      name: 'Ability 标签资源 ID',
-      value: String(this.context.abilityInfo.labelId)
-    },
-    {
-      name: 'Ability 描述',
-      value: this.context.abilityInfo.description
-    },
-    {
-      name: 'Ability 描述资源 ID',
-      value: String(this.context.abilityInfo.descriptionId)
-    },
-    {
-      name: 'Ability 图标资源描述符',
-      value: this.context.abilityInfo.icon
-    },
-    {
-      name: 'Ability 图标资源 ID',
-      value: String(this.context.abilityInfo.iconId)
-    },
-    {
-      name: 'Ability 进程名称',
-      value: this.context.abilityInfo.process
-    },
-    {
-      name: 'Ability 是否可以被其他应用调用',
-      value: this.context.abilityInfo.exported ? '是' : '否'
-    },
-    {
-      name: 'Ability 显示模式',
-      value: this.context.abilityInfo.orientation === 0 ? '未定义，由系统判定' :
-        this.context.abilityInfo.orientation === 1 ? '横屏' :
-          this.context.abilityInfo.orientation === 2 ? '竖屏' :
-            this.context.abilityInfo.orientation === 3 ? '跟随上一个' :
-              this.context.abilityInfo.orientation === 4 ? '反向横屏' :
-                this.context.abilityInfo.orientation === 5 ? '反向竖屏' :
-                  this.context.abilityInfo.orientation === 6 ? '传感器自动旋转' :
-                    this.context.abilityInfo.orientation === 7 ? '传感器自动横向旋转' :
-                      this.context.abilityInfo.orientation === 8 ? '传感器自动竖向旋转' :
-                        this.context.abilityInfo.orientation === 9 ? '受开关控制的自动旋转' :
-                          this.context.abilityInfo.orientation === 10 ? '受开关控制的自动横向旋转' :
-                            this.context.abilityInfo.orientation === 11 ? '受开关控制的自动竖向旋转' :
-                              this.context.abilityInfo.orientation === 12 ? '锁定' :
-                                this.context.abilityInfo.orientation === 13 ? '受开关控制和由系统判定的自动旋转模式' :
-                                  this.context.abilityInfo.orientation === 14 ? '跟随桌面旋转' :
-                                    'undefined'
-    },
-    {
-      name: 'Ability 启动模式',
-      value: this.context.abilityInfo.launchType === 0 ? '单实例' :
-        this.context.abilityInfo.launchType === 1 ? '普通多实例' :
-          this.context.abilityInfo.launchType === 2 ? '该 Ability 内部根据业务自己指定多实例' :
-            'undefined'
-    },
-    {
-      name: 'Ability 是否可用',
-      value: this.context.abilityInfo.enabled ? '是' : '否'
-    },
-    {
-      name: 'Ability 自由窗口状态下窗口的最大宽高比',
-      value: String(this.context.abilityInfo.windowSize.maxWindowRatio)
-    },
-    {
-      name: 'Ability 自由窗口状态下窗口的最小宽高比',
-      value: String(this.context.abilityInfo.windowSize.minWindowRatio)
-    },
-    {
-      name: 'Ability 自由窗口状态下窗口的最大宽度',
-      value: String(this.context.abilityInfo.windowSize.maxWindowWidth) + ' vp'
-    },
-    {
-      name: 'Ability 自由窗口状态下窗口的最小宽度',
-      value: String(this.context.abilityInfo.windowSize.minWindowWidth) + ' vp'
-    },
-    {
-      name: 'Ability 自由窗口状态下窗口的最大高度',
-      value: String(this.context.abilityInfo.windowSize.maxWindowHeight) + ' vp'
-    },
-    {
-      name: 'Ability 自由窗口状态下窗口的最小高度',
-      value: String(this.context.abilityInfo.windowSize.minWindowHeight) + ' vp'
-    },
-    {
-      name: 'Ability 是否可以在 dock 区域隐藏图标',
-      value: this.context.abilityInfo.excludeFromDock ? '是' : '否'
-    },
-    {
-      name: 'Ability 显示模式资源 ID',
-      value: String(this.context.abilityInfo.orientationId)
-    },
-    {
       name: '当前语言',
       value: String(this.context.config.language)
     },
@@ -356,33 +240,35 @@ export struct Debug {
     {
       name: '移动设备网络代码',
       value: String(this.context.config.mnc)
-    },
+    }
+  ]
+  hapModuleInfoArray: Element[] = [
     {
-      name: '模块名称',
+      name: '名称',
       value: this.context.currentHapModuleInfo.name
     },
     {
-      name: '模块图标',
+      name: '图标',
       value: this.context.currentHapModuleInfo.icon
     },
     {
-      name: '模块图标资源 ID',
+      name: '图标资源 ID',
       value: String(this.context.currentHapModuleInfo.iconId)
     },
     {
-      name: '模块标签',
+      name: '标签',
       value: this.context.currentHapModuleInfo.label
     },
     {
-      name: '模块标签资源 ID',
+      name: '标签资源 ID',
       value: String(this.context.currentHapModuleInfo.labelId)
     },
     {
-      name: '模块描述',
+      name: '描述',
       value: this.context.currentHapModuleInfo.description
     },
     {
-      name: '模块描述资源 ID',
+      name: '描述资源 ID',
       value: String(this.context.currentHapModuleInfo.descriptionId)
     },
     {
@@ -390,33 +276,143 @@ export struct Debug {
       value: this.context.currentHapModuleInfo.mainElementName
     },
     {
-      name: '模块是否支持免安装',
+      name: '是否支持免安装',
       value: this.context.currentHapModuleInfo.installationFree ? '是' : '否'
     },
     {
-      name: '模块 Hash 值',
+      name: 'Hash 值',
       value: this.context.currentHapModuleInfo.hashValue
     },
     {
-      name: '模块类型',
+      name: '类型',
       value: this.context.currentHapModuleInfo.type === 1 ? '主模块' :
         this.context.currentHapModuleInfo.type === 2 ? '动态特性模块' :
           this.context.currentHapModuleInfo.type === 3 ? '动态共享库模块' :
             'undefined'
     },
     {
-      name: '模块文件菜单配置',
+      name: '文件菜单配置',
       value: this.context.currentHapModuleInfo.fileContextMenuConfig
     },
     {
-      name: '模块安装路径',
+      name: '安装路径',
       value: this.context.currentHapModuleInfo.codePath
     },
     {
-      name: 'hapModule 本地库文件路径',
+      name: '本地库文件路径',
       value: this.context.currentHapModuleInfo.nativeLibraryPath
     }
   ]
+  abilityInfoArray: Element[] = [
+    {
+      name: '应用 Bundle 名称',
+      value: this.context.abilityInfo.bundleName
+    },
+    {
+      name: '所属 HAP 名称',
+      value: this.context.abilityInfo.moduleName
+    },
+    {
+      name: '名称',
+      value: this.context.abilityInfo.name
+    },
+    {
+      name: '对用户显示名称的资源描述符',
+      value: this.context.abilityInfo.label
+    },
+    {
+      name: '标签资源 ID',
+      value: String(this.context.abilityInfo.labelId)
+    },
+    {
+      name: '描述',
+      value: this.context.abilityInfo.description
+    },
+    {
+      name: '描述资源 ID',
+      value: String(this.context.abilityInfo.descriptionId)
+    },
+    {
+      name: '图标资源描述符',
+      value: this.context.abilityInfo.icon
+    },
+    {
+      name: '图标资源 ID',
+      value: String(this.context.abilityInfo.iconId)
+    },
+    {
+      name: '进程名称',
+      value: this.context.abilityInfo.process
+    },
+    {
+      name: '是否可以被其他应用调用',
+      value: this.context.abilityInfo.exported ? '是' : '否'
+    },
+    {
+      name: '显示模式',
+      value: this.context.abilityInfo.orientation === 0 ? '未定义，由系统判定' :
+        this.context.abilityInfo.orientation === 1 ? '横屏' :
+          this.context.abilityInfo.orientation === 2 ? '竖屏' :
+            this.context.abilityInfo.orientation === 3 ? '跟随上一个' :
+              this.context.abilityInfo.orientation === 4 ? '反向横屏' :
+                this.context.abilityInfo.orientation === 5 ? '反向竖屏' :
+                  this.context.abilityInfo.orientation === 6 ? '传感器自动旋转' :
+                    this.context.abilityInfo.orientation === 7 ? '传感器自动横向旋转' :
+                      this.context.abilityInfo.orientation === 8 ? '传感器自动竖向旋转' :
+                        this.context.abilityInfo.orientation === 9 ? '受开关控制的自动旋转' :
+                          this.context.abilityInfo.orientation === 10 ? '受开关控制的自动横向旋转' :
+                            this.context.abilityInfo.orientation === 11 ? '受开关控制的自动竖向旋转' :
+                              this.context.abilityInfo.orientation === 12 ? '锁定' :
+                                this.context.abilityInfo.orientation === 13 ? '受开关控制和由系统判定的自动旋转模式' :
+                                  this.context.abilityInfo.orientation === 14 ? '跟随桌面旋转' :
+                                    'undefined'
+    },
+    {
+      name: '启动模式',
+      value: this.context.abilityInfo.launchType === 0 ? '单实例' :
+        this.context.abilityInfo.launchType === 1 ? '普通多实例' :
+          this.context.abilityInfo.launchType === 2 ? '该 Ability 内部根据业务自己指定多实例' :
+            'undefined'
+    },
+    {
+      name: '是否可用',
+      value: this.context.abilityInfo.enabled ? '是' : '否'
+    },
+    {
+      name: '自由窗口状态下窗口的最大宽高比',
+      value: String(this.context.abilityInfo.windowSize.maxWindowRatio)
+    },
+    {
+      name: '自由窗口状态下窗口的最小宽高比',
+      value: String(this.context.abilityInfo.windowSize.minWindowRatio)
+    },
+    {
+      name: '自由窗口状态下窗口的最大宽度',
+      value: String(this.context.abilityInfo.windowSize.maxWindowWidth) + ' vp'
+    },
+    {
+      name: '自由窗口状态下窗口的最小宽度',
+      value: String(this.context.abilityInfo.windowSize.minWindowWidth) + ' vp'
+    },
+    {
+      name: '自由窗口状态下窗口的最大高度',
+      value: String(this.context.abilityInfo.windowSize.maxWindowHeight) + ' vp'
+    },
+    {
+      name: '自由窗口状态下窗口的最小高度',
+      value: String(this.context.abilityInfo.windowSize.minWindowHeight) + ' vp'
+    },
+    {
+      name: '是否可以在 dock 区域隐藏图标',
+      value: this.context.abilityInfo.excludeFromDock ? '是' : '否'
+    },
+    {
+      name: '显示模式资源 ID',
+      value: String(this.context.abilityInfo.orientationId)
+    }
+  ]
+  abilityRunningInfoArray: Element[] = []
+  bundleInfoArray: Element[] = []
   deviceInfoArray: Element[] = [
     { name: '设备类型', value: deviceInfo.deviceType },
     { name: '设备厂家名称', value: deviceInfo.manufacture },
@@ -624,7 +620,7 @@ export struct Debug {
   ]
   processInfoArray: Element[] = [
     { name: '是否被隔离', value: process.isIsolatedProcess() ? '是' : '否' },
-    { name: '运行环境是否是 64 位', value: process.is64Bit() ? '是' : '否' },
+    { name: '运行环境是否 64 位', value: process.is64Bit() ? '是' : '否' },
     { name: '从系统启动到进程启动所经过的时间', value: String(process.getStartRealtime()) + ' ms' },
     { name: '进程启动到当前时间的 CPU 时间', value: String(process.getPastCpuTime()) + ' ms' }
   ]
@@ -1275,7 +1271,7 @@ export struct Debug {
 
         ListItem() {
           Column() {
-            Text('应用信息')
+            Text('应用程序信息')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight('medium')
@@ -1284,7 +1280,203 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.appInfoArray, (item: Element, index: number) => {
+              ForEach(this.applicationInfoArray, (item: Element, index: number) => {
+                if (item.value) {
+                  if (index !== 0) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('HAP 信息')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              ForEach(this.hapModuleInfoArray, (item: Element, index: number) => {
+                if (item.value) {
+                  if (index !== 0) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('Ability 信息')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              ForEach(this.abilityInfoArray, (item: Element, index: number) => {
+                if (item.value) {
+                  if (index !== 0) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('Ability 运行信息')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              ForEach(this.abilityRunningInfoArray, (item: Element, index: number) => {
+                if (item.value) {
+                  if (index !== 0) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                  }
+                  Row() {
+                    Text(item.name)
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                      .width('45%')
+                    Blank()
+                      .width('5%')
+                    Text(item.value)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .textAlign(TextAlign.End)
+                      .width('50%')
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .width('100%')
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('应用包信息')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              ForEach(this.bundleInfoArray, (item: Element, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1973,47 +2165,112 @@ export struct Debug {
       this.getSetting()
       this.pageInfos = context.pathStack
       const abilityRunningInfos = await abilityManager.getAbilityRunningInfos()
-      this.appInfoArray.push({
+      this.abilityRunningInfoArray.push({
         name: '进程 ID',
         value: String(abilityRunningInfos[0].pid)
       })
-      this.appInfoArray.push({
+      this.abilityRunningInfoArray.push({
         name: '用户 ID',
         value: String(abilityRunningInfos[0].uid)
       })
-      this.appInfoArray.push({
+      this.abilityRunningInfoArray.push({
         name: '进程名称',
         value: abilityRunningInfos[0].processName
       })
-      this.appInfoArray.push({
-        name: 'Ability 启动时间',
+      this.abilityRunningInfoArray.push({
+        name: '启动时间',
         value: String(abilityRunningInfos[0].startTime)
       })
+      this.abilityRunningInfoArray.push({
+        name: '状态',
+        value: abilityRunningInfos[0].abilityState === 0 ? '初始化' :
+          abilityRunningInfos[0].abilityState === 2 ? '获焦' :
+            abilityRunningInfos[0].abilityState === 9 ? '前台' :
+              abilityRunningInfos[0].abilityState === 10 ? '后台' :
+                abilityRunningInfos[0].abilityState === 11 ? '前台调度中' :
+                  abilityRunningInfos[0].abilityState === 12 ? '后台调度中' :
+                    'undefined'
+      })
       const isRunningInStabilityTest = await appManager.isRunningInStabilityTest()
-      this.appInfoArray.push({
+      this.applicationInfoArray.push({
         name: '当前是否处于稳定性测试场景',
         value: isRunningInStabilityTest ? '是' : '否'
       })
       const isRamConstrainedDevice = await appManager.isRamConstrainedDevice()
-      this.appInfoArray.push({
+      this.applicationInfoArray.push({
         name: '是否为 ram 受限设备',
         value: isRamConstrainedDevice ? '是' : '否'
       })
       const memorySize = await appManager.getAppMemorySize()
-      this.appInfoArray.push({
+      this.applicationInfoArray.push({
         name: '可用内存',
         value: String(memorySize) + ' MB'
       })
       const runningProcessInformation = await appManager.getRunningProcessInformation()
-      this.appInfoArray.push({
+      this.applicationInfoArray.push({
         name: '当前进程运行的包类型',
         value: runningProcessInformation[0].bundleType === 0 ? '应用' :
           runningProcessInformation[0].bundleType === 1 ? '元服务' :
             'undefined'
       })
-      this.appInfoArray.push({
+      this.applicationInfoArray.push({
         name: '分身索引',
         value: String(runningProcessInformation[0].appCloneIndex)
+      })
+      const bundleInfo =
+        bundleManager.getBundleInfoSync('com.zhangxm.aipasswordmemo', bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT |
+        bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_SIGNATURE_INFO)
+      this.bundleInfoArray.push({
+        name: '名称',
+        value: bundleInfo.name
+      })
+      this.bundleInfoArray.push({
+        name: '供应商',
+        value: bundleInfo.vendor
+      })
+      this.bundleInfoArray.push({
+        name: '版本号',
+        value: String(bundleInfo.versionCode)
+      })
+      this.bundleInfoArray.push({
+        name: '版本文本描述',
+        value: bundleInfo.versionName
+      })
+      this.bundleInfoArray.push({
+        name: '分布式场景下兼容的最低版本',
+        value: String(bundleInfo.minCompatibleVersionCode)
+      })
+      this.bundleInfoArray.push({
+        name: '应用运行目标版本',
+        value: String(bundleInfo.targetVersion)
+      })
+      this.bundleInfoArray.push({
+        name: '应用 appId',
+        value: bundleInfo.signatureInfo.appId
+      })
+      this.bundleInfoArray.push({
+        name: '指纹',
+        value: bundleInfo.signatureInfo.fingerprint
+      })
+      this.bundleInfoArray.push({
+        name: '应用唯一标识',
+        value: bundleInfo.signatureInfo.appIdentifier
+      })
+      this.bundleInfoArray.push({
+        name: '应用证书公钥',
+        value: String(bundleInfo.signatureInfo.certificate)
+      })
+      this.bundleInfoArray.push({
+        name: '安装时间',
+        value: String(bundleInfo.installTime)
+      })
+      this.bundleInfoArray.push({
+        name: '更新时间',
+        value: String(bundleInfo.updateTime)
+      })
+      this.bundleInfoArray.push({
+        name: '分身索引标识',
+        value: String(bundleInfo.appIndex)
       })
       const lastWindow = await window.getLastWindow(this.context)
       this.windowClass = lastWindow
