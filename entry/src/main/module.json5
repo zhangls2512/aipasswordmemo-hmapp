@@ -52,7 +52,8 @@
         ],
         "startWindowIcon": "$media:layered_image",
         "startWindowBackground": "$color:start_window_background",
-        "removeMissionAfterTerminate": true
+        "removeMissionAfterTerminate": true,
+        "recoverable": true
       }
     ],
     "extensionAbilities": [

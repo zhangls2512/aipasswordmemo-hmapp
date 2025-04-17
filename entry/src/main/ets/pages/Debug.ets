@@ -1,4 +1,4 @@
-import { abilityManager, appManager, bundleManager, common } from '@kit.AbilityKit'
+import { abilityManager, appManager, appRecovery, bundleManager, common } from '@kit.AbilityKit'
 import { accessibility } from '@kit.AccessibilityKit'
 import { preferences } from '@kit.ArkData'
 import { process } from '@kit.ArkTS'
@@ -15,12 +15,8 @@ interface Element {
   value: string
 }
 
-function decimalToDottedIP(decimalIP: number): string {
-  const part1 = (decimalIP >>> 24) & 0xFF
-  const part2 = (decimalIP >>> 16) & 0xFF
-  const part3 = (decimalIP >>> 8) & 0xFF
-  const part4 = decimalIP & 0xFF
-  return `${part1}.${part2}.${part3}.${part4}`
+function decimalToDottedIP(decimalIP: number) {
+  return (decimalIP >>> 24) + '.' + (decimalIP >> 16 & 0xFF) + '.' + (decimalIP >> 8 & 0xFF) + '.' + (decimalIP & 0xFF)
 }
 
 @Builder
@@ -802,6 +798,119 @@ export struct Debug {
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('应用恢复')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              Row() {
+                Text('重启当前进程')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                appRecovery.restartApp()
+              })
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('保存当前状态')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                const res = appRecovery.saveAppState()
+                if (res) {
+                  promptAction.showToast({
+                    message: '保存成功'
+                  })
+                }
+              })
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('设置')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Recoverysetting'
+                })
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))

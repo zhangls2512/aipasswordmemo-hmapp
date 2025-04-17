@@ -28,6 +28,7 @@ export struct Huaweiaccount {
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   context = getContext(this) as common.UIAbilityContext
+  pageInfos: NavPathStack = new NavPathStack()
   openLinkType: boolean = false
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
@@ -66,7 +67,7 @@ export struct Huaweiaccount {
             promptAction.showToast({
               message: '绑定成功'
             })
-            this.refresh()
+            this.pageInfos.pop()
           }
         }
         if (err) {
@@ -75,34 +76,6 @@ export struct Huaweiaccount {
           })
         }
       })
-
-  async refresh() {
-    this.controller.setEnabled(false)
-    const accessToken = get()
-    if (accessToken) {
-      this.loading = true
-      const infores = await httpRequest('/account/getAccountInfo', {
-        accessToken: accessToken
-      })
-      if (infores !== 'fail') {
-        this.email = JSON.parse(infores).data.email as string
-        const accountres = await httpRequest('/account/getExternalAccount', {
-          accessToken: accessToken
-        })
-        this.loading = false
-        if (accountres !== 'fail') {
-          const account = JSON.parse(accountres).data as Account[]
-          if (account.some(item => item.platform === 'huawei')) {
-            this.isBind = true
-          } else {
-            this.isBind = false
-          }
-        }
-      } else {
-        this.loading = false
-      }
-    }
-  }
 
   build() {
     NavDestination() {
@@ -282,7 +255,7 @@ export struct Huaweiaccount {
                       promptAction.showToast({
                         message: '解绑成功'
                       })
-                      this.refresh()
+                      this.pageInfos.pop()
                     }
                   })
               }
@@ -347,21 +320,46 @@ export struct Huaweiaccount {
         left: $r('sys.float.ohos_id_max_padding_start'),
         right: $r('sys.float.ohos_id_max_padding_end')
       })
-      .onAppear(() => {
-        const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-          name: 'commonSetting'
-        })
-        const openLinkType: preferences.ValueType = commonSettingDataPreferences.getSync('openLinkType', 0)
-        if (openLinkType === 0) {
-          this.openLinkType = false
-        }
-        if (openLinkType === 1) {
-          this.openLinkType = true
-        }
-        this.refresh()
-      })
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title(this.isBind ? '解绑华为账号' : '绑定华为账号')
+    .onReady(async (context: NavDestinationContext) => {
+      this.pageInfos = context.pathStack
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const openLinkType: preferences.ValueType = commonSettingDataPreferences.getSync('openLinkType', 0)
+      if (openLinkType === 0) {
+        this.openLinkType = false
+      }
+      if (openLinkType === 1) {
+        this.openLinkType = true
+      }
+      this.controller.setEnabled(false)
+      const accessToken = get()
+      if (accessToken) {
+        this.loading = true
+        const infores = await httpRequest('/account/getAccountInfo', {
+          accessToken: accessToken
+        })
+        if (infores !== 'fail') {
+          this.email = JSON.parse(infores).data.email as string
+          const accountres = await httpRequest('/account/getExternalAccount', {
+            accessToken: accessToken
+          })
+          this.loading = false
+          if (accountres !== 'fail') {
+            const account = JSON.parse(accountres).data as Account[]
+            if (account.some(item => item.platform === 'huawei')) {
+              this.isBind = true
+            } else {
+              this.isBind = false
+            }
+          }
+        } else {
+          this.loading = false
+        }
+      }
+    })
   }
 }

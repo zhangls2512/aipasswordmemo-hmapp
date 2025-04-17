@@ -9,6 +9,7 @@ export function ReportQoeBuilder() {
 
 @ComponentV2
 export struct ReportQoe {
+  pageInfos: NavPathStack = new NavPathStack()
   serviceType: netQuality.ServiceType = 'default'
   qoeType: netQuality.QoeType = 'good'
 
@@ -120,6 +121,7 @@ export struct ReportQoe {
                   promptAction.showToast({
                     message: '反馈成功'
                   })
+                  this.pageInfos.pop()
                 } catch (err) {
                   promptAction.showToast({
                     message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
@@ -141,5 +143,8 @@ export struct ReportQoe {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('反馈网络传输体验')
+    .onReady((context: NavDestinationContext) => {
+      this.pageInfos = context.pathStack
+    })
   }
 }

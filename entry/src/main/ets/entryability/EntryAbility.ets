@@ -1,4 +1,4 @@
-import { AbilityConstant, ConfigurationConstant, errorManager, UIAbility } from '@kit.AbilityKit'
+import { AbilityConstant, appRecovery, ConfigurationConstant, errorManager, UIAbility } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
@@ -11,6 +11,10 @@ import { remove } from '../common/Accesstoken'
 import { httpRequest } from '../common/Request'
 
 export default class EntryAbility extends UIAbility {
+  onCreate() {
+    appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
+  }
+
   async onWindowStageCreate(windowStage: window.WindowStage) {
     windowStage.loadContent('pages/Index')
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
