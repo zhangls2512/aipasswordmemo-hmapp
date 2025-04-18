@@ -29,17 +29,27 @@ export struct Agreements {
         ListItem() {
           Column() {
             Row() {
-              Text('用户服务条款与条件')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                .fontWeight('medium')
+              if (this.agreedUserAgreement !== 2) {
+                Text('用户服务条款与条件')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+              }
               if (this.agreedUserAgreement === 2) {
                 Badge({
                   value: '',
-                  style: {}
-                })
-                  .margin({
-                    left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
+                  position: BadgePosition.Right,
+                  style: {
+                    badgeSize: 12,
+                    badgeColor: '#FA2A2D'
+                  }
+                }) {
+                  Text('用户服务条款与条件')
+                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                    .fontWeight('medium')
+                    .margin({
+                      right: 16
+                    })
+                }
               }
               Blank()
               Image($r('app.media.right'))

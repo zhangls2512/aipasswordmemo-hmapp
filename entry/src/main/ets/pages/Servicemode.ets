@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { AppStorageV2 } from '@kit.ArkUI'
+import openLink from '../common/Openlink'
 import { AllService } from './Setting'
 
 @Builder
@@ -15,19 +16,11 @@ export struct Servicemode {
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
-  openLinkType: boolean = false
 
   getSetting() {
     const allService: preferences.ValueType =
       this.commonSettingDataPreferences.getSync('allService', true)
     this.AllService.allService = allService as boolean
-    const openLinkType: preferences.ValueType = this.commonSettingDataPreferences.getSync('openLinkType', 0)
-    if (openLinkType === 0) {
-      this.openLinkType = false
-    }
-    if (openLinkType === 1) {
-      this.openLinkType = true
-    }
   }
 
   build() {
@@ -69,12 +62,7 @@ export struct Servicemode {
                 .fontSize($r('sys.float.ohos_id_text_size_body3'))
                 .fontWeight('medium')
                 .onClick(() => {
-                  this.context.openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904',
-                    {
-                      parameters: {
-                        'ohos.ability.params.showDefaultPicker': this.openLinkType
-                      }
-                    })
+                  openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
                 })
               Span('。开启开关，即表示您知悉并同意我们向您提供本应用服务。')
                 .fontColor($r('sys.color.font_secondary'))

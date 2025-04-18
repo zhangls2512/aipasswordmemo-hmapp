@@ -4,6 +4,7 @@ import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { set } from '../common/Accesstoken'
+import openLink from '../common/Openlink'
 import { httpRequest } from '../common/Request'
 
 @ComponentV2
@@ -19,7 +20,6 @@ export default struct Login {
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   context = getContext(this) as common.UIAbilityContext
-  openLinkType: boolean = false
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
@@ -329,11 +329,7 @@ export default struct Login {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
               .onClick(() => {
-                this.context.openLink('https://www.zhangls2512.cn/product/account/register', {
-                  parameters: {
-                    'ohos.ability.params.showDefaultPicker': this.openLinkType
-                  }
-                })
+                openLink('https://www.zhangls2512.cn/product/account/register')
               })
             Blank()
             Row() {
@@ -356,32 +352,18 @@ export default struct Login {
                 Span('《用户服务条款与条件》')
                   .fontColor($r('sys.color.font_emphasize'))
                   .onClick(() => {
-                    this.context.openLink('https://www.zhangls2512.cn/index', {
-                      parameters: {
-                        'ohos.ability.params.showDefaultPicker': this.openLinkType
-                      }
-                    })
+                    openLink('https://docs.qq.com/doc/p/575bbc2072a149822917882aa974fcba0e111dac')
                   })
                 Span('《关于轩铭密码智能备忘录与隐私的声明》')
                   .fontColor($r('sys.color.font_emphasize'))
                   .onClick(() => {
-                    this.context.openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904',
-                      {
-                        parameters: {
-                          'ohos.ability.params.showDefaultPicker': this.openLinkType
-                        }
-                      })
+                    openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
                   })
                 Span('。如果使用华为账号登录，已阅读并同意')
                 Span('《关于华为账号与隐私的声明》')
                   .fontColor($r('sys.color.font_emphasize'))
                   .onClick(() => {
-                    this.context.openLink('https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN',
-                      {
-                        parameters: {
-                          'ohos.ability.params.showDefaultPicker': this.openLinkType
-                        }
-                      })
+                    openLink('https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN')
                   })
                 Span('。')
               }
@@ -417,16 +399,6 @@ export default struct Login {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(() => {
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      const openLinkType: preferences.ValueType = commonSettingDataPreferences.getSync('openLinkType', 0)
-      if (openLinkType === 0) {
-        this.openLinkType = false
-      }
-      if (openLinkType === 1) {
-        this.openLinkType = true
-      }
       this.controller.setEnabled(false)
     })
   }

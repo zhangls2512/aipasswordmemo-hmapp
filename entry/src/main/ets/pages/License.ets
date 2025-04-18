@@ -1,5 +1,4 @@
-import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
+import openLink from '../common/Openlink'
 
 @Builder
 export function LicenseBuilder() {
@@ -8,9 +7,6 @@ export function LicenseBuilder() {
 
 @ComponentV2
 export struct License {
-  context = getContext(this) as common.UIAbilityContext
-  openLinkType: boolean = false
-
   build() {
     NavDestination() {
       List() {
@@ -25,11 +21,7 @@ export struct License {
                 .fontColor($r('sys.color.font_emphasize'))
                 .width('75%')
                 .onClick(() => {
-                  this.context.openLink('https://beian.miit.gov.cn/#/Integrated/recordQuery', {
-                    parameters: {
-                      'ohos.ability.params.showDefaultPicker': this.openLinkType
-                    }
-                  })
+                  openLink('https://beian.miit.gov.cn/#/Integrated/recordQuery')
                 })
             }
 
@@ -42,11 +34,7 @@ export struct License {
                 .fontColor($r('sys.color.font_emphasize'))
                 .width('75%')
                 .onClick(() => {
-                  this.context.openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512品备12号-HA', {
-                    parameters: {
-                      'ohos.ability.params.showDefaultPicker': this.openLinkType
-                    }
-                  })
+                  openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512品备12号-HA')
                 })
             }
             .margin({
@@ -68,17 +56,5 @@ export struct License {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('资质证照')
-    .onReady(() => {
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      const openLinkType: preferences.ValueType = commonSettingDataPreferences.getSync('openLinkType', 0)
-      if (openLinkType === 0) {
-        this.openLinkType = false
-      }
-      if (openLinkType === 1) {
-        this.openLinkType = true
-      }
-    })
   }
 }

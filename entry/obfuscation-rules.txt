@@ -16,6 +16,7 @@ errMsg
 requestIp
 -keep-file-name
 src/main/ets/pages/Notice.ets
+src/main/ets/pages/Recoverysetting.ets
 src/main/ets/pages/Faultlog.ets
 src/main/ets/pages/Feedback.ets
 src/main/ets/pages/Debug.ets

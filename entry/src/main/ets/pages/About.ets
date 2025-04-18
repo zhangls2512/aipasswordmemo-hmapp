@@ -1,9 +1,9 @@
 import { common } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
-import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { call } from '@kit.TelephonyKit'
+import openLink from '../common/Openlink'
 import { copy } from '../common/Pasteboard'
 
 @Builder
@@ -17,7 +17,6 @@ export struct About {
   @Local updateLoading: boolean = false
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
-  openLinkType: boolean = false
 
   build() {
     NavDestination() {
@@ -72,7 +71,7 @@ export struct About {
               Blank()
               if (!this.updateLoading) {
                 if (this.hasUpdate === -1) {
-                  Text('检测新版本')
+                  Text('检查更新')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
@@ -123,11 +122,6 @@ export struct About {
                 const res = await updateManager.checkAppUpdate(this.context)
                 this.updateLoading = false
                 this.hasUpdate = res.updateAvailable
-                if (res.updateAvailable === 0) {
-                  promptAction.showToast({
-                    message: '已是最新版本'
-                  })
-                }
                 if (res.updateAvailable === 1) {
                   updateManager.showUpdateDialog(this.context)
                 }
@@ -177,11 +171,7 @@ export struct About {
             })
             .width('100%')
             .onClick(() => {
-              this.context.openLink('https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp', {
-                parameters: {
-                  'ohos.ability.params.showDefaultPicker': this.openLinkType
-                }
-              })
+              openLink('https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp')
             })
 
             Divider()
@@ -327,12 +317,7 @@ export struct About {
               })
               .width('100%')
               .onClick(() => {
-                this.context.openLink('https://chatbot.weixin.qq.com/webapp/5e2JglFAERGl06z0FkTK6eWL6D1Oa5?robotName=轩铭2512产品客服',
-                  {
-                    parameters: {
-                      'ohos.ability.params.showDefaultPicker': this.openLinkType
-                    }
-                  })
+                openLink('https://chatbot.weixin.qq.com/webapp/5e2JglFAERGl06z0FkTK6eWL6D1Oa5?robotName=轩铭2512产品客服')
               })
 
               Divider()
@@ -503,11 +488,7 @@ export struct About {
               })
               .width('100%')
               .onClick(() => {
-                this.context.openLink('https://pd.qq.com/s/cnx7f1zdm', {
-                  parameters: {
-                    'ohos.ability.params.showDefaultPicker': this.openLinkType
-                  }
-                })
+                openLink('https://pd.qq.com/s/cnx7f1zdm')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -563,11 +544,7 @@ export struct About {
               })
               .width('100%')
               .onClick(() => {
-                this.context.openLink('https://www.zhangls2512.cn/index', {
-                  parameters: {
-                    'ohos.ability.params.showDefaultPicker': this.openLinkType
-                  }
-                })
+                openLink('https://www.zhangls2512.cn/index')
               })
 
               Divider()
@@ -607,11 +584,7 @@ export struct About {
               })
               .width('100%')
               .onClick(() => {
-                this.context.openLink('https://space.bilibili.com/448824492', {
-                  parameters: {
-                    'ohos.ability.params.showDefaultPicker': this.openLinkType
-                  }
-                })
+                openLink('https://space.bilibili.com/448824492')
               })
 
               Divider()
@@ -651,11 +624,7 @@ export struct About {
               })
               .width('100%')
               .onClick(() => {
-                this.context.openLink('https://gitcode.com/zhangls2512/aipasswordmemo-hmapp', {
-                  parameters: {
-                    'ohos.ability.params.showDefaultPicker': this.openLinkType
-                  }
-                })
+                openLink('https://gitcode.com/zhangls2512/aipasswordmemo-hmapp')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -703,16 +672,6 @@ export struct About {
     .title('关于')
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      const openLinkType: preferences.ValueType = commonSettingDataPreferences.getSync('openLinkType', 0)
-      if (openLinkType === 0) {
-        this.openLinkType = false
-      }
-      if (openLinkType === 1) {
-        this.openLinkType = true
-      }
     })
   }
 }

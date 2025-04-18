@@ -3,6 +3,7 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { AppStorageV2, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
+import openLink from '../common/Openlink'
 
 @ObservedV2
 export class AllService {
@@ -18,19 +19,11 @@ export default struct Setting {
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
-  openLinkType: boolean = false
   accessToken: string = get()
 
   getSetting() {
     const allService: preferences.ValueType = this.commonSettingDataPreferences.getSync('allService', true)
     this.AllService.allService = allService as boolean
-    const openLinkType: preferences.ValueType = this.commonSettingDataPreferences.getSync('openLinkType', 0)
-    if (openLinkType === 0) {
-      this.openLinkType = false
-    }
-    if (openLinkType === 1) {
-      this.openLinkType = true
-    }
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
       this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
@@ -212,17 +205,27 @@ export default struct Setting {
                 })
               if (this.agreedPrivacyAgreement === 0 || this.agreedPrivacyAgreement === 2) {
                 Row() {
-                  Text('阅读并签署隐私协议')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                    .fontWeight('medium')
+                  if (this.agreedPrivacyAgreement === 0) {
+                    Text('阅读并签署隐私协议')
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                  }
                   if (this.agreedPrivacyAgreement === 2) {
                     Badge({
                       value: '',
-                      style: {}
-                    })
-                      .margin({
-                        left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                      })
+                      position: BadgePosition.Right,
+                      style: {
+                        badgeSize: 12,
+                        badgeColor: '#FA2A2D'
+                      }
+                    }) {
+                      Text('阅读并签署隐私协议')
+                        .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                        .fontWeight('medium')
+                        .margin({
+                          right: 16
+                        })
+                    }
                   }
                   Blank()
                   Image($r('app.media.right'))
@@ -252,7 +255,7 @@ export default struct Setting {
                   }
                 })
               }
-              if (this.agreedPrivacyAgreement) {
+              if (this.agreedPrivacyAgreement === 1) {
                 Row() {
                   Text('撤回同意隐私协议')
                     .fontColor($r('sys.color.warning'))
@@ -330,12 +333,7 @@ export default struct Setting {
               })
               .width('100%')
               .onClick(() => {
-                this.context.openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904',
-                  {
-                    parameters: {
-                      'ohos.ability.params.showDefaultPicker': this.openLinkType
-                    }
-                  })
+                openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
               })
 
               Divider()

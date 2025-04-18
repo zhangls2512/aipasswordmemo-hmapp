@@ -1,9 +1,8 @@
-import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
-import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
+import openLink from '../common/Openlink'
 import { httpRequest } from '../common/Request'
 
 interface Account {
@@ -27,9 +26,7 @@ export struct Huaweiaccount {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
-  openLinkType: boolean = false
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
@@ -281,12 +278,7 @@ export struct Huaweiaccount {
                     Span('《关于华为账号与隐私的声明》')
                       .fontColor($r('sys.color.font_emphasize'))
                       .onClick(() => {
-                        this.context.openLink('https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN',
-                          {
-                            parameters: {
-                              'ohos.ability.params.showDefaultPicker': this.openLinkType
-                            }
-                          })
+                        openLink('https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN')
                       })
                     Span('。')
                   }
@@ -325,16 +317,6 @@ export struct Huaweiaccount {
     .title(this.isBind ? '解绑华为账号' : '绑定华为账号')
     .onReady(async (context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      const openLinkType: preferences.ValueType = commonSettingDataPreferences.getSync('openLinkType', 0)
-      if (openLinkType === 0) {
-        this.openLinkType = false
-      }
-      if (openLinkType === 1) {
-        this.openLinkType = true
-      }
       this.controller.setEnabled(false)
       const accessToken = get()
       if (accessToken) {
