@@ -32,7 +32,7 @@ export struct Recoverysetting {
                 ])
                   .selected(2)
                   .value('APP_FREEZE')
-                  .onSelect(async (index: number) => {
+                  .onSelect((index: number) => {
                     if (index === 0) {
                       this.restart = appRecovery.RestartFlag.ALWAYS_RESTART
                     }
@@ -67,7 +67,7 @@ export struct Recoverysetting {
                 ])
                   .selected(0)
                   .value('发生故障')
-                  .onSelect(async (index: number) => {
+                  .onSelect((index: number) => {
                     if (index === 0) {
                       this.saveOccasion = appRecovery.SaveOccasionFlag.SAVE_WHEN_ERROR
                     }
@@ -96,7 +96,7 @@ export struct Recoverysetting {
                 ])
                   .selected(0)
                   .value('写入到本地文件缓存')
-                  .onSelect(async (index: number) => {
+                  .onSelect((index: number) => {
                     if (index === 0) {
                       this.saveMode = appRecovery.SaveModeFlag.SAVE_WITH_FILE
                     }

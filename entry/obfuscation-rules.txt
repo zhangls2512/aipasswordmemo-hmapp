@@ -24,9 +24,15 @@ src/main/ets/pages/About.ets
 src/main/ets/pages/ReportQoe.ets
 src/main/ets/pages/Commonsetting.ets
 src/main/ets/pages/Permissionsetting.ets
+src/main/ets/pages/Vip.ets
+src/main/ets/pages/Cloudbackupmanage.ets
+src/main/ets/pages/Key.ets
 src/main/ets/pages/Moresetting.ets
 src/main/ets/pages/Agreements.ets
 src/main/ets/pages/Networktest.ets
+src/main/ets/pages/Cloudservice.ets
 src/main/ets/pages/Servicemode.ets
+src/main/ets/pages/Viplog.ets
 src/main/ets/pages/License.ets
 src/main/ets/pages/Huaweiaccount.ets
+src/main/ets/pages/Vipcode.ets

@@ -4,16 +4,25 @@ import { preferences } from '@kit.ArkData'
 import { AppStorageV2, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
+import { httpRequest } from '../common/Request'
 
 @ObservedV2
 export class AllService {
   @Trace allService: boolean = true
 }
 
+@ObservedV2
+export class CloudService {
+  @Trace status: boolean = false
+}
+
 @ComponentV2
 export default struct Setting {
   @Local AllService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
-  @Local agreedPrivacyAgreement: number | undefined = 0
+  @Local CloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
+  @Local loading: boolean = false
+  @Local autoCloudBackup: boolean = false
+  @Local agreedPrivacyAgreement: number | undefined = undefined
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
@@ -24,6 +33,8 @@ export default struct Setting {
   getSetting() {
     const allService: preferences.ValueType = this.commonSettingDataPreferences.getSync('allService', true)
     this.AllService.allService = allService as boolean
+    const autoCloudBackup: preferences.ValueType = this.commonSettingDataPreferences.getSync('autoCloudBackup', false)
+    this.autoCloudBackup = autoCloudBackup as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
       this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
@@ -75,17 +86,255 @@ export default struct Setting {
                     name: 'Huaweiaccount'
                   })
                 })
+
+                if (!this.loading) {
+                  Divider()
+                    .padding({
+                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                    })
+                  Row() {
+                    if (!this.CloudService.status) {
+                      Text('开通云服务')
+                        .fontColor($r('sys.color.font_emphasize'))
+                        .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                        .fontWeight('medium')
+                    }
+                    if (this.CloudService.status) {
+                      Text('取消开通云服务')
+                        .fontColor($r('sys.color.warning'))
+                        .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                        .fontWeight('medium')
+                    }
+                    Blank()
+                    Image($r('app.media.right'))
+                      .fillColor($r('sys.color.icon_fourth'))
+                      .height(12)
+                      .width(12)
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.interactive_pressed'))
+                    }
+                  })
+                  .width('100%')
+                  .onClick(() => {
+                    this.pageInfos.pushPath({
+                      name: 'Cloudservice'
+                    })
+                  })
+
+                  if (this.CloudService.status) {
+                    Divider()
+                      .padding({
+                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      })
+                    Row() {
+                      Text('会员中心')
+                        .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                        .fontWeight('medium')
+                      Blank()
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                    .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onClick(() => {
+                      this.pageInfos.pushPath({
+                        name: 'Vip'
+                      })
+                    })
+                  }
+                }
               }
               .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
               .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+              if (this.loading) {
+                LoadingProgress()
+                  .height(20)
+                  .margin({
+                    top: 6,
+                    left: $r('sys.float.ohos_id_corner_radius_default_m')
+                  })
+                  .width(20)
+              }
             }
             .alignItems(HorizontalAlign.Start)
           }
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
+
+          if (this.CloudService.status) {
+            ListItem() {
+              Column() {
+                Text('云备份')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .fontWeight('medium')
+                  .margin({
+                    bottom: 6,
+                    left: $r('sys.float.ohos_id_corner_radius_default_m')
+                  })
+                Column() {
+                  Row() {
+                    Text('自动开启')
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                    Blank()
+                    Toggle({
+                      type: ToggleType.Switch,
+                      isOn: $$this.autoCloudBackup
+                    })
+                      .onChange((isOn: boolean) => {
+                        this.commonSettingDataPreferences.putSync('autoCloudBackup', isOn)
+                        this.commonSettingDataPreferences.flushSync()
+                      })
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.interactive_pressed'))
+                    }
+                  })
+                  .width('100%')
+                  .onClick(() => {
+                    this.pageInfos.pushPath({
+                      name: 'Cloudbackupmanage'
+                    })
+                  })
+
+                  Divider()
+                    .padding({
+                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                    })
+                  Row() {
+                    Text('管理')
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                    Blank()
+                    Image($r('app.media.right'))
+                      .fillColor($r('sys.color.icon_fourth'))
+                      .height(12)
+                      .width(12)
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.interactive_pressed'))
+                    }
+                  })
+                  .width('100%')
+                  .onClick(() => {
+                    this.pageInfos.pushPath({
+                      name: 'Cloudbackupmanage'
+                    })
+                  })
+
+                  Divider()
+                    .padding({
+                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                    })
+                  Row() {
+                    Text('导入')
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                    Blank()
+                    Image($r('app.media.right'))
+                      .fillColor($r('sys.color.icon_fourth'))
+                      .height(12)
+                      .width(12)
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.interactive_pressed'))
+                    }
+                  })
+                  .width('100%')
+                  .onClick(() => {
+                    promptAction.showToast({
+                      message: '敬请期待'
+                    })
+                  })
+
+                  Divider()
+                    .padding({
+                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                    })
+                  Row() {
+                    Text('密钥')
+                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                      .fontWeight('medium')
+                    Blank()
+                    Image($r('app.media.right'))
+                      .fillColor($r('sys.color.icon_fourth'))
+                      .height(12)
+                      .width(12)
+                  }
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.interactive_pressed'))
+                    }
+                  })
+                  .width('100%')
+                  .onClick(() => {
+                    this.pageInfos.pushPath({
+                      name: 'Key'
+                    })
+                  })
+                }
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                .padding($r('sys.float.ohos_id_corner_radius_mark'))
+              }
+              .alignItems(HorizontalAlign.Start)
+            }
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
+          }
         }
+
         ListItem() {
           Column() {
             Row() {
@@ -198,11 +447,13 @@ export default struct Setting {
                 })
               })
 
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
-                })
+              if (typeof (this.agreedPrivacyAgreement) === 'number') {
+                Divider()
+                  .padding({
+                    left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                    right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  })
+              }
               if (this.agreedPrivacyAgreement === 0 || this.agreedPrivacyAgreement === 2) {
                 Row() {
                   if (this.agreedPrivacyAgreement === 0) {
@@ -281,12 +532,12 @@ export default struct Setting {
                 .onClick(() => {
                   try {
                     privacyManager.disableService()
-                    this.getSetting()
                   } catch (err) {
                     promptAction.showToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }
+                  this.context.terminateSelf()
                 })
               }
             }
@@ -363,9 +614,7 @@ export default struct Setting {
               })
               .width('100%')
               .onClick(() => {
-                promptAction.showToast({
-                  message: '敬请期待'
-                })
+                openLink('https://docs.qq.com/doc/p/2bde62f6c2aaea97fbcca04c929c284005326d37')
               })
 
               Divider()
@@ -427,9 +676,7 @@ export default struct Setting {
               })
               .width('100%')
               .onClick(() => {
-                promptAction.showToast({
-                  message: '敬请期待'
-                })
+                openLink('https://docs.qq.com/doc/p/bdc2799638a46746599c68d82697b10a2becb2e4')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -623,8 +870,21 @@ export default struct Setting {
     })
     .title('设置')
     .titleMode(NavigationTitleMode.Mini)
-    .onAppear(() => {
+    .onAppear(async () => {
       this.getSetting()
+      if (this.accessToken) {
+        this.loading = true
+        const infores = await httpRequest('/account/getAccountInfo', {
+          accessToken: this.accessToken
+        })
+        this.loading = false
+        if (infores !== 'fail') {
+          const service = JSON.parse(infores).data.service as string[]
+          this.CloudService.status = service.includes('password')
+        } else {
+          this.loading = false
+        }
+      }
     })
   }
 }

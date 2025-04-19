@@ -1,6 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 
 @Builder
 export function MoresettingBuilder() {
@@ -47,18 +45,11 @@ export struct Moresetting {
               })
               .width('100%')
               .onClick(() => {
-                try {
-                  const applicationContext = this.context.getApplicationContext()
-                  applicationContext.restartApp({
-                    bundleName: 'com.zhangxm.aipasswordmemo',
-                    abilityName: 'EntryAbility'
-                  })
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
-                }
+                const applicationContext = this.context.getApplicationContext()
+                applicationContext.restartApp({
+                  bundleName: 'com.zhangxm.aipasswordmemo',
+                  abilityName: 'EntryAbility'
+                })
               })
 
               Divider()
@@ -89,14 +80,7 @@ export struct Moresetting {
               })
               .width('100%')
               .onClick(() => {
-                try {
-                  this.context.terminateSelf()
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
-                }
+                this.context.terminateSelf()
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

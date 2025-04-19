@@ -74,6 +74,36 @@
       "name": "Recoverysetting",
       "pageSourceFile": "src/main/ets/pages/Recoverysetting.ets",
       "buildFunction": "RecoverysettingBuilder"
+    },
+    {
+      "name": "Cloudservice",
+      "pageSourceFile": "src/main/ets/pages/Cloudservice.ets",
+      "buildFunction": "CloudserviceBuilder"
+    },
+    {
+      "name": "Vip",
+      "pageSourceFile": "src/main/ets/pages/Vip.ets",
+      "buildFunction": "VipBuilder"
+    },
+    {
+      "name": "Vipcode",
+      "pageSourceFile": "src/main/ets/pages/Vipcode.ets",
+      "buildFunction": "VipcodeBuilder"
+    },
+    {
+      "name": "Viplog",
+      "pageSourceFile": "src/main/ets/pages/Viplog.ets",
+      "buildFunction": "ViplogBuilder"
+    },
+    {
+      "name": "Cloudbackupmanage",
+      "pageSourceFile": "src/main/ets/pages/Cloudbackupmanage.ets",
+      "buildFunction": "CloudbackupmanageBuilder"
+    },
+    {
+      "name": "Key",
+      "pageSourceFile": "src/main/ets/pages/Key.ets",
+      "buildFunction": "KeyBuilder"
     }
   ]
 }

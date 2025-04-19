@@ -1251,15 +1251,8 @@ export struct Debug {
                   ]
                 })
                 if (data.index === 1) {
-                  try {
-                    const applicationContext = this.context.getApplicationContext()
-                    applicationContext.clearUpApplicationData()
-                  } catch (err) {
-                    promptAction.showToast({
-                      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                      (err as BusinessError).message
-                    })
-                  }
+                  const applicationContext = this.context.getApplicationContext()
+                  applicationContext.clearUpApplicationData()
                 }
               })
 
@@ -1305,26 +1298,12 @@ export struct Debug {
                   ]
                 })
                 if (data.index === 0) {
-                  try {
-                    const applicationContext = this.context.getApplicationContext()
-                    applicationContext.killAllProcesses(true)
-                  } catch (err) {
-                    promptAction.showToast({
-                      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                      (err as BusinessError).message
-                    })
-                  }
+                  const applicationContext = this.context.getApplicationContext()
+                  applicationContext.killAllProcesses(true)
                 }
                 if (data.index === 1) {
-                  try {
-                    const applicationContext = this.context.getApplicationContext()
-                    applicationContext.killAllProcesses(false)
-                  } catch (err) {
-                    promptAction.showToast({
-                      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                      (err as BusinessError).message
-                    })
-                  }
+                  const applicationContext = this.context.getApplicationContext()
+                  applicationContext.killAllProcesses(false)
                 }
               })
             }

@@ -32,7 +32,7 @@ export struct ReportQoe {
                 ])
                   .selected(0)
                   .value('默认')
-                  .onSelect(async (index: number) => {
+                  .onSelect((index: number) => {
                     if (index === 0) {
                       this.serviceType = 'default'
                     }
@@ -73,7 +73,7 @@ export struct ReportQoe {
                 ])
                   .selected(0)
                   .value('良好')
-                  .onSelect(async (index: number) => {
+                  .onSelect((index: number) => {
                     if (index === 0) {
                       this.qoeType = 'good'
                     }

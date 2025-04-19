@@ -79,7 +79,7 @@ export default struct Me {
           })
           .width('100%')
           .onClick(async () => {
-            if (this.email === '') {
+            if (this.email === '' && !this.loading) {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(true)
               this.isShowLoginSheet = !this.isShowLoginSheet
