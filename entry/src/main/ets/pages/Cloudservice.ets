@@ -1,6 +1,6 @@
 import { AppStorageV2, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 import { CloudService } from './Setting'
 
 @Builder
@@ -36,7 +36,7 @@ export struct Cloudservice {
                   .width('100%')
                   .onClick(async () => {
                     this.loading = true
-                    const res = await httpRequest('/account/openService', {
+                    const res = await request('/account/openService', {
                       accessToken: get(),
                       service: 'password'
                     })
@@ -71,7 +71,7 @@ export struct Cloudservice {
                   .width('100%')
                   .onClick(async () => {
                     this.loading = true
-                    const res = await httpRequest('/account/closeService', {
+                    const res = await request('/account/closeService', {
                       accessToken: get(),
                       service: 'password'
                     })
@@ -115,7 +115,7 @@ export struct Cloudservice {
     .onReady(async (context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
       this.loading = true
-      const infores = await httpRequest('/account/getAccountInfo', {
+      const infores = await request('/account/getAccountInfo', {
         accessToken: get()
       })
       this.loading = false

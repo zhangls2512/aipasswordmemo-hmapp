@@ -3,7 +3,7 @@ import { promptAction } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { iap } from '@kit.IAPKit'
 import { get } from '../common/Accesstoken'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 
 @Builder
 export function VipBuilder() {
@@ -20,7 +20,7 @@ export struct Vip {
 
   async getVipEndDate() {
     this.vipEndDateLoading = true
-    const userres = await httpRequest('/product/getUserInfo', {
+    const userres = await request('/product/getUserInfo', {
       accessToken: get(),
       product: 'password'
     })

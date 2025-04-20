@@ -8,7 +8,7 @@ import { connection } from '@kit.NetworkKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
 import { remove } from '../common/Accesstoken'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 
 export default class EntryAbility extends UIAbility {
   onCreate() {
@@ -82,7 +82,7 @@ export default class EntryAbility extends UIAbility {
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
           const promises = appEventGroups.map(async (item) => {
-            const res = await httpRequest('/debug/newErrorLog', {
+            const res = await request('/debug/newErrorLog', {
               key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
               object: item
             })

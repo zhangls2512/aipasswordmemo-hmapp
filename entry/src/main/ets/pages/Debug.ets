@@ -407,7 +407,6 @@ export struct Debug {
       value: String(this.context.abilityInfo.orientationId)
     }
   ]
-  abilityRunningInfoArray: Element[] = []
   bundleInfoArray: Element[] = []
   deviceInfoArray: Element[] = [
     { name: '设备类型', value: deviceInfo.deviceType },
@@ -1506,55 +1505,6 @@ export struct Debug {
 
         ListItem() {
           Column() {
-            Text('Ability 运行信息')
-              .fontColor($r('sys.color.font_secondary'))
-              .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
-              .margin({
-                bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
-              })
-            Column() {
-              ForEach(this.abilityRunningInfoArray, (item: Element, index: number) => {
-                if (item.value) {
-                  if (index !== 0) {
-                    Divider()
-                      .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
-                      })
-                  }
-                  Row() {
-                    Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                      .fontWeight('medium')
-                      .width('45%')
-                    Blank()
-                      .width('5%')
-                    Text(item.value)
-                      .fontColor($r('sys.color.font_secondary'))
-                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                      .textAlign(TextAlign.End)
-                      .width('50%')
-                  }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .width('100%')
-                }
-              })
-            }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
-          }
-          .alignItems(HorizontalAlign.Start)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
-          Column() {
             Text('应用包信息')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -2252,33 +2202,6 @@ export struct Debug {
     .onReady(async (context: NavDestinationContext) => {
       this.getSetting()
       this.pageInfos = context.pathStack
-      const abilityRunningInfos = await abilityManager.getAbilityRunningInfos()
-      this.abilityRunningInfoArray.push({
-        name: '进程 ID',
-        value: String(abilityRunningInfos[0].pid)
-      })
-      this.abilityRunningInfoArray.push({
-        name: '用户 ID',
-        value: String(abilityRunningInfos[0].uid)
-      })
-      this.abilityRunningInfoArray.push({
-        name: '进程名称',
-        value: abilityRunningInfos[0].processName
-      })
-      this.abilityRunningInfoArray.push({
-        name: '启动时间',
-        value: String(abilityRunningInfos[0].startTime)
-      })
-      this.abilityRunningInfoArray.push({
-        name: '状态',
-        value: abilityRunningInfos[0].abilityState === 0 ? '初始化' :
-          abilityRunningInfos[0].abilityState === 2 ? '获焦' :
-            abilityRunningInfos[0].abilityState === 9 ? '前台' :
-              abilityRunningInfos[0].abilityState === 10 ? '后台' :
-                abilityRunningInfos[0].abilityState === 11 ? '前台调度中' :
-                  abilityRunningInfos[0].abilityState === 12 ? '后台调度中' :
-                    'undefined'
-      })
       const isRunningInStabilityTest = await appManager.isRunningInStabilityTest()
       this.applicationInfoArray.push({
         name: '当前是否处于稳定性测试场景',

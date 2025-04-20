@@ -1,6 +1,6 @@
 import { promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 
 @Builder
 export function VipcodeBuilder() {
@@ -27,16 +27,15 @@ export struct Vipcode {
                 placeholder: '请输入兑换码',
                 text: $$this.vipcode
               })
-                .maxLength(40)
-                .showCounter(true)
+                .maxLength(32)
               Button('兑换')
-                .enabled(this.vipcode ? true : false)
+                .enabled(this.vipcode.length === 32 ? true : false)
                 .margin({
-                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_l')
                 })
                 .onClick(async () => {
                   this.loading = true
-                  const res = await httpRequest('/product/useVipcode', {
+                  const res = await request('/product/useVipcode', {
                     accessToken: get(),
                     vipcode: this.vipcode
                   })
@@ -51,6 +50,22 @@ export struct Vipcode {
             }
           }
           .width('100%')
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('如何获取兑换码？')
+              .fontWeight('bold')
+            Text('· 关注官方活动')
+              .fontWeight('medium')
+              .margin({
+                top: $r('sys.float.ohos_id_text_paragraph_margin_m')
+              })
+          }
+          .alignItems(HorizontalAlign.Start)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')

@@ -27,6 +27,7 @@ src/main/ets/pages/Permissionsetting.ets
 src/main/ets/pages/Vip.ets
 src/main/ets/pages/Cloudbackupmanage.ets
 src/main/ets/pages/Key.ets
+src/main/ets/pages/Importkey.ets
 src/main/ets/pages/Moresetting.ets
 src/main/ets/pages/Agreements.ets
 src/main/ets/pages/Networktest.ets

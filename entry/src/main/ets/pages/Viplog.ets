@@ -1,5 +1,5 @@
 import { get } from '../common/Accesstoken'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 
 interface Item {
   date: number,
@@ -138,7 +138,7 @@ export struct Viplog {
       .onReachEnd(async () => {
         if (this.empty === false) {
           this.loading = true
-          const res = await httpRequest('/product/getViplogList', {
+          const res = await request('/product/getViplogList', {
             accessToken: get(),
             product: 'password',
             skip: this.vipLogArray.length
@@ -160,7 +160,7 @@ export struct Viplog {
     .title('会员开通记录')
     .onReady(async () => {
       this.loading = true
-      const res = await httpRequest('/product/getViplogList', {
+      const res = await request('/product/getViplogList', {
         accessToken: get(),
         product: 'password'
       })

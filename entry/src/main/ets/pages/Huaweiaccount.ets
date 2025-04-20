@@ -3,7 +3,7 @@ import { promptAction } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 
 interface Account {
   platform: string,
@@ -52,7 +52,7 @@ export struct Huaweiaccount {
         }
         if (response) {
           this.loading = true
-          const res = await httpRequest('/account/bindExternalAccount', {
+          const res = await request('/account/bindExternalAccount', {
             verifyType: this.type,
             verifyCode: code,
             email: this.email,
@@ -172,7 +172,7 @@ export struct Huaweiaccount {
                   .width('100%')
                   .onClick(async () => {
                     this.loading = true
-                    const res = await httpRequest('/account/sendEmailCode', {
+                    const res = await request('/account/sendEmailCode', {
                       email: this.email
                     })
                     this.loading = false
@@ -241,7 +241,7 @@ export struct Huaweiaccount {
                       code = this.emailcode
                     }
                     this.loading = true
-                    const res = await httpRequest('/account/unbindExternalAccount', {
+                    const res = await request('/account/unbindExternalAccount', {
                       verifyType: this.type,
                       verifyCode: code,
                       email: this.email,
@@ -321,12 +321,12 @@ export struct Huaweiaccount {
       const accessToken = get()
       if (accessToken) {
         this.loading = true
-        const infores = await httpRequest('/account/getAccountInfo', {
+        const infores = await request('/account/getAccountInfo', {
           accessToken: accessToken
         })
         if (infores !== 'fail') {
           this.email = JSON.parse(infores).data.email as string
-          const accountres = await httpRequest('/account/getExternalAccount', {
+          const accountres = await request('/account/getExternalAccount', {
             accessToken: accessToken
           })
           this.loading = false

@@ -1,0 +1,225 @@
+import { util } from '@kit.ArkTS'
+import { asset } from '@kit.AssetStoreKit'
+import { cryptoFramework } from '@kit.CryptoArchitectureKit'
+import { huks } from '@kit.UniversalKeystoreKit'
+
+export interface Key {
+  key: string,
+  iv: string
+}
+
+function stringToArray(str: string): Uint8Array {
+  const textEncoder = new util.TextEncoder()
+  return textEncoder.encodeInto(str)
+}
+
+function arrayToString(arr: Uint8Array): string {
+  const textDecoder = util.TextDecoder.create('utf-8', {
+    ignoreBOM: true
+  })
+  return textDecoder.decodeToString(arr, {
+    stream: false
+  })
+}
+
+function encodeBase64(arr: Uint8Array): Uint8Array {
+  const base64 = new util.Base64Helper()
+  return base64.encodeSync(arr)
+}
+
+function decodeBase64(arr: Uint8Array): Uint8Array {
+  const base64 = new util.Base64Helper()
+  return base64.decodeSync(arr)
+}
+
+export function hasKey(): boolean {
+  const query: asset.AssetMap = new Map()
+  query.set(asset.Tag.ALIAS, stringToArray('key'))
+  query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
+  try {
+    asset.querySync(query)
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function getKey(): Key | string {
+  const query: asset.AssetMap = new Map()
+  query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
+  try {
+    query.set(asset.Tag.ALIAS, stringToArray('key'))
+    const keyres: Array<asset.AssetMap> = asset.querySync(query)
+    const key: Uint8Array = keyres[0].get(asset.Tag.SECRET) as Uint8Array
+    query.set(asset.Tag.ALIAS, stringToArray('iv'))
+    const ivres: Array<asset.AssetMap> = asset.querySync(query)
+    const iv: Uint8Array = ivres[0].get(asset.Tag.SECRET) as Uint8Array
+    return {
+      key: arrayToString(key),
+      iv: arrayToString(iv)
+    }
+  } catch {
+    return 'fail'
+  }
+}
+
+export async function setRandomKey() {
+  const keyGenerator = cryptoFramework.createSymKeyGenerator('AES256')
+  const keyres = await keyGenerator.generateSymKey()
+  const key = keyres.getEncoded().data
+  const random = cryptoFramework.createRandom()
+  const iv = random.generateRandomSync(16).data
+  await huks.importKeyItem('key', {
+    inData: key,
+    properties: [
+      {
+        tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+        value: huks.HuksKeyAlg.HUKS_ALG_AES
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PURPOSE,
+        value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_ENCRYPT | huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
+        value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
+      }
+    ]
+  })
+  const query: asset.AssetMap = new Map()
+  query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
+  query.set(asset.Tag.SECRET, encodeBase64(key))
+  query.set(asset.Tag.ALIAS, stringToArray('key'))
+  asset.addSync(query)
+  query.set(asset.Tag.SECRET, encodeBase64(iv))
+  query.set(asset.Tag.ALIAS, stringToArray('iv'))
+  asset.addSync(query)
+}
+
+export async function setCustomKey(key: Key): Promise<string> {
+  try {
+    await huks.importKeyItem('key', {
+      inData: decodeBase64(stringToArray(key.key)),
+      properties: [
+        {
+          tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+          value: huks.HuksKeyAlg.HUKS_ALG_AES
+        },
+        {
+          tag: huks.HuksTag.HUKS_TAG_PURPOSE,
+          value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_ENCRYPT | huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
+        },
+        {
+          tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
+          value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
+        }
+      ]
+    })
+    const query: asset.AssetMap = new Map()
+    query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
+    query.set(asset.Tag.SECRET, stringToArray(key.key))
+    query.set(asset.Tag.ALIAS, stringToArray('key'))
+    asset.addSync(query)
+    query.set(asset.Tag.SECRET, stringToArray(key.iv))
+    query.set(asset.Tag.ALIAS, stringToArray('iv'))
+    asset.addSync(query)
+    return 'success'
+  } catch {
+    return 'fail'
+  }
+}
+
+export async function removeKey(): Promise<string> {
+  try {
+    await huks.deleteKeyItem('key', {})
+    const query: asset.AssetMap = new Map()
+    query.set(asset.Tag.ALIAS, stringToArray('key'))
+    asset.removeSync(query)
+    query.set(asset.Tag.ALIAS, stringToArray('iv'))
+    asset.removeSync(query)
+    return 'success'
+  } catch {
+    return 'fail'
+  }
+}
+
+export async function encrypt(inputData: string): Promise<Uint8Array> {
+  const data = stringToArray(inputData)
+  const query: asset.AssetMap = new Map()
+  query.set(asset.Tag.ALIAS, stringToArray('iv'))
+  query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
+  const ivres: Array<asset.AssetMap> = asset.querySync(query)
+  const iv: Uint8Array = ivres[0].get(asset.Tag.SECRET) as Uint8Array
+  const options: huks.HuksOptions = {
+    inData: data,
+    properties: [
+      {
+        tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+        value: huks.HuksKeyAlg.HUKS_ALG_AES
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PURPOSE,
+        value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_ENCRYPT
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
+        value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PADDING,
+        value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
+        value: huks.HuksCipherMode.HUKS_MODE_CBC
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_IV,
+        value: decodeBase64(iv)
+      }
+    ]
+  }
+  const session = await huks.initSession('key', options)
+  const res = await huks.finishSession(session.handle, options)
+  return res.outData as Uint8Array
+}
+
+export async function decrypt(data: Uint8Array): Promise<string> {
+  const query: asset.AssetMap = new Map()
+  query.set(asset.Tag.ALIAS, stringToArray('iv'))
+  query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
+  const ivres: Array<asset.AssetMap> = asset.querySync(query)
+  const iv: Uint8Array = ivres[0].get(asset.Tag.SECRET) as Uint8Array
+  const options: huks.HuksOptions = {
+    inData: data,
+    properties: [
+      {
+        tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+        value: huks.HuksKeyAlg.HUKS_ALG_AES
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PURPOSE,
+        value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
+        value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PADDING,
+        value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
+        value: huks.HuksCipherMode.HUKS_MODE_CBC
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_IV,
+        value: decodeBase64(iv)
+      }
+    ]
+  }
+  const session = await huks.initSession('key', options)
+  const res = await huks.finishSession(session.handle, options)
+  return arrayToString(res.outData as Uint8Array)
+}

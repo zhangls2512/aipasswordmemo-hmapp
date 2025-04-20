@@ -1,5 +1,5 @@
 import { promptAction } from '@kit.ArkUI'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 
 @Builder
 export function FeedbackBuilder() {
@@ -35,7 +35,7 @@ export struct Feedback {
                 })
                 .onClick(async () => {
                   this.loading = true
-                  const res = await httpRequest('/debug/sendFeedbackEmail', {
+                  const res = await request('/debug/sendFeedbackEmail', {
                     key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
                     content: this.content
                   })

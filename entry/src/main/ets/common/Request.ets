@@ -10,7 +10,7 @@ interface ErrorResponse {
   errFix: string
 }
 
-export async function httpRequest(path: string, body: rcp.RequestContent) {
+export default async function request(path: string, body: rcp.RequestContent) {
   const context = getContext() as common.UIAbilityContext
   const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'commonSetting'

@@ -104,6 +104,11 @@
       "name": "Key",
       "pageSourceFile": "src/main/ets/pages/Key.ets",
       "buildFunction": "KeyBuilder"
+    },
+    {
+      "name": "Importkey",
+      "pageSourceFile": "src/main/ets/pages/Importkey.ets",
+      "buildFunction": "ImportkeyBuilder"
     }
   ]
 }

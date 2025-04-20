@@ -4,7 +4,7 @@ import { preferences } from '@kit.ArkData'
 import { AppStorageV2, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 
 @ObservedV2
 export class AllService {
@@ -203,7 +203,7 @@ export default struct Setting {
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
 
-          if (this.CloudService.status) {
+          if (!this.cloudServiceLoading && this.CloudService.status) {
             ListItem() {
               Column() {
                 Text('云备份')
@@ -893,7 +893,7 @@ export default struct Setting {
       this.getSetting()
       if (this.accessToken) {
         this.cloudServiceLoading = true
-        const infores = await httpRequest('/account/getAccountInfo', {
+        const infores = await request('/account/getAccountInfo', {
           accessToken: this.accessToken
         })
         this.cloudServiceLoading = false
@@ -903,7 +903,7 @@ export default struct Setting {
           this.CloudService.status = status
           if (status) {
             this.vipEndDateLoading = true
-            const userres = await httpRequest('/product/getUserInfo', {
+            const userres = await request('/product/getUserInfo', {
               accessToken: this.accessToken,
               product: 'password'
             })

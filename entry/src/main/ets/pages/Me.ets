@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
 import { get, remove } from '../common/Accesstoken'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 import Login from './Login'
 import Setting from './Setting'
 
@@ -18,7 +18,7 @@ export default struct Me {
     const accessToken = get()
     if (accessToken) {
       this.loading = true
-      const res = await httpRequest('/account/getAccountInfo', {
+      const res = await request('/account/getAccountInfo', {
         accessToken: accessToken
       })
       this.loading = false

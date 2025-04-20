@@ -1,6 +1,6 @@
 import { promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 
 interface Count {
   password: number,
@@ -28,7 +28,7 @@ export struct Cloudbackupmanage {
 
   async getCount() {
     this.loading = true
-    const infores = await httpRequest('/password/getBackupCount', {
+    const infores = await request('/password/getBackupCount', {
       accessToken: get()
     })
     this.loading = false
@@ -184,7 +184,7 @@ export struct Cloudbackupmanage {
                   })
                   if (data.index === 1) {
                     this.loading = true
-                    const res = await httpRequest('/password/clearBackup', {
+                    const res = await request('/password/clearBackup', {
                       accessToken: get(),
                       types: this.types
                     })

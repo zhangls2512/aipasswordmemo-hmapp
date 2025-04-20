@@ -5,7 +5,7 @@ import { promptAction, window } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
-import { httpRequest } from '../common/Request'
+import request from '../common/Request'
 
 @ComponentV2
 export default struct Login {
@@ -26,7 +26,7 @@ export default struct Login {
         response: loginComponentManager.HuaweiIDCredential) => {
         if (response) {
           this.loading = true
-          const res = await httpRequest('/account/getAccessToken', {
+          const res = await request('/account/getAccessToken', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode
           })
@@ -220,7 +220,7 @@ export default struct Login {
                     return
                   }
                   this.loading = true
-                  const res = await httpRequest('/account/sendEmailCode', {
+                  const res = await request('/account/sendEmailCode', {
                     email: this.email
                   })
                   this.loading = false
@@ -285,7 +285,7 @@ export default struct Login {
                   code = this.emailcode
                 }
                 this.loading = true
-                const res = await httpRequest('/account/getAccessToken', {
+                const res = await request('/account/getAccessToken', {
                   verifyType: this.type,
                   verifyCode: code,
                   email: this.email
