@@ -18,7 +18,7 @@ export struct Viplog {
   @Local vipLogArray: Array<Item> = []
   @Local loading: boolean = false
   accessToken: string = get()
-  empty: boolean = false
+  empty: boolean | undefined = undefined
 
   build() {
     NavDestination() {
@@ -136,24 +136,23 @@ export struct Viplog {
         right: $r('sys.float.ohos_id_max_padding_end')
       })
       .onReachEnd(async () => {
-        if (this.empty) {
-          return
-        }
-        this.loading = true
-        const res = await httpRequest('/product/getViplogList', {
-          accessToken: get(),
-          product: 'password',
-          skip: this.vipLogArray.length
-        })
-        this.loading = false
-        if (res !== 'fail') {
-          const array = JSON.parse(res).data as Item[]
-          if (array.length === 0) {
-            this.empty = true
-          }
-          this.vipLogArray = this.vipLogArray.concat(array)
-        } else {
+        if (this.empty === false) {
+          this.loading = true
+          const res = await httpRequest('/product/getViplogList', {
+            accessToken: get(),
+            product: 'password',
+            skip: this.vipLogArray.length
+          })
           this.loading = false
+          if (res !== 'fail') {
+            const array = JSON.parse(res).data as Item[]
+            if (array.length === 0) {
+              this.empty = true
+            }
+            this.vipLogArray = this.vipLogArray.concat(array)
+          } else {
+            this.loading = false
+          }
         }
       })
     }
@@ -168,6 +167,7 @@ export struct Viplog {
       this.loading = false
       if (res !== 'fail') {
         this.vipLogArray = JSON.parse(res).data as Item[]
+        this.empty = false
       } else {
         this.loading = false
       }

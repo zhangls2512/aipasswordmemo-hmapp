@@ -20,7 +20,9 @@ export class CloudService {
 export default struct Setting {
   @Local AllService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
   @Local CloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
-  @Local loading: boolean = false
+  @Local cloudServiceLoading: boolean = false
+  @Local vipEndDate: string = ''
+  @Local vipEndDateLoading: boolean = false
   @Local autoCloudBackup: boolean = false
   @Local agreedPrivacyAgreement: number | undefined = undefined
   context = getContext(this) as common.UIAbilityContext
@@ -87,7 +89,7 @@ export default struct Setting {
                   })
                 })
 
-                if (!this.loading) {
+                if (!this.cloudServiceLoading) {
                   Divider()
                     .padding({
                       left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -137,9 +139,26 @@ export default struct Setting {
                       })
                     Row() {
                       Text('会员中心')
+                        .fontColor('#FFD700')
                         .fontSize($r('sys.float.ohos_id_text_size_body1'))
                         .fontWeight('medium')
                       Blank()
+                      if (this.vipEndDateLoading) {
+                        LoadingProgress()
+                          .height(14)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                          .width(14)
+                      }
+                      if (this.vipEndDate) {
+                        Text(this.vipEndDate)
+                          .fontColor($r('sys.color.font_secondary'))
+                          .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                      }
                       Image($r('app.media.right'))
                         .fillColor($r('sys.color.icon_fourth'))
                         .height(12)
@@ -168,7 +187,7 @@ export default struct Setting {
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
               .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
-              if (this.loading) {
+              if (this.cloudServiceLoading) {
                 LoadingProgress()
                   .height(20)
                   .margin({
@@ -873,16 +892,36 @@ export default struct Setting {
     .onAppear(async () => {
       this.getSetting()
       if (this.accessToken) {
-        this.loading = true
+        this.cloudServiceLoading = true
         const infores = await httpRequest('/account/getAccountInfo', {
           accessToken: this.accessToken
         })
-        this.loading = false
+        this.cloudServiceLoading = false
         if (infores !== 'fail') {
           const service = JSON.parse(infores).data.service as string[]
-          this.CloudService.status = service.includes('password')
+          const status = service.includes('password')
+          this.CloudService.status = status
+          if (status) {
+            this.vipEndDateLoading = true
+            const userres = await httpRequest('/product/getUserInfo', {
+              accessToken: this.accessToken,
+              product: 'password'
+            })
+            this.vipEndDateLoading = false
+            if (userres !== 'fail') {
+              const vipenddate = JSON.parse(userres).data.vipEndDate as number
+              if (vipenddate === 0) {
+                this.vipEndDate = '终身'
+              }
+              if (vipenddate > 0 && vipenddate >= Date.now()) {
+                this.vipEndDate = '有效期至 ' + String(new Date(vipenddate))
+              }
+            } else {
+              this.vipEndDateLoading = false
+            }
+          }
         } else {
-          this.loading = false
+          this.cloudServiceLoading = false
         }
       }
     })

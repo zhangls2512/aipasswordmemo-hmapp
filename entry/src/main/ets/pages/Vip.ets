@@ -2,6 +2,8 @@ import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { iap } from '@kit.IAPKit'
+import { get } from '../common/Accesstoken'
+import { httpRequest } from '../common/Request'
 
 @Builder
 export function VipBuilder() {
@@ -10,15 +12,60 @@ export function VipBuilder() {
 
 @ComponentV2
 export struct Vip {
+  @Local vipEndDate: string = '未开通会员'
+  @Local vipEndDateLoading: boolean = false
+  @Local color: string = ''
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
+
+  async getVipEndDate() {
+    this.vipEndDateLoading = true
+    const userres = await httpRequest('/product/getUserInfo', {
+      accessToken: get(),
+      product: 'password'
+    })
+    this.vipEndDateLoading = false
+    if (userres !== 'fail') {
+      const vipenddate = JSON.parse(userres).data.vipEndDate as number
+      if (vipenddate === 0) {
+        this.vipEndDate = '终身会员'
+        this.color = '#FFD700'
+      }
+      if (vipenddate > 0 && vipenddate >= Date.now()) {
+        this.vipEndDate = '会员有效期至 ' + String(new Date(vipenddate))
+        this.color = '#FFD700'
+      }
+    } else {
+      this.vipEndDateLoading = false
+    }
+  }
 
   build() {
     NavDestination() {
       List() {
         ListItem() {
           Column() {
-            Text('开通会员，即享以下特权：')
+            if (!this.vipEndDateLoading) {
+              Text(this.vipEndDate)
+                .fontColor(this.color)
+                .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+                .fontWeight('bold')
+            }
+            if (this.vipEndDateLoading) {
+              LoadingProgress()
+                .height(20)
+                .width(20)
+            }
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('会员可享以下特权：')
               .fontWeight('bold')
             Text('· 云备份不限个数')
               .fontWeight('medium')
@@ -151,6 +198,7 @@ export struct Vip {
     .title('会员中心')
     .onReady(async (context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
+      this.getVipEndDate()
     })
   }
 }

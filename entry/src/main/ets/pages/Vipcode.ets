@@ -29,7 +29,7 @@ export struct Vipcode {
               })
                 .maxLength(40)
                 .showCounter(true)
-              Button('提交')
+              Button('兑换')
                 .enabled(this.vipcode ? true : false)
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
