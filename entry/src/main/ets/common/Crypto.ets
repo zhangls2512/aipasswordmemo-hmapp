@@ -27,7 +27,12 @@ function encodeBase64(arr: Uint8Array): Uint8Array {
   return base64.encodeSync(arr)
 }
 
-function decodeBase64(arr: Uint8Array): Uint8Array {
+function encodeBase64ToString(arr: Uint8Array): string {
+  const base64 = new util.Base64Helper()
+  return base64.encodeToStringSync(arr)
+}
+
+function decodeBase64(arr: Uint8Array | string): Uint8Array {
   const base64 = new util.Base64Helper()
   return base64.decodeSync(arr)
 }
@@ -143,7 +148,7 @@ export async function removeKey(): Promise<string> {
   }
 }
 
-export async function encrypt(inputData: string): Promise<Uint8Array> {
+export async function encrypt(inputData: string): Promise<string> {
   const data = stringToArray(inputData)
   const query: asset.AssetMap = new Map()
   query.set(asset.Tag.ALIAS, stringToArray('iv'))
@@ -181,17 +186,17 @@ export async function encrypt(inputData: string): Promise<Uint8Array> {
   }
   const session = await huks.initSession('key', options)
   const res = await huks.finishSession(session.handle, options)
-  return res.outData as Uint8Array
+  return encodeBase64ToString(res.outData as Uint8Array)
 }
 
-export async function decrypt(data: Uint8Array): Promise<string> {
+export async function decrypt(data: string): Promise<string> {
   const query: asset.AssetMap = new Map()
   query.set(asset.Tag.ALIAS, stringToArray('iv'))
   query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
   const ivres: Array<asset.AssetMap> = asset.querySync(query)
   const iv: Uint8Array = ivres[0].get(asset.Tag.SECRET) as Uint8Array
   const options: huks.HuksOptions = {
-    inData: data,
+    inData: decodeBase64(data),
     properties: [
       {
         tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
