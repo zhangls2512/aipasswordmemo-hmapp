@@ -8,7 +8,7 @@ export function VipcodeBuilder() {
 }
 
 @ComponentV2
-export struct Vipcode {
+struct Vipcode {
   @Local vipcode: string = ''
   pageInfos: NavPathStack = new NavPathStack()
   dialogControllerProgress: CustomDialogController = new CustomDialogController({

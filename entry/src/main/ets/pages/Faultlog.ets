@@ -6,7 +6,7 @@ export function FaultlogBuilder() {
 }
 
 @ComponentV2
-export struct Faultlog {
+struct Faultlog {
   @Local faultLogArray: Array<FaultLogger.FaultLogInfo> = []
 
   build() {

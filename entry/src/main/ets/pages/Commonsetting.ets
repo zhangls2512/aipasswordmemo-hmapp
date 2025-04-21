@@ -7,7 +7,7 @@ export function CommonsettingBuilder() {
 }
 
 @ComponentV2
-export struct Commonsetting {
+struct Commonsetting {
   @Local colorModeIndex: number = 0
   @Local colorModeValue: string = '跟随系统'
   @Local checkVersionUpdateIndex: number = 1

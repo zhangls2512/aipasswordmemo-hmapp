@@ -10,7 +10,7 @@ import { connection } from '@kit.NetworkKit'
 import { atomicService } from '@kit.ScenarioFusionKit'
 import { data } from '@kit.TelephonyKit'
 
-interface Element {
+interface Item {
   name: string
   value: string
 }
@@ -25,10 +25,10 @@ export function DebugBuilder() {
 }
 
 @ComponentV2
-export struct Debug {
+struct Debug {
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
-  applicationInfoArray: Element[] = [
+  applicationInfoArray: Item[] = [
     {
       name: '名称',
       value: this.context.applicationInfo.name
@@ -238,7 +238,7 @@ export struct Debug {
       value: String(this.context.config.mnc)
     }
   ]
-  hapModuleInfoArray: Element[] = [
+  hapModuleInfoArray: Item[] = [
     {
       name: '名称',
       value: this.context.currentHapModuleInfo.name
@@ -299,7 +299,7 @@ export struct Debug {
       value: this.context.currentHapModuleInfo.nativeLibraryPath
     }
   ]
-  abilityInfoArray: Element[] = [
+  abilityInfoArray: Item[] = [
     {
       name: '应用 Bundle 名称',
       value: this.context.abilityInfo.bundleName
@@ -407,8 +407,8 @@ export struct Debug {
       value: String(this.context.abilityInfo.orientationId)
     }
   ]
-  bundleInfoArray: Element[] = []
-  deviceInfoArray: Element[] = [
+  bundleInfoArray: Item[] = []
+  deviceInfoArray: Item[] = [
     { name: '设备类型', value: deviceInfo.deviceType },
     { name: '设备厂家名称', value: deviceInfo.manufacture },
     { name: '设备品牌名称', value: deviceInfo.brand },
@@ -462,7 +462,7 @@ export struct Debug {
     'windowWidth',
     'windowHeight'
   ]
-  systemInfoArray: Element[] = [
+  systemInfoArray: Item[] = [
     { name: '设备品牌名称', value: String(atomicService.getSystemInfoSync(this.stateArray).brand) },
     { name: '设备类型', value: String(atomicService.getSystemInfoSync(this.stateArray).deviceModel) },
     { name: '屏幕宽度', value: String(atomicService.getSystemInfoSync(this.stateArray).screenWidth) + ' px' },
@@ -492,7 +492,7 @@ export struct Debug {
     { name: '可使用窗口宽度', value: String(atomicService.getSystemInfoSync(this.stateArray).windowWidth) + ' px' },
     { name: '可使用窗口高度', value: String(atomicService.getSystemInfoSync(this.stateArray).windowHeight) + ' px' }
   ]
-  displayInfoArray: Element[] = [
+  displayInfoArray: Item[] = [
     { name: 'id 号', value: String(display.getDefaultDisplaySync().id) },
     { name: '名称', value: display.getDefaultDisplaySync().name },
     { name: '是否启用', value: display.getDefaultDisplaySync().alive ? '是' : '否' },
@@ -537,8 +537,8 @@ export struct Debug {
     { name: '是否正在截屏、投屏、录屏', value: display.isCaptured() ? '是' : '否' }
   ]
   windowClass: window.Window | undefined = undefined
-  windowInfoArray: Element[] = []
-  batteryInfoArray: Element[] = [
+  windowInfoArray: Item[] = []
+  batteryInfoArray: Item[] = [
     { name: '剩余电池电量百分比', value: String(batteryInfo.batterySOC) + '%' },
     {
       name: '电池充电状态',
@@ -584,7 +584,7 @@ export struct Debug {
     { name: '电池电流', value: String(batteryInfo.nowCurrent) + ' mA' }
   ]
   @Local systemLoadValue: number = -1
-  networkInfoArray: Element[] = [
+  networkInfoArray: Item[] = [
     { name: '数据网络句柄', value: String(connection.getDefaultNetSync().netId) },
     { name: '当前网络上的数据流量使用是否被计量', value: connection.isDefaultNetMeteredSync() ? '是' : '否' },
     { name: '默认数据网络是否被激活', value: connection.hasDefaultNetSync() ? '是' : '否' },
@@ -609,11 +609,11 @@ export struct Debug {
     { name: '热点是否已使能', value: wifiManager.isHotspotActive() ? '是' : '否' },
     { name: '蜂窝数据业务是否启用', value: data.isCellularDataEnabledSync() ? '是' : '否' }
   ]
-  storageStatisticsInfoArray: Element[] = [
+  storageStatisticsInfoArray: Item[] = [
     { name: '系统总', value: String(storageStatistics.getTotalSizeSync()) + ' B' },
     { name: '系统空闲', value: String(storageStatistics.getFreeSizeSync()) + ' B' }
   ]
-  processInfoArray: Element[] = [
+  processInfoArray: Item[] = [
     { name: '是否被隔离', value: process.isIsolatedProcess() ? '是' : '否' },
     { name: '运行环境是否 64 位', value: process.is64Bit() ? '是' : '否' },
     { name: '从系统启动到进程启动所经过的时间', value: String(process.getStartRealtime()) + ' ms' },
@@ -1367,7 +1367,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.applicationInfoArray, (item: Element, index: number) => {
+              ForEach(this.applicationInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1416,7 +1416,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.hapModuleInfoArray, (item: Element, index: number) => {
+              ForEach(this.hapModuleInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1465,7 +1465,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.abilityInfoArray, (item: Element, index: number) => {
+              ForEach(this.abilityInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1514,7 +1514,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.bundleInfoArray, (item: Element, index: number) => {
+              ForEach(this.bundleInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1563,7 +1563,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.deviceInfoArray, (item: Element, index: number) => {
+              ForEach(this.deviceInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1612,7 +1612,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.systemInfoArray, (item: Element, index: number) => {
+              ForEach(this.systemInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1661,7 +1661,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.displayInfoArray, (item: Element, index: number) => {
+              ForEach(this.displayInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1710,7 +1710,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.windowInfoArray, (item: Element, index: number) => {
+              ForEach(this.windowInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1759,7 +1759,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.batteryInfoArray, (item: Element, index: number) => {
+              ForEach(this.batteryInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1995,7 +1995,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.networkInfoArray, (item: Element, index: number) => {
+              ForEach(this.networkInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -2104,7 +2104,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.storageStatisticsInfoArray, (item: Element, index: number) => {
+              ForEach(this.storageStatisticsInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -2153,7 +2153,7 @@ export struct Debug {
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Column() {
-              ForEach(this.processInfoArray, (item: Element, index: number) => {
+              ForEach(this.processInfoArray, (item: Item, index: number) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()

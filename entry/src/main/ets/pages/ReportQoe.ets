@@ -8,7 +8,7 @@ export function ReportQoeBuilder() {
 }
 
 @ComponentV2
-export struct ReportQoe {
+struct ReportQoe {
   pageInfos: NavPathStack = new NavPathStack()
   serviceType: netQuality.ServiceType = 'default'
   qoeType: netQuality.QoeType = 'good'

@@ -345,6 +345,18 @@ export default struct Setting {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
                 .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+                Text('安全保障说明')
+                  .fontColor($r('sys.color.font_emphasize'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                  .fontWeight('medium')
+                  .margin({
+                    top: 6,
+                    left: $r('sys.float.ohos_id_corner_radius_default_m')
+                  })
+                  .onClick(() => {
+                    openLink('https://docs.qq.com/doc/p/2fc9d7d60e5b79dcc09dec8251cb049fb29c7705')
+                  })
               }
               .alignItems(HorizontalAlign.Start)
             }

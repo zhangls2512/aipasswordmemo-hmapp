@@ -7,7 +7,7 @@ export function RecoverysettingBuilder() {
 }
 
 @ComponentV2
-export struct Recoverysetting {
+struct Recoverysetting {
   pageInfos: NavPathStack = new NavPathStack()
   restart: appRecovery.RestartFlag = appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE
   saveOccasion: appRecovery.SaveOccasionFlag = appRecovery.SaveOccasionFlag.SAVE_WHEN_ERROR

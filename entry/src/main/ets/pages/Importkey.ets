@@ -7,7 +7,7 @@ export function ImportkeyBuilder() {
 }
 
 @ComponentV2
-export struct Importkey {
+struct Importkey {
   @Local keycontent: string = ''
   @Local iv: string = ''
   pageInfos: NavPathStack = new NavPathStack()

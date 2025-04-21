@@ -1,5 +1,3 @@
 /.hvigor
 /.idea
 **/build
-.clang-format
-*.xlsx

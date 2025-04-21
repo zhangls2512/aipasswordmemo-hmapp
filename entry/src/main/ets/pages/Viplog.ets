@@ -14,7 +14,7 @@ export function ViplogBuilder() {
 }
 
 @ComponentV2
-export struct Viplog {
+struct Viplog {
   @Local vipLogArray: Array<Item> = []
   @Local loading: boolean = false
   accessToken: string = get()

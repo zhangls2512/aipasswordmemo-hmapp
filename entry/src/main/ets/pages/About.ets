@@ -12,7 +12,7 @@ export function AboutBuilder() {
 }
 
 @ComponentV2
-export struct About {
+struct About {
   @Local hasUpdate: number = -1
   @Local updateLoading: boolean = false
   context = getContext(this) as common.UIAbilityContext

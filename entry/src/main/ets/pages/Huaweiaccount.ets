@@ -16,7 +16,7 @@ export function HuaweiaccountBuilder() {
 }
 
 @ComponentV2
-export struct Huaweiaccount {
+struct Huaweiaccount {
   @Local loading: boolean = false
   @Local isBind: boolean = false
   @Local type: string = 'mfa'

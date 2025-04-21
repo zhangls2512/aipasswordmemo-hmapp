@@ -8,7 +8,7 @@ export function KeyBuilder() {
 }
 
 @ComponentV2
-export struct Keypage {
+struct Keypage {
   @Local hasKey: boolean = false
   @Local keyInfo: Key = {
     key: '',
@@ -110,31 +110,76 @@ export struct Keypage {
             })
             .width('100%')
             .onClick(async () => {
-              const data = await promptAction.showActionMenu({
-                title: '选择方式',
-                buttons: [
-                  {
-                    text: '随机',
-                    color: $r('sys.color.font_primary')
-                  },
-                  {
-                    text: '自定义',
-                    color: $r('sys.color.font_primary')
+              if (!this.hasKey) {
+                const data = await promptAction.showActionMenu({
+                  title: '选择导入方式',
+                  buttons: [
+                    {
+                      text: '随机',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '自定义',
+                      color: $r('sys.color.font_primary')
+                    }
+                  ]
+                })
+                if (data.index === 0) {
+                  await setRandomKey()
+                  promptAction.showToast({
+                    message: '导入成功'
+                  })
+                  this.hasKey = hasKey()
+                  this.keyInfo = getKey() as Key
+                }
+                if (data.index === 1) {
+                  this.pageInfos.pushPath({
+                    name: 'Importkey'
+                  })
+                }
+              } else {
+                const confirm = await promptAction.showDialog({
+                  title: '提示',
+                  message: '导入成功后新密钥将覆盖当前密钥，当前密钥无法恢复，需重新导入当前密钥才可解密使用当前密钥加密的云备份数据，确定导入？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '导入',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
+                })
+                if (confirm.index === 1) {
+                  const data = await promptAction.showActionMenu({
+                    title: '选择导入方式',
+                    buttons: [
+                      {
+                        text: '随机',
+                        color: $r('sys.color.font_primary')
+                      },
+                      {
+                        text: '自定义',
+                        color: $r('sys.color.font_primary')
+                      }
+                    ]
+                  })
+                  if (data.index === 0) {
+                    await setRandomKey()
+                    promptAction.showToast({
+                      message: '导入成功'
+                    })
+                    this.hasKey = hasKey()
+                    this.keyInfo = getKey() as Key
                   }
-                ]
-              })
-              if (data.index === 0) {
-                await setRandomKey()
-                promptAction.showToast({
-                  message: '导入成功'
-                })
-                this.hasKey = hasKey()
-                this.keyInfo = getKey() as Key
-              }
-              if (data.index === 1) {
-                this.pageInfos.pushPath({
-                  name: 'Importkey'
-                })
+                  if (data.index === 1) {
+                    this.pageInfos.pushPath({
+                      name: 'Importkey'
+                    })
+                  }
+                }
               }
             })
 

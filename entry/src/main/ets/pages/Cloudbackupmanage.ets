@@ -14,7 +14,7 @@ export function CloudbackupmanageBuilder() {
 }
 
 @ComponentV2
-export struct Cloudbackupmanage {
+struct Cloudbackupmanage {
   @Local loading: boolean = false
   @Local total: string = ''
   @Local password: string = ''
@@ -165,13 +165,11 @@ export struct Cloudbackupmanage {
               .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
               Button('清理')
-                .buttonStyle(ButtonStyleMode.NORMAL)
                 .enabled(this.types.length > 0)
-                .fontColor($r('sys.color.warning'))
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_l')
                 })
-                .width('100%')
+                .role(ButtonRole.ERROR)
                 .onClick(async () => {
                   const data = await promptAction.showDialog({
                     title: '提示',

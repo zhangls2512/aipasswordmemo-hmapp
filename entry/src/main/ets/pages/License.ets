@@ -6,7 +6,7 @@ export function LicenseBuilder() {
 }
 
 @ComponentV2
-export struct License {
+struct License {
   build() {
     NavDestination() {
       List() {

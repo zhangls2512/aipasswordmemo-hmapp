@@ -6,7 +6,7 @@ export function MoresettingBuilder() {
 }
 
 @ComponentV2
-export struct Moresetting {
+struct Moresetting {
   context = getContext(this) as common.UIAbilityContext
 
   build() {

@@ -7,7 +7,7 @@ export function FeedbackBuilder() {
 }
 
 @ComponentV2
-export struct Feedback {
+struct Feedback {
   @Local content: string = ''
   pageInfos: NavPathStack = new NavPathStack()
   dialogControllerProgress: CustomDialogController = new CustomDialogController({

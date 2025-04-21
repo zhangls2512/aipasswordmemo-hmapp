@@ -11,7 +11,7 @@ export function VipBuilder() {
 }
 
 @ComponentV2
-export struct Vip {
+struct Vip {
   @Local vipEndDate: string = '未开通会员'
   @Local vipEndDateLoading: boolean = false
   @Local color: string = ''

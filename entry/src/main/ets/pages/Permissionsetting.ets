@@ -7,7 +7,7 @@ export function PermissionsettingBuilder() {
 }
 
 @ComponentV2
-export struct Permissionsetting {
+struct Permissionsetting {
   @Local writePasteBoard: boolean = false
   context = getContext(this) as common.UIAbilityContext
   permissionSettingDataPreferences = preferences.getPreferencesSync(this.context, {

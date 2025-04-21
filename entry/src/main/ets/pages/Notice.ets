@@ -7,7 +7,7 @@ export function NoticeBuilder() {
 }
 
 @ComponentV2
-export struct Notice {
+struct Notice {
   context = getContext(this) as common.UIAbilityContext
 
   build() {

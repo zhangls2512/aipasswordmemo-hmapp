@@ -15,7 +15,7 @@ export function NetworktestBuilder() {
 }
 
 @ComponentV2
-export struct Networktest {
+struct Networktest {
   @Local errCode: number = 0
   @Local errMsg: string = ''
   @Local requestIp: string = ''

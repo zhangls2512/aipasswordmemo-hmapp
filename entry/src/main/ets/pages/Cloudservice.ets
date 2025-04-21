@@ -9,7 +9,7 @@ export function CloudserviceBuilder() {
 }
 
 @ComponentV2
-export struct Cloudservice {
+struct Cloudservice {
   @Local CloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
   @Local loading: boolean = false
   pageInfos: NavPathStack = new NavPathStack()
@@ -31,12 +31,33 @@ export struct Cloudservice {
                   .margin({
                     top: $r('sys.float.ohos_id_text_paragraph_margin_m')
                   })
+              }
+              if (this.CloudService.status) {
+                Text('取消开通云服务前，需：')
+                  .fontWeight('bold')
+                Text('· 清空云备份数据')
+                  .fontWeight('medium')
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_paragraph_margin_m')
+                  })
+                Text('· 无会员开通记录')
+                  .fontWeight('medium')
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+                  })
+              }
+            }
+            .alignItems(HorizontalAlign.Start)
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
+
+          ListItem() {
+            Column() {
+              if (!this.CloudService.status) {
                 Button('开通')
                   .buttonStyle(ButtonStyleMode.EMPHASIZED)
-                  .margin({
-                    top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-                  })
-                  .width('100%')
                   .onClick(async () => {
                     this.dialogControllerProgress.open()
                     const res = await request('/account/openService', {
@@ -54,24 +75,8 @@ export struct Cloudservice {
                   })
               }
               if (this.CloudService.status) {
-                Text('取消开通云服务前，需：')
-                  .fontWeight('bold')
-                Text('· 清空云备份数据')
-                  .fontWeight('medium')
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_paragraph_margin_m')
-                  })
-                Text('· 无会员开通记录')
-                  .fontWeight('medium')
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_paragraph_margin_s')
-                  })
                 Button('取消开通')
-                  .margin({
-                    top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-                  })
                   .role(ButtonRole.ERROR)
-                  .width('100%')
                   .onClick(async () => {
                     this.dialogControllerProgress.open()
                     const res = await request('/account/closeService', {
@@ -89,7 +94,7 @@ export struct Cloudservice {
                   })
               }
             }
-            .alignItems(HorizontalAlign.Start)
+            .width('100%')
           }
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')

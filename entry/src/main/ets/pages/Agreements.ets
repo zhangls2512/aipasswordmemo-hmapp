@@ -8,7 +8,7 @@ export function AgreementsBuilder() {
 }
 
 @ComponentV2
-export struct Agreements {
+struct Agreements {
   @Local agreedUserAgreement: number | undefined = 0
   context = getContext(this) as common.UIAbilityContext
 
