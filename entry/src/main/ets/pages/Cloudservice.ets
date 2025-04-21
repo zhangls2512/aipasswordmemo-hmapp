@@ -1,4 +1,4 @@
-import { AppStorageV2, promptAction } from '@kit.ArkUI'
+import { AppStorageV2, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 import { CloudService } from './Setting'
@@ -13,6 +13,9 @@ export struct Cloudservice {
   @Local CloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
   @Local loading: boolean = false
   pageInfos: NavPathStack = new NavPathStack()
+  dialogControllerProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog()
+  })
 
   build() {
     NavDestination() {
@@ -35,12 +38,12 @@ export struct Cloudservice {
                   })
                   .width('100%')
                   .onClick(async () => {
-                    this.loading = true
+                    this.dialogControllerProgress.open()
                     const res = await request('/account/openService', {
                       accessToken: get(),
                       service: 'password'
                     })
-                    this.loading = false
+                    this.dialogControllerProgress.close()
                     if (res !== 'fail') {
                       promptAction.showToast({
                         message: '开通成功'
@@ -70,12 +73,12 @@ export struct Cloudservice {
                   .role(ButtonRole.ERROR)
                   .width('100%')
                   .onClick(async () => {
-                    this.loading = true
+                    this.dialogControllerProgress.open()
                     const res = await request('/account/closeService', {
                       accessToken: get(),
                       service: 'password'
                     })
-                    this.loading = false
+                    this.dialogControllerProgress.close()
                     if (res !== 'fail') {
                       promptAction.showToast({
                         message: '取消开通成功'

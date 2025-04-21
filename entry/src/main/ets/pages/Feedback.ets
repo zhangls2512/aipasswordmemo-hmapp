@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import request from '../common/Request'
 
 @Builder
@@ -8,48 +8,46 @@ export function FeedbackBuilder() {
 
 @ComponentV2
 export struct Feedback {
-  @Local loading: boolean = false
   @Local content: string = ''
   pageInfos: NavPathStack = new NavPathStack()
+  dialogControllerProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '提交中...'
+    })
+  })
 
   build() {
     NavDestination() {
       List() {
         ListItem() {
           Column() {
-            if (this.loading) {
-              LoadingProgress()
-                .width('50%')
-            }
-            if (!this.loading) {
-              TextArea({
-                placeholder: '请输入内容',
-                text: $$this.content
+            TextArea({
+              placeholder: '请输入内容',
+              text: $$this.content
+            })
+              .maxLength(500)
+              .showCounter(true)
+            Button('提交')
+              .enabled(this.content ? true : false)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
-                .maxLength(500)
-                .showCounter(true)
-              Button('提交')
-                .enabled(this.content ? true : false)
-                .margin({
-                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              .onClick(async () => {
+                this.dialogControllerProgress.open()
+                const res = await request('/debug/sendFeedbackEmail', {
+                  key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
+                  product: '密码智能备忘录',
+                  content: this.content
                 })
-                .onClick(async () => {
-                  this.loading = true
-                  const res = await request('/debug/sendFeedbackEmail', {
-                    key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
-                    content: this.content
+                this.dialogControllerProgress.close()
+                if (res !== 'fail') {
+                  promptAction.showToast({
+                    message: '提交成功'
                   })
-                  this.loading = false
-                  if (res !== 'fail') {
-                    promptAction.showToast({
-                      message: '提交成功'
-                    })
-                    this.pageInfos.pop()
-                  }
-                })
-            }
+                  this.pageInfos.pop()
+                }
+              })
           }
-          .width('100%')
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')

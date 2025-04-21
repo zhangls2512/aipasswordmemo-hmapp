@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -25,6 +25,11 @@ export struct Cloudbackupmanage {
   @Local infoSelected: boolean = false
   @Local tagSelected: boolean = false
   @Local types: string[] = []
+  dialogControllerProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '清理中...'
+    })
+  })
 
   async getCount() {
     this.loading = true
@@ -183,12 +188,12 @@ export struct Cloudbackupmanage {
                     ]
                   })
                   if (data.index === 1) {
-                    this.loading = true
+                    this.dialogControllerProgress.open()
                     const res = await request('/password/clearBackup', {
                       accessToken: get(),
                       types: this.types
                     })
-                    this.loading = false
+                    this.dialogControllerProgress.close()
                     if (res !== 'fail') {
                       promptAction.showToast({
                         message: '清理成功'

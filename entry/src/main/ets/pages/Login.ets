@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { preferences } from '@kit.ArkData'
-import { promptAction, window } from '@kit.ArkUI'
+import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
@@ -10,7 +10,6 @@ import request from '../common/Request'
 @ComponentV2
 export default struct Login {
   @Consumer() isShowLoginSheet: boolean = false
-  @Local loading: boolean = false
   @Local type: string = 'password'
   @Local email: string = ''
   @Local password: string = ''
@@ -20,17 +19,20 @@ export default struct Login {
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   context = getContext(this) as common.UIAbilityContext
+  dialogControllerProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog()
+  })
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
         response: loginComponentManager.HuaweiIDCredential) => {
         if (response) {
-          this.loading = true
+          this.dialogControllerProgress.open()
           const res = await request('/account/getAccessToken', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode
           })
-          this.loading = false
+          this.dialogControllerProgress.close()
           if (res !== 'fail') {
             const accessToken = JSON.parse(res).accessToken as string
             const endDate = JSON.parse(res).endDate as number
@@ -56,197 +58,159 @@ export default struct Login {
 
   build() {
     List() {
-      if (!this.loading) {
-        ListItem() {
-          Column() {
-            Text('登录')
-              .fontSize(25)
-              .fontWeight('bold')
+      ListItem() {
+        Column() {
+          Text('登录')
+            .fontSize(25)
+            .fontWeight('bold')
+          Row() {
+            Text('方式')
+              .fontWeight('medium')
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
+              .width('15%')
             Row() {
-              Text('方式')
-                .fontWeight('medium')
+              Radio({
+                value: 'password',
+                group: 'type'
+              })
+                .checked(this.type === 'password' ? true : false)
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                .width('15%')
-              Row() {
-                Radio({
-                  value: 'password',
-                  group: 'type'
+                .onChange((isChecked: boolean) => {
+                  if (isChecked) {
+                    this.type = 'password'
+                  }
                 })
-                  .checked(this.type === 'password' ? true : false)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                  .onChange((isChecked: boolean) => {
-                    if (isChecked) {
-                      this.type = 'password'
-                    }
-                  })
-                Text('密码')
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Radio({
-                  value: 'mfa',
-                  group: 'type'
+              Text('密码')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                  .checked(this.type === 'mfa' ? true : false)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                  .onChange((isChecked: boolean) => {
-                    if (isChecked) {
-                      this.type = 'mfa'
-                    }
-                  })
-                Text('MFA')
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Radio({
-                  value: 'emailcode',
-                  group: 'type'
+              Radio({
+                value: 'mfa',
+                group: 'type'
+              })
+                .checked(this.type === 'mfa' ? true : false)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                  .checked(this.type === 'emailcode' ? true : false)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                  .onChange((isChecked: boolean) => {
-                    if (isChecked) {
-                      this.type = 'emailcode'
-                    }
-                  })
-                Text('邮箱验证码')
-              }
-              .width('80%')
+                .onChange((isChecked: boolean) => {
+                  if (isChecked) {
+                    this.type = 'mfa'
+                  }
+                })
+              Text('MFA')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Radio({
+                value: 'emailcode',
+                group: 'type'
+              })
+                .checked(this.type === 'emailcode' ? true : false)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+                .onChange((isChecked: boolean) => {
+                  if (isChecked) {
+                    this.type = 'emailcode'
+                  }
+                })
+              Text('邮箱验证码')
             }
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-            })
+            .width('80%')
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
 
+          Row() {
+            Text('邮箱')
+              .fontWeight('medium')
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
+              .width('15%')
+            TextInput({
+              text: $$this.email,
+              placeholder: '请输入邮箱'
+            })
+              .contentType(ContentType.EMAIL_ADDRESS)
+              .type(InputType.Email)
+              .width('80%')
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+
+          if (this.type === 'password') {
             Row() {
-              Text('邮箱')
+              Text('密码')
                 .fontWeight('medium')
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
                 .width('15%')
               TextInput({
-                text: $$this.email,
-                placeholder: '请输入邮箱'
+                text: $$this.password,
+                placeholder: '请输入密码'
               })
-                .contentType(ContentType.EMAIL_ADDRESS)
-                .type(InputType.Email)
+                .contentType(ContentType.PASSWORD)
+                .maxLength(30)
+                .type(InputType.Password)
+                .width('80%')
+            }
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+          }
+          if (this.type === 'mfa') {
+            Row() {
+              Text('MFA')
+                .fontWeight('medium')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+                .width('15%')
+              TextInput({
+                text: $$this.mfa,
+                placeholder: '请输入 MFA'
+              })
+                .maxLength(6)
+                .type(InputType.Number)
+                .width('80%')
+            }
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+          }
+          if (this.type === 'emailcode') {
+            Row() {
+              Text('验证码')
+                .fontWeight('medium')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+                .width('15%')
+              TextInput({
+                text: $$this.emailcode,
+                placeholder: '请输入邮箱验证码'
+              })
+                .maxLength(8)
+                .type(InputType.Number)
                 .width('80%')
             }
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
 
-            if (this.type === 'password') {
-              Row() {
-                Text('密码')
-                  .fontWeight('medium')
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                  .width('15%')
-                TextInput({
-                  text: $$this.password,
-                  placeholder: '请输入密码'
-                })
-                  .contentType(ContentType.PASSWORD)
-                  .maxLength(30)
-                  .type(InputType.Password)
-                  .width('80%')
-              }
+            Button(this.buttonText)
+              .buttonStyle(ButtonStyleMode.NORMAL)
+              .enabled(this.buttonEnabled)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-              })
-            }
-            if (this.type === 'mfa') {
-              Row() {
-                Text('MFA')
-                  .fontWeight('medium')
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                  .width('15%')
-                TextInput({
-                  text: $$this.mfa,
-                  placeholder: '请输入 MFA'
-                })
-                  .maxLength(6)
-                  .type(InputType.Number)
-                  .width('80%')
-              }
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-              })
-            }
-            if (this.type === 'emailcode') {
-              Row() {
-                Text('验证码')
-                  .fontWeight('medium')
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                  .width('15%')
-                TextInput({
-                  text: $$this.emailcode,
-                  placeholder: '请输入邮箱验证码'
-                })
-                  .maxLength(8)
-                  .type(InputType.Number)
-                  .width('80%')
-              }
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-              })
-
-              Button(this.buttonText)
-                .buttonStyle(ButtonStyleMode.NORMAL)
-                .enabled(this.buttonEnabled)
-                .margin({
-                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                })
-                .width('100%')
-                .onClick(async () => {
-                  if (this.email === '') {
-                    promptAction.showToast({
-                      message: '请输入邮箱'
-                    })
-                    return
-                  }
-                  this.loading = true
-                  const res = await request('/account/sendEmailCode', {
-                    email: this.email
-                  })
-                  this.loading = false
-                  if (res !== 'fail') {
-                    promptAction.showToast({
-                      message: '验证码已成功发送到邮箱：' + this.email
-                    })
-                    this.buttonEnabled = false
-                    let countdown: number = 60
-                    const interval = setInterval(() => {
-                      countdown--
-                      if (countdown > 0) {
-                        this.buttonText = '重新发送 (' + countdown + ')'
-                      } else {
-                        clearInterval(interval)
-                        this.buttonEnabled = true
-                        this.buttonText = '获取验证码'
-                      }
-                    }, 1000)
-                  }
-                })
-            }
-            Button('登录')
-              .enabled(this.agree)
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
               .width('100%')
               .onClick(async () => {
@@ -256,141 +220,167 @@ export default struct Login {
                   })
                   return
                 }
-                if (this.type === 'password' && this.password.length < 8) {
-                  promptAction.showToast({
-                    message: '请输入正确的密码'
-                  })
-                  return
-                }
-                if (this.type === 'mfa' && this.mfa.length !== 6) {
-                  promptAction.showToast({
-                    message: '请输入正确的 MFA'
-                  })
-                  return
-                }
-                if (this.type === 'emailcode' && this.emailcode.length !== 8) {
-                  promptAction.showToast({
-                    message: '请输入正确的邮箱验证码'
-                  })
-                  return
-                }
-                let code: string = ''
-                if (this.type === 'password') {
-                  code = this.password
-                }
-                if (this.type === 'mfa') {
-                  code = this.mfa
-                }
-                if (this.type === 'emailcode') {
-                  code = this.emailcode
-                }
-                this.loading = true
-                const res = await request('/account/getAccessToken', {
-                  verifyType: this.type,
-                  verifyCode: code,
+                this.dialogControllerProgress.open()
+                const res = await request('/account/sendEmailCode', {
                   email: this.email
                 })
-                this.loading = false
+                this.dialogControllerProgress.close()
                 if (res !== 'fail') {
-                  const accessToken = JSON.parse(res).accessToken as string
-                  const endDate = JSON.parse(res).endDate as number
-                  set(accessToken)
-                  const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                    name: 'commonSetting'
-                  })
-                  commonSettingDataPreferences.putSync('loginEndDate', endDate)
                   promptAction.showToast({
-                    message: '登录成功'
+                    message: '验证码已成功发送到邮箱：' + this.email
                   })
-                  const lastWindow = await window.getLastWindow(this.context)
-                  await lastWindow.setWindowPrivacyMode(false)
-                  this.isShowLoginSheet = false
+                  this.buttonEnabled = false
+                  let countdown: number = 60
+                  const interval = setInterval(() => {
+                    countdown--
+                    if (countdown > 0) {
+                      this.buttonText = '重新发送 (' + countdown + ')'
+                    } else {
+                      clearInterval(interval)
+                      this.buttonEnabled = true
+                      this.buttonText = '获取验证码'
+                    }
+                  }, 1000)
                 }
               })
-            LoginWithHuaweiIDButton({
-              params: {
-                style: loginComponentManager.Style.BUTTON_RED,
-                extraStyle: {
-                  buttonStyle: new loginComponentManager.ButtonStyle().loadingStyle({
-                    show: true
-                  })
-                }
-              },
-              controller: this.controller
-            })
-              .enabled(this.agree)
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-              })
-              .height(40)
-            Text('注册账号')
-              .fontColor($r('sys.color.font_emphasize'))
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-              })
-              .onClick(() => {
-                openLink('https://www.zhangls2512.cn/product/account/register')
-              })
-            Blank()
-            Row() {
-              Column() {
-                Toggle({
-                  type: ToggleType.Checkbox,
-                  isOn: $$this.agree
-                })
-                  .onChange((isOn: boolean) => {
-                    this.controller.setEnabled(isOn)
-                  })
-              }
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
-              .width('10%')
-
-              Text() {
-                Span('已阅读并同意')
-                Span('《用户服务条款与条件》')
-                  .fontColor($r('sys.color.font_emphasize'))
-                  .onClick(() => {
-                    openLink('https://docs.qq.com/doc/p/575bbc2072a149822917882aa974fcba0e111dac')
-                  })
-                Span('《关于轩铭密码智能备忘录与隐私的声明》')
-                  .fontColor($r('sys.color.font_emphasize'))
-                  .onClick(() => {
-                    openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
-                  })
-                Span('。如果使用华为账号登录，已阅读并同意')
-                Span('《关于华为账号与隐私的声明》')
-                  .fontColor($r('sys.color.font_emphasize'))
-                  .onClick(() => {
-                    openLink('https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN')
-                  })
-                Span('。')
-              }
-              .fontSize($r('sys.float.ohos_id_text_size_body3'))
-              .width('85%')
-            }
+          }
+          Button('登录')
+            .enabled(this.agree)
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_l')
             })
+            .width('100%')
+            .onClick(async () => {
+              if (this.email === '') {
+                promptAction.showToast({
+                  message: '请输入邮箱'
+                })
+                return
+              }
+              if (this.type === 'password' && this.password.length < 8) {
+                promptAction.showToast({
+                  message: '请输入正确的密码'
+                })
+                return
+              }
+              if (this.type === 'mfa' && this.mfa.length !== 6) {
+                promptAction.showToast({
+                  message: '请输入正确的 MFA'
+                })
+                return
+              }
+              if (this.type === 'emailcode' && this.emailcode.length !== 8) {
+                promptAction.showToast({
+                  message: '请输入正确的邮箱验证码'
+                })
+                return
+              }
+              let code: string = ''
+              if (this.type === 'password') {
+                code = this.password
+              }
+              if (this.type === 'mfa') {
+                code = this.mfa
+              }
+              if (this.type === 'emailcode') {
+                code = this.emailcode
+              }
+              this.dialogControllerProgress.open()
+              const res = await request('/account/getAccessToken', {
+                verifyType: this.type,
+                verifyCode: code,
+                email: this.email
+              })
+              this.dialogControllerProgress.close()
+              if (res !== 'fail') {
+                const accessToken = JSON.parse(res).accessToken as string
+                const endDate = JSON.parse(res).endDate as number
+                set(accessToken)
+                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: 'commonSetting'
+                })
+                commonSettingDataPreferences.putSync('loginEndDate', endDate)
+                promptAction.showToast({
+                  message: '登录成功'
+                })
+                const lastWindow = await window.getLastWindow(this.context)
+                await lastWindow.setWindowPrivacyMode(false)
+                this.isShowLoginSheet = false
+              }
+            })
+          LoginWithHuaweiIDButton({
+            params: {
+              style: loginComponentManager.Style.BUTTON_RED,
+              extraStyle: {
+                buttonStyle: new loginComponentManager.ButtonStyle().loadingStyle({
+                  show: true
+                })
+              }
+            },
+            controller: this.controller
+          })
+            .enabled(this.agree)
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .height(40)
+          Text('注册账号')
+            .fontColor($r('sys.color.font_emphasize'))
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
+            .onClick(() => {
+              openLink('https://www.zhangls2512.cn/product/account/register')
+            })
+          Blank()
+          Row() {
+            Column() {
+              Toggle({
+                type: ToggleType.Checkbox,
+                isOn: $$this.agree
+              })
+                .onChange((isOn: boolean) => {
+                  this.controller.setEnabled(isOn)
+                })
+            }
+            .margin({
+              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+            })
+            .width('10%')
+
+            Text() {
+              Span('已阅读并同意')
+              Span('《用户服务条款与条件》')
+                .fontColor($r('sys.color.font_emphasize'))
+                .onClick(() => {
+                  openLink('https://docs.qq.com/doc/p/575bbc2072a149822917882aa974fcba0e111dac')
+                })
+              Span('《关于轩铭密码智能备忘录与隐私的声明》')
+                .fontColor($r('sys.color.font_emphasize'))
+                .onClick(() => {
+                  openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
+                })
+              Span('。如果使用华为账号登录，已阅读并同意')
+              Span('《关于华为账号与隐私的声明》')
+                .fontColor($r('sys.color.font_emphasize'))
+                .onClick(() => {
+                  openLink('https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN')
+                })
+              Span('。')
+            }
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
+            .width('85%')
           }
-          .height('100%')
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
         }
         .align(Alignment.Top)
-        .margin({
-          top: '20%'
-        })
+        .height('100%')
       }
-      if (this.loading) {
-        ListItem() {
-          LoadingProgress()
-            .width('50%')
-        }
-        .margin({
-          top: '20%'
-        })
-        .width('100%')
-      }
+      .margin({
+        top: '20%'
+      })
     }
     .backgroundColor($r('app.color.sheet_background'))
     .padding({

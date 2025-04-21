@@ -57,6 +57,27 @@ export struct Importkey {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
+
+        ListItem() {
+          Column() {
+            Text('格式要求')
+              .fontWeight('bold')
+            Text('· 密钥：Base64 编码的 AES256 密钥（长度 44）')
+              .fontWeight('medium')
+              .margin({
+                top: $r('sys.float.ohos_id_text_paragraph_margin_m')
+              })
+            Text('· 初始向量：Base64 编码的初始向量（长度 24）')
+              .fontWeight('medium')
+              .margin({
+                top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+              })
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

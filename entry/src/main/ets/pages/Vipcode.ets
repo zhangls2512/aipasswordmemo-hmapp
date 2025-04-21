@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -9,47 +9,44 @@ export function VipcodeBuilder() {
 
 @ComponentV2
 export struct Vipcode {
-  @Local loading: boolean = false
   @Local vipcode: string = ''
   pageInfos: NavPathStack = new NavPathStack()
+  dialogControllerProgress: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '验证中...'
+    })
+  })
 
   build() {
     NavDestination() {
       List() {
         ListItem() {
           Column() {
-            if (this.loading) {
-              LoadingProgress()
-                .width('50%')
-            }
-            if (!this.loading) {
-              TextInput({
-                placeholder: '请输入兑换码',
-                text: $$this.vipcode
+            TextInput({
+              placeholder: '请输入兑换码',
+              text: $$this.vipcode
+            })
+              .maxLength(32)
+            Button('兑换')
+              .enabled(this.vipcode.length === 32 ? true : false)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
-                .maxLength(32)
-              Button('兑换')
-                .enabled(this.vipcode.length === 32 ? true : false)
-                .margin({
-                  top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              .onClick(async () => {
+                this.dialogControllerProgress.open()
+                const res = await request('/product/useVipcode', {
+                  accessToken: get(),
+                  vipcode: this.vipcode
                 })
-                .onClick(async () => {
-                  this.loading = true
-                  const res = await request('/product/useVipcode', {
-                    accessToken: get(),
-                    vipcode: this.vipcode
+                this.dialogControllerProgress.close()
+                if (res !== 'fail') {
+                  promptAction.showToast({
+                    message: '兑换成功'
                   })
-                  this.loading = false
-                  if (res !== 'fail') {
-                    promptAction.showToast({
-                      message: '兑换成功'
-                    })
-                    this.pageInfos.pop()
-                  }
-                })
-            }
+                  this.pageInfos.pop()
+                }
+              })
           }
-          .width('100%')
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
