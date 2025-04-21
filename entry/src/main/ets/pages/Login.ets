@@ -350,7 +350,7 @@ export default struct Login {
 
             Text() {
               Span('已阅读并同意')
-              Span('《用户服务条款与条件》')
+              Span('《轩铭密码智能备忘录用户服务条款与条件》')
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(() => {
                   openLink('https://docs.qq.com/doc/p/575bbc2072a149822917882aa974fcba0e111dac')

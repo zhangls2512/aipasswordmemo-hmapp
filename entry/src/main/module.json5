@@ -15,18 +15,6 @@
       {
         "name": "client_id",
         "value": "6917568345502278703"
-      },
-      {
-        "name": "appgallery_privacy_hosted",
-        "value": "1"
-      },
-      {
-        "name": "appgallery_privacy_link_privacy_statement",
-        "value": "https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904"
-      },
-      {
-        "name": "appgallery_privacy_link_user_agreement",
-        "value": "https://docs.qq.com/doc/p/575bbc2072a149822917882aa974fcba0e111dac"
       }
     ],
     "abilities": [

@@ -1,4 +1,5 @@
-import { promptAction } from '@kit.ArkUI'
+import { common } from '@kit.AbilityKit'
+import { promptAction, window } from '@kit.ArkUI'
 import { Key, hasKey, getKey, setRandomKey, removeKey } from '../common/Crypto'
 import { copy } from '../common/Pasteboard'
 
@@ -14,6 +15,7 @@ struct Keypage {
     key: '',
     iv: ''
   }
+  context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
 
   build() {
@@ -257,6 +259,14 @@ struct Keypage {
       if (hasKey()) {
         this.keyInfo = getKey() as Key
       }
+    })
+    .onShown(async () => {
+      const lastWindow = await window.getLastWindow(this.context)
+      await lastWindow.setWindowPrivacyMode(true)
+    })
+    .onHidden(async () => {
+      const lastWindow = await window.getLastWindow(this.context)
+      await lastWindow.setWindowPrivacyMode(false)
     })
   }
 }

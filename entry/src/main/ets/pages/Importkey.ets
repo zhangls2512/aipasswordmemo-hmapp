@@ -1,4 +1,5 @@
-import { promptAction } from '@kit.ArkUI'
+import { common } from '@kit.AbilityKit'
+import { promptAction, window } from '@kit.ArkUI'
 import { setCustomKey } from '../common/Crypto'
 
 @Builder
@@ -10,6 +11,7 @@ export function ImportkeyBuilder() {
 struct Importkey {
   @Local keycontent: string = ''
   @Local iv: string = ''
+  context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
 
   build() {
@@ -89,6 +91,14 @@ struct Importkey {
     .title('导入自定义密钥')
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
+    })
+    .onShown(async () => {
+      const lastWindow = await window.getLastWindow(this.context)
+      await lastWindow.setWindowPrivacyMode(true)
+    })
+    .onHidden(async () => {
+      const lastWindow = await window.getLastWindow(this.context)
+      await lastWindow.setWindowPrivacyMode(false)
     })
   }
 }

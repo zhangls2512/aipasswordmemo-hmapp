@@ -348,7 +348,7 @@ export default struct Setting {
 
                 Text('安全保障说明')
                   .fontColor($r('sys.color.font_emphasize'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .fontWeight('medium')
                   .margin({
                     top: 6,
