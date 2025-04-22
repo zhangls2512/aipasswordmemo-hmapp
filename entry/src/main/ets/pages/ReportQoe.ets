@@ -1,5 +1,4 @@
 import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 
 @Builder
@@ -113,21 +112,14 @@ struct ReportQoe {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
               .onClick(() => {
-                try {
-                  netQuality.reportQoe({
-                    serviceType: this.serviceType,
-                    qoeType: this.qoeType
-                  })
-                  promptAction.showToast({
-                    message: '反馈成功'
-                  })
-                  this.pageInfos.pop()
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
-                }
+                netQuality.reportQoe({
+                  serviceType: this.serviceType,
+                  qoeType: this.qoeType
+                })
+                promptAction.showToast({
+                  message: '反馈成功'
+                })
+                this.pageInfos.pop()
               })
           }
         }

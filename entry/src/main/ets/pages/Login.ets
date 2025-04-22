@@ -20,7 +20,9 @@ export default struct Login {
   @Local buttonEnabled: boolean = true
   context = getContext(this) as common.UIAbilityContext
   dialogControllerProgress: CustomDialogController = new CustomDialogController({
-    builder: LoadingDialog()
+    builder: LoadingDialog({
+      content: '请稍候...'
+    })
   })
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()

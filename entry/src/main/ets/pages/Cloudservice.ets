@@ -14,7 +14,9 @@ struct Cloudservice {
   @Local loading: boolean = false
   pageInfos: NavPathStack = new NavPathStack()
   dialogControllerProgress: CustomDialogController = new CustomDialogController({
-    builder: LoadingDialog()
+    builder: LoadingDialog({
+      content: '请稍候...'
+    })
   })
 
   build() {

@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { promptAction, window } from '@kit.ArkUI'
-import { Key, hasKey, getKey, setRandomKey, removeKey } from '../common/Crypto'
+import { getKey, setRandomKey, removeKey } from '../common/Crypto'
 import { copy } from '../common/Pasteboard'
 
 @Builder
@@ -10,18 +10,14 @@ export function KeyBuilder() {
 
 @ComponentV2
 struct Keypage {
-  @Local hasKey: boolean = false
-  @Local keyInfo: Key = {
-    key: '',
-    iv: ''
-  }
+  @Local keyValue: string = ''
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
 
   build() {
     NavDestination() {
       List() {
-        if (this.hasKey) {
+        if (this.keyValue) {
           ListItem() {
             Column() {
               Row() {
@@ -31,7 +27,7 @@ struct Keypage {
                   .width('45%')
                 Blank()
                   .width('5%')
-                Text(this.keyInfo.key)
+                Text(this.keyValue)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
@@ -49,40 +45,7 @@ struct Keypage {
               })
               .width('100%')
               .onClick(() => {
-                copy(this.keyInfo.key)
-              })
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
-                })
-              Row() {
-                Text('初始向量')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(this.keyInfo.iv)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onClick(() => {
-                copy(this.keyInfo.iv)
+                copy(this.keyValue)
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -112,7 +75,7 @@ struct Keypage {
             })
             .width('100%')
             .onClick(async () => {
-              if (!this.hasKey) {
+              if (!this.keyValue) {
                 const data = await promptAction.showActionMenu({
                   title: '选择导入方式',
                   buttons: [
@@ -131,8 +94,7 @@ struct Keypage {
                   promptAction.showToast({
                     message: '导入成功'
                   })
-                  this.hasKey = hasKey()
-                  this.keyInfo = getKey() as Key
+                  this.keyValue = getKey()
                 }
                 if (data.index === 1) {
                   this.pageInfos.pushPath({
@@ -173,8 +135,7 @@ struct Keypage {
                     promptAction.showToast({
                       message: '导入成功'
                     })
-                    this.hasKey = hasKey()
-                    this.keyInfo = getKey() as Key
+                    this.keyValue = getKey()
                   }
                   if (data.index === 1) {
                     this.pageInfos.pushPath({
@@ -185,7 +146,7 @@ struct Keypage {
               }
             })
 
-            if (this.hasKey) {
+            if (this.keyValue) {
               Divider()
                 .padding({
                   left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -228,11 +189,7 @@ struct Keypage {
                   promptAction.showToast({
                     message: '删除成功'
                   })
-                  this.hasKey = hasKey()
-                  this.keyInfo = {
-                    key: '',
-                    iv: ''
-                  }
+                  this.keyValue = getKey()
                 }
               })
             }
@@ -255,10 +212,7 @@ struct Keypage {
     .title('密钥')
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
-      this.hasKey = hasKey()
-      if (hasKey()) {
-        this.keyInfo = getKey() as Key
-      }
+      this.keyValue = getKey()
     })
     .onShown(async () => {
       const lastWindow = await window.getLastWindow(this.context)

@@ -97,7 +97,7 @@ struct Commonsetting {
                 right: $r('sys.float.ohos_id_corner_radius_default_m')
               })
             Row() {
-              Text('启动时检测新版本')
+              Text('启动时检查更新')
                 .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()

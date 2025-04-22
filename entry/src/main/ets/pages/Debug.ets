@@ -3,7 +3,7 @@ import { accessibility } from '@kit.AccessibilityKit'
 import { preferences } from '@kit.ArkData'
 import { process } from '@kit.ArkTS'
 import { display, promptAction, window } from '@kit.ArkUI'
-import { batteryInfo, BusinessError, deviceInfo, power, systemLoad, thermal } from '@kit.BasicServicesKit'
+import { batteryInfo, deviceInfo, power, systemLoad, thermal } from '@kit.BasicServicesKit'
 import { wifiManager } from '@kit.ConnectivityKit'
 import { storageStatistics } from '@kit.CoreFileKit'
 import { connection } from '@kit.NetworkKit'
@@ -1335,19 +1335,12 @@ struct Debug {
                 ]
               })
               if (data.index === 1) {
-                try {
-                  this.debugSettingDataPreferences.clearSync()
-                  this.debugSettingDataPreferences.flushSync()
-                  promptAction.showToast({
-                    message: '恢复成功'
-                  })
-                  this.getSetting()
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
-                }
+                this.debugSettingDataPreferences.clearSync()
+                this.debugSettingDataPreferences.flushSync()
+                promptAction.showToast({
+                  message: '恢复成功'
+                })
+                this.getSetting()
               }
             })
         }

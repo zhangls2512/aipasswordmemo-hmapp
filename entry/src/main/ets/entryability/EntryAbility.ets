@@ -2,7 +2,6 @@ import { AbilityConstant, appRecovery, ConfigurationConstant, errorManager, UIAb
 import { updateManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { wifiManager } from '@kit.ConnectivityKit'
 import { connection } from '@kit.NetworkKit'
 import { netQuality } from '@kit.NetworkBoostKit'
@@ -181,20 +180,13 @@ export default class EntryAbility extends UIAbility {
         }
         if (debugSettingDataPreferences.getSync('autoReportHighLatency', true) &&
           data.rttMs >= debugSettingDataPreferences.getSync('highLatencyThreshold', 200)) {
-          try {
-            netQuality.reportQoe({
-              serviceType: 'default',
-              qoeType: 'highLatency'
-            })
-            promptAction.showToast({
-              message: '自动反馈网络高时延传输体验成功'
-            })
-          } catch (err) {
-            promptAction.showToast({
-              message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-              (err as BusinessError).message
-            })
-          }
+          netQuality.reportQoe({
+            serviceType: 'default',
+            qoeType: 'highLatency'
+          })
+          promptAction.showToast({
+            message: '自动反馈网络高时延传输体验成功'
+          })
         }
       }
     })

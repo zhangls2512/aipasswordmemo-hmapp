@@ -4,8 +4,8 @@ import { asset } from '@kit.AssetStoreKit'
 import { cryptoFramework } from '@kit.CryptoArchitectureKit'
 import { huks } from '@kit.UniversalKeystoreKit'
 
-export interface Key {
-  key: string,
+export interface EncryptData {
+  content: string,
   iv: string
 }
 
@@ -38,34 +38,16 @@ function decodeBase64(arr: Uint8Array | string): Uint8Array {
   return base64.decodeSync(arr)
 }
 
-export function hasKey(): boolean {
+export function getKey(): string {
   const query: asset.AssetMap = new Map()
   query.set(asset.Tag.ALIAS, stringToArray('key'))
   query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
   try {
-    asset.querySync(query)
-    return true
-  } catch {
-    return false
-  }
-}
-
-export function getKey(): Key | string {
-  const query: asset.AssetMap = new Map()
-  query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
-  try {
-    query.set(asset.Tag.ALIAS, stringToArray('key'))
     const keyres: Array<asset.AssetMap> = asset.querySync(query)
     const key: Uint8Array = keyres[0].get(asset.Tag.SECRET) as Uint8Array
-    query.set(asset.Tag.ALIAS, stringToArray('iv'))
-    const ivres: Array<asset.AssetMap> = asset.querySync(query)
-    const iv: Uint8Array = ivres[0].get(asset.Tag.SECRET) as Uint8Array
-    return {
-      key: arrayToString(key),
-      iv: arrayToString(iv)
-    }
+    return arrayToString(key)
   } catch {
-    return 'fail'
+    return ''
   }
 }
 
@@ -73,8 +55,6 @@ export async function setRandomKey() {
   const keyGenerator = cryptoFramework.createSymKeyGenerator('AES256')
   const keyres = await keyGenerator.generateSymKey()
   const key = keyres.getEncoded().data
-  const random = cryptoFramework.createRandom()
-  const iv = random.generateRandomSync(16).data
   await huks.importKeyItem('key', {
     inData: key,
     properties: [
@@ -93,19 +73,16 @@ export async function setRandomKey() {
     ]
   })
   const query: asset.AssetMap = new Map()
-  query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
   query.set(asset.Tag.SECRET, encodeBase64(key))
   query.set(asset.Tag.ALIAS, stringToArray('key'))
-  asset.addSync(query)
-  query.set(asset.Tag.SECRET, encodeBase64(iv))
-  query.set(asset.Tag.ALIAS, stringToArray('iv'))
+  query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
   asset.addSync(query)
 }
 
-export async function setCustomKey(key: Key): Promise<string> {
+export async function setCustomKey(key: string): Promise<string> {
   try {
     await huks.importKeyItem('key', {
-      inData: decodeBase64(stringToArray(key.key)),
+      inData: decodeBase64(stringToArray(key)),
       properties: [
         {
           tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
@@ -122,12 +99,9 @@ export async function setCustomKey(key: Key): Promise<string> {
       ]
     })
     const query: asset.AssetMap = new Map()
-    query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
-    query.set(asset.Tag.SECRET, stringToArray(key.key))
+    query.set(asset.Tag.SECRET, stringToArray(key))
     query.set(asset.Tag.ALIAS, stringToArray('key'))
-    asset.addSync(query)
-    query.set(asset.Tag.SECRET, stringToArray(key.iv))
-    query.set(asset.Tag.ALIAS, stringToArray('iv'))
+    query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
     asset.addSync(query)
     return 'success'
   } catch {
@@ -141,24 +115,18 @@ export async function removeKey(): Promise<string> {
     const query: asset.AssetMap = new Map()
     query.set(asset.Tag.ALIAS, stringToArray('key'))
     asset.removeSync(query)
-    query.set(asset.Tag.ALIAS, stringToArray('iv'))
-    asset.removeSync(query)
     return 'success'
   } catch {
     return 'fail'
   }
 }
 
-export async function encrypt(inputData: string): Promise<string> {
+export async function encrypt(content: string): Promise<EncryptData | string> {
+  const random = cryptoFramework.createRandom()
+  const iv = random.generateRandomSync(16).data
   try {
-    const data = stringToArray(inputData)
-    const query: asset.AssetMap = new Map()
-    query.set(asset.Tag.ALIAS, stringToArray('iv'))
-    query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
-    const ivres: Array<asset.AssetMap> = asset.querySync(query)
-    const iv: Uint8Array = ivres[0].get(asset.Tag.SECRET) as Uint8Array
     const options: huks.HuksOptions = {
-      inData: data,
+      inData: stringToArray(content),
       properties: [
         {
           tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
@@ -182,13 +150,16 @@ export async function encrypt(inputData: string): Promise<string> {
         },
         {
           tag: huks.HuksTag.HUKS_TAG_IV,
-          value: decodeBase64(iv)
+          value: iv
         }
       ]
     }
     const session = await huks.initSession('key', options)
     const res = await huks.finishSession(session.handle, options)
-    return encodeBase64ToString(res.outData as Uint8Array)
+    return {
+      content: encodeBase64ToString(res.outData as Uint8Array),
+      iv: encodeBase64ToString(iv)
+    }
   } catch (err) {
     promptAction.showDialog({
       title: '加密失败',
@@ -204,15 +175,10 @@ export async function encrypt(inputData: string): Promise<string> {
   }
 }
 
-export async function decrypt(data: string): Promise<string> {
+export async function decrypt(encryptData: EncryptData): Promise<string> {
   try {
-    const query: asset.AssetMap = new Map()
-    query.set(asset.Tag.ALIAS, stringToArray('iv'))
-    query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
-    const ivres: Array<asset.AssetMap> = asset.querySync(query)
-    const iv: Uint8Array = ivres[0].get(asset.Tag.SECRET) as Uint8Array
     const options: huks.HuksOptions = {
-      inData: decodeBase64(data),
+      inData: decodeBase64(encryptData.content),
       properties: [
         {
           tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
@@ -236,7 +202,7 @@ export async function decrypt(data: string): Promise<string> {
         },
         {
           tag: huks.HuksTag.HUKS_TAG_IV,
-          value: decodeBase64(iv)
+          value: decodeBase64(encryptData.iv)
         }
       ]
     }

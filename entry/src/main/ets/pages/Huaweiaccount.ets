@@ -28,7 +28,9 @@ struct Huaweiaccount {
   @Local buttonEnabled: boolean = true
   pageInfos: NavPathStack = new NavPathStack()
   dialogControllerProgress: CustomDialogController = new CustomDialogController({
-    builder: LoadingDialog()
+    builder: LoadingDialog({
+      content: '请稍候...'
+    })
   })
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()

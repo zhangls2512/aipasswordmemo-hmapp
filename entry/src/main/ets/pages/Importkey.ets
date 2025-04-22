@@ -9,8 +9,7 @@ export function ImportkeyBuilder() {
 
 @ComponentV2
 struct Importkey {
-  @Local keycontent: string = ''
-  @Local iv: string = ''
+  @Local keyValue: string = ''
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
 
@@ -19,29 +18,19 @@ struct Importkey {
       List() {
         ListItem() {
           Column() {
-            TextInput({
-              placeholder: '请输入密钥',
-              text: $$this.keycontent
+            TextArea({
+              placeholder: '请输入 Base64 编码、长度 44 的 AES256 密钥',
+              text: $$this.keyValue
             })
               .maxLength(44)
-            TextInput({
-              placeholder: '请输入初始向量',
-              text: $$this.iv
-            })
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-              })
-              .maxLength(24)
+              .showCounter(true)
             Button('导入')
-              .enabled(this.keycontent.length === 44 && this.iv.length === 24 ? true : false)
+              .enabled(this.keyValue.length === 44 ? true : false)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
               .onClick(async () => {
-                const res = await setCustomKey({
-                  key: this.keycontent,
-                  iv: this.iv
-                })
+                const res = await setCustomKey(this.keyValue)
                 if (res !== 'fail') {
                   promptAction.showToast({
                     message: '导入成功'
@@ -55,27 +44,6 @@ struct Importkey {
               })
           }
           .width('100%')
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
-          Column() {
-            Text('格式要求')
-              .fontWeight('bold')
-            Text('· 密钥：Base64 编码的 AES256 密钥（长度 44）')
-              .fontWeight('medium')
-              .margin({
-                top: $r('sys.float.ohos_id_text_paragraph_margin_m')
-              })
-            Text('· 初始向量：Base64 编码的初始向量（长度 24）')
-              .fontWeight('medium')
-              .margin({
-                top: $r('sys.float.ohos_id_text_paragraph_margin_s')
-              })
-          }
-          .alignItems(HorizontalAlign.Start)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
