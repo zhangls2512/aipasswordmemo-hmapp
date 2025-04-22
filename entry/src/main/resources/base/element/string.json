@@ -3,6 +3,10 @@
     {
       "name": "EntryAbility_label",
       "value": "轩铭密码智能备忘录"
+    },
+    {
+      "name": "WRITE_PASTEBOARD_reason",
+      "value": "用于写入数据到剪贴板，便于在外部环境使用。"
     }
   ]
 }
