@@ -15,7 +15,7 @@ export function ViplogBuilder() {
 
 @ComponentV2
 struct Viplog {
-  @Local vipLogArray: Array<Item> = []
+  @Local viplogArray: Array<Item> = []
   @Local loading: boolean = false
   accessToken: string = get()
   empty: boolean | undefined = undefined
@@ -23,19 +23,17 @@ struct Viplog {
   build() {
     NavDestination() {
       List() {
-        ForEach(this.vipLogArray, (item: Item) => {
+        ForEach(this.viplogArray, (item: Item) => {
           ListItem() {
             Column() {
               Row() {
-                Text('类型')
+                Text('时长')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
                   .width('5%')
-                Text(item.type === 'pay' ? '付费' :
-                  item.type === 'vipcode' ? '兑换码' :
-                    'undefined')
+                Text(item.duration === 0 ? '终身' : String(item.duration) + ' 天')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
@@ -51,13 +49,15 @@ struct Viplog {
                   right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
-                Text('时长')
+                Text('类型')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
                   .width('5%')
-                Text(item.duration === 0 ? '终身' : String(item.duration) + ' 天')
+                Text(item.type === 'pay' ? '付费' :
+                  item.type === 'vipcode' ? '兑换码' :
+                    'undefined')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
@@ -129,6 +129,15 @@ struct Viplog {
           })
           .width('100%')
         }
+        if (this.viplogArray.length === 0 && !this.loading) {
+          ListItem() {
+            Text('无数据')
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
+          .width('100%')
+        }
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
@@ -141,7 +150,7 @@ struct Viplog {
           const res = await request('/product/getViplogList', {
             accessToken: get(),
             product: 'password',
-            skip: this.vipLogArray.length
+            skip: this.viplogArray.length
           })
           this.loading = false
           if (res !== 'fail') {
@@ -149,9 +158,7 @@ struct Viplog {
             if (array.length === 0) {
               this.empty = true
             }
-            this.vipLogArray = this.vipLogArray.concat(array)
-          } else {
-            this.loading = false
+            this.viplogArray = this.viplogArray.concat(array)
           }
         }
       })
@@ -166,10 +173,9 @@ struct Viplog {
       })
       this.loading = false
       if (res !== 'fail') {
-        this.vipLogArray = JSON.parse(res).data as Item[]
+        const viplogs = JSON.parse(res).data as Item[]
+        this.viplogArray = viplogs
         this.empty = false
-      } else {
-        this.loading = false
       }
     })
   }

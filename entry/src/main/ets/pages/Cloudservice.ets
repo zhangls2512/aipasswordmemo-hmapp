@@ -132,8 +132,6 @@ struct Cloudservice {
       if (infores !== 'fail') {
         const service = JSON.parse(infores).data.service as string[]
         this.CloudService.status = service.includes('password')
-      } else {
-        this.loading = false
       }
     })
   }

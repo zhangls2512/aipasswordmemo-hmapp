@@ -21,8 +21,9 @@ export default struct Setting {
   @Local AllService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
   @Local CloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
   @Local cloudServiceLoading: boolean = false
-  @Local vipEndDate: string = ''
-  @Local vipEndDateLoading: boolean = false
+  @Local vipStatus: string = '未开通'
+  @Local vipStatusLoading: boolean = false
+  @Local vipStatusColor: string = 'red'
   @Local autoCloudBackup: boolean = false
   @Local agreedPrivacyAgreement: number | undefined = undefined
   context = getContext(this) as common.UIAbilityContext
@@ -143,21 +144,21 @@ export default struct Setting {
                         .fontSize($r('sys.float.ohos_id_text_size_body1'))
                         .fontWeight('medium')
                       Blank()
-                      if (this.vipEndDateLoading) {
+                      if (!this.vipStatusLoading) {
+                        Text(this.vipStatus)
+                          .fontColor(this.vipStatusColor)
+                          .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                      }
+                      if (this.vipStatusLoading) {
                         LoadingProgress()
                           .height(14)
                           .margin({
                             right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                           })
                           .width(14)
-                      }
-                      if (this.vipEndDate) {
-                        Text(this.vipEndDate)
-                          .fontColor($r('sys.color.font_secondary'))
-                          .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                          .margin({
-                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                          })
                       }
                       Image($r('app.media.right'))
                         .fillColor($r('sys.color.icon_fourth'))
@@ -914,26 +915,20 @@ export default struct Setting {
           const status = service.includes('password')
           this.CloudService.status = status
           if (status) {
-            this.vipEndDateLoading = true
+            this.vipStatusLoading = true
             const userres = await request('/product/getUserInfo', {
               accessToken: this.accessToken,
               product: 'password'
             })
-            this.vipEndDateLoading = false
+            this.vipStatusLoading = false
             if (userres !== 'fail') {
               const vipenddate = JSON.parse(userres).data.vipEndDate as number
-              if (vipenddate === 0) {
-                this.vipEndDate = '终身'
+              if (vipenddate === 0 || vipenddate >= Date.now()) {
+                this.vipStatus = '已开通'
+                this.vipStatusColor = '#FFD700'
               }
-              if (vipenddate > 0 && vipenddate >= Date.now()) {
-                this.vipEndDate = '有效期至 ' + String(new Date(vipenddate))
-              }
-            } else {
-              this.vipEndDateLoading = false
             }
           }
-        } else {
-          this.cloudServiceLoading = false
         }
       }
     })

@@ -12,9 +12,9 @@ export function VipBuilder() {
 
 @ComponentV2
 struct Vip {
-  @Local vipEndDate: string = '未开通会员'
+  @Local vipEndDate: string = '未开通'
   @Local vipEndDateLoading: boolean = false
-  @Local color: string = ''
+  @Local vipEndDateColor: string = 'red'
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
 
@@ -28,15 +28,13 @@ struct Vip {
     if (userres !== 'fail') {
       const vipenddate = JSON.parse(userres).data.vipEndDate as number
       if (vipenddate === 0) {
-        this.vipEndDate = '终身会员'
-        this.color = '#FFD700'
+        this.vipEndDate = '终身'
+        this.vipEndDateColor = '#FFD700'
       }
       if (vipenddate > 0 && vipenddate >= Date.now()) {
-        this.vipEndDate = '会员有效期至 ' + String(new Date(vipenddate))
-        this.color = '#FFD700'
+        this.vipEndDate = '有效期至 ' + String(new Date(vipenddate))
+        this.vipEndDateColor = '#FFD700'
       }
-    } else {
-      this.vipEndDateLoading = false
     }
   }
 
@@ -47,7 +45,7 @@ struct Vip {
           Column() {
             if (!this.vipEndDateLoading) {
               Text(this.vipEndDate)
-                .fontColor(this.color)
+                .fontColor(this.vipEndDateColor)
                 .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                 .fontWeight('bold')
             }
@@ -65,8 +63,13 @@ struct Vip {
 
         ListItem() {
           Column() {
-            Text('会员可享以下特权：')
-              .fontWeight('bold')
+            Text() {
+              Span('会员')
+                .fontColor('#FFD700')
+              Span('可享以下特权：')
+            }
+            .fontWeight('bold')
+
             Text('· 云备份不限个数')
               .fontWeight('medium')
               .margin({

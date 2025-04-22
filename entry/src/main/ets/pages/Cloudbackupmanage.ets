@@ -43,8 +43,6 @@ struct Cloudbackupmanage {
       this.password = String(count.password)
       this.info = String(count.info)
       this.tag = String(count.tag)
-    } else {
-      this.loading = false
     }
   }
 

@@ -56,18 +56,16 @@ struct Servicemode {
             Text() {
               Span('全量模式下，本应用需联网，除可使用记录密码等离线功能外，还可使用账号登录、云备份、自动上传故障日志等在线功能。我们仅在您使用具体业务功能时，才会触发上述行为收集使用相关的个人信息。详情请参阅')
                 .fontColor($r('sys.color.font_secondary'))
-                .fontSize($r('sys.float.ohos_id_text_size_body3'))
               Span('关于轩铭密码智能备忘录与隐私的声明')
                 .fontColor($r('sys.color.font_emphasize'))
-                .fontSize($r('sys.float.ohos_id_text_size_body3'))
                 .fontWeight('medium')
                 .onClick(() => {
                   openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
                 })
               Span('。开启开关，即表示您知悉并同意我们向您提供本应用服务。')
                 .fontColor($r('sys.color.font_secondary'))
-                .fontSize($r('sys.float.ohos_id_text_size_body3'))
             }
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
             .margin({
               top: 6,
               left: $r('sys.float.ohos_id_corner_radius_default_m')
