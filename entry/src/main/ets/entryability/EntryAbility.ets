@@ -77,7 +77,7 @@ export default class EntryAbility extends UIAbility {
           eventTypes: [1]
         }
       ],
-      onReceive: async (domain: string, appEventGroups: Array<hiAppEvent.AppEventGroup>) => {
+      onReceive: async (domain: string, appEventGroups: hiAppEvent.AppEventGroup[]) => {
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
           const promises = appEventGroups.map(async (item) => {
@@ -154,7 +154,7 @@ export default class EntryAbility extends UIAbility {
         })
       }
     })
-    netQuality.on('netQosChange', (list: Array<netQuality.NetworkQos>) => {
+    netQuality.on('netQosChange', (list: netQuality.NetworkQos[]) => {
       if (list.length > 0) {
         const data = list[0]
         if (debugSettingDataPreferences.getSync('showNetQosChange', false)) {
@@ -190,7 +190,7 @@ export default class EntryAbility extends UIAbility {
         }
       }
     })
-    netQuality.on('netSceneChange', (list: Array<netQuality.NetworkScene>) => {
+    netQuality.on('netSceneChange', (list: netQuality.NetworkScene[]) => {
       if (list.length > 0) {
         const data = list[0]
         if (debugSettingDataPreferences.getSync('showNetSceneChange', false)) {

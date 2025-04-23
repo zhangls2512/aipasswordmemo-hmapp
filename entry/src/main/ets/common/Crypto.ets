@@ -43,7 +43,7 @@ export function getKey(): string {
   query.set(asset.Tag.ALIAS, stringToArray('key'))
   query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
   try {
-    const keyres: Array<asset.AssetMap> = asset.querySync(query)
+    const keyres: asset.AssetMap[] = asset.querySync(query)
     const key: Uint8Array = keyres[0].get(asset.Tag.SECRET) as Uint8Array
     return arrayToString(key)
   } catch {

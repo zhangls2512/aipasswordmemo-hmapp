@@ -68,7 +68,8 @@ struct Servicemode {
             .fontSize($r('sys.float.ohos_id_text_size_body3'))
             .margin({
               top: 6,
-              left: $r('sys.float.ohos_id_corner_radius_default_m')
+              left: $r('sys.float.ohos_id_corner_radius_default_m'),
+              right: $r('sys.float.ohos_id_corner_radius_default_m')
             })
           }
           .alignItems(HorizontalAlign.Start)
@@ -109,7 +110,8 @@ struct Servicemode {
               .fontSize($r('sys.float.ohos_id_text_size_body3'))
               .margin({
                 top: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                right: $r('sys.float.ohos_id_corner_radius_default_m')
               })
           }
           .alignItems(HorizontalAlign.Start)

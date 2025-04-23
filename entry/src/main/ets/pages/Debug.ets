@@ -444,7 +444,7 @@ struct Debug {
     { name: '发行版系统类型', value: deviceInfo.distributionOSReleaseType },
     { name: '开发者匿名设备标识符', value: deviceInfo.ODID }
   ]
-  stateArray: Array<atomicService.SystemInfoType> = [
+  stateArray: atomicService.SystemInfoType[] = [
     'brand',
     'deviceModel',
     'screenWidth',
@@ -2221,9 +2221,8 @@ struct Debug {
         name: '分身索引',
         value: String(runningProcessInformation[0].appCloneIndex)
       })
-      const bundleInfo =
-        bundleManager.getBundleInfoSync('com.zhangxm.aipasswordmemo', bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT |
-        bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_SIGNATURE_INFO)
+      const bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT |
+      bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_SIGNATURE_INFO)
       this.bundleInfoArray.push({
         name: '名称',
         value: bundleInfo.name

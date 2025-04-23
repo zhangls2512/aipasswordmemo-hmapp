@@ -5,6 +5,14 @@
       "value": "轩铭密码智能备忘录"
     },
     {
+      "name": "DISTRIBUTED_DATASYNC_reason",
+      "value": "用于获取可信设备列表、在可信设备间同步数据。"
+    },
+    {
+      "name": "MICROPHONE_reason",
+      "value": "用于 AI 智能语音助手。"
+    },
+    {
       "name": "WRITE_PASTEBOARD_reason",
       "value": "用于写入数据到剪贴板，便于在外部环境使用。"
     }
