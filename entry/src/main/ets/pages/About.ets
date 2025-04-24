@@ -61,7 +61,7 @@ struct About {
                   .fontWeight('medium')
                 Text($r('app.string.app_version'))
                   .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -146,7 +146,7 @@ struct About {
                   .fontWeight('medium')
                 Text('https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp')
                   .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -292,7 +292,7 @@ struct About {
                     .fontWeight('medium')
                   Text('https://chatbot.weixin.qq.com/webapp/5e2JglFAERGl06z0FkTK6eWL6D1Oa5?robotName=轩铭2512产品客服')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -332,7 +332,7 @@ struct About {
                     .fontWeight('medium')
                   Text('18846496985')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -378,7 +378,7 @@ struct About {
                     .fontWeight('medium')
                   Text('2300990296@qq.com')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -423,7 +423,7 @@ struct About {
                     .fontWeight('medium')
                   Text('gerenyinsi_z07x17m')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -463,7 +463,7 @@ struct About {
                     .fontWeight('medium')
                   Text('https://pd.qq.com/s/cnx7f1zdm')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -519,7 +519,7 @@ struct About {
                     .fontWeight('medium')
                   Text('https://www.zhangls2512.cn/index')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -559,7 +559,7 @@ struct About {
                     .fontWeight('medium')
                   Text('https://space.bilibili.com/448824492')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -599,7 +599,7 @@ struct About {
                     .fontWeight('medium')
                   Text('https://gitcode.com/zhangls2512/aipasswordmemo-hmapp')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })

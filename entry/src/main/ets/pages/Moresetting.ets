@@ -97,7 +97,7 @@ struct Moresetting {
         ListItem() {
           Column() {
             Row() {
-              Text('清除自定义设置')
+              Text('清除设置数据')
                 .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()

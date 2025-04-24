@@ -623,6 +623,8 @@ struct Debug {
   @Local globalErrorShowTypeValue: string = 'Toast'
   @Local autoUploadErrorLog: boolean = true
   @Local showMemoryLevelChange: boolean = false
+  @Local lowBatteryCapacityLevelIndex: number = 3
+  @Local lowBatteryCapacityLevelValue: string = '低'
   @Local showNetAvailableStatusChange: boolean = false
   @Local showNetBlockStatusChange: boolean = false
   @Local showNetLost: boolean = false
@@ -659,6 +661,30 @@ struct Debug {
       this.debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
     this.showMemoryLevelChange = showMemoryLevelChange as boolean
     this.autoUploadErrorLog = autoUploadErrorLog as boolean
+    const lowBatteryCapacityLevel: preferences.ValueType =
+      this.debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
+    this.lowBatteryCapacityLevelIndex = (lowBatteryCapacityLevel as number) - 1
+    if (lowBatteryCapacityLevel === 1) {
+      this.lowBatteryCapacityLevelValue = '满'
+    }
+    if (lowBatteryCapacityLevel === 2) {
+      this.lowBatteryCapacityLevelValue = '高'
+    }
+    if (lowBatteryCapacityLevel === 3) {
+      this.lowBatteryCapacityLevelValue = '正常'
+    }
+    if (lowBatteryCapacityLevel === 4) {
+      this.lowBatteryCapacityLevelValue = '低'
+    }
+    if (lowBatteryCapacityLevel === 5) {
+      this.lowBatteryCapacityLevelValue = '告警'
+    }
+    if (lowBatteryCapacityLevel === 6) {
+      this.lowBatteryCapacityLevelValue = '极低'
+    }
+    if (lowBatteryCapacityLevel === 7) {
+      this.lowBatteryCapacityLevelValue = '关机'
+    }
     const autoReportHighLatency: preferences.ValueType =
       this.debugSettingDataPreferences.getSync('autoReportHighLatency', true)
     this.autoReportHighLatency = autoReportHighLatency as boolean
@@ -791,6 +817,36 @@ struct Debug {
                 })
                   .onChange((isOn: boolean) => {
                     this.debugSettingDataPreferences.putSync('showMemoryLevelChange', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('电池电量低阈值')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Select([
+                  { value: '满' },
+                  { value: '高' },
+                  { value: '正常' },
+                  { value: '低' },
+                  { value: '告警' },
+                  { value: '极低' },
+                  { value: '关机' }
+                ])
+                  .selected($$this.lowBatteryCapacityLevelIndex)
+                  .value($$this.lowBatteryCapacityLevelValue)
+                  .onSelect((index: number) => {
+                    this.debugSettingDataPreferences.putSync('lowBatteryCapacityLevel', index + 1)
                     this.debugSettingDataPreferences.flushSync()
                   })
               }

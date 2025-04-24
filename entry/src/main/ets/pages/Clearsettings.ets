@@ -10,9 +10,10 @@ export function ClearsettingsBuilder() {
 @ComponentV2
 struct Clearsettings {
   @Local all: boolean = false
+  @Local cloudbackup: boolean = false
+  @Local data: boolean = false
   @Local common: boolean = false
   @Local permission: boolean = false
-  @Local cloudbackup: boolean = false
   @Local types: string[] = []
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
@@ -50,6 +51,72 @@ struct Clearsettings {
                 })
               Row() {
                 Checkbox({
+                  name: 'cloudbackup',
+                  group: 'type'
+                })
+                  .shape(CheckBoxShape.ROUNDED_SQUARE)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                  .select($$this.cloudbackup)
+                Column() {
+                  Text('云备份')
+                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                    .fontWeight('medium')
+                  Text('自动同步')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                    .width('90%')
+                }
+                .alignItems(HorizontalAlign.Start)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Checkbox({
+                  name: 'data',
+                  group: 'type'
+                })
+                  .shape(CheckBoxShape.ROUNDED_SQUARE)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                  .select($$this.data)
+                Column() {
+                  Text('数据')
+                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                    .fontWeight('medium')
+                  Text('设备间自动同步、自动备份等')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                    .width('90%')
+                }
+                .alignItems(HorizontalAlign.Start)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Checkbox({
                   name: 'common',
                   group: 'type'
                 })
@@ -64,7 +131,7 @@ struct Clearsettings {
                     .fontWeight('medium')
                   Text('应用服务模式、深色模式、启动时检查更新、链接打开方式')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -97,40 +164,7 @@ struct Clearsettings {
                     .fontWeight('medium')
                   Text('写入剪贴板')
                     .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
-                    .margin({
-                      top: $r('sys.float.ohos_id_text_margin_vertical')
-                    })
-                    .width('90%')
-                }
-                .alignItems(HorizontalAlign.Start)
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
-                })
-              Row() {
-                Checkbox({
-                  name: 'cloudbackup',
-                  group: 'type'
-                })
-                  .shape(CheckBoxShape.ROUNDED_SQUARE)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                  .select($$this.cloudbackup)
-                Column() {
-                  Text('云备份')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                    .fontWeight('medium')
-                  Text('自动同步')
-                    .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -155,7 +189,7 @@ struct Clearsettings {
               .onClick(async () => {
                 const data = await promptAction.showDialog({
                   title: '提示',
-                  message: '清除成功后将恢复默认设置，无法恢复。确定清除？',
+                  message: '清除成功后将恢复所选设置为默认，无法恢复。确定清除？',
                   buttons: [
                     {
                       text: '取消',
@@ -172,7 +206,22 @@ struct Clearsettings {
                     const dataPreferences = preferences.getPreferencesSync(this.context, {
                       name: item + 'Setting'
                     })
-                    dataPreferences.clearSync()
+                    if (item === 'data') {
+                      const keys = [
+                        'autoSyncTables',
+                        'autoSyncDevices',
+                        'autoBackupTables',
+                        'pauseAutoSyncWhenLowBatteryCapacityLevel',
+                        'pauseAutoSyncWhenPowerSave',
+                        'pauseAutoBackupWhenLowBatteryCapacityLevel',
+                        'pauseAutoBackupWhenPowerSave'
+                      ]
+                      keys.forEach((item) => {
+                        dataPreferences.deleteSync(item)
+                      })
+                    } else {
+                      dataPreferences.clearSync()
+                    }
                     dataPreferences.flushSync()
                   })
                   promptAction.showToast({
@@ -195,7 +244,7 @@ struct Clearsettings {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('清除自定义设置')
+    .title('清除设置数据')
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
     })
