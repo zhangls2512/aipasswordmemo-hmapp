@@ -19,7 +19,7 @@ export class CloudService {
 @ComponentV2
 export default struct Setting {
   @Local AllService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
-  @Local CloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
+  @Local cloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
   @Local cloudServiceLoading: boolean = false
   @Local vipStatus: string = '未开通'
   @Local vipStatusLoading: boolean = false
@@ -94,13 +94,13 @@ export default struct Setting {
                       right: $r('sys.float.ohos_id_corner_radius_default_m')
                     })
                   Row() {
-                    if (!this.CloudService.status) {
+                    if (!this.cloudService.status) {
                       Text('开通云服务')
                         .fontColor($r('sys.color.font_emphasize'))
                         .fontSize($r('sys.float.ohos_id_text_size_body1'))
                         .fontWeight('medium')
                     }
-                    if (this.CloudService.status) {
+                    if (this.cloudService.status) {
                       Text('取消开通云服务')
                         .fontColor($r('sys.color.warning'))
                         .fontSize($r('sys.float.ohos_id_text_size_body1'))
@@ -129,7 +129,7 @@ export default struct Setting {
                     })
                   })
 
-                  if (this.CloudService.status) {
+                  if (this.cloudService.status) {
                     Divider()
                       .padding({
                         left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -201,7 +201,7 @@ export default struct Setting {
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
 
-          if (!this.cloudServiceLoading && this.CloudService.status) {
+          if (!this.cloudServiceLoading && this.cloudService.status) {
             ListItem() {
               Column() {
                 Text('云备份')
@@ -985,7 +985,7 @@ export default struct Setting {
         if (infores !== 'fail') {
           const service = JSON.parse(infores).data.service as string[]
           const status = service.includes('password')
-          this.CloudService.status = status
+          this.cloudService.status = status
           if (status) {
             this.vipStatusLoading = true
             const userres = await request('/product/getUserInfo', {

@@ -107,7 +107,7 @@ export async function backupTable(table: string): Promise<boolean> {
       name: 'dataSetting'
     })
     const isBackupTables: string[] = dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
-    dataSettingDataPreferences.putSync('isBackupTables', [...isBackupTables, table])
+    dataSettingDataPreferences.putSync('isBackupTables', Array.from(new Set([...isBackupTables, table])))
     dataSettingDataPreferences.flushSync()
     promptAction.showToast({
       message: '备份成功'

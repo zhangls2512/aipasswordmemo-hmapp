@@ -9,7 +9,8 @@ export function FeedbackBuilder() {
 @ComponentV2
 struct Feedback {
   @Local content: string = ''
-  @Local contactType: string = 'email'
+  @Local contactType: string = '邮箱'
+  @Local contactTypeIndex: number = 0
   @Local contactValue: string = ''
   pageInfos: NavPathStack = new NavPathStack()
   dialogControllerProgress: CustomDialogController = new CustomDialogController({
@@ -43,21 +44,21 @@ struct Feedback {
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                .selected(0)
-                .value('邮箱')
+                .selected($$this.contactTypeIndex)
+                .value($$this.contactType)
                 .width('30%')
                 .onSelect((index: number) => {
                   if (index === 0) {
-                    this.contactType = 'email'
+                    this.contactType = '邮箱'
                   }
                   if (index === 1) {
-                    this.contactType = 'wx'
+                    this.contactType = '微信'
                   }
                   if (index === 2) {
-                    this.contactType = 'qq'
+                    this.contactType = 'QQ'
                   }
                 })
-              if (this.contactType === 'email') {
+              if (this.contactType === '邮箱') {
                 TextInput({
                   placeholder: '请输入邮箱',
                   text: $$this.contactValue
@@ -66,7 +67,7 @@ struct Feedback {
                   .type(InputType.Email)
                   .width('65%')
               }
-              if (this.contactType === 'wx') {
+              if (this.contactType === '微信') {
                 TextInput({
                   placeholder: '请输入微信号',
                   text: $$this.contactValue
@@ -74,7 +75,7 @@ struct Feedback {
                   .maxLength(30)
                   .width('65%')
               }
-              if (this.contactType === 'qq') {
+              if (this.contactType === 'QQ') {
                 TextInput({
                   placeholder: '请输入 QQ 号',
                   text: $$this.contactValue
