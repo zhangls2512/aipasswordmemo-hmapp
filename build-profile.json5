@@ -20,11 +20,11 @@
         "material": {
           "certpath": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001BA263C697345698E2548214A0EF8FF8A307C9AB9B5E9F20BC8D3ABDFAE0B43671AE2E77D99F4C90",
+          "keyPassword": "0000001B86120E3BAFDFC76124CC61BF392789EFF4CB72DEC1BFD55DC3B74ABB5AE3F1DC464C0324D5D1FB",
           "profile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
-          "storePassword": "0000001BB503D3F51271A39033AD7086CF4F1FB0CEE43351EC81891D83C0FCE909CDAB23F85B27DCAA05AE"
+          "storePassword": "0000001BF791019031C50EEBF8D11E29956A8B12C36BD04F5AF02AA8FC2EBF06D112F001ADCE6AA83BE091"
         }
       }
     ],

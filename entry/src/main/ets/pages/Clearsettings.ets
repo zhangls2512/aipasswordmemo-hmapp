@@ -219,9 +219,9 @@ struct Clearsettings {
                       keys.forEach((item) => {
                         dataPreferences.deleteSync(item)
                       })
-                    } else {
-                      dataPreferences.clearSync()
+                      return
                     }
+                    dataPreferences.clearSync()
                     dataPreferences.flushSync()
                   })
                   promptAction.showToast({

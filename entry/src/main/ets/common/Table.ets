@@ -16,27 +16,26 @@ export async function syncTable(table: string, deviceId: string, type: relationa
   if (table === 'tag') {
     securityLevel = 1
   }
-  const rdbStore = await relationalStore.getRdbStore(context, {
-    name: 'password',
-    securityLevel: securityLevel,
-    encrypt: true,
-    allowRebuild: true
-  })
-  const predicates = new relationalStore.RdbPredicates(table)
-  predicates.inDevices([deviceId])
   try {
+    const rdbStore = await relationalStore.getRdbStore(context, {
+      name: table,
+      securityLevel: securityLevel,
+      encrypt: true,
+      allowRebuild: true
+    })
+    const predicates = new relationalStore.RdbPredicates(table)
+    predicates.inDevices([deviceId])
     const res = await rdbStore.sync(type, predicates)
     if (res[0][1] === 0) {
       promptAction.showToast({
         message: '同步成功'
       })
       return true
-    } else {
-      promptAction.showToast({
-        message: '同步失败'
-      })
-      return false
     }
+    promptAction.showToast({
+      message: '同步失败'
+    })
+    return false
   } catch (err) {
     promptAction.showToast({
       message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
@@ -84,9 +83,8 @@ export async function autoSyncTable(table: string): Promise<boolean> {
     })
     await Promise.all(promises)
     return true
-  } else {
-    return false
   }
+  return false
 }
 
 export async function backupTable(table: string): Promise<boolean> {
@@ -156,9 +154,8 @@ export async function autoBackupTable(table: string): Promise<boolean> {
   if (autoBackupTables.includes(table)) {
     await backupTable(table)
     return true
-  } else {
-    return false
   }
+  return false
 }
 
 export async function recoveryTable(table: string): Promise<boolean> {

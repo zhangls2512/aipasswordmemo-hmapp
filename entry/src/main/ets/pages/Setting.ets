@@ -3,6 +3,7 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { AppStorageV2, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
+import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 
@@ -18,7 +19,7 @@ export class CloudService {
 
 @ComponentV2
 export default struct Setting {
-  @Local AllService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
+  @Local allService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
   @Local cloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
   @Local cloudServiceLoading: boolean = false
   @Local vipStatus: string = '未开通'
@@ -34,7 +35,7 @@ export default struct Setting {
 
   getSetting() {
     const allService: preferences.ValueType = this.commonSettingDataPreferences.getSync('allService', true)
-    this.AllService.allService = allService as boolean
+    this.allService.allService = allService as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
       this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
@@ -299,8 +300,8 @@ export default struct Setting {
                   })
                   .width('100%')
                   .onClick(() => {
-                    promptAction.showToast({
-                      message: '敬请期待'
+                    this.pageInfos.pushPath({
+                      name: 'Cloudbackupimport'
                     })
                   })
 
@@ -394,6 +395,38 @@ export default struct Setting {
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Tablesync'
+                })
+              })
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('导入与导出')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'DataInOut'
                 })
               })
 
@@ -809,7 +842,7 @@ export default struct Setting {
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
-                Text(this.AllService.allService ? '全量模式' : '基本模式')
+                Text(this.allService.allService ? '全量模式' : '基本模式')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -976,33 +1009,25 @@ export default struct Setting {
     .titleMode(NavigationTitleMode.Mini)
     .onAppear(async () => {
       this.getSetting()
-      if (this.accessToken) {
-        this.cloudServiceLoading = true
-        const infores = await request('/account/getAccountInfo', {
-          accessToken: this.accessToken
+      this.cloudServiceLoading = true
+      const cloudServiceStatus = await getCloudServiceStatus()
+      this.cloudServiceLoading = false
+      this.cloudService.status = cloudServiceStatus
+      if (cloudServiceStatus) {
+        this.vipStatusLoading = true
+        const userres = await request('/product/getUserInfo', {
+          accessToken: this.accessToken,
+          product: 'password'
         })
-        this.cloudServiceLoading = false
-        if (infores !== 'fail') {
-          const service = JSON.parse(infores).data.service as string[]
-          const status = service.includes('password')
-          this.cloudService.status = status
-          if (status) {
-            this.vipStatusLoading = true
-            const userres = await request('/product/getUserInfo', {
-              accessToken: this.accessToken,
-              product: 'password'
-            })
-            this.vipStatusLoading = false
-            if (userres !== 'fail') {
-              const vipenddate = JSON.parse(userres).data.vipEndDate as number
-              if (vipenddate > 0 && vipenddate < Date.now()) {
-                this.vipStatus = '已过期'
-              }
-              if (vipenddate === 0 || vipenddate >= Date.now()) {
-                this.vipStatus = '已开通'
-                this.vipStatusColor = '#FFD700'
-              }
-            }
+        this.vipStatusLoading = false
+        if (userres !== 'fail') {
+          const vipenddate = JSON.parse(userres).data.vipEndDate as number
+          if (vipenddate > 0 && vipenddate < Date.now()) {
+            this.vipStatus = '已过期'
+          }
+          if (vipenddate === 0 || vipenddate >= Date.now()) {
+            this.vipStatus = '已开通'
+            this.vipStatusColor = '#FFD700'
           }
         }
       }

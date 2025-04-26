@@ -129,6 +129,16 @@
       "name": "Clearsettings",
       "pageSourceFile": "src/main/ets/pages/Clearsettings.ets",
       "buildFunction": "ClearsettingsBuilder"
+    },
+    {
+      "name": "DataInOut",
+      "pageSourceFile": "src/main/ets/pages/DataInOut.ets",
+      "buildFunction": "DataInOutBuilder"
+    },
+    {
+      "name": "Cloudbackupimport",
+      "pageSourceFile": "src/main/ets/pages/Cloudbackupimport.ets",
+      "buildFunction": "CloudbackupimportBuilder"
     }
   ]
 }
