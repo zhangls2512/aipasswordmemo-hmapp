@@ -279,7 +279,7 @@ struct Tablesync {
                   type: ToggleType.Switch,
                   isOn: $$this.autoSyncInfo
                 })
-                  .enabled(this.onPassword)
+                  .enabled(this.onInfo)
                   .onChange((isOn: boolean) => {
                     let autoSyncTables = [] as string[]
                     if (!isOn) {
@@ -311,7 +311,7 @@ struct Tablesync {
                   type: ToggleType.Switch,
                   isOn: $$this.autoSyncTag
                 })
-                  .enabled(this.onPassword)
+                  .enabled(this.onTag)
                   .onChange((isOn: boolean) => {
                     let autoSyncTables = [] as string[]
                     if (!isOn) {
@@ -508,11 +508,6 @@ struct Tablesync {
                   .fontColor($r('sys.color.warning'))
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
-                Blank()
-                Image($r('app.media.right'))
-                  .fillColor($r('sys.color.icon_fourth'))
-                  .height(12)
-                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -659,11 +654,6 @@ struct Tablesync {
                     .fontColor($r('sys.color.font_emphasize'))
                     .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
-                  Blank()
-                  Image($r('app.media.right'))
-                    .fillColor($r('sys.color.icon_fourth'))
-                    .height(12)
-                    .width(12)
                 }
                 .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
                 .padding($r('sys.float.ohos_id_corner_radius_default_m'))
