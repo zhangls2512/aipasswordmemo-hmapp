@@ -1,6 +1,7 @@
 import { AppStorageV2, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
+import getCloudServiceStatus from '../common/Cloudservice'
 import { CloudService } from './Setting'
 
 @Builder
@@ -125,14 +126,9 @@ struct Cloudservice {
     .onReady(async (context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
       this.loading = true
-      const infores = await request('/account/getAccountInfo', {
-        accessToken: get()
-      })
+      const cloudServiceStatus = await getCloudServiceStatus()
       this.loading = false
-      if (infores !== 'fail') {
-        const service = JSON.parse(infores).data.service as string[]
-        this.CloudService.status = service.includes('password')
-      }
+      this.CloudService.status = cloudServiceStatus
     })
   }
 }

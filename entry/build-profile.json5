@@ -2,7 +2,7 @@
   "apiType": "stageMode",
   "buildOptionSet": [
     {
-      "name": "debug",
+      "name": "default",
       "arkOptions": {
         "obfuscation": {
           "ruleOptions": {

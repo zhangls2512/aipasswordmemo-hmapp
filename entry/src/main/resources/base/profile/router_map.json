@@ -109,6 +109,36 @@
       "name": "Importkey",
       "pageSourceFile": "src/main/ets/pages/Importkey.ets",
       "buildFunction": "ImportkeyBuilder"
+    },
+    {
+      "name": "Tablesync",
+      "pageSourceFile": "src/main/ets/pages/Tablesync.ets",
+      "buildFunction": "TablesyncBuilder"
+    },
+    {
+      "name": "DataBackupRecovery",
+      "pageSourceFile": "src/main/ets/pages/DataBackupRecovery.ets",
+      "buildFunction": "DataBackupRecoveryBuilder"
+    },
+    {
+      "name": "Autocloudbackupsetting",
+      "pageSourceFile": "src/main/ets/pages/Autocloudbackupsetting.ets",
+      "buildFunction": "AutocloudbackupsettingBuilder"
+    },
+    {
+      "name": "Clearsettings",
+      "pageSourceFile": "src/main/ets/pages/Clearsettings.ets",
+      "buildFunction": "ClearsettingsBuilder"
+    },
+    {
+      "name": "DataInOut",
+      "pageSourceFile": "src/main/ets/pages/DataInOut.ets",
+      "buildFunction": "DataInOutBuilder"
+    },
+    {
+      "name": "Cloudbackupimport",
+      "pageSourceFile": "src/main/ets/pages/Cloudbackupimport.ets",
+      "buildFunction": "CloudbackupimportBuilder"
     }
   ]
 }

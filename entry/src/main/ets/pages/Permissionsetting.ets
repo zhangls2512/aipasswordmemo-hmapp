@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
+import { getPermission } from '../common/Permission'
 
 @Builder
 export function PermissionsettingBuilder() {
@@ -13,6 +14,8 @@ struct Permissionsetting {
   permissionSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'permissionSetting'
   })
+  dataSync: boolean = getPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+  microPhone: boolean = getPermission('ohos.permission.MICROPHONE')
 
   getSetting() {
     const writePasteBoard: preferences.ValueType =
@@ -23,6 +26,98 @@ struct Permissionsetting {
   build() {
     NavDestination() {
       List() {
+        ListItem() {
+          Column() {
+            Column() {
+              Row() {
+                Text('设备发现和连接')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.dataSync
+                })
+                  .enabled(false)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text() {
+              Span($r('app.string.DISTRIBUTED_DATASYNC_reason'))
+                .fontColor($r('sys.color.font_secondary'))
+              Span('请前往')
+                .fontColor($r('sys.color.font_secondary'))
+              Span('系统设置')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontWeight('medium')
+              Span('管理此权限。')
+                .fontColor($r('sys.color.font_secondary'))
+            }
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
+            .margin({
+              top: 6,
+              left: $r('sys.float.ohos_id_corner_radius_default_m'),
+              right: $r('sys.float.ohos_id_corner_radius_default_m')
+            })
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Column() {
+              Row() {
+                Text('麦克风')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.microPhone
+                })
+                  .enabled(false)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text() {
+              Span($r('app.string.MICROPHONE_reason'))
+                .fontColor($r('sys.color.font_secondary'))
+              Span('请前往')
+                .fontColor($r('sys.color.font_secondary'))
+              Span('系统设置')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontWeight('medium')
+              Span('管理此权限。')
+                .fontColor($r('sys.color.font_secondary'))
+            }
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
+            .margin({
+              top: 6,
+              left: $r('sys.float.ohos_id_corner_radius_default_m'),
+              right: $r('sys.float.ohos_id_corner_radius_default_m')
+            })
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
         ListItem() {
           Column() {
             Column() {
@@ -53,7 +148,8 @@ struct Permissionsetting {
               .fontSize($r('sys.float.ohos_id_text_size_body3'))
               .margin({
                 top: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                right: $r('sys.float.ohos_id_corner_radius_default_m')
               })
           }
           .alignItems(HorizontalAlign.Start)

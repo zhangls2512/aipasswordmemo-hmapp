@@ -12,28 +12,36 @@ export function VipBuilder() {
 
 @ComponentV2
 struct Vip {
-  @Local vipEndDate: string = '未开通'
-  @Local vipEndDateLoading: boolean = false
-  @Local vipEndDateColor: string = 'red'
+  @Local vipStatus: string = '未开通'
+  @Local vipStatusLoading: boolean = false
+  @Local vipStatusColor: string = 'red'
+  @Local vipEndDate: string = ''
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
 
-  async getVipEndDate() {
-    this.vipEndDateLoading = true
+  async getVipStatus() {
+    this.vipStatusLoading = true
     const userres = await request('/product/getUserInfo', {
       accessToken: get(),
       product: 'password'
     })
-    this.vipEndDateLoading = false
+    this.vipStatusLoading = false
     if (userres !== 'fail') {
       const vipenddate = JSON.parse(userres).data.vipEndDate as number
       if (vipenddate === 0) {
+        this.vipStatus = '已开通'
+        this.vipStatusColor = '#FFD700'
         this.vipEndDate = '终身'
-        this.vipEndDateColor = '#FFD700'
       }
-      if (vipenddate > 0 && vipenddate >= Date.now()) {
-        this.vipEndDate = '有效期至 ' + String(new Date(vipenddate))
-        this.vipEndDateColor = '#FFD700'
+      if (vipenddate > 0) {
+        this.vipEndDate = String(new Date(vipenddate))
+        if (vipenddate >= Date.now()) {
+          this.vipStatus = '已开通 '
+          this.vipStatusColor = '#FFD700'
+        }
+        if (vipenddate < Date.now()) {
+          this.vipStatus = '已过期'
+        }
       }
     }
   }
@@ -43,13 +51,20 @@ struct Vip {
       List() {
         ListItem() {
           Column() {
-            if (!this.vipEndDateLoading) {
-              Text(this.vipEndDate)
-                .fontColor(this.vipEndDateColor)
+            if (!this.vipStatusLoading) {
+              Text(this.vipStatus)
+                .fontColor(this.vipStatusColor)
                 .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                 .fontWeight('bold')
+              if (this.vipEndDate) {
+                Text('到期时间：' + this.vipEndDate)
+                  .fontWeight('medium')
+                  .margin({
+                    top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                  })
+              }
             }
-            if (this.vipEndDateLoading) {
+            if (this.vipStatusLoading) {
               LoadingProgress()
                 .height(20)
                 .width(20)
@@ -199,9 +214,9 @@ struct Vip {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('会员中心')
-    .onReady(async (context: NavDestinationContext) => {
+    .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
-      this.getVipEndDate()
+      this.getVipStatus()
     })
   }
 }

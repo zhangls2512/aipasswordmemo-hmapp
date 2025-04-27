@@ -8,6 +8,7 @@ export function MoresettingBuilder() {
 @ComponentV2
 struct Moresetting {
   context = getContext(this) as common.UIAbilityContext
+  pageInfos: NavPathStack = new NavPathStack()
 
   build() {
     NavDestination() {
@@ -92,6 +93,43 @@ struct Moresetting {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
+
+        ListItem() {
+          Column() {
+            Row() {
+              Text('清除设置数据')
+                .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                .fontWeight('medium')
+              Blank()
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
+            }
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
+            .width('100%')
+            .onClick(() => {
+              this.pageInfos.pushPath({
+                name: 'Clearsettings'
+              })
+            })
+          }
+          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+          .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+          .padding($r('sys.float.ohos_id_corner_radius_mark'))
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
@@ -101,5 +139,8 @@ struct Moresetting {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('其他')
+    .onReady((context: NavDestinationContext) => {
+      this.pageInfos = context.pathStack
+    })
   }
 }

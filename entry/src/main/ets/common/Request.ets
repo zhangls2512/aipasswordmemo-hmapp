@@ -41,26 +41,24 @@ export default async function request(path: string, body: rcp.RequestContent) {
       const errCode = JSON.parse(body).errCode as number
       if (errCode === 0) {
         return body
-      } else {
-        const res = JSON.parse(body) as ErrorResponse
-        promptAction.showDialog({
-          title: '接口调用失败',
-          message: '错误码：' + res.errCode + '\n错误信息：' + res.errMsg + '\n修复方法：' + res.errFix,
-          buttons: [
-            {
-              text: '确定',
-              color: $r('sys.color.font_emphasize')
-            }
-          ]
-        })
-        return 'fail'
       }
-    } else {
-      promptAction.showToast({
-        message: '请求失败，错误码：' + response.statusCode + '，错误信息：' + response.reasonPhrase
+      const res = JSON.parse(body) as ErrorResponse
+      promptAction.showDialog({
+        title: '接口调用失败',
+        message: '错误码：' + res.errCode + '\n错误信息：' + res.errMsg + '\n修复方法：' + res.errFix,
+        buttons: [
+          {
+            text: '确定',
+            color: $r('sys.color.font_emphasize')
+          }
+        ]
       })
       return 'fail'
     }
+    promptAction.showToast({
+      message: '请求失败，错误码：' + response.statusCode + '，错误信息：' + response.reasonPhrase
+    })
+    return 'fail'
   } catch (err) {
     session.close()
     promptAction.showToast({

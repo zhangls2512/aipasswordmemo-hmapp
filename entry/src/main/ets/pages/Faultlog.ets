@@ -7,7 +7,7 @@ export function FaultlogBuilder() {
 
 @ComponentV2
 struct Faultlog {
-  @Local faultLogArray: Array<FaultLogger.FaultLogInfo> = []
+  @Local faultLogArray: FaultLogger.FaultLogInfo[] = []
 
   build() {
     NavDestination() {
