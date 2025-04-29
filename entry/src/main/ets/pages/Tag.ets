@@ -99,7 +99,7 @@ export default struct TagPage {
           Column() {
             Row() {
               if (item.cloudBackupTime >= item.updateTime) {
-                Image($r('app.media.success'))
+                Image($r('app.media.cloud'))
                   .height(16)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')

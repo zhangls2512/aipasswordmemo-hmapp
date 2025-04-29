@@ -161,36 +161,43 @@ export async function encrypt(content: string): Promise<EncryptData> {
 }
 
 export async function decrypt(encryptData: EncryptData): Promise<string> {
-  const options: huks.HuksOptions = {
-    inData: decodeBase64(encryptData.content),
-    properties: [
-      {
-        tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
-        value: huks.HuksKeyAlg.HUKS_ALG_AES
-      },
-      {
-        tag: huks.HuksTag.HUKS_TAG_PURPOSE,
-        value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
-      },
-      {
-        tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
-        value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
-      },
-      {
-        tag: huks.HuksTag.HUKS_TAG_PADDING,
-        value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
-      },
-      {
-        tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
-        value: huks.HuksCipherMode.HUKS_MODE_CBC
-      },
-      {
-        tag: huks.HuksTag.HUKS_TAG_IV,
-        value: decodeBase64(encryptData.iv)
-      }
-    ]
+  try {
+    const options: huks.HuksOptions = {
+      inData: decodeBase64(encryptData.content),
+      properties: [
+        {
+          tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+          value: huks.HuksKeyAlg.HUKS_ALG_AES
+        },
+        {
+          tag: huks.HuksTag.HUKS_TAG_PURPOSE,
+          value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
+        },
+        {
+          tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
+          value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
+        },
+        {
+          tag: huks.HuksTag.HUKS_TAG_PADDING,
+          value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
+        },
+        {
+          tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
+          value: huks.HuksCipherMode.HUKS_MODE_CBC
+        },
+        {
+          tag: huks.HuksTag.HUKS_TAG_IV,
+          value: decodeBase64(encryptData.iv)
+        }
+      ]
+    }
+    const session = await huks.initSession('key', options)
+    const res = await huks.finishSession(session.handle, options)
+    return arrayToString(res.outData as Uint8Array)
+  } catch (err) {
+    promptAction.showToast({
+      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+    })
+    return 'fail'
   }
-  const session = await huks.initSession('key', options)
-  const res = await huks.finishSession(session.handle, options)
-  return arrayToString(res.outData as Uint8Array)
 }

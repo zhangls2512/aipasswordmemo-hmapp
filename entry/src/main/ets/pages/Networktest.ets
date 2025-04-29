@@ -1,5 +1,4 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
 
 interface Response {
@@ -77,8 +76,7 @@ struct Networktest {
                   session.close()
                   this.dialogControllerProgress.close()
                   promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
+                    message: '发生错误，错误码：' + err.code
                   })
                 }
               })

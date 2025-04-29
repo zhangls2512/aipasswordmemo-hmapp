@@ -120,8 +120,7 @@ struct Cloudbackupimport {
                 }
                 this.dialogControllerProgress.open()
                 const countres = await request('/password/getBackupCount', {
-                  accessToken: get(),
-                  type: 'password'
+                  accessToken: get()
                 })
                 if (countres !== 'fail') {
                   const total = JSON.parse(countres).count.password as number
@@ -139,15 +138,17 @@ struct Cloudbackupimport {
                           content: item.content,
                           iv: item.iv
                         })
-                        const itemobject = JSON.parse(itemstring) as PasswordCloudBackup
-                        array.push({
-                          id: item.id,
-                          name: itemobject.name,
-                          info: itemobject.info,
-                          tag: itemobject.tag,
-                          updateTime: itemobject.updateTime,
-                          cloudBackupTime: itemobject.cloudBackTime
-                        })
+                        if (itemstring !== 'fail') {
+                          const itemobject = JSON.parse(itemstring) as PasswordCloudBackup
+                          array.push({
+                            id: item.id,
+                            name: itemobject.name,
+                            info: itemobject.info,
+                            tag: itemobject.tag,
+                            updateTime: itemobject.updateTime,
+                            cloudBackupTime: itemobject.cloudBackTime
+                          })
+                        }
                       })
                       await Promise.all(promises)
                       let conflictResolution = 0
@@ -205,8 +206,7 @@ struct Cloudbackupimport {
                 }
                 this.dialogControllerProgress.open()
                 const countres = await request('/password/getBackupCount', {
-                  accessToken: get(),
-                  type: 'info'
+                  accessToken: get()
                 })
                 if (countres !== 'fail') {
                   const total = JSON.parse(countres).count.info as number
@@ -224,14 +224,16 @@ struct Cloudbackupimport {
                           content: item.content,
                           iv: item.iv
                         })
-                        const itemobject = JSON.parse(itemstring) as InfoCloudBackup
-                        array.push({
-                          id: item.id,
-                          type: itemobject.type,
-                          value: itemobject.value,
-                          updateTime: itemobject.updateTime,
-                          cloudBackupTime: itemobject.cloudBackTime
-                        })
+                        if (itemstring !== 'fail') {
+                          const itemobject = JSON.parse(itemstring) as InfoCloudBackup
+                          array.push({
+                            id: item.id,
+                            type: itemobject.type,
+                            value: itemobject.value,
+                            updateTime: itemobject.updateTime,
+                            cloudBackupTime: itemobject.cloudBackTime
+                          })
+                        }
                       })
                       await Promise.all(promises)
                       let conflictResolution = 0
@@ -289,8 +291,7 @@ struct Cloudbackupimport {
                 }
                 this.dialogControllerProgress.open()
                 const countres = await request('/password/getBackupCount', {
-                  accessToken: get(),
-                  type: 'tag '
+                  accessToken: get()
                 })
                 if (countres !== 'fail') {
                   const total = JSON.parse(countres).count.tag as number
@@ -308,14 +309,16 @@ struct Cloudbackupimport {
                           content: item.content,
                           iv: item.iv
                         })
-                        const itemobject = JSON.parse(itemstring) as TagCloudBackup
-                        array.push({
-                          id: item.id,
-                          value: itemobject.value,
-                          color: itemobject.color,
-                          updateTime: itemobject.updateTime,
-                          cloudBackupTime: itemobject.cloudBackTime
-                        })
+                        if (itemstring !== 'fail') {
+                          const itemobject = JSON.parse(itemstring) as TagCloudBackup
+                          array.push({
+                            id: item.id,
+                            value: itemobject.value,
+                            color: itemobject.color,
+                            updateTime: itemobject.updateTime,
+                            cloudBackupTime: itemobject.cloudBackTime
+                          })
+                        }
                       })
                       await Promise.all(promises)
                       let conflictResolution = 0

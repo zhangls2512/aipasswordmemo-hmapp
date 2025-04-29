@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { call } from '@kit.TelephonyKit'
 import openLink from '../common/Openlink'
 import { copy } from '../common/Pasteboard'
@@ -357,13 +356,7 @@ struct About {
               })
               .width('100%')
               .onClick(() => {
-                call.makeCall('18846496985', (err: BusinessError) => {
-                  if (err) {
-                    promptAction.showToast({
-                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                    })
-                  }
-                })
+                call.makeCall('18846496985')
               })
 
               Divider()

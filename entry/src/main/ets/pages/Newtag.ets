@@ -79,9 +79,6 @@ export default struct Settag {
             })
         }
       }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
 
       ListItem() {
         Column() {

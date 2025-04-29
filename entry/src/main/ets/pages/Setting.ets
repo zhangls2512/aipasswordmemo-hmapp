@@ -34,8 +34,14 @@ export default struct Setting {
   accessToken: string = get()
 
   getSetting() {
-    const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
-    this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
+    try {
+      const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
+      this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
+    } catch (err) {
+      promptAction.showToast({
+        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+      })
+    }
   }
 
   build() {

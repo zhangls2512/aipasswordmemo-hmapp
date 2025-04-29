@@ -121,9 +121,6 @@ export default struct Login {
             }
             .width('80%')
           }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-          })
 
           Row() {
             Text('邮箱')
