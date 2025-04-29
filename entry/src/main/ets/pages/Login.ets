@@ -19,22 +19,22 @@ export default struct Login {
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   context = getContext(this) as common.UIAbilityContext
-  dialogControllerProgress: CustomDialogController = new CustomDialogController({
-    builder: LoadingDialog({
-      content: '请稍候...'
-    })
-  })
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
         response: loginComponentManager.HuaweiIDCredential) => {
         if (response) {
-          this.dialogControllerProgress.open()
+          const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+            builder: LoadingDialog({
+              content: '登录中...'
+            })
+          })
+          dialogControllerProgress.open()
           const res = await request('/account/getAccessToken', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode
           })
-          this.dialogControllerProgress.close()
+          dialogControllerProgress.close()
           if (res !== 'fail') {
             const accessToken = JSON.parse(res).accessToken as string
             const endDate = JSON.parse(res).endDate as number
@@ -62,9 +62,6 @@ export default struct Login {
     List() {
       ListItem() {
         Column() {
-          Text('登录')
-            .fontSize(25)
-            .fontWeight('bold')
           Row() {
             Text('方式')
               .fontWeight('medium')
@@ -222,11 +219,16 @@ export default struct Login {
                   })
                   return
                 }
-                this.dialogControllerProgress.open()
+                const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '发送中...'
+                  })
+                })
+                dialogControllerProgress.open()
                 const res = await request('/account/sendEmailCode', {
                   email: this.email
                 })
-                this.dialogControllerProgress.close()
+                dialogControllerProgress.close()
                 if (res !== 'fail') {
                   promptAction.showToast({
                     message: '验证码已成功发送到邮箱：' + this.email
@@ -287,13 +289,18 @@ export default struct Login {
               if (this.type === 'emailcode') {
                 code = this.emailcode
               }
-              this.dialogControllerProgress.open()
+              const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '发送中...'
+                })
+              })
+              dialogControllerProgress.open()
               const res = await request('/account/getAccessToken', {
                 verifyType: this.type,
                 verifyCode: code,
                 email: this.email
               })
-              this.dialogControllerProgress.close()
+              dialogControllerProgress.close()
               if (res !== 'fail') {
                 const accessToken = JSON.parse(res).accessToken as string
                 const endDate = JSON.parse(res).endDate as number
@@ -334,7 +341,6 @@ export default struct Login {
             .onClick(() => {
               openLink('https://www.zhangls2512.cn/product/account/register')
             })
-          Blank()
           Row() {
             Column() {
               Toggle({
@@ -363,6 +369,11 @@ export default struct Login {
                   openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
                 })
               Span('。如果使用华为账号登录，已阅读并同意')
+              Span('《华为账号用户认证协议》')
+                .fontColor($r('sys.color.font_emphasize'))
+                .onClick(() => {
+                  openLink('https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN')
+                })
               Span('《关于华为账号与隐私的声明》')
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(() => {
@@ -377,12 +388,7 @@ export default struct Login {
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
         }
-        .align(Alignment.Top)
-        .height('100%')
       }
-      .margin({
-        top: '20%'
-      })
     }
     .backgroundColor($r('app.color.sheet_background'))
     .padding({

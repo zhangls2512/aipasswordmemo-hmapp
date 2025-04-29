@@ -1,6 +1,5 @@
 import { common } from '@kit.AbilityKit'
 import { privacyManager } from '@kit.AppGalleryKit'
-import { promptAction } from '@kit.ArkUI'
 
 @Builder
 export function AgreementsBuilder() {
@@ -13,14 +12,8 @@ struct Agreements {
   context = getContext(this) as common.UIAbilityContext
 
   getSetting() {
-    try {
-      const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
-      this.agreedUserAgreement = appPrivacyResults.find(item => item.type === 2)?.result
-    } catch (err) {
-      promptAction.showToast({
-        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-      })
-    }
+    const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
+    this.agreedUserAgreement = appPrivacyResults.find(item => item.type === 2)?.result
   }
 
   build() {
@@ -69,14 +62,8 @@ struct Agreements {
             })
             .width('100%')
             .onClick(async () => {
-              try {
-                await privacyManager.requestAppPrivacyConsent(this.context)
-                this.getSetting()
-              } catch (err) {
-                promptAction.showToast({
-                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                })
-              }
+              await privacyManager.requestAppPrivacyConsent(this.context)
+              this.getSetting()
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

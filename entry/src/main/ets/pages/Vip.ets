@@ -1,6 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { iap } from '@kit.IAPKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -124,14 +122,7 @@ struct Vip {
               const uiWindowParameter: iap.UIWindowParameter = {
                 windowScreenMode: iap.WindowScreenMode.DIALOG_BOX
               }
-              try {
-                iap.showManagedSubscriptions(this.context, uiWindowParameter)
-              } catch (err) {
-                promptAction.showToast({
-                  message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                  (err as BusinessError).message
-                })
-              }
+              iap.showManagedSubscriptions(this.context, uiWindowParameter)
             })
 
             Divider()

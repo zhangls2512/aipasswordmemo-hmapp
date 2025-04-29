@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { fileIo as fs, picker } from '@kit.CoreFileKit'
 import { getPasswordList, getInfoList, getTagList } from '../common/Dataget'
 import { importPassword, importInfo, importTag } from '../common/Dataimport'
@@ -95,12 +94,10 @@ struct DataInOut {
                 if (this.index === 1) {
                   conflictResolution = 5
                 }
-                const res = await importPassword(filestring, conflictResolution)
-                if (res) {
-                  promptAction.showToast({
-                    message: '导入成功'
-                  })
-                }
+                await importPassword(filestring, conflictResolution)
+                promptAction.showToast({
+                  message: '导入成功'
+                })
               })
 
               Divider()
@@ -147,12 +144,10 @@ struct DataInOut {
                 if (this.index === 1) {
                   conflictResolution = 5
                 }
-                const res = await importInfo(filestring, conflictResolution)
-                if (res) {
-                  promptAction.showToast({
-                    message: '导入成功'
-                  })
-                }
+                await importInfo(filestring, conflictResolution)
+                promptAction.showToast({
+                  message: '导入成功'
+                })
               })
 
               Divider()
@@ -199,12 +194,10 @@ struct DataInOut {
                 if (this.index === 1) {
                   conflictResolution = 5
                 }
-                const res = await importTag(filestring, conflictResolution)
-                if (res) {
-                  promptAction.showToast({
-                    message: '导入成功'
-                  })
-                }
+                await importTag(filestring, conflictResolution)
+                promptAction.showToast({
+                  message: '导入成功'
+                })
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

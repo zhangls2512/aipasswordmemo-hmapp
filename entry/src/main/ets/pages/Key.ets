@@ -91,9 +91,6 @@ struct Keypage {
                 })
                 if (data.index === 0) {
                   await setRandomKey()
-                  promptAction.showToast({
-                    message: '导入成功'
-                  })
                   this.keyValue = getKey()
                 }
                 if (data.index === 1) {
@@ -132,9 +129,6 @@ struct Keypage {
                   })
                   if (data.index === 0) {
                     await setRandomKey()
-                    promptAction.showToast({
-                      message: '导入成功'
-                    })
                     this.keyValue = getKey()
                   }
                   if (data.index === 1) {
@@ -186,9 +180,6 @@ struct Keypage {
                 })
                 if (data.index === 1) {
                   await removeKey()
-                  promptAction.showToast({
-                    message: '删除成功'
-                  })
                   this.keyValue = getKey()
                 }
               })

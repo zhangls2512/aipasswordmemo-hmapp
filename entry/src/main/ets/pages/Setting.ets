@@ -34,16 +34,8 @@ export default struct Setting {
   accessToken: string = get()
 
   getSetting() {
-    const allService: preferences.ValueType = this.commonSettingDataPreferences.getSync('allService', true)
-    this.allService.allService = allService as boolean
-    try {
-      const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
-      this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
-    } catch (err) {
-      promptAction.showToast({
-        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-      })
-    }
+    const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
+    this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
   }
 
   build() {
@@ -633,14 +625,8 @@ export default struct Setting {
                 })
                 .width('100%')
                 .onClick(async () => {
-                  try {
-                    await privacyManager.requestAppPrivacyConsent(this.context)
-                    this.getSetting()
-                  } catch (err) {
-                    promptAction.showToast({
-                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                    })
-                  }
+                  await privacyManager.requestAppPrivacyConsent(this.context)
+                  this.getSetting()
                 })
               }
               if (this.agreedPrivacyAgreement === 1) {
@@ -667,13 +653,7 @@ export default struct Setting {
                 })
                 .width('100%')
                 .onClick(() => {
-                  try {
-                    privacyManager.disableService()
-                  } catch (err) {
-                    promptAction.showToast({
-                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                    })
-                  }
+                  privacyManager.disableService()
                   this.context.terminateSelf()
                 })
               }
@@ -1008,6 +988,8 @@ export default struct Setting {
     .title('设置')
     .titleMode(NavigationTitleMode.Mini)
     .onAppear(async () => {
+      const allService: preferences.ValueType = this.commonSettingDataPreferences.getSync('allService', true)
+      this.allService.allService = allService as boolean
       this.getSetting()
       this.cloudServiceLoading = true
       const cloudServiceStatus = await getCloudServiceStatus()

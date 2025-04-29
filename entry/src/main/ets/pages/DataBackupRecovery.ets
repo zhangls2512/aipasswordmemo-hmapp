@@ -249,10 +249,8 @@ struct DataBackupRecovery {
               })
               .width('100%')
               .onClick(async () => {
-                const res = await backupTable('password')
-                if (res) {
-                  this.getSetting()
-                }
+                await backupTable('password')
+                this.getSetting()
               })
 
               Divider()
@@ -277,10 +275,8 @@ struct DataBackupRecovery {
               })
               .width('100%')
               .onClick(async () => {
-                const res = await backupTable('info')
-                if (res) {
-                  this.getSetting()
-                }
+                await backupTable('info')
+                this.getSetting()
               })
 
               Divider()
@@ -305,10 +301,8 @@ struct DataBackupRecovery {
               })
               .width('100%')
               .onClick(async () => {
-                const res = await backupTable('tag')
-                if (res) {
-                  this.getSetting()
-                }
+                await backupTable('tag')
+                this.getSetting()
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

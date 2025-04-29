@@ -14,11 +14,6 @@ struct Cloudservice {
   @Local CloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
   @Local loading: boolean = false
   pageInfos: NavPathStack = new NavPathStack()
-  dialogControllerProgress: CustomDialogController = new CustomDialogController({
-    builder: LoadingDialog({
-      content: '请稍候...'
-    })
-  })
 
   build() {
     NavDestination() {
@@ -60,14 +55,18 @@ struct Cloudservice {
             Column() {
               if (!this.CloudService.status) {
                 Button('开通')
-                  .buttonStyle(ButtonStyleMode.EMPHASIZED)
                   .onClick(async () => {
-                    this.dialogControllerProgress.open()
+                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                      builder: LoadingDialog({
+                        content: '开通中...'
+                      })
+                    })
+                    dialogControllerProgress.open()
                     const res = await request('/account/openService', {
                       accessToken: get(),
                       service: 'password'
                     })
-                    this.dialogControllerProgress.close()
+                    dialogControllerProgress.close()
                     if (res !== 'fail') {
                       promptAction.showToast({
                         message: '开通成功'
@@ -81,12 +80,17 @@ struct Cloudservice {
                 Button('取消开通')
                   .role(ButtonRole.ERROR)
                   .onClick(async () => {
-                    this.dialogControllerProgress.open()
+                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                      builder: LoadingDialog({
+                        content: '取消开通中...'
+                      })
+                    })
+                    dialogControllerProgress.open()
                     const res = await request('/account/closeService', {
                       accessToken: get(),
                       service: 'password'
                     })
-                    this.dialogControllerProgress.close()
+                    dialogControllerProgress.close()
                     if (res !== 'fail') {
                       promptAction.showToast({
                         message: '取消开通成功'

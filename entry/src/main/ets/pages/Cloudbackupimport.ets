@@ -42,10 +42,9 @@ export function CloudbackupimportBuilder() {
 struct Cloudbackupimport {
   @Local index: number = 0
   @Local value: string = '保留'
-  text: string = ''
   dialogControllerProgress: CustomDialogController = new CustomDialogController({
     builder: LoadingDialog({
-      content: '导入中...' + this.text
+      content: '导入中...'
     })
   })
 
@@ -125,9 +124,8 @@ struct Cloudbackupimport {
                   type: 'password'
                 })
                 if (countres !== 'fail') {
-                  const total = JSON.parse(countres).count as number
+                  const total = JSON.parse(countres).count.password as number
                   for (let i = 0; i < total; i += 10) {
-                    this.text = '(' + i + '/' + total + ')'
                     const listres = await request('/password/getBackupList', {
                       accessToken: get(),
                       type: 'password',
@@ -211,9 +209,8 @@ struct Cloudbackupimport {
                   type: 'info'
                 })
                 if (countres !== 'fail') {
-                  const total = JSON.parse(countres).count as number
+                  const total = JSON.parse(countres).count.info as number
                   for (let i = 0; i < total; i += 10) {
-                    this.text = '(' + i + '/' + total + ')'
                     const listres = await request('/password/getBackupList', {
                       accessToken: get(),
                       type: 'info',
@@ -293,12 +290,11 @@ struct Cloudbackupimport {
                 this.dialogControllerProgress.open()
                 const countres = await request('/password/getBackupCount', {
                   accessToken: get(),
-                  type: 'tag'
+                  type: 'tag '
                 })
                 if (countres !== 'fail') {
-                  const total = JSON.parse(countres).count as number
+                  const total = JSON.parse(countres).count.tag as number
                   for (let i = 0; i < total; i += 10) {
-                    this.text = '(' + i + '/' + total + ')'
                     const listres = await request('/password/getBackupList', {
                       accessToken: get(),
                       type: 'tag',

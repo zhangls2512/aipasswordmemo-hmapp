@@ -27,11 +27,6 @@ struct Huaweiaccount {
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   pageInfos: NavPathStack = new NavPathStack()
-  dialogControllerProgress: CustomDialogController = new CustomDialogController({
-    builder: LoadingDialog({
-      content: '请稍候...'
-    })
-  })
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
@@ -56,7 +51,12 @@ struct Huaweiaccount {
           code = this.emailcode
         }
         if (response) {
-          this.dialogControllerProgress.open()
+          const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+            builder: LoadingDialog({
+              content: '绑定中...'
+            })
+          })
+          dialogControllerProgress.open()
           const res = await request('/account/bindExternalAccount', {
             verifyType: this.type,
             verifyCode: code,
@@ -64,7 +64,7 @@ struct Huaweiaccount {
             platform: 'huaweiaipasswordmemoapp',
             code: response.authorizationCode
           })
-          this.dialogControllerProgress.close()
+          dialogControllerProgress.close()
           if (res !== 'fail') {
             promptAction.showToast({
               message: '绑定成功'
@@ -176,11 +176,16 @@ struct Huaweiaccount {
                   })
                   .width('100%')
                   .onClick(async () => {
-                    this.dialogControllerProgress.open()
+                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                      builder: LoadingDialog({
+                        content: '发送中...'
+                      })
+                    })
+                    dialogControllerProgress.open()
                     const res = await request('/account/sendEmailCode', {
                       email: this.email
                     })
-                    this.dialogControllerProgress.close()
+                    dialogControllerProgress.close()
                     if (res !== 'fail') {
                       promptAction.showToast({
                         message: '验证码已成功发送到邮箱：' + this.email
@@ -245,14 +250,19 @@ struct Huaweiaccount {
                     if (this.type === 'emailcode') {
                       code = this.emailcode
                     }
-                    this.dialogControllerProgress.open()
+                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                      builder: LoadingDialog({
+                        content: '解绑中...'
+                      })
+                    })
+                    dialogControllerProgress.open()
                     const res = await request('/account/unbindExternalAccount', {
                       verifyType: this.type,
                       verifyCode: code,
                       email: this.email,
                       platform: 'huawei'
                     })
-                    this.dialogControllerProgress.close()
+                    dialogControllerProgress.close()
                     if (res !== 'fail') {
                       promptAction.showToast({
                         message: '解绑成功'

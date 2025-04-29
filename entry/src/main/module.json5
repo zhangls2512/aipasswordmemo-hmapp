@@ -32,10 +32,6 @@
             ]
           }
         ],
-        "backgroundModes": [
-          "dataTransfer",
-          "audioRecording"
-        ],
         "startWindowIcon": "$media:layered_image",
         "startWindowBackground": "$color:start_window_background",
         "removeMissionAfterTerminate": true,

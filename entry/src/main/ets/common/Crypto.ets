@@ -77,149 +77,120 @@ export async function setRandomKey() {
   query.set(asset.Tag.ALIAS, stringToArray('key'))
   query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
   asset.addSync(query)
+  promptAction.showToast({
+    message: '导入成功'
+  })
 }
 
-export async function setCustomKey(key: string): Promise<string> {
-  try {
-    await huks.importKeyItem('key', {
-      inData: decodeBase64(stringToArray(key)),
-      properties: [
-        {
-          tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
-          value: huks.HuksKeyAlg.HUKS_ALG_AES
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_PURPOSE,
-          value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_ENCRYPT | huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
-          value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
-        }
-      ]
-    })
-    const query: asset.AssetMap = new Map()
-    query.set(asset.Tag.SECRET, stringToArray(key))
-    query.set(asset.Tag.ALIAS, stringToArray('key'))
-    query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
-    asset.addSync(query)
-    return 'success'
-  } catch {
-    return 'fail'
-  }
+export async function setCustomKey(key: string) {
+  await huks.importKeyItem('key', {
+    inData: decodeBase64(stringToArray(key)),
+    properties: [
+      {
+        tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+        value: huks.HuksKeyAlg.HUKS_ALG_AES
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PURPOSE,
+        value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_ENCRYPT | huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
+        value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
+      }
+    ]
+  })
+  const query: asset.AssetMap = new Map()
+  query.set(asset.Tag.SECRET, stringToArray(key))
+  query.set(asset.Tag.ALIAS, stringToArray('key'))
+  query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
+  asset.addSync(query)
+  promptAction.showToast({
+    message: '导入成功'
+  })
 }
 
-export async function removeKey(): Promise<string> {
-  try {
-    await huks.deleteKeyItem('key', {})
-    const query: asset.AssetMap = new Map()
-    query.set(asset.Tag.ALIAS, stringToArray('key'))
-    asset.removeSync(query)
-    return 'success'
-  } catch {
-    return 'fail'
-  }
+export async function removeKey() {
+  await huks.deleteKeyItem('key', {})
+  const query: asset.AssetMap = new Map()
+  query.set(asset.Tag.ALIAS, stringToArray('key'))
+  asset.removeSync(query)
+  promptAction.showToast({
+    message: '删除成功'
+  })
 }
 
-export async function encrypt(content: string): Promise<EncryptData | string> {
+export async function encrypt(content: string): Promise<EncryptData> {
   const random = cryptoFramework.createRandom()
   const iv = random.generateRandomSync(16).data
-  try {
-    const options: huks.HuksOptions = {
-      inData: stringToArray(content),
-      properties: [
-        {
-          tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
-          value: huks.HuksKeyAlg.HUKS_ALG_AES
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_PURPOSE,
-          value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_ENCRYPT
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
-          value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_PADDING,
-          value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
-          value: huks.HuksCipherMode.HUKS_MODE_CBC
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_IV,
-          value: iv
-        }
-      ]
-    }
-    const session = await huks.initSession('key', options)
-    const res = await huks.finishSession(session.handle, options)
-    return {
-      content: encodeBase64ToString(res.outData as Uint8Array),
-      iv: encodeBase64ToString(iv)
-    }
-  } catch (err) {
-    promptAction.showDialog({
-      title: '加密失败',
-      message: JSON.stringify(err),
-      buttons: [
-        {
-          text: '确定',
-          color: $r('sys.color.font_emphasize')
-        }
-      ]
-    })
-    return 'fail'
+  const options: huks.HuksOptions = {
+    inData: stringToArray(content),
+    properties: [
+      {
+        tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+        value: huks.HuksKeyAlg.HUKS_ALG_AES
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PURPOSE,
+        value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_ENCRYPT
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
+        value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PADDING,
+        value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
+        value: huks.HuksCipherMode.HUKS_MODE_CBC
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_IV,
+        value: iv
+      }
+    ]
+  }
+  const session = await huks.initSession('key', options)
+  const res = await huks.finishSession(session.handle, options)
+  return {
+    content: encodeBase64ToString(res.outData as Uint8Array),
+    iv: encodeBase64ToString(iv)
   }
 }
 
 export async function decrypt(encryptData: EncryptData): Promise<string> {
-  try {
-    const options: huks.HuksOptions = {
-      inData: decodeBase64(encryptData.content),
-      properties: [
-        {
-          tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
-          value: huks.HuksKeyAlg.HUKS_ALG_AES
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_PURPOSE,
-          value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
-          value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_PADDING,
-          value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
-          value: huks.HuksCipherMode.HUKS_MODE_CBC
-        },
-        {
-          tag: huks.HuksTag.HUKS_TAG_IV,
-          value: decodeBase64(encryptData.iv)
-        }
-      ]
-    }
-    const session = await huks.initSession('key', options)
-    const res = await huks.finishSession(session.handle, options)
-    return arrayToString(res.outData as Uint8Array)
-  } catch (err) {
-    promptAction.showDialog({
-      title: '解密失败',
-      message: JSON.stringify(err),
-      buttons: [
-        {
-          text: '确定',
-          color: $r('sys.color.font_emphasize')
-        }
-      ]
-    })
-    return 'fail'
+  const options: huks.HuksOptions = {
+    inData: decodeBase64(encryptData.content),
+    properties: [
+      {
+        tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+        value: huks.HuksKeyAlg.HUKS_ALG_AES
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PURPOSE,
+        value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
+        value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PADDING,
+        value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
+        value: huks.HuksCipherMode.HUKS_MODE_CBC
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_IV,
+        value: decodeBase64(encryptData.iv)
+      }
+    ]
   }
+  const session = await huks.initSession('key', options)
+  const res = await huks.finishSession(session.handle, options)
+  return arrayToString(res.outData as Uint8Array)
 }

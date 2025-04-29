@@ -86,7 +86,11 @@ export default struct Me {
             }
           })
           .bindSheet($$this.isShowLoginSheet, this.LoginSheetBuilder(), {
+            height: SheetSize.FIT_CONTENT,
             preferType: SheetType.BOTTOM,
+            title: {
+              title: '登录'
+            },
             onDisappear: (async () => {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(false)

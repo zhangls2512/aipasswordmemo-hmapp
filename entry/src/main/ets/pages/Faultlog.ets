@@ -19,6 +19,9 @@ struct Faultlog {
             { value: 'JS 程序' },
             { value: '应用程序卡死' }
           ])
+            .margin({
+              bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
             .selected(0)
             .value('全部')
             .onSelect(async (index: number) => {
@@ -224,7 +227,7 @@ struct Faultlog {
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
       }

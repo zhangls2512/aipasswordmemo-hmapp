@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { checkPermission } from '../common/Permission'
 import { syncTable } from '../common/Table'
@@ -98,19 +97,11 @@ struct Tablesync {
                           encrypt: true,
                           allowRebuild: true
                         })
-                        try {
-                          await rdbStore.setDistributedTables(['password'])
-                          const onTables = [...this.onTables, 'password']
-                          this.dataSettingDataPreferences.putSync('onTables', onTables)
-                          this.dataSettingDataPreferences.flushSync()
-                          this.getSetting()
-                        } catch (err) {
-                          this.onPassword = false
-                          promptAction.showToast({
-                            message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                            (err as BusinessError).message
-                          })
-                        }
+                        await rdbStore.setDistributedTables(['password'])
+                        const onTables = [...this.onTables, 'password']
+                        this.dataSettingDataPreferences.putSync('onTables', onTables)
+                        this.dataSettingDataPreferences.flushSync()
+                        this.getSetting()
                       }
                     }
                   })
@@ -147,19 +138,11 @@ struct Tablesync {
                           encrypt: true,
                           allowRebuild: true
                         })
-                        try {
-                          await rdbStore.setDistributedTables(['info'])
-                          const onTables = [...this.onTables, 'info']
-                          this.dataSettingDataPreferences.putSync('onTables', onTables)
-                          this.dataSettingDataPreferences.flushSync()
-                          this.getSetting()
-                        } catch (err) {
-                          this.onInfo = false
-                          promptAction.showToast({
-                            message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                            (err as BusinessError).message
-                          })
-                        }
+                        await rdbStore.setDistributedTables(['info'])
+                        const onTables = [...this.onTables, 'info']
+                        this.dataSettingDataPreferences.putSync('onTables', onTables)
+                        this.dataSettingDataPreferences.flushSync()
+                        this.getSetting()
                       }
                     }
                   })
@@ -196,19 +179,11 @@ struct Tablesync {
                           encrypt: true,
                           allowRebuild: true
                         })
-                        try {
-                          await rdbStore.setDistributedTables(['tag'])
-                          const onTables = [...this.onTables, 'tag']
-                          this.dataSettingDataPreferences.putSync('onTables', onTables)
-                          this.dataSettingDataPreferences.flushSync()
-                          this.getSetting()
-                        } catch (err) {
-                          this.onTag = false
-                          promptAction.showToast({
-                            message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                            (err as BusinessError).message
-                          })
-                        }
+                        await rdbStore.setDistributedTables(['tag'])
+                        const onTables = [...this.onTables, 'tag']
+                        this.dataSettingDataPreferences.putSync('onTables', onTables)
+                        this.dataSettingDataPreferences.flushSync()
+                        this.getSetting()
                       }
                     }
                   })
