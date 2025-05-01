@@ -72,7 +72,7 @@ export default class EntryAbility extends UIAbility {
       },
       onException(err) {
         if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 1) {
-          let message: string = '名称：' + err.name + '\n消息：' + err.message
+          let message = '名称：' + err.name + '\n消息：' + err.message
           if (typeof (err.stack) === 'string') {
             message = message + '\n错误堆栈信息：' + err.stack
           }
@@ -279,7 +279,7 @@ export default class EntryAbility extends UIAbility {
     })
     const showMemoryLevelChange = debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
     if (showMemoryLevelChange) {
-      let memoryLevel: string = ''
+      let memoryLevel = ''
       if (level === 0) {
         memoryLevel = '适中'
       }

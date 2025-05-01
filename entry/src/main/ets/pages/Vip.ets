@@ -67,21 +67,15 @@ struct Vip {
                 .height(20)
                 .width(20)
             }
-          }
-          .alignItems(HorizontalAlign.Start)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
-          Column() {
             Text() {
               Span('会员')
                 .fontColor('#FFD700')
               Span('可享以下特权：')
             }
             .fontWeight('bold')
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
 
             Text('· 云备份不限个数')
               .fontWeight('medium')

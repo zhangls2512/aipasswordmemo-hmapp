@@ -24,7 +24,7 @@ struct Cloudservice {
               if (!this.CloudService.status) {
                 Text('开通云服务后，可使用以下功能：')
                   .fontWeight('bold')
-                Text('· 数据云备份')
+                Text('· 云备份')
                   .fontWeight('medium')
                   .margin({
                     top: $r('sys.float.ohos_id_text_paragraph_margin_m')
@@ -33,7 +33,7 @@ struct Cloudservice {
               if (this.CloudService.status) {
                 Text('取消开通云服务前，需：')
                   .fontWeight('bold')
-                Text('· 清空云备份数据')
+                Text('· 清空云备份')
                   .fontWeight('medium')
                   .margin({
                     top: $r('sys.float.ohos_id_text_paragraph_margin_m')

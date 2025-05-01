@@ -231,7 +231,7 @@ export default struct Login {
                     message: '验证码已成功发送到邮箱：' + this.email
                   })
                   this.buttonEnabled = false
-                  let countdown: number = 60
+                  let countdown = 60
                   const interval = setInterval(() => {
                     countdown--
                     if (countdown > 0) {
@@ -276,7 +276,7 @@ export default struct Login {
                 })
                 return
               }
-              let code: string = ''
+              let code = ''
               if (this.type === 'password') {
                 code = this.password
               }
@@ -288,7 +288,7 @@ export default struct Login {
               }
               const dialogControllerProgress: CustomDialogController = new CustomDialogController({
                 builder: LoadingDialog({
-                  content: '发送中...'
+                  content: '登录中...'
                 })
               })
               dialogControllerProgress.open()

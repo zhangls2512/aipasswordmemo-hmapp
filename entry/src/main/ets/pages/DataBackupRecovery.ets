@@ -17,12 +17,12 @@ struct DataBackupRecovery {
   @Local autoBackupTag: boolean = false
   @Local pauseAutoBackupWhenLowBatteryCapacityLevel: boolean = false
   @Local pauseAutoBackupWhenPowerSave: boolean = false
-  @Local isBackupTables: string[] = []
-  @Local autoBackupTables: string[] = []
   context = getContext(this) as common.UIAbilityContext
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
+  isBackupTables: string[] = []
+  autoBackupTables: string[] = []
 
   getSetting() {
     const isBackupTables: preferences.ValueType =
@@ -50,7 +50,7 @@ struct DataBackupRecovery {
       List() {
         ListItem() {
           Column() {
-            Text('自动备份表')
+            Text('自动备份')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight('medium')
@@ -236,6 +236,11 @@ struct DataBackupRecovery {
                 Text('密码')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -262,6 +267,11 @@ struct DataBackupRecovery {
                 Text('常用信息')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -288,6 +298,11 @@ struct DataBackupRecovery {
                 Text('标签')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -342,6 +357,11 @@ struct DataBackupRecovery {
                           'undefined')
                       .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
+                    Blank()
+                    Image($r('app.media.right'))
+                      .fillColor($r('sys.color.icon_fourth'))
+                      .height(12)
+                      .width(12)
                   }
                   .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
                   .padding($r('sys.float.ohos_id_corner_radius_default_m'))

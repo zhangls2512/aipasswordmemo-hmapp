@@ -33,7 +33,7 @@ export default async function request(path: string, body: rcp.RequestContent) {
     const response = await session.post('https://api.zhangls2512.cn' + path, body)
     session.close()
     if (response.statusCode === 200) {
-      let body: string = 'undefined'
+      let body = ''
       if (response.toString()) {
         body = response.toString() as string
       }

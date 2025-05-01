@@ -16,21 +16,21 @@ interface PasswordCloudBackup {
   info: PasswordInfoItem[],
   tag: string[],
   updateTime: number,
-  cloudBackTime: number
+  cloudBackupTime: number
 }
 
 interface InfoCloudBackup {
   type: string,
   value: string,
   updateTime: number,
-  cloudBackTime: number
+  cloudBackupTime: number
 }
 
 interface TagCloudBackup {
   value: string,
   color: string,
   updateTime: number,
-  cloudBackTime: number
+  cloudBackupTime: number
 }
 
 @Builder
@@ -92,6 +92,11 @@ struct Cloudbackupimport {
                 Text('密码')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -146,7 +151,7 @@ struct Cloudbackupimport {
                             info: itemobject.info,
                             tag: itemobject.tag,
                             updateTime: itemobject.updateTime,
-                            cloudBackupTime: itemobject.cloudBackTime
+                            cloudBackupTime: itemobject.cloudBackupTime
                           })
                         }
                       })
@@ -178,6 +183,11 @@ struct Cloudbackupimport {
                 Text('常用信息')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -231,7 +241,7 @@ struct Cloudbackupimport {
                             type: itemobject.type,
                             value: itemobject.value,
                             updateTime: itemobject.updateTime,
-                            cloudBackupTime: itemobject.cloudBackTime
+                            cloudBackupTime: itemobject.cloudBackupTime
                           })
                         }
                       })
@@ -263,6 +273,11 @@ struct Cloudbackupimport {
                 Text('标签')
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -316,7 +331,7 @@ struct Cloudbackupimport {
                             value: itemobject.value,
                             color: itemobject.color,
                             updateTime: itemobject.updateTime,
-                            cloudBackupTime: itemobject.cloudBackTime
+                            cloudBackupTime: itemobject.cloudBackupTime
                           })
                         }
                       })

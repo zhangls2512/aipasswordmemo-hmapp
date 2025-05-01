@@ -14,9 +14,9 @@ export default struct TagPage {
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
-  @Local updateId: number = 0
   @Local orderColumnText: string = '修改时间'
   orderColumn: string = 'updateTime'
+  updateId: number = 0
 
   async getList() {
     this.loading = true

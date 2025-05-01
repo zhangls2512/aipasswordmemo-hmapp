@@ -28,13 +28,13 @@ struct Tablesync {
   @Local pauseAutoSyncWhenLowBatteryCapacityLevel: boolean = false
   @Local pauseAutoSyncWhenPowerSave: boolean = false
   @Local autoSyncDevices: Item[] = []
-  @Local onTables: string[] = []
-  @Local autoSyncTables: string[] = []
   @Local availableDeviceArray: Item[] = []
   context = getContext(this) as common.UIAbilityContext
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
+  onTables: string[] = []
+  autoSyncTables: string[] = []
 
   getSetting() {
     const onTables: preferences.ValueType =
@@ -204,7 +204,7 @@ struct Tablesync {
 
         ListItem() {
           Column() {
-            Text('自动同步表 (推送)')
+            Text('自动同步')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight('medium')
@@ -315,71 +315,7 @@ struct Tablesync {
         })
 
         ListItem() {
-          Column() {
-            Text('暂停自动同步')
-              .fontColor($r('sys.color.font_secondary'))
-              .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
-              .margin({
-                bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
-              })
-            Column() {
-              Row() {
-                Text('电池电量低')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.pauseAutoSyncWhenLowBatteryCapacityLevel
-                })
-                  .onChange((isOn: boolean) => {
-                    this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenLowBatteryCapacityLevel', isOn)
-                    this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
-                  })
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
-                })
-              Row() {
-                Text('系统开启 (超级) 省电模式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                  .fontWeight('medium')
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.pauseAutoSyncWhenPowerSave
-                })
-                  .onChange((isOn: boolean) => {
-                    this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenPowerSave', isOn)
-                    this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
-                  })
-              }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-              .width('100%')
-            }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
-          }
-          .alignItems(HorizontalAlign.Start)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
-          Text('自动同步设备')
+          Text('自动同步 (推送) 上方开启项数据到以下设备')
             .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
             .fontWeight('bold')
         }
@@ -483,6 +419,11 @@ struct Tablesync {
                   .fontColor($r('sys.color.warning'))
                   .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -522,6 +463,70 @@ struct Tablesync {
           })
           .width('100%')
         }
+
+        ListItem() {
+          Column() {
+            Text('暂停自动同步')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: $r('sys.float.ohos_id_corner_radius_default_m')
+              })
+            Column() {
+              Row() {
+                Text('电池电量低')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.pauseAutoSyncWhenLowBatteryCapacityLevel
+                })
+                  .onChange((isOn: boolean) => {
+                    this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenLowBatteryCapacityLevel', isOn)
+                    this.dataSettingDataPreferences.flushSync()
+                    this.getSetting()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('系统开启 (超级) 省电模式')
+                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.pauseAutoSyncWhenPowerSave
+                })
+                  .onChange((isOn: boolean) => {
+                    this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenPowerSave', isOn)
+                    this.dataSettingDataPreferences.flushSync()
+                    this.getSetting()
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
 
         ListItem() {
           Text('可信设备')
@@ -629,6 +634,11 @@ struct Tablesync {
                     .fontColor($r('sys.color.font_emphasize'))
                     .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
+                  Blank()
+                  Image($r('app.media.right'))
+                    .fillColor($r('sys.color.icon_fourth'))
+                    .height(12)
+                    .width(12)
                 }
                 .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
                 .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -679,7 +689,7 @@ struct Tablesync {
               .width('100%')
               .onClick(async () => {
                 const data = await promptAction.showActionMenu({
-                  title: '选择数据表',
+                  title: '选择数据项',
                   buttons: [
                     {
                       text: '密码',
@@ -734,7 +744,7 @@ struct Tablesync {
               .width('100%')
               .onClick(async () => {
                 const data = await promptAction.showActionMenu({
-                  title: '选择数据表',
+                  title: '选择数据项',
                   buttons: [
                     {
                       text: '密码',

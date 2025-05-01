@@ -122,6 +122,17 @@ struct Feedback {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
+
+        ListItem() {
+          Column() {
+            Text('建议填写联系方式，以便开发人员在需要时联系您。')
+              .fontWeight('medium')
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

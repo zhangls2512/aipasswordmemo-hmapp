@@ -47,7 +47,7 @@ struct Networktest {
                   session.close()
                   this.dialogControllerProgress.close()
                   if (response.statusCode === 200) {
-                    let body: string = 'undefined'
+                    let body = 'undefined'
                     if (response.toString()) {
                       body = response.toString() as string
                     }

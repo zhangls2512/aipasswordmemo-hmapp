@@ -14,9 +14,9 @@ struct Clearsettings {
   @Local data: boolean = false
   @Local common: boolean = false
   @Local permission: boolean = false
-  @Local types: string[] = []
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
+  types: string[] = []
 
   build() {
     NavDestination() {
