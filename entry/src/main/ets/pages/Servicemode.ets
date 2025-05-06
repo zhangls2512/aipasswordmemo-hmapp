@@ -16,12 +16,6 @@ struct Servicemode {
     name: 'commonSetting'
   })
 
-  getSetting() {
-    const allService: preferences.ValueType =
-      this.commonSettingDataPreferences.getSync('allService', true)
-    this.allService = allService as boolean
-  }
-
   build() {
     NavDestination() {
       List() {
@@ -126,7 +120,9 @@ struct Servicemode {
     .backgroundColor($r('app.color.sheet_background'))
     .title('应用服务模式')
     .onReady(() => {
-      this.getSetting()
+      const allService: preferences.ValueType =
+        this.commonSettingDataPreferences.getSync('allService', true)
+      this.allService = allService as boolean
     })
     .onDisAppear(() => {
       emitter.emit('2')

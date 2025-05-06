@@ -2,10 +2,10 @@ import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
 interface Item {
-  date: number,
   duration: number,
+  type: string,
   info: string,
-  type: string
+  date: number
 }
 
 @Builder
@@ -17,7 +17,6 @@ export function ViplogBuilder() {
 struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
-  accessToken: string = get()
   empty: boolean | undefined = undefined
 
   build() {

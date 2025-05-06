@@ -16,12 +16,6 @@ struct Permissionsetting {
   })
   dataSync: boolean = getPermission('ohos.permission.DISTRIBUTED_DATASYNC')
 
-  getSetting() {
-    const writePasteBoard: preferences.ValueType =
-      this.permissionSettingDataPreferences.getSync('writePasteBoard', false)
-    this.writePasteBoard = writePasteBoard as boolean
-  }
-
   build() {
     NavDestination() {
       List() {
@@ -118,7 +112,9 @@ struct Permissionsetting {
     .backgroundColor($r('app.color.sheet_background'))
     .title('权限管理')
     .onReady(() => {
-      this.getSetting()
+      const writePasteBoard: preferences.ValueType =
+        this.permissionSettingDataPreferences.getSync('writePasteBoard', false)
+      this.writePasteBoard = writePasteBoard as boolean
     })
   }
 }

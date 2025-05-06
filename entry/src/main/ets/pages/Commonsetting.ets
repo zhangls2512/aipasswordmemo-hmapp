@@ -19,42 +19,6 @@ struct Commonsetting {
     name: 'commonSetting'
   })
 
-  getSetting() {
-    const colorMode: preferences.ValueType =
-      this.commonSettingDataPreferences.getSync('colorMode', 0)
-    this.colorModeIndex = colorMode as number
-    if (colorMode === 0) {
-      this.colorModeValue = '跟随系统'
-    }
-    if (colorMode === 1) {
-      this.colorModeValue = '浅色模式'
-    }
-    if (colorMode === 2) {
-      this.colorModeValue = '深色模式'
-    }
-    const checkVersionUpdate: preferences.ValueType =
-      this.commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
-    this.checkVersionUpdateIndex = checkVersionUpdate as number
-    if (checkVersionUpdate === 0) {
-      this.checkVersionUpdateValue = '从不'
-    }
-    if (checkVersionUpdate === 1) {
-      this.checkVersionUpdateValue = '仅 WLAN 下'
-    }
-    if (checkVersionUpdate === 2) {
-      this.checkVersionUpdateValue = '始终'
-    }
-    const openLinkType: preferences.ValueType =
-      this.commonSettingDataPreferences.getSync('openLinkType', 0)
-    this.openLinkTypeIndex = openLinkType as number
-    if (openLinkType === 0) {
-      this.openLinkTypeValue = '系统默认'
-    }
-    if (openLinkType === 1) {
-      this.openLinkTypeValue = '自行选择'
-    }
-  }
-
   build() {
     NavDestination() {
       List() {
@@ -166,7 +130,39 @@ struct Commonsetting {
     .backgroundColor($r('app.color.sheet_background'))
     .title('通用')
     .onReady(() => {
-      this.getSetting()
+      const colorMode: preferences.ValueType =
+        this.commonSettingDataPreferences.getSync('colorMode', 0)
+      this.colorModeIndex = colorMode as number
+      if (colorMode === 0) {
+        this.colorModeValue = '跟随系统'
+      }
+      if (colorMode === 1) {
+        this.colorModeValue = '浅色模式'
+      }
+      if (colorMode === 2) {
+        this.colorModeValue = '深色模式'
+      }
+      const checkVersionUpdate: preferences.ValueType =
+        this.commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
+      this.checkVersionUpdateIndex = checkVersionUpdate as number
+      if (checkVersionUpdate === 0) {
+        this.checkVersionUpdateValue = '从不'
+      }
+      if (checkVersionUpdate === 1) {
+        this.checkVersionUpdateValue = '仅 WLAN 下'
+      }
+      if (checkVersionUpdate === 2) {
+        this.checkVersionUpdateValue = '始终'
+      }
+      const openLinkType: preferences.ValueType =
+        this.commonSettingDataPreferences.getSync('openLinkType', 0)
+      this.openLinkTypeIndex = openLinkType as number
+      if (openLinkType === 0) {
+        this.openLinkTypeValue = '系统默认'
+      }
+      if (openLinkType === 1) {
+        this.openLinkTypeValue = '自行选择'
+      }
     })
   }
 }

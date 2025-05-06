@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { Password, Info, Tag } from './Dataget'
+import { Info, Password, Tag } from './Dataget'
 import { autoBackupTable, autoSyncTable } from './Table'
 
 export async function importPassword(data: string, conflict: relationalStore.ConflictResolution) {
