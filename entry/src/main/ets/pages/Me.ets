@@ -55,12 +55,12 @@ export default struct Me {
                 .width(40)
             }
             if (!this.loading) {
-              if (this.email === '') {
+              if (!this.email) {
                 Text('登录')
                   .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                   .fontWeight('bold')
               }
-              if (this.email !== '') {
+              if (this.email) {
                 Text(this.email)
                   .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                   .fontWeight('bold')
@@ -79,7 +79,7 @@ export default struct Me {
           })
           .width('100%')
           .onClick(async () => {
-            if (this.email === '' && !this.loading) {
+            if (!this.email && !this.loading) {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(true)
               this.isShowLoginSheet = !this.isShowLoginSheet
@@ -117,7 +117,6 @@ export default struct Me {
               })
               .width(24)
             Text('设置')
-              .fontSize($r('sys.float.ohos_id_text_size_body1'))
               .fontWeight('medium')
             Blank()
             Image($r('app.media.right'))

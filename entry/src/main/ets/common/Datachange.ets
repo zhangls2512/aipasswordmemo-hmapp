@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { get } from './Accesstoken'
-import { encrypt, EncryptData } from './Crypto'
+import { encrypt } from './Crypto'
 import request from './Request'
 import { autoBackupTable, autoSyncTable } from './Table'
 
@@ -117,29 +117,41 @@ export async function newInfo(data: InfoInput) {
     encrypt: true,
     allowRebuild: true
   })
-  const updateTime = Date.now()
-  const id = rdbStore.insertSync('info', {
-    type: data.type,
-    value: data.value,
-    updateTime: updateTime,
-    cloudBackupTime: 0
-  })
-  promptAction.showToast({
-    message: '新增成功'
-  })
-  autoSyncTable('info')
-  autoBackupTable('info')
-  if (data.cloudBackup) {
-    setCloudBackup({
-      type: 'info',
-      id: id,
-      content: JSON.stringify({
-        type: data.type,
-        value: data.value,
-        updateTime: updateTime,
-        cloudBackupTime: updateTime
-      })
+  const predicates = new relationalStore.RdbPredicates('info')
+  predicates.equalTo('type', data.type)
+  predicates.equalTo('value', data.value)
+  const resultSet = await rdbStore.query(predicates)
+  if (resultSet.goToNextRow()) {
+    promptAction.showToast({
+      message: '新增失败：已存在'
     })
+    resultSet.close()
+    throw new Error('fail')
+  } else {
+    const updateTime = Date.now()
+    const id = rdbStore.insertSync('info', {
+      type: data.type,
+      value: data.value,
+      updateTime: updateTime,
+      cloudBackupTime: 0
+    })
+    promptAction.showToast({
+      message: '新增成功'
+    })
+    autoSyncTable('info')
+    autoBackupTable('info')
+    if (data.cloudBackup) {
+      setCloudBackup({
+        type: 'info',
+        id: id,
+        content: JSON.stringify({
+          type: data.type,
+          value: data.value,
+          updateTime: updateTime,
+          cloudBackupTime: updateTime
+        })
+      })
+    }
   }
 }
 
@@ -151,30 +163,42 @@ export async function updateInfo(id: number, data: InfoInput) {
     encrypt: true,
     allowRebuild: true
   })
-  const predicates = new relationalStore.RdbPredicates('info')
-  predicates.equalTo('id', id)
-  const updateTime = Date.now()
-  rdbStore.updateSync({
-    type: data.type,
-    value: data.value,
-    updateTime: updateTime
-  }, predicates)
-  promptAction.showToast({
-    message: '修改成功'
-  })
-  autoSyncTable('info')
-  autoBackupTable('info')
-  if (data.cloudBackup) {
-    setCloudBackup({
-      type: 'info',
-      id: id,
-      content: JSON.stringify({
-        type: data.type,
-        value: data.value,
-        updateTime: updateTime,
-        cloudBackupTime: updateTime
-      })
+  const predicatesa = new relationalStore.RdbPredicates('info')
+  predicatesa.equalTo('type', data.type)
+  predicatesa.equalTo('value', data.value)
+  const resultSet = await rdbStore.query(predicatesa)
+  if (resultSet.goToNextRow()) {
+    promptAction.showToast({
+      message: '修改失败：已存在'
     })
+    resultSet.close()
+    throw new Error('fail')
+  } else {
+    const predicatesb = new relationalStore.RdbPredicates('info')
+    predicatesb.equalTo('id', id)
+    const updateTime = Date.now()
+    rdbStore.updateSync({
+      type: data.type,
+      value: data.value,
+      updateTime: updateTime
+    }, predicatesb)
+    promptAction.showToast({
+      message: '修改成功'
+    })
+    autoSyncTable('info')
+    autoBackupTable('info')
+    if (data.cloudBackup) {
+      setCloudBackup({
+        type: 'info',
+        id: id,
+        content: JSON.stringify({
+          type: data.type,
+          value: data.value,
+          updateTime: updateTime,
+          cloudBackupTime: updateTime
+        })
+      })
+    }
   }
 }
 
@@ -186,29 +210,40 @@ export async function newTag(data: TagInput) {
     encrypt: true,
     allowRebuild: true
   })
-  const updateTime = Date.now()
-  const id = rdbStore.insertSync('tag', {
-    value: data.value,
-    color: data.color,
-    updateTime: updateTime,
-    cloudBackupTime: 0
-  })
-  promptAction.showToast({
-    message: '新增成功'
-  })
-  autoSyncTable('tag')
-  autoBackupTable('tag')
-  if (data.cloudBackup) {
-    setCloudBackup({
-      type: 'tag',
-      id: id,
-      content: JSON.stringify({
-        value: data.value,
-        color: data.color,
-        updateTime: updateTime,
-        cloudBackupTime: updateTime
-      })
+  const predicates = new relationalStore.RdbPredicates('tag')
+  predicates.equalTo('value', data.value)
+  const resultSet = await rdbStore.query(predicates)
+  if (resultSet.goToNextRow()) {
+    promptAction.showToast({
+      message: '新增失败：已存在'
     })
+    resultSet.close()
+    throw new Error('fail')
+  } else {
+    const updateTime = Date.now()
+    const id = rdbStore.insertSync('tag', {
+      value: data.value,
+      color: data.color,
+      updateTime: updateTime,
+      cloudBackupTime: 0
+    })
+    promptAction.showToast({
+      message: '新增成功'
+    })
+    autoSyncTable('tag')
+    autoBackupTable('tag')
+    if (data.cloudBackup) {
+      setCloudBackup({
+        type: 'tag',
+        id: id,
+        content: JSON.stringify({
+          value: data.value,
+          color: data.color,
+          updateTime: updateTime,
+          cloudBackupTime: updateTime
+        })
+      })
+    }
   }
 }
 
@@ -220,30 +255,41 @@ export async function updateTag(id: number, data: TagInput) {
     encrypt: true,
     allowRebuild: true
   })
-  const predicates = new relationalStore.RdbPredicates('tag')
-  predicates.equalTo('id', id)
-  const updateTime = Date.now()
-  rdbStore.updateSync({
-    value: data.value,
-    color: data.color,
-    updateTime: updateTime
-  }, predicates)
-  promptAction.showToast({
-    message: '修改成功'
-  })
-  autoSyncTable('tag')
-  autoBackupTable('tag')
-  if (data.cloudBackup) {
-    setCloudBackup({
-      type: 'tag',
-      id: id,
-      content: JSON.stringify({
-        value: data.value,
-        color: data.color,
-        updateTime: updateTime,
-        cloudBackupTime: updateTime
-      })
+  const predicatesa = new relationalStore.RdbPredicates('tag')
+  predicatesa.equalTo('value', data.value)
+  const resultSet = await rdbStore.query(predicatesa)
+  if (resultSet.goToNextRow() && resultSet.getValue(resultSet.getColumnIndex('color')) as string === data.color) {
+    promptAction.showToast({
+      message: '修改失败：已存在'
     })
+    resultSet.close()
+    throw new Error('fail')
+  } else {
+    const predicatesb = new relationalStore.RdbPredicates('tag')
+    predicatesb.equalTo('id', id)
+    const updateTime = Date.now()
+    rdbStore.updateSync({
+      value: data.value,
+      color: data.color,
+      updateTime: updateTime
+    }, predicatesb)
+    promptAction.showToast({
+      message: '修改成功'
+    })
+    autoSyncTable('tag')
+    autoBackupTable('tag')
+    if (data.cloudBackup) {
+      setCloudBackup({
+        type: 'tag',
+        id: id,
+        content: JSON.stringify({
+          value: data.value,
+          color: data.color,
+          updateTime: updateTime,
+          cloudBackupTime: updateTime
+        })
+      })
+    }
   }
 }
 

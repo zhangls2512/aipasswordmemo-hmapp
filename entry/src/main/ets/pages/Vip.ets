@@ -1,6 +1,8 @@
 import { common } from '@kit.AbilityKit'
+import { emitter } from '@kit.BasicServicesKit'
 import { iap } from '@kit.IAPKit'
 import { get } from '../common/Accesstoken'
+import { copy } from '../common/Pasteboard'
 import request from '../common/Request'
 
 @Builder
@@ -14,6 +16,7 @@ struct Vip {
   @Local vipStatusLoading: boolean = false
   @Local vipStatusColor: string = 'red'
   @Local vipEndDate: string = ''
+  @Local uid: string = ''
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
 
@@ -61,6 +64,20 @@ struct Vip {
                     top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                   })
               }
+              if (this.uid) {
+                Text() {
+                  Span('UID：')
+                  Span(this.uid)
+                    .fontColor($r('sys.color.font_emphasize'))
+                    .onClick(() => {
+                      copy(this.uid)
+                    })
+                }
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                })
+              }
             }
             if (this.vipStatusLoading) {
               LoadingProgress()
@@ -93,7 +110,6 @@ struct Vip {
           Column() {
             Row() {
               Text('订阅管理')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))
@@ -126,7 +142,6 @@ struct Vip {
               })
             Row() {
               Text('兑换码')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))
@@ -158,7 +173,6 @@ struct Vip {
               })
             Row() {
               Text('开通记录')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))
@@ -199,9 +213,21 @@ struct Vip {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('会员中心')
-    .onReady((context: NavDestinationContext) => {
+    .onReady(async (context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
-      this.getVipStatus()
+      await this.getVipStatus()
+      emitter.on('3', () => {
+        this.getVipStatus()
+      })
+      const res = await request('/account/getAccountInfo', {
+        accessToken: get()
+      })
+      if (res !== 'fail') {
+        this.uid = JSON.parse(res).data.uid as string
+      }
+    })
+    .onDisAppear(() => {
+      emitter.emit('2')
     })
   }
 }

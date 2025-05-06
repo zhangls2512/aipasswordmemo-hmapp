@@ -48,7 +48,6 @@ struct Faultlog {
             Column() {
               Row() {
                 Text('进程 ID')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -70,7 +69,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('用户 ID')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -92,7 +90,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -119,7 +116,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('日志生成时的毫秒级时间戳')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -141,7 +137,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('原因')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -163,7 +158,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('模块')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -185,7 +179,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('概要')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -207,7 +200,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('日志全文')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()

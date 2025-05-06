@@ -291,6 +291,11 @@ struct Huaweiaccount {
 
                     Text() {
                       Span('已阅读并同意')
+                      Span('《华为账号用户认证协议》')
+                        .fontColor($r('sys.color.font_emphasize'))
+                        .onClick(() => {
+                          openLink('https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN')
+                        })
                       Span('《关于华为账号与隐私的声明》')
                         .fontColor($r('sys.color.font_emphasize'))
                         .onClick(() => {

@@ -28,7 +28,6 @@ struct Viplog {
             Column() {
               Row() {
                 Text('时长')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -50,7 +49,6 @@ struct Viplog {
                 })
               Row() {
                 Text('类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -74,7 +72,6 @@ struct Viplog {
                 })
               Row() {
                 Text('详情')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -96,7 +93,6 @@ struct Viplog {
                 })
               Row() {
                 Text('时间')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()

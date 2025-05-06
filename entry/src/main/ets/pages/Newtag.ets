@@ -6,7 +6,7 @@ import { getKey } from '../common/Crypto'
 import { newTag } from '../common/Datachange'
 
 @ComponentV2
-export default struct Settag {
+export default struct Newtag {
   @Consumer() isShowNewSheet: boolean = false
   @Local tagValue: string = ''
   @Local tagColor: string = 'rgba(0,0,0,0)'
@@ -85,7 +85,6 @@ export default struct Settag {
           Column() {
             Row() {
               Text('云备份')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Toggle({

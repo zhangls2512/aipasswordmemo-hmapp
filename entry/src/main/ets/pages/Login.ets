@@ -210,7 +210,7 @@ export default struct Login {
               })
               .width('100%')
               .onClick(async () => {
-                if (this.email === '') {
+                if (!this.email) {
                   promptAction.showToast({
                     message: '请输入邮箱'
                   })
@@ -252,7 +252,7 @@ export default struct Login {
             })
             .width('100%')
             .onClick(async () => {
-              if (this.email === '') {
+              if (!this.email) {
                 promptAction.showToast({
                   message: '请输入邮箱'
                 })
@@ -332,6 +332,7 @@ export default struct Login {
             .height(40)
           Text('注册账号')
             .fontColor($r('sys.color.font_emphasize'))
+            .fontWeight('medium')
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_l')
             })

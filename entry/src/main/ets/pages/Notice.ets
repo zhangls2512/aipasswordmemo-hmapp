@@ -17,7 +17,6 @@ struct Notice {
           Column() {
             Row() {
               Text('通知管理')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))

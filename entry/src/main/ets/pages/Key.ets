@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { promptAction, window } from '@kit.ArkUI'
-import { getKey, setRandomKey, removeKey } from '../common/Crypto'
+import { getKey, removeKey, setRandomKey } from '../common/Crypto'
 import { copy } from '../common/Pasteboard'
 
 @Builder
@@ -22,7 +22,6 @@ struct Keypage {
             Column() {
               Row() {
                 Text('密钥')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -60,8 +59,12 @@ struct Keypage {
           Column() {
             Row() {
               Text('导入')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
+              Blank()
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
             }
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -149,8 +152,12 @@ struct Keypage {
               Row() {
                 Text('删除')
                   .fontColor($r('sys.color.warning'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))

@@ -20,7 +20,6 @@ struct ReportQoe {
             Column() {
               Row() {
                 Text('业务类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Select([
@@ -57,7 +56,6 @@ struct ReportQoe {
                 })
               Row() {
                 Text('体验类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Select([

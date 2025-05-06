@@ -14,9 +14,9 @@ struct Clearsettings {
   @Local data: boolean = false
   @Local common: boolean = false
   @Local permission: boolean = false
+  @Local types: string[] = []
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
-  types: string[] = []
 
   build() {
     NavDestination() {
@@ -37,7 +37,6 @@ struct Clearsettings {
                     this.types = itemName.name
                   })
                 Text('全部')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('bold')
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -61,7 +60,6 @@ struct Clearsettings {
                   .select($$this.cloudbackup)
                 Column() {
                   Text('云备份')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('自动同步')
                     .fontColor($r('sys.color.font_secondary'))
@@ -94,7 +92,6 @@ struct Clearsettings {
                   .select($$this.data)
                 Column() {
                   Text('数据')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('设备间自动同步、自动备份等')
                     .fontColor($r('sys.color.font_secondary'))
@@ -127,7 +124,6 @@ struct Clearsettings {
                   .select($$this.common)
                 Column() {
                   Text('通用')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('应用服务模式、深色模式、启动时检查更新、链接打开方式')
                     .fontColor($r('sys.color.font_secondary'))
@@ -160,7 +156,6 @@ struct Clearsettings {
                   .select($$this.permission)
                 Column() {
                   Text('权限')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('写入剪贴板')
                     .fontColor($r('sys.color.font_secondary'))

@@ -31,7 +31,6 @@ struct Agreements {
             Row() {
               if (this.agreedUserAgreement !== 2) {
                 Text('用户服务条款与条件')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
               }
               if (this.agreedUserAgreement === 2) {
@@ -44,7 +43,6 @@ struct Agreements {
                   }
                 }) {
                   Text('用户服务条款与条件')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                     .margin({
                       right: 16

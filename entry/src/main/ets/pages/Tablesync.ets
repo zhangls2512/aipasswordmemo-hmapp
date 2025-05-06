@@ -76,7 +76,6 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('密码')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -117,7 +116,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('常用信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -158,7 +156,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('标签')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -215,7 +212,6 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('密码')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -247,7 +243,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('常用信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -279,7 +274,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('标签')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -315,9 +309,8 @@ struct Tablesync {
         })
 
         ListItem() {
-          Text('自动同步 (推送) 上方开启项数据到以下设备')
-            .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-            .fontWeight('bold')
+          Text('自动同步 (推送) 到以下设备')
+            .fontWeight('medium')
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -328,7 +321,6 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('标识符')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -350,7 +342,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('名称')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -372,7 +363,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -394,7 +384,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('网络标识')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -417,7 +406,6 @@ struct Tablesync {
               Row() {
                 Text('关闭自动同步')
                   .fontColor($r('sys.color.warning'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -463,7 +451,6 @@ struct Tablesync {
           })
           .width('100%')
         }
-
         ListItem() {
           Column() {
             Text('暂停自动同步')
@@ -477,7 +464,6 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('电池电量低')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -501,7 +487,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('系统开启 (超级) 省电模式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -530,8 +515,7 @@ struct Tablesync {
 
         ListItem() {
           Text('可信设备')
-            .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-            .fontWeight('bold')
+            .fontWeight('medium')
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -542,7 +526,6 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('标识符')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -564,7 +547,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('名称')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -586,7 +568,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -608,7 +589,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('网络标识')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -632,7 +612,6 @@ struct Tablesync {
                 Row() {
                   Text('开启自动同步')
                     .fontColor($r('sys.color.font_emphasize'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Blank()
                   Image($r('app.media.right'))
@@ -668,7 +647,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('推送')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -723,7 +701,6 @@ struct Tablesync {
                 })
               Row() {
                 Text('拉取')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))

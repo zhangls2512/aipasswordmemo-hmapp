@@ -139,6 +139,11 @@
       "name": "Cloudbackupimport",
       "pageSourceFile": "src/main/ets/pages/Cloudbackupimport.ets",
       "buildFunction": "CloudbackupimportBuilder"
+    },
+    {
+      "name": "Infolist",
+      "pageSourceFile": "src/main/ets/pages/Infolist.ets",
+      "buildFunction": "InfolistBuilder"
     }
   ]
 }

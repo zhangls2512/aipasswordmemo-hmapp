@@ -87,7 +87,6 @@ export default struct Updatetag {
           Column() {
             Row() {
               Text('云备份')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Toggle({

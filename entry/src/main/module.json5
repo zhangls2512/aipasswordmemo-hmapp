@@ -79,16 +79,6 @@
           ],
           "when": "inuse"
         }
-      },
-      {
-        "name": "ohos.permission.MICROPHONE",
-        "reason": "$string:MICROPHONE_reason",
-        "usedScene": {
-          "abilities": [
-            "EntryAbility"
-          ],
-          "when": "inuse"
-        }
       }
     ],
     "routerMap": "$profile:router_map"

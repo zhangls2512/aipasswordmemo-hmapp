@@ -52,9 +52,27 @@ export default struct TagPage {
               },
               onDisappear: (() => {
                 this.getList()
+              }),
+              onWillDismiss: (async (DismissSheetAction: DismissSheetAction) => {
+                const data = await promptAction.showDialog({
+                  title: '提示',
+                  message: '数据尚未保存，确定退出？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
+                })
+                if (data.index === 1) {
+                  DismissSheetAction.dismiss()
+                }
               })
             })
-
           Blank()
           Button('按' + this.orderColumnText + '排序')
             .buttonStyle(ButtonStyleMode.NORMAL)
@@ -100,23 +118,24 @@ export default struct TagPage {
             Row() {
               if (item.cloudBackupTime >= item.updateTime) {
                 Image($r('app.media.cloud'))
-                  .height(16)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .width(16)
+                  .width('5%')
               }
-              Circle({
-                height: 16,
-                width: 16
-              })
-                .fill(item.color)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              Row() {
+                Circle({
+                  height: 16,
+                  width: 16
                 })
-              Text(item.value)
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                .fontWeight('medium')
+                  .fill(item.color)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Text(item.value)
+                  .fontWeight('medium')
+              }
+              .width('90%')
             }
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -253,6 +272,25 @@ export default struct TagPage {
       },
       onDisappear: (() => {
         this.getList()
+      }),
+      onWillDismiss: (async (DismissSheetAction: DismissSheetAction) => {
+        const data = await promptAction.showDialog({
+          title: '提示',
+          message: '数据尚未保存，确定退出？',
+          buttons: [
+            {
+              text: '取消',
+              color: $r('sys.color.font_primary')
+            },
+            {
+              text: '确定',
+              color: $r('sys.color.font_emphasize')
+            }
+          ]
+        })
+        if (data.index === 1) {
+          DismissSheetAction.dismiss()
+        }
       })
     })
   }

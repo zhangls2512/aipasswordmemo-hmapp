@@ -21,7 +21,6 @@ struct Recoverysetting {
             Column() {
               Row() {
                 Text('重启时机')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Select([
@@ -58,7 +57,6 @@ struct Recoverysetting {
                 })
               Row() {
                 Text('状态保存时机')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Select([
@@ -87,7 +85,6 @@ struct Recoverysetting {
                 })
               Row() {
                 Text('状态保存方式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Select([

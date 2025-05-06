@@ -1,8 +1,8 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import { decrypt, getKey } from '../common/Crypto'
-import { Password, PasswordInfoItem, Info, Tag } from '../common/Dataget'
-import { importPassword, importInfo, importTag } from '../common/Dataimport'
+import { Info, Password, PasswordInfoItem, Tag } from '../common/Dataget'
+import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import request from '../common/Request'
 
 interface Item {
@@ -55,7 +55,6 @@ struct Cloudbackupimport {
           Column() {
             Row() {
               Text('冲突解决模式')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Select([
@@ -90,7 +89,6 @@ struct Cloudbackupimport {
             Column() {
               Row() {
                 Text('密码')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -181,7 +179,6 @@ struct Cloudbackupimport {
                 })
               Row() {
                 Text('常用信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -271,7 +268,6 @@ struct Cloudbackupimport {
                 })
               Row() {
                 Text('标签')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))

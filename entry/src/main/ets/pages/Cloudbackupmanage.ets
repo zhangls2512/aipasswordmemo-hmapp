@@ -24,7 +24,7 @@ struct Cloudbackupmanage {
   @Local passwordSelected: boolean = false
   @Local infoSelected: boolean = false
   @Local tagSelected: boolean = false
-  types: string[] = []
+  @Local types: string[] = []
   dialogControllerProgress: CustomDialogController = new CustomDialogController({
     builder: LoadingDialog({
       content: '清理中...'
@@ -67,7 +67,6 @@ struct Cloudbackupmanage {
                         this.types = itemName.name
                       })
                     Text('全部')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('bold')
                     Blank()
                     Text(this.total)
@@ -94,7 +93,6 @@ struct Cloudbackupmanage {
                       })
                       .select($$this.passwordSelected)
                     Text('密码')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                     Blank()
                     Text(this.password)
@@ -121,7 +119,6 @@ struct Cloudbackupmanage {
                       })
                       .select($$this.infoSelected)
                     Text('常用信息')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                     Blank()
                     Text(this.info)
@@ -148,7 +145,6 @@ struct Cloudbackupmanage {
                       })
                       .select($$this.tagSelected)
                     Text('标签')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                     Blank()
                     Text(this.tag)

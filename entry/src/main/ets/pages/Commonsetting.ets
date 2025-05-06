@@ -62,7 +62,6 @@ struct Commonsetting {
           Column() {
             Row() {
               Text('深色模式')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Select([
@@ -98,7 +97,6 @@ struct Commonsetting {
               })
             Row() {
               Text('启动时检查更新')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Select([
@@ -124,7 +122,6 @@ struct Commonsetting {
               })
             Row() {
               Text('使用')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -143,7 +140,6 @@ struct Commonsetting {
                   this.commonSettingDataPreferences.flushSync()
                 })
               Text('浏览器打开链接')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')

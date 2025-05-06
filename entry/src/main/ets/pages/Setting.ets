@@ -1,26 +1,17 @@
 import { common } from '@kit.AbilityKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
-import { AppStorageV2, promptAction } from '@kit.ArkUI'
+import { promptAction } from '@kit.ArkUI'
+import { emitter } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 
-@ObservedV2
-export class AllService {
-  @Trace allService: boolean = true
-}
-
-@ObservedV2
-export class CloudService {
-  @Trace status: boolean = false
-}
-
 @ComponentV2
 export default struct Setting {
-  @Local allService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
-  @Local cloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
+  @Local allService: boolean = true
+  @Local cloudService: boolean = false
   @Local cloudServiceLoading: boolean = false
   @Local vipStatus: string = '未开通'
   @Local vipStatusLoading: boolean = false
@@ -33,7 +24,9 @@ export default struct Setting {
   })
   accessToken: string = get()
 
-  getSetting() {
+  async getSetting() {
+    const allService: preferences.ValueType = this.commonSettingDataPreferences.getSync('allService', true)
+    this.allService = allService as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
       this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
@@ -41,6 +34,28 @@ export default struct Setting {
       promptAction.showToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
+    }
+    this.cloudServiceLoading = true
+    const cloudServiceStatus = await getCloudServiceStatus()
+    this.cloudServiceLoading = false
+    this.cloudService = cloudServiceStatus
+    if (cloudServiceStatus) {
+      this.vipStatusLoading = true
+      const userres = await request('/product/getUserInfo', {
+        accessToken: this.accessToken,
+        product: 'password'
+      })
+      this.vipStatusLoading = false
+      if (userres !== 'fail') {
+        const vipenddate = JSON.parse(userres).data.vipEndDate as number
+        if (vipenddate > 0 && vipenddate < Date.now()) {
+          this.vipStatus = '已过期'
+        }
+        if (vipenddate === 0 || vipenddate >= Date.now()) {
+          this.vipStatus = '已开通'
+          this.vipStatusColor = '#FFD700'
+        }
+      }
     }
   }
 
@@ -61,7 +76,6 @@ export default struct Setting {
               Column() {
                 Row() {
                   Text('绑定华为账号')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Blank()
                   Image($r('app.media.right'))
@@ -93,16 +107,14 @@ export default struct Setting {
                       right: $r('sys.float.ohos_id_corner_radius_default_m')
                     })
                   Row() {
-                    if (!this.cloudService.status) {
+                    if (!this.cloudService) {
                       Text('开通云服务')
                         .fontColor($r('sys.color.font_emphasize'))
-                        .fontSize($r('sys.float.ohos_id_text_size_body1'))
                         .fontWeight('medium')
                     }
-                    if (this.cloudService.status) {
+                    if (this.cloudService) {
                       Text('取消开通云服务')
                         .fontColor($r('sys.color.warning'))
-                        .fontSize($r('sys.float.ohos_id_text_size_body1'))
                         .fontWeight('medium')
                     }
                     Blank()
@@ -128,7 +140,7 @@ export default struct Setting {
                     })
                   })
 
-                  if (this.cloudService.status) {
+                  if (this.cloudService) {
                     Divider()
                       .padding({
                         left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -137,7 +149,6 @@ export default struct Setting {
                     Row() {
                       Text('会员中心')
                         .fontColor('#FFD700')
-                        .fontSize($r('sys.float.ohos_id_text_size_body1'))
                         .fontWeight('medium')
                       Blank()
                       if (!this.vipStatusLoading) {
@@ -200,7 +211,7 @@ export default struct Setting {
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
 
-          if (!this.cloudServiceLoading && this.cloudService.status) {
+          if (!this.cloudServiceLoading && this.cloudService) {
             ListItem() {
               Column() {
                 Text('云备份')
@@ -214,7 +225,6 @@ export default struct Setting {
                 Column() {
                   Row() {
                     Text('自动开启')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                     Blank()
                     Image($r('app.media.right'))
@@ -246,7 +256,6 @@ export default struct Setting {
                     })
                   Row() {
                     Text('管理')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                     Blank()
                     Image($r('app.media.right'))
@@ -278,7 +287,6 @@ export default struct Setting {
                     })
                   Row() {
                     Text('导入')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                     Blank()
                     Image($r('app.media.right'))
@@ -310,7 +318,6 @@ export default struct Setting {
                     })
                   Row() {
                     Text('密钥')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                     Blank()
                     Image($r('app.media.right'))
@@ -371,7 +378,6 @@ export default struct Setting {
             Column() {
               Row() {
                 Text('设备间同步')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -403,7 +409,6 @@ export default struct Setting {
                 })
               Row() {
                 Text('导入与导出')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -435,7 +440,6 @@ export default struct Setting {
                 })
               Row() {
                 Text('备份与恢复')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -474,7 +478,6 @@ export default struct Setting {
           Column() {
             Row() {
               Text('通用')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))
@@ -511,7 +514,6 @@ export default struct Setting {
           Column() {
             Row() {
               Text('消息通知')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))
@@ -557,7 +559,6 @@ export default struct Setting {
             Column() {
               Row() {
                 Text('权限管理')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -593,7 +594,6 @@ export default struct Setting {
                 Row() {
                   if (this.agreedPrivacyAgreement === 0) {
                     Text('阅读并签署隐私协议')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                   }
                   if (this.agreedPrivacyAgreement === 2) {
@@ -606,7 +606,6 @@ export default struct Setting {
                       }
                     }) {
                       Text('阅读并签署隐私协议')
-                        .fontSize($r('sys.float.ohos_id_text_size_body1'))
                         .fontWeight('medium')
                         .margin({
                           right: 16
@@ -639,7 +638,6 @@ export default struct Setting {
                 Row() {
                   Text('撤回同意隐私协议')
                     .fontColor($r('sys.color.warning'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Blank()
                   Image($r('app.media.right'))
@@ -687,7 +685,6 @@ export default struct Setting {
             Column() {
               Row() {
                 Text('业务与隐私的声明')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -716,8 +713,7 @@ export default struct Setting {
                   right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
               Row() {
-                Text('第三方共享信息清单')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
+                Text('第三方 SDK 列表')
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -747,7 +743,6 @@ export default struct Setting {
                 })
               Row() {
                 Text('已收集个人信息清单')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -767,8 +762,8 @@ export default struct Setting {
               })
               .width('100%')
               .onClick(() => {
-                promptAction.showToast({
-                  message: '敬请期待'
+                this.pageInfos.pushPath({
+                  name: 'Infolist'
                 })
               })
 
@@ -779,7 +774,6 @@ export default struct Setting {
                 })
               Row() {
                 Text('隐私声明摘要')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -825,10 +819,9 @@ export default struct Setting {
             Column() {
               Row() {
                 Text('应用服务模式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
-                Text(this.allService.allService ? '全量模式' : '基本模式')
+                Text(this.allService ? '全量模式' : '基本模式')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -863,7 +856,6 @@ export default struct Setting {
                 })
               Row() {
                 Text('其他')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -902,7 +894,6 @@ export default struct Setting {
           Column() {
             Row() {
               Text('关于')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Text('版本 ')
@@ -943,7 +934,6 @@ export default struct Setting {
               })
             Row() {
               Text('服务协议与规则')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))
@@ -993,32 +983,14 @@ export default struct Setting {
     })
     .title('设置')
     .titleMode(NavigationTitleMode.Mini)
-    .onAppear(async () => {
-      const allService: preferences.ValueType = this.commonSettingDataPreferences.getSync('allService', true)
-      this.allService.allService = allService as boolean
+    .onAppear(() => {
       this.getSetting()
-      this.cloudServiceLoading = true
-      const cloudServiceStatus = await getCloudServiceStatus()
-      this.cloudServiceLoading = false
-      this.cloudService.status = cloudServiceStatus
-      if (cloudServiceStatus) {
-        this.vipStatusLoading = true
-        const userres = await request('/product/getUserInfo', {
-          accessToken: this.accessToken,
-          product: 'password'
-        })
-        this.vipStatusLoading = false
-        if (userres !== 'fail') {
-          const vipenddate = JSON.parse(userres).data.vipEndDate as number
-          if (vipenddate > 0 && vipenddate < Date.now()) {
-            this.vipStatus = '已过期'
-          }
-          if (vipenddate === 0 || vipenddate >= Date.now()) {
-            this.vipStatus = '已开通'
-            this.vipStatusColor = '#FFD700'
-          }
-        }
-      }
+      emitter.on('2', () => {
+        this.getSetting()
+      })
+    })
+    .onDisAppear(() => {
+      emitter.off('2')
     })
   }
 }

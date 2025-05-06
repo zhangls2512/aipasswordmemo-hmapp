@@ -26,7 +26,6 @@ struct Moresetting {
             Column() {
               Row() {
                 Text('重启')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -61,7 +60,6 @@ struct Moresetting {
               Row() {
                 Text('退出')
                   .fontColor($r('sys.color.warning'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -98,7 +96,6 @@ struct Moresetting {
           Column() {
             Row() {
               Text('清除设置数据')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))

@@ -727,7 +727,6 @@ struct Debug {
             Column() {
               Row() {
                 Text('故障展示方式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Select([
@@ -752,7 +751,6 @@ struct Debug {
                 })
               Row() {
                 Text('自动上传故障日志')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -776,7 +774,6 @@ struct Debug {
                 })
               Row() {
                 Text('故障日志')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -808,7 +805,6 @@ struct Debug {
                 })
               Row() {
                 Text('内存占用级别变化时弹窗')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -831,7 +827,6 @@ struct Debug {
                 })
               Row() {
                 Text('电池电量低阈值')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Select([
@@ -877,7 +872,6 @@ struct Debug {
             Column() {
               Row() {
                 Text('重启当前进程')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -907,7 +901,6 @@ struct Debug {
                 })
               Row() {
                 Text('保存当前状态')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -942,7 +935,6 @@ struct Debug {
                 })
               Row() {
                 Text('设置')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -990,7 +982,6 @@ struct Debug {
             Column() {
               Row() {
                 Text('可用状态变化时弹窗')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -1013,7 +1004,6 @@ struct Debug {
                 })
               Row() {
                 Text('阻塞状态变化时弹窗')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -1036,7 +1026,6 @@ struct Debug {
                 })
               Row() {
                 Text('丢失时弹窗')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -1059,7 +1048,6 @@ struct Debug {
                 })
               Row() {
                 Text('能力变化时弹窗')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -1082,7 +1070,6 @@ struct Debug {
                 })
               Row() {
                 Text('质量变化时弹窗')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -1105,7 +1092,6 @@ struct Debug {
                 })
               Row() {
                 Text('场景变化时弹窗')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -1128,7 +1114,6 @@ struct Debug {
                 })
               Row() {
                 Text('高时延时自动反馈传输体验')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -1151,7 +1136,6 @@ struct Debug {
                 })
               Row() {
                 Text('时延达到')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -1173,7 +1157,6 @@ struct Debug {
                     })
                   })
                 Text('ms 时判定为高时延')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -1190,7 +1173,6 @@ struct Debug {
                 })
               Row() {
                 Text('反馈传输体验')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -1222,7 +1204,6 @@ struct Debug {
                 })
               Row() {
                 Text('测试')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -1271,7 +1252,6 @@ struct Debug {
               Row() {
                 Text('清除所有数据并退出')
                   .fontColor($r('sys.color.warning'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -1319,7 +1299,6 @@ struct Debug {
               Row() {
                 Text('终止所有进程并退出')
                   .fontColor($r('sys.color.warning'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -1427,7 +1406,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -1476,7 +1454,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -1525,7 +1502,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -1574,7 +1550,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -1623,7 +1598,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -1672,7 +1646,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -1721,7 +1694,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -1770,7 +1742,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -1819,7 +1790,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -1859,7 +1829,6 @@ struct Debug {
             Column() {
               Row() {
                 Text('是否处于活动状态')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -1881,7 +1850,6 @@ struct Debug {
                 })
               Row() {
                 Text('是否进入待机低功耗续航模式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -1903,7 +1871,6 @@ struct Debug {
                 })
               Row() {
                 Text('电源模式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -1947,7 +1914,6 @@ struct Debug {
             Column() {
               Row() {
                 Text('热档位')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -1995,7 +1961,6 @@ struct Debug {
             Column() {
               Row() {
                 Text('系统负载融合档位')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -2055,7 +2020,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -2095,7 +2059,6 @@ struct Debug {
             Column() {
               Row() {
                 Text('辅助功能')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -2117,7 +2080,6 @@ struct Debug {
                 })
               Row() {
                 Text('触摸浏览模式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -2164,7 +2126,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -2213,7 +2174,6 @@ struct Debug {
                   }
                   Row() {
                     Text(item.name)
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                       .width('45%')
                     Blank()
@@ -2648,7 +2608,6 @@ struct Debug {
                   wifiLinkedInfo.wifiStandard === 5 ? '802.11ac' :
                     wifiLinkedInfo.wifiStandard === 6 ? '802.11ax' :
                       wifiLinkedInfo.wifiStandard === 7 ? '802.11ad' :
-
                         'undefined'
       })
       this.networkInfoArray.push({

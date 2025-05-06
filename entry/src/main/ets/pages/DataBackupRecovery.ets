@@ -17,11 +17,11 @@ struct DataBackupRecovery {
   @Local autoBackupTag: boolean = false
   @Local pauseAutoBackupWhenLowBatteryCapacityLevel: boolean = false
   @Local pauseAutoBackupWhenPowerSave: boolean = false
+  @Local isBackupTables: string[] = []
   context = getContext(this) as common.UIAbilityContext
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
-  isBackupTables: string[] = []
   autoBackupTables: string[] = []
 
   getSetting() {
@@ -61,7 +61,6 @@ struct DataBackupRecovery {
             Column() {
               Row() {
                 Text('密码')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -92,7 +91,6 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('常用信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -123,7 +121,6 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('标签')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -170,7 +167,6 @@ struct DataBackupRecovery {
             Column() {
               Row() {
                 Text('电池电量低')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -194,7 +190,6 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('系统开启 (超级) 省电模式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
@@ -234,7 +229,6 @@ struct DataBackupRecovery {
             Column() {
               Row() {
                 Text('密码')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -265,7 +259,6 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('常用信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -296,7 +289,6 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('标签')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -355,7 +347,6 @@ struct DataBackupRecovery {
                       item === 'info' ? '常用信息' :
                         item === 'tag' ? '标签' :
                           'undefined')
-                      .fontSize($r('sys.float.ohos_id_text_size_body1'))
                       .fontWeight('medium')
                     Blank()
                     Image($r('app.media.right'))

@@ -1,8 +1,8 @@
-import { AppStorageV2, LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { emitter } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { CloudService } from './Setting'
 
 @Builder
 export function CloudserviceBuilder() {
@@ -11,7 +11,7 @@ export function CloudserviceBuilder() {
 
 @ComponentV2
 struct Cloudservice {
-  @Local CloudService: CloudService = AppStorageV2.connect(CloudService, () => new CloudService())!
+  @Local cloudService: boolean = false
   @Local loading: boolean = false
   pageInfos: NavPathStack = new NavPathStack()
 
@@ -21,7 +21,7 @@ struct Cloudservice {
         if (!this.loading) {
           ListItem() {
             Column() {
-              if (!this.CloudService.status) {
+              if (!this.cloudService) {
                 Text('开通云服务后，可使用以下功能：')
                   .fontWeight('bold')
                 Text('· 云备份')
@@ -30,7 +30,7 @@ struct Cloudservice {
                     top: $r('sys.float.ohos_id_text_paragraph_margin_m')
                   })
               }
-              if (this.CloudService.status) {
+              if (this.cloudService) {
                 Text('取消开通云服务前，需：')
                   .fontWeight('bold')
                 Text('· 清空云备份')
@@ -53,7 +53,7 @@ struct Cloudservice {
 
           ListItem() {
             Column() {
-              if (!this.CloudService.status) {
+              if (!this.cloudService) {
                 Button('开通')
                   .onClick(async () => {
                     const dialogControllerProgress: CustomDialogController = new CustomDialogController({
@@ -71,12 +71,13 @@ struct Cloudservice {
                       promptAction.showToast({
                         message: '开通成功'
                       })
-                      this.CloudService.status = true
+                      this.cloudService = true
                       this.pageInfos.pop()
+                      emitter.emit('2')
                     }
                   })
               }
-              if (this.CloudService.status) {
+              if (this.cloudService) {
                 Button('取消开通')
                   .role(ButtonRole.ERROR)
                   .onClick(async () => {
@@ -95,8 +96,9 @@ struct Cloudservice {
                       promptAction.showToast({
                         message: '取消开通成功'
                       })
-                      this.CloudService.status = false
+                      this.cloudService = false
                       this.pageInfos.pop()
+                      emitter.emit('2')
                     }
                   })
               }
@@ -126,13 +128,13 @@ struct Cloudservice {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title(this.CloudService.status ? '取消开通云服务' : '开通云服务')
+    .title(this.cloudService ? '取消开通云服务' : '开通云服务')
     .onReady(async (context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
       this.loading = true
       const cloudServiceStatus = await getCloudServiceStatus()
       this.loading = false
-      this.CloudService.status = cloudServiceStatus
+      this.cloudService = cloudServiceStatus
     })
   }
 }
