@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { call } from '@kit.TelephonyKit'
 import openLink from '../common/Openlink'
 import { copy } from '../common/Pasteboard'
@@ -57,7 +56,6 @@ struct About {
             Row() {
               Column() {
                 Text('版本信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Text($r('app.string.app_version'))
                   .fontColor($r('sys.color.font_secondary'))
@@ -142,7 +140,6 @@ struct About {
             Row() {
               Column() {
                 Text('更新日志')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Text('https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp')
                   .fontColor($r('sys.color.font_secondary'))
@@ -181,7 +178,6 @@ struct About {
               })
             Row() {
               Text('应用详情')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))
@@ -211,7 +207,6 @@ struct About {
               })
             Row() {
               Text('评论应用')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))
@@ -241,7 +236,6 @@ struct About {
               })
             Row() {
               Text('意见反馈')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Image($r('app.media.right'))
@@ -288,7 +282,6 @@ struct About {
               Row() {
                 Column() {
                   Text('在线')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('https://chatbot.weixin.qq.com/webapp/5e2JglFAERGl06z0FkTK6eWL6D1Oa5?robotName=轩铭2512产品客服')
                     .fontColor($r('sys.color.font_secondary'))
@@ -328,7 +321,6 @@ struct About {
               Row() {
                 Column() {
                   Text('电话')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('18846496985')
                     .fontColor($r('sys.color.font_secondary'))
@@ -357,13 +349,7 @@ struct About {
               })
               .width('100%')
               .onClick(() => {
-                call.makeCall('18846496985', (err: BusinessError) => {
-                  if (err) {
-                    promptAction.showToast({
-                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                    })
-                  }
-                })
+                call.makeCall('18846496985')
               })
 
               Divider()
@@ -374,7 +360,6 @@ struct About {
               Row() {
                 Column() {
                   Text('邮箱')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('2300990296@qq.com')
                     .fontColor($r('sys.color.font_secondary'))
@@ -419,7 +404,6 @@ struct About {
               Row() {
                 Column() {
                   Text('微信')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('gerenyinsi_z07x17m')
                     .fontColor($r('sys.color.font_secondary'))
@@ -459,7 +443,6 @@ struct About {
               Row() {
                 Column() {
                   Text('腾讯频道')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('https://pd.qq.com/s/cnx7f1zdm')
                     .fontColor($r('sys.color.font_secondary'))
@@ -515,7 +498,6 @@ struct About {
               Row() {
                 Column() {
                   Text('官网')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('https://www.zhangls2512.cn/index')
                     .fontColor($r('sys.color.font_secondary'))
@@ -555,7 +537,6 @@ struct About {
               Row() {
                 Column() {
                   Text('哔哩哔哩')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('https://space.bilibili.com/448824492')
                     .fontColor($r('sys.color.font_secondary'))
@@ -595,7 +576,6 @@ struct About {
               Row() {
                 Column() {
                   Text('Gitcode')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                   Text('https://gitcode.com/zhangls2512/aipasswordmemo-hmapp')
                     .fontColor($r('sys.color.font_secondary'))
@@ -660,7 +640,6 @@ struct About {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
-
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

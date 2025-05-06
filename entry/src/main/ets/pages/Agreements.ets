@@ -31,7 +31,6 @@ struct Agreements {
             Row() {
               if (this.agreedUserAgreement !== 2) {
                 Text('用户服务条款与条件')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
               }
               if (this.agreedUserAgreement === 2) {
@@ -44,7 +43,6 @@ struct Agreements {
                   }
                 }) {
                   Text('用户服务条款与条件')
-                    .fontSize($r('sys.float.ohos_id_text_size_body1'))
                     .fontWeight('medium')
                     .margin({
                       right: 16
@@ -69,14 +67,8 @@ struct Agreements {
             })
             .width('100%')
             .onClick(async () => {
-              try {
-                await privacyManager.requestAppPrivacyConsent(this.context)
-                this.getSetting()
-              } catch (err) {
-                promptAction.showToast({
-                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                })
-              }
+              await privacyManager.requestAppPrivacyConsent(this.context)
+              this.getSetting()
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

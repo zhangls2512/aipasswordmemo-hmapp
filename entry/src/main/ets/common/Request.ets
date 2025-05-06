@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
 
 interface ErrorResponse {
@@ -34,7 +33,7 @@ export default async function request(path: string, body: rcp.RequestContent) {
     const response = await session.post('https://api.zhangls2512.cn' + path, body)
     session.close()
     if (response.statusCode === 200) {
-      let body: string = 'undefined'
+      let body = ''
       if (response.toString()) {
         body = response.toString() as string
       }
@@ -62,8 +61,7 @@ export default async function request(path: string, body: rcp.RequestContent) {
   } catch (err) {
     session.close()
     promptAction.showToast({
-      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-      (err as BusinessError).message
+      message: '发生错误，错误码：' + err.code
     })
     return 'fail'
   }

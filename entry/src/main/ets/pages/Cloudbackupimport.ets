@@ -1,8 +1,8 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import { decrypt, getKey } from '../common/Crypto'
-import { Password, PasswordInfoItem, Info, Tag } from '../common/Dataget'
-import { importPassword, importInfo, importTag } from '../common/Dataimport'
+import { Info, Password, PasswordInfoItem, Tag } from '../common/Dataget'
+import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import request from '../common/Request'
 
 interface Item {
@@ -16,21 +16,21 @@ interface PasswordCloudBackup {
   info: PasswordInfoItem[],
   tag: string[],
   updateTime: number,
-  cloudBackTime: number
+  cloudBackupTime: number
 }
 
 interface InfoCloudBackup {
   type: string,
   value: string,
   updateTime: number,
-  cloudBackTime: number
+  cloudBackupTime: number
 }
 
 interface TagCloudBackup {
   value: string,
   color: string,
   updateTime: number,
-  cloudBackTime: number
+  cloudBackupTime: number
 }
 
 @Builder
@@ -42,10 +42,9 @@ export function CloudbackupimportBuilder() {
 struct Cloudbackupimport {
   @Local index: number = 0
   @Local value: string = '保留'
-  text: string = ''
   dialogControllerProgress: CustomDialogController = new CustomDialogController({
     builder: LoadingDialog({
-      content: '导入中...' + this.text
+      content: '导入中...'
     })
   })
 
@@ -56,7 +55,6 @@ struct Cloudbackupimport {
           Column() {
             Row() {
               Text('冲突解决模式')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Select([
@@ -91,8 +89,12 @@ struct Cloudbackupimport {
             Column() {
               Row() {
                 Text('密码')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -121,13 +123,11 @@ struct Cloudbackupimport {
                 }
                 this.dialogControllerProgress.open()
                 const countres = await request('/password/getBackupCount', {
-                  accessToken: get(),
-                  type: 'password'
+                  accessToken: get()
                 })
                 if (countres !== 'fail') {
-                  const total = JSON.parse(countres).count as number
+                  const total = JSON.parse(countres).count.password as number
                   for (let i = 0; i < total; i += 10) {
-                    this.text = '(' + i + '/' + total + ')'
                     const listres = await request('/password/getBackupList', {
                       accessToken: get(),
                       type: 'password',
@@ -141,15 +141,17 @@ struct Cloudbackupimport {
                           content: item.content,
                           iv: item.iv
                         })
-                        const itemobject = JSON.parse(itemstring) as PasswordCloudBackup
-                        array.push({
-                          id: item.id,
-                          name: itemobject.name,
-                          info: itemobject.info,
-                          tag: itemobject.tag,
-                          updateTime: itemobject.updateTime,
-                          cloudBackupTime: itemobject.cloudBackTime
-                        })
+                        if (itemstring !== 'fail') {
+                          const itemobject = JSON.parse(itemstring) as PasswordCloudBackup
+                          array.push({
+                            id: item.id,
+                            name: itemobject.name,
+                            info: itemobject.info,
+                            tag: itemobject.tag,
+                            updateTime: itemobject.updateTime,
+                            cloudBackupTime: itemobject.cloudBackupTime
+                          })
+                        }
                       })
                       await Promise.all(promises)
                       let conflictResolution = 0
@@ -177,8 +179,12 @@ struct Cloudbackupimport {
                 })
               Row() {
                 Text('常用信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -207,13 +213,11 @@ struct Cloudbackupimport {
                 }
                 this.dialogControllerProgress.open()
                 const countres = await request('/password/getBackupCount', {
-                  accessToken: get(),
-                  type: 'info'
+                  accessToken: get()
                 })
                 if (countres !== 'fail') {
-                  const total = JSON.parse(countres).count as number
+                  const total = JSON.parse(countres).count.info as number
                   for (let i = 0; i < total; i += 10) {
-                    this.text = '(' + i + '/' + total + ')'
                     const listres = await request('/password/getBackupList', {
                       accessToken: get(),
                       type: 'info',
@@ -227,14 +231,16 @@ struct Cloudbackupimport {
                           content: item.content,
                           iv: item.iv
                         })
-                        const itemobject = JSON.parse(itemstring) as InfoCloudBackup
-                        array.push({
-                          id: item.id,
-                          type: itemobject.type,
-                          value: itemobject.value,
-                          updateTime: itemobject.updateTime,
-                          cloudBackupTime: itemobject.cloudBackTime
-                        })
+                        if (itemstring !== 'fail') {
+                          const itemobject = JSON.parse(itemstring) as InfoCloudBackup
+                          array.push({
+                            id: item.id,
+                            type: itemobject.type,
+                            value: itemobject.value,
+                            updateTime: itemobject.updateTime,
+                            cloudBackupTime: itemobject.cloudBackupTime
+                          })
+                        }
                       })
                       await Promise.all(promises)
                       let conflictResolution = 0
@@ -262,8 +268,12 @@ struct Cloudbackupimport {
                 })
               Row() {
                 Text('标签')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
@@ -292,13 +302,11 @@ struct Cloudbackupimport {
                 }
                 this.dialogControllerProgress.open()
                 const countres = await request('/password/getBackupCount', {
-                  accessToken: get(),
-                  type: 'tag'
+                  accessToken: get()
                 })
                 if (countres !== 'fail') {
-                  const total = JSON.parse(countres).count as number
+                  const total = JSON.parse(countres).count.tag as number
                   for (let i = 0; i < total; i += 10) {
-                    this.text = '(' + i + '/' + total + ')'
                     const listres = await request('/password/getBackupList', {
                       accessToken: get(),
                       type: 'tag',
@@ -312,14 +320,16 @@ struct Cloudbackupimport {
                           content: item.content,
                           iv: item.iv
                         })
-                        const itemobject = JSON.parse(itemstring) as TagCloudBackup
-                        array.push({
-                          id: item.id,
-                          value: itemobject.value,
-                          color: itemobject.color,
-                          updateTime: itemobject.updateTime,
-                          cloudBackupTime: itemobject.cloudBackTime
-                        })
+                        if (itemstring !== 'fail') {
+                          const itemobject = JSON.parse(itemstring) as TagCloudBackup
+                          array.push({
+                            id: item.id,
+                            value: itemobject.value,
+                            color: itemobject.color,
+                            updateTime: itemobject.updateTime,
+                            cloudBackupTime: itemobject.cloudBackupTime
+                          })
+                        }
                       })
                       await Promise.all(promises)
                       let conflictResolution = 0

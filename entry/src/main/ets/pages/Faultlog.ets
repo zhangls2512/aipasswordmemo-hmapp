@@ -19,6 +19,9 @@ struct Faultlog {
             { value: 'JS 程序' },
             { value: '应用程序卡死' }
           ])
+            .margin({
+              bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
             .selected(0)
             .value('全部')
             .onSelect(async (index: number) => {
@@ -45,7 +48,6 @@ struct Faultlog {
             Column() {
               Row() {
                 Text('进程 ID')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -67,7 +69,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('用户 ID')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -89,7 +90,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -116,7 +116,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('日志生成时的毫秒级时间戳')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -138,7 +137,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('原因')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -160,7 +158,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('模块')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -182,7 +179,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('概要')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -204,7 +200,6 @@ struct Faultlog {
                 })
               Row() {
                 Text('日志全文')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -224,7 +219,7 @@ struct Faultlog {
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
       }

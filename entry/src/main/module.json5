@@ -32,10 +32,6 @@
             ]
           }
         ],
-        "backgroundModes": [
-          "dataTransfer",
-          "audioRecording"
-        ],
         "startWindowIcon": "$media:layered_image",
         "startWindowBackground": "$color:start_window_background",
         "removeMissionAfterTerminate": true,
@@ -77,16 +73,6 @@
       {
         "name": "ohos.permission.DISTRIBUTED_DATASYNC",
         "reason": "$string:DISTRIBUTED_DATASYNC_reason",
-        "usedScene": {
-          "abilities": [
-            "EntryAbility"
-          ],
-          "when": "inuse"
-        }
-      },
-      {
-        "name": "ohos.permission.MICROPHONE",
-        "reason": "$string:MICROPHONE_reason",
         "usedScene": {
           "abilities": [
             "EntryAbility"

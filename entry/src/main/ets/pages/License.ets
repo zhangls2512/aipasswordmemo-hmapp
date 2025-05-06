@@ -24,7 +24,7 @@ struct License {
     { property: '主体类型', value: '个人' },
     { property: '开办者名称', value: '张**' },
     { property: '注册地公安机关', value: '萨尔图区网安大队' },
-    { property: '注册时间', value: '2025-04-29' }
+    { property: '注册时间', value: '2025-05-07' }
   ]
   tscjInfoArray: ItemWithDesc[] = [
     {
@@ -62,7 +62,6 @@ struct License {
             Span('ICP备案：')
             Span('黑ICP备2024023054号-9A')
               .fontColor($r('sys.color.font_emphasize'))
-              .width('75%')
               .onClick(() => {
                 openLink('https://beian.miit.gov.cn/#/Integrated/recordQuery')
               })
@@ -138,7 +137,6 @@ struct License {
             Span('产品备案：')
             Span('轩铭2512品备12号-HA')
               .fontColor($r('sys.color.font_emphasize'))
-              .width('75%')
               .onClick(() => {
                 openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512品备12号-HA')
               })
@@ -283,7 +281,7 @@ struct License {
                     .textAlign(TextAlign.Center)
                     .onClick(() => {
                       promptAction.showDialog({
-                        title: '备注',
+                        title: '描述',
                         message: item.desc,
                         buttons: [
                           {
@@ -381,7 +379,7 @@ struct License {
               .width('50%')
 
               Column() {
-                Text('有隐私相关功能，包括但不限于权限管理、业务与隐私的声明、第三方共享信息清单、已收集个人信息清单、隐私声明摘要')
+                Text('有隐私相关功能，包括但不限于权限管理、业务与隐私的声明、第三方 SDK 列表、已收集个人信息清单、隐私声明摘要')
                   .textAlign(TextAlign.Center)
               }
               .border({

@@ -33,7 +33,6 @@ struct Autocloudbackupsetting {
           Column() {
             Row() {
               Text('密码')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Toggle({
@@ -64,7 +63,6 @@ struct Autocloudbackupsetting {
               })
             Row() {
               Text('常用信息')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Toggle({
@@ -95,7 +93,6 @@ struct Autocloudbackupsetting {
               })
             Row() {
               Text('标签')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Toggle({

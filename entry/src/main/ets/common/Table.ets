@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { batteryInfo, BusinessError, power } from '@kit.BasicServicesKit'
+import { batteryInfo, power } from '@kit.BasicServicesKit'
 
 interface Item {
   deviceId: string,
@@ -10,42 +10,33 @@ interface Item {
   networkId: string
 }
 
-export async function syncTable(table: string, deviceId: string, type: relationalStore.SyncMode): Promise<boolean> {
+export async function syncTable(table: string, deviceId: string, syncMode: relationalStore.SyncMode) {
   const context = getContext() as common.UIAbilityContext
   let securityLevel = 4
   if (table === 'tag') {
     securityLevel = 1
   }
-  try {
-    const rdbStore = await relationalStore.getRdbStore(context, {
-      name: table,
-      securityLevel: securityLevel,
-      encrypt: true,
-      allowRebuild: true
-    })
-    const predicates = new relationalStore.RdbPredicates(table)
-    predicates.inDevices([deviceId])
-    const res = await rdbStore.sync(type, predicates)
-    if (res[0][1] === 0) {
-      promptAction.showToast({
-        message: '同步成功'
-      })
-      return true
-    }
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: table,
+    securityLevel: securityLevel,
+    encrypt: true,
+    allowRebuild: true
+  })
+  const predicates = new relationalStore.RdbPredicates(table)
+  predicates.inDevices([deviceId])
+  const res = await rdbStore.sync(syncMode, predicates)
+  if (res[0][1] === 0) {
     promptAction.showToast({
-      message: '同步失败'
+      message: '同步成功'
     })
-    return false
-  } catch (err) {
-    promptAction.showToast({
-      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-      (err as BusinessError).message
-    })
-    return false
+    return
   }
+  promptAction.showToast({
+    message: '同步失败'
+  })
 }
 
-export async function autoSyncTable(table: string): Promise<boolean> {
+export async function autoSyncTable(table: string) {
   const context = getContext() as common.UIAbilityContext
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
@@ -63,7 +54,7 @@ export async function autoSyncTable(table: string): Promise<boolean> {
     promptAction.showToast({
       message: '电池电量低，自动暂停同步'
     })
-    return false
+    return
   }
   if (pauseAutoSyncWhenPowerSave && (power.getPowerMode() === 600 || power.getPowerMode() === 603)) {
     let text = ''
@@ -73,7 +64,7 @@ export async function autoSyncTable(table: string): Promise<boolean> {
     promptAction.showToast({
       message: '系统开启' + text + '省电模式，暂停自动同步'
     })
-    return false
+    return
   }
   const autoSyncTables: string[] = dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
   if (autoSyncTables.includes(table)) {
@@ -82,45 +73,34 @@ export async function autoSyncTable(table: string): Promise<boolean> {
       await syncTable(table, item.deviceId, relationalStore.SyncMode.SYNC_MODE_PUSH)
     })
     await Promise.all(promises)
-    return true
   }
-  return false
 }
 
-export async function backupTable(table: string): Promise<boolean> {
+export async function backupTable(table: string) {
   const context = getContext() as common.UIAbilityContext
   let securityLevel = 4
   if (table === 'tag') {
     securityLevel = 1
   }
-  try {
-    const rdbStore = await relationalStore.getRdbStore(context, {
-      name: table,
-      securityLevel: securityLevel,
-      encrypt: true,
-      allowRebuild: true
-    })
-    await rdbStore.backup(table + 'Backup.db')
-    const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
-      name: 'dataSetting'
-    })
-    const isBackupTables: string[] = dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
-    dataSettingDataPreferences.putSync('isBackupTables', Array.from(new Set([...isBackupTables, table])))
-    dataSettingDataPreferences.flushSync()
-    promptAction.showToast({
-      message: '备份成功'
-    })
-    return true
-  } catch (err) {
-    promptAction.showToast({
-      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-      (err as BusinessError).message
-    })
-  }
-  return false
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: table,
+    securityLevel: securityLevel,
+    encrypt: true,
+    allowRebuild: true
+  })
+  await rdbStore.backup(table + 'Backup.db')
+  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
+    name: 'dataSetting'
+  })
+  const isBackupTables: string[] = dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
+  dataSettingDataPreferences.putSync('isBackupTables', Array.from(new Set([...isBackupTables, table])))
+  dataSettingDataPreferences.flushSync()
+  promptAction.showToast({
+    message: '备份成功'
+  })
 }
 
-export async function autoBackupTable(table: string): Promise<boolean> {
+export async function autoBackupTable(table: string) {
   const context = getContext() as common.UIAbilityContext
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
@@ -138,7 +118,7 @@ export async function autoBackupTable(table: string): Promise<boolean> {
     promptAction.showToast({
       message: '电池电量低，自动暂停同步'
     })
-    return false
+    return
   }
   if (pauseAutoBackupWhenPowerSave && (power.getPowerMode() === 600 || power.getPowerMode() === 603)) {
     let text = ''
@@ -148,39 +128,28 @@ export async function autoBackupTable(table: string): Promise<boolean> {
     promptAction.showToast({
       message: '系统开启' + text + '省电模式，暂停自动备份'
     })
-    return false
+    return
   }
   const autoBackupTables: string[] = dataSettingDataPreferences.getSync('autoBackupTables', []) as string[]
   if (autoBackupTables.includes(table)) {
     await backupTable(table)
-    return true
   }
-  return false
 }
 
-export async function recoveryTable(table: string): Promise<boolean> {
+export async function recoveryTable(table: string) {
   const context = getContext() as common.UIAbilityContext
   let securityLevel = 4
   if (table === 'tag') {
     securityLevel = 1
   }
-  try {
-    const rdbStore = await relationalStore.getRdbStore(context, {
-      name: table,
-      securityLevel: securityLevel,
-      encrypt: true,
-      allowRebuild: true
-    })
-    await rdbStore.restore(table + 'Backup.db')
-    promptAction.showToast({
-      message: '恢复成功'
-    })
-    return true
-  } catch (err) {
-    promptAction.showToast({
-      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-      (err as BusinessError).message
-    })
-  }
-  return false
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: table,
+    securityLevel: securityLevel,
+    encrypt: true,
+    allowRebuild: true
+  })
+  await rdbStore.restore(table + 'Backup.db')
+  promptAction.showToast({
+    message: '恢复成功'
+  })
 }

@@ -1,16 +1,37 @@
 import { AbilityConstant, appRecovery, ConfigurationConstant, errorManager, UIAbility } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
-import { preferences } from '@kit.ArkData'
+import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
 import { wifiManager } from '@kit.ConnectivityKit'
-import { connection } from '@kit.NetworkKit'
 import { netQuality } from '@kit.NetworkBoostKit'
+import { connection } from '@kit.NetworkKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
 import { remove } from '../common/Accesstoken'
 import request from '../common/Request'
 
 export default class EntryAbility extends UIAbility {
-  onCreate() {
+  async onCreate() {
+    const passwordRdbStore = await relationalStore.getRdbStore(this.context, {
+      name: 'password',
+      securityLevel: 4,
+      encrypt: true,
+      allowRebuild: true
+    })
+    passwordRdbStore.executeSql('CREATE TABLE IF NOT EXISTS password (id INTEGER PRIMARY KEY AUTOINCREMENT, name, info, tag, updateTime, cloudBackupTime)')
+    const infoRdbStore = await relationalStore.getRdbStore(this.context, {
+      name: 'info',
+      securityLevel: 4,
+      encrypt: true,
+      allowRebuild: true
+    })
+    infoRdbStore.executeSql('CREATE TABLE IF NOT EXISTS info (id INTEGER PRIMARY KEY AUTOINCREMENT, type, value, updateTime, cloudBackupTime)')
+    const tagRdbStore = await relationalStore.getRdbStore(this.context, {
+      name: 'tag',
+      securityLevel: 1,
+      encrypt: true,
+      allowRebuild: true
+    })
+    tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag (id INTEGER PRIMARY KEY AUTOINCREMENT, value, color, updateTime, cloudBackupTime)')
     appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
   }
 
@@ -51,7 +72,7 @@ export default class EntryAbility extends UIAbility {
       },
       onException(err) {
         if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 1) {
-          let message: string = '名称：' + err.name + '\n消息：' + err.message
+          let message = '名称：' + err.name + '\n消息：' + err.message
           if (typeof (err.stack) === 'string') {
             message = message + '\n错误堆栈信息：' + err.stack
           }
@@ -70,7 +91,7 @@ export default class EntryAbility extends UIAbility {
     }
     errorManager.on('error', observer)
     hiAppEvent.addWatcher({
-      name: "watcher",
+      name: 'watcher',
       appEventFilters: [
         {
           domain: hiAppEvent.domain.OS,
@@ -258,7 +279,7 @@ export default class EntryAbility extends UIAbility {
     })
     const showMemoryLevelChange = debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
     if (showMemoryLevelChange) {
-      let memoryLevel: string = ''
+      let memoryLevel = ''
       if (level === 0) {
         memoryLevel = '适中'
       }

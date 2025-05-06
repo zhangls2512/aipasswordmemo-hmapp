@@ -1,4 +1,5 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { emitter } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -44,6 +45,7 @@ struct Vipcode {
                     message: '兑换成功'
                   })
                   this.pageInfos.pop()
+                  emitter.emit('3')
                 }
               })
           }

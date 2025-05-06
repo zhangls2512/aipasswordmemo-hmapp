@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction, window } from '@kit.ArkUI'
+import { window } from '@kit.ArkUI'
 import { setCustomKey } from '../common/Crypto'
 
 @Builder
@@ -30,17 +30,8 @@ struct Importkey {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
               .onClick(async () => {
-                const res = await setCustomKey(this.keyValue)
-                if (res !== 'fail') {
-                  promptAction.showToast({
-                    message: '导入成功'
-                  })
-                  this.pageInfos.pop()
-                } else {
-                  promptAction.showToast({
-                    message: '导入失败'
-                  })
-                }
+                await setCustomKey(this.keyValue)
+                this.pageInfos.pop()
               })
           }
           .width('100%')

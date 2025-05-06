@@ -1,14 +1,13 @@
 import { common } from '@kit.AbilityKit'
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
-import { Password, Info, Tag } from './Dataget'
+import { Info, Password, Tag } from './Dataget'
 import { autoBackupTable, autoSyncTable } from './Table'
 
-export async function importPassword(data: string, conflict: relationalStore.ConflictResolution): Promise<boolean> {
-  const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as Password[]
-  const context = getContext() as common.UIAbilityContext
+export async function importPassword(data: string, conflict: relationalStore.ConflictResolution) {
   try {
+    const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as Password[]
+    const context = getContext() as common.UIAbilityContext
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'password',
       securityLevel: 4,
@@ -17,7 +16,7 @@ export async function importPassword(data: string, conflict: relationalStore.Con
     })
     array.forEach((item: Password) => {
       rdbStore.insertSync('password', {
-        rowId: item.id,
+        id: item.id,
         name: item.name,
         info: JSON.stringify(item.info),
         tag: JSON.stringify(item.tag),
@@ -27,20 +26,17 @@ export async function importPassword(data: string, conflict: relationalStore.Con
     })
     autoSyncTable('password')
     autoBackupTable('password')
-    return true
   } catch (err) {
     promptAction.showToast({
-      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-      (err as BusinessError).message
+      message: '发生错误，错误码：' + err.code
     })
-    return false
   }
 }
 
-export async function importInfo(data: string, conflict: relationalStore.ConflictResolution): Promise<boolean> {
-  const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as Info[]
-  const context = getContext() as common.UIAbilityContext
+export async function importInfo(data: string, conflict: relationalStore.ConflictResolution) {
   try {
+    const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as Info[]
+    const context = getContext() as common.UIAbilityContext
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
       securityLevel: 4,
@@ -49,7 +45,7 @@ export async function importInfo(data: string, conflict: relationalStore.Conflic
     })
     array.forEach((item: Info) => {
       rdbStore.insertSync('info', {
-        rowId: item.id,
+        id: item.id,
         type: item.type,
         value: item.value,
         updateTime: item.updateTime,
@@ -58,20 +54,17 @@ export async function importInfo(data: string, conflict: relationalStore.Conflic
     })
     autoSyncTable('info')
     autoBackupTable('info')
-    return true
   } catch (err) {
     promptAction.showToast({
-      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-      (err as BusinessError).message
+      message: '发生错误，错误码：' + err.code
     })
-    return false
   }
 }
 
-export async function importTag(data: string, conflict: relationalStore.ConflictResolution): Promise<boolean> {
-  const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as Tag[]
-  const context = getContext() as common.UIAbilityContext
+export async function importTag(data: string, conflict: relationalStore.ConflictResolution) {
   try {
+    const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as Tag[]
+    const context = getContext() as common.UIAbilityContext
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'tag',
       securityLevel: 1,
@@ -80,7 +73,7 @@ export async function importTag(data: string, conflict: relationalStore.Conflict
     })
     array.forEach((item: Tag) => {
       rdbStore.insertSync('tag', {
-        rowId: item.id,
+        id: item.id,
         value: item.value,
         color: item.color,
         updateTime: item.updateTime,
@@ -89,12 +82,9 @@ export async function importTag(data: string, conflict: relationalStore.Conflict
     })
     autoSyncTable('tag')
     autoBackupTable('tag')
-    return true
   } catch (err) {
     promptAction.showToast({
-      message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-      (err as BusinessError).message
+      message: '发生错误，错误码：' + err.code
     })
-    return false
   }
 }

@@ -1,5 +1,4 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
 
 interface Response {
@@ -48,7 +47,7 @@ struct Networktest {
                   session.close()
                   this.dialogControllerProgress.close()
                   if (response.statusCode === 200) {
-                    let body: string = 'undefined'
+                    let body = ''
                     if (response.toString()) {
                       body = response.toString() as string
                     }
@@ -77,15 +76,13 @@ struct Networktest {
                   session.close()
                   this.dialogControllerProgress.close()
                   promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
+                    message: '发生错误，错误码：' + err.code
                   })
                 }
               })
             Column() {
               Row() {
                 Text('错误码')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -107,7 +104,6 @@ struct Networktest {
                 })
               Row() {
                 Text('错误信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -129,7 +125,6 @@ struct Networktest {
                 })
               Row() {
                 Text('请求 IP')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -151,7 +146,6 @@ struct Networktest {
                 })
               Row() {
                 Text('请求时间戳')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -173,7 +167,6 @@ struct Networktest {
                 })
               Row() {
                 Text('HTTP 版本')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -195,7 +188,6 @@ struct Networktest {
                 })
               Row() {
                 Text('DNS 解析所需的时间')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -217,7 +209,6 @@ struct Networktest {
                 })
               Row() {
                 Text('建立连接时间')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -239,7 +230,6 @@ struct Networktest {
                 })
               Row() {
                 Text('从开始到远程主机 (或代理) 的 TLS 握手完成的时间')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -261,7 +251,6 @@ struct Networktest {
                 })
               Row() {
                 Text('传输开始前的时间')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -283,7 +272,6 @@ struct Networktest {
                 })
               Row() {
                 Text('传输开始时间')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -305,7 +293,6 @@ struct Networktest {
                 })
               Row() {
                 Text('请求总耗时')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -327,7 +314,6 @@ struct Networktest {
                 })
               Row() {
                 Text('重定向所需的时间')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()

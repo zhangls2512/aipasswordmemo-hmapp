@@ -1,8 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { AppStorageV2 } from '@kit.ArkUI'
+import { emitter } from '@kit.BasicServicesKit'
 import openLink from '../common/Openlink'
-import { AllService } from './Setting'
 
 @Builder
 export function ServicemodeBuilder() {
@@ -11,17 +10,11 @@ export function ServicemodeBuilder() {
 
 @ComponentV2
 struct Servicemode {
-  @Local allService: AllService = AppStorageV2.connect(AllService, () => new AllService())!
+  @Local allService: boolean = true
   context = getContext(this) as common.UIAbilityContext
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
-
-  getSetting() {
-    const allService: preferences.ValueType =
-      this.commonSettingDataPreferences.getSync('allService', true)
-    this.allService.allService = allService as boolean
-  }
 
   build() {
     NavDestination() {
@@ -31,16 +24,15 @@ struct Servicemode {
             Column() {
               Row() {
                 Text('全量模式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: this.allService.allService
+                  isOn: this.allService
                 })
-                  .enabled(!this.allService.allService)
+                  .enabled(!this.allService)
                   .onChange((isOn: boolean) => {
-                    this.allService.allService = isOn
+                    this.allService = isOn
                     this.commonSettingDataPreferences.putSync('allService', isOn)
                     this.commonSettingDataPreferences.flushSync()
                   })
@@ -83,16 +75,15 @@ struct Servicemode {
             Column() {
               Row() {
                 Text('基本模式')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: !this.allService.allService
+                  isOn: !this.allService
                 })
-                  .enabled(this.allService.allService)
+                  .enabled(this.allService)
                   .onChange((isOn: boolean) => {
-                    this.allService.allService = !isOn
+                    this.allService = !isOn
                     this.commonSettingDataPreferences.putSync('allService', !isOn)
                     this.commonSettingDataPreferences.flushSync()
                   })
@@ -129,7 +120,12 @@ struct Servicemode {
     .backgroundColor($r('app.color.sheet_background'))
     .title('应用服务模式')
     .onReady(() => {
-      this.getSetting()
+      const allService: preferences.ValueType =
+        this.commonSettingDataPreferences.getSync('allService', true)
+      this.allService = allService as boolean
+    })
+    .onDisAppear(() => {
+      emitter.emit('2')
     })
   }
 }

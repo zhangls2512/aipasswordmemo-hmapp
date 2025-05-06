@@ -2,10 +2,10 @@ import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
 interface Item {
-  date: number,
   duration: number,
+  type: string,
   info: string,
-  type: string
+  date: number
 }
 
 @Builder
@@ -17,7 +17,6 @@ export function ViplogBuilder() {
 struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
-  accessToken: string = get()
   empty: boolean | undefined = undefined
 
   build() {
@@ -28,7 +27,6 @@ struct Viplog {
             Column() {
               Row() {
                 Text('时长')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -50,7 +48,6 @@ struct Viplog {
                 })
               Row() {
                 Text('类型')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -74,7 +71,6 @@ struct Viplog {
                 })
               Row() {
                 Text('详情')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -96,7 +92,6 @@ struct Viplog {
                 })
               Row() {
                 Text('时间')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                   .width('45%')
                 Blank()
@@ -116,7 +111,7 @@ struct Viplog {
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
         if (this.loading) {
@@ -125,7 +120,7 @@ struct Viplog {
               .width('20%')
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .width('100%')
         }
@@ -134,7 +129,7 @@ struct Viplog {
             Text('无数据')
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .width('100%')
         }
@@ -142,7 +137,8 @@ struct Viplog {
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        right: $r('sys.float.ohos_id_max_padding_end'),
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
       .onReachEnd(async () => {
         if (this.empty === false) {

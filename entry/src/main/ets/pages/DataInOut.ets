@@ -1,10 +1,18 @@
 import { common } from '@kit.AbilityKit'
 import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { fileIo as fs, picker } from '@kit.CoreFileKit'
-import { getPasswordList, getInfoList, getTagList } from '../common/Dataget'
-import { importPassword, importInfo, importTag } from '../common/Dataimport'
+import { getInfoList, getPasswordList, getTagList, PasswordInfoItem } from '../common/Dataget'
+import { importInfo, importPassword, importTag } from '../common/Dataimport'
+
+interface PasswordOutItem {
+  id: number,
+  name: string,
+  info: PasswordInfoItem[],
+  tag: string[],
+  updateTime: number,
+  cloudBackupTime: number
+}
 
 @Builder
 export function DataInOutBuilder() {
@@ -15,6 +23,7 @@ export function DataInOutBuilder() {
 struct DataInOut {
   @Local index: number = 0
   @Local value: string = '保留'
+  context = getContext(this) as common.Context
 
   build() {
     NavDestination() {
@@ -23,7 +32,6 @@ struct DataInOut {
           Column() {
             Row() {
               Text('冲突解决模式')
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
                 .fontWeight('medium')
               Blank()
               Select([
@@ -58,7 +66,6 @@ struct DataInOut {
             Column() {
               Row() {
                 Text('密码')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -78,36 +85,26 @@ struct DataInOut {
               })
               .width('100%')
               .onClick(async () => {
-                try {
-                  const documentSelectOptions = new picker.DocumentSelectOptions()
-                  documentSelectOptions.maxSelectNumber = 1
-                  documentSelectOptions.fileSuffixFilters = ['.txt']
-                  const context = getContext(this) as common.Context
-                  const documentViewPicker = new picker.DocumentViewPicker(context)
-                  const uris = await documentViewPicker.select(documentSelectOptions)
-                  const file = fs.openSync(uris[0])
-                  const size = fs.statSync(file.fd).size
-                  const filebuffer = new ArrayBuffer(size)
-                  fs.readSync(file.fd, filebuffer)
-                  const decoder = util.TextDecoder.create()
-                  const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                  fs.closeSync(file)
-                  let conflictResolution = 0
-                  if (this.index === 1) {
-                    conflictResolution = 5
-                  }
-                  const res = await importPassword(filestring, conflictResolution)
-                  if (res) {
-                    promptAction.showToast({
-                      message: '导入成功'
-                    })
-                  }
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
+                const documentSelectOptions = new picker.DocumentSelectOptions()
+                documentSelectOptions.maxSelectNumber = 1
+                documentSelectOptions.fileSuffixFilters = ['.txt']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.select(documentSelectOptions)
+                const file = fs.openSync(uris[0])
+                const size = fs.statSync(file.fd).size
+                const filebuffer = new ArrayBuffer(size)
+                fs.readSync(file.fd, filebuffer)
+                const decoder = util.TextDecoder.create()
+                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
+                fs.closeSync(file)
+                let conflictResolution = 0
+                if (this.index === 1) {
+                  conflictResolution = 5
                 }
+                await importPassword(filestring, conflictResolution)
+                promptAction.showToast({
+                  message: '导入成功'
+                })
               })
 
               Divider()
@@ -117,7 +114,6 @@ struct DataInOut {
                 })
               Row() {
                 Text('常用信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -137,36 +133,26 @@ struct DataInOut {
               })
               .width('100%')
               .onClick(async () => {
-                try {
-                  const documentSelectOptions = new picker.DocumentSelectOptions()
-                  documentSelectOptions.maxSelectNumber = 1
-                  documentSelectOptions.fileSuffixFilters = ['.txt']
-                  const context = getContext(this) as common.Context
-                  const documentViewPicker = new picker.DocumentViewPicker(context)
-                  const uris = await documentViewPicker.select(documentSelectOptions)
-                  const file = fs.openSync(uris[0])
-                  const size = fs.statSync(file.fd).size
-                  const filebuffer = new ArrayBuffer(size)
-                  fs.readSync(file.fd, filebuffer)
-                  const decoder = util.TextDecoder.create()
-                  const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                  fs.closeSync(file)
-                  let conflictResolution = 0
-                  if (this.index === 1) {
-                    conflictResolution = 5
-                  }
-                  const res = await importInfo(filestring, conflictResolution)
-                  if (res) {
-                    promptAction.showToast({
-                      message: '导入成功'
-                    })
-                  }
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
+                const documentSelectOptions = new picker.DocumentSelectOptions()
+                documentSelectOptions.maxSelectNumber = 1
+                documentSelectOptions.fileSuffixFilters = ['.txt']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.select(documentSelectOptions)
+                const file = fs.openSync(uris[0])
+                const size = fs.statSync(file.fd).size
+                const filebuffer = new ArrayBuffer(size)
+                fs.readSync(file.fd, filebuffer)
+                const decoder = util.TextDecoder.create()
+                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
+                fs.closeSync(file)
+                let conflictResolution = 0
+                if (this.index === 1) {
+                  conflictResolution = 5
                 }
+                await importInfo(filestring, conflictResolution)
+                promptAction.showToast({
+                  message: '导入成功'
+                })
               })
 
               Divider()
@@ -176,7 +162,6 @@ struct DataInOut {
                 })
               Row() {
                 Text('标签')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -196,36 +181,26 @@ struct DataInOut {
               })
               .width('100%')
               .onClick(async () => {
-                try {
-                  const documentSelectOptions = new picker.DocumentSelectOptions()
-                  documentSelectOptions.maxSelectNumber = 1
-                  documentSelectOptions.fileSuffixFilters = ['.txt']
-                  const context = getContext(this) as common.Context
-                  const documentViewPicker = new picker.DocumentViewPicker(context)
-                  const uris = await documentViewPicker.select(documentSelectOptions)
-                  const file = fs.openSync(uris[0])
-                  const size = fs.statSync(file.fd).size
-                  const filebuffer = new ArrayBuffer(size)
-                  fs.readSync(file.fd, filebuffer)
-                  const decoder = util.TextDecoder.create()
-                  const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                  fs.closeSync(file)
-                  let conflictResolution = 0
-                  if (this.index === 1) {
-                    conflictResolution = 5
-                  }
-                  const res = await importTag(filestring, conflictResolution)
-                  if (res) {
-                    promptAction.showToast({
-                      message: '导入成功'
-                    })
-                  }
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
+                const documentSelectOptions = new picker.DocumentSelectOptions()
+                documentSelectOptions.maxSelectNumber = 1
+                documentSelectOptions.fileSuffixFilters = ['.txt']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.select(documentSelectOptions)
+                const file = fs.openSync(uris[0])
+                const size = fs.statSync(file.fd).size
+                const filebuffer = new ArrayBuffer(size)
+                fs.readSync(file.fd, filebuffer)
+                const decoder = util.TextDecoder.create()
+                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
+                fs.closeSync(file)
+                let conflictResolution = 0
+                if (this.index === 1) {
+                  conflictResolution = 5
                 }
+                await importTag(filestring, conflictResolution)
+                promptAction.showToast({
+                  message: '导入成功'
+                })
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -251,7 +226,6 @@ struct DataInOut {
             Column() {
               Row() {
                 Text('密码')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -271,26 +245,26 @@ struct DataInOut {
               })
               .width('100%')
               .onClick(async () => {
-                try {
-                  const documentSaveOptions = new picker.DocumentSaveOptions()
-                  documentSaveOptions.newFileNames = ['password']
-                  documentSaveOptions.fileSuffixChoices = ['.txt']
-                  const context = getContext(this) as common.Context
-                  const documentViewPicker = new picker.DocumentViewPicker(context)
-                  const uris = await documentViewPicker.save(documentSaveOptions)
-                  const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
-                  const array = await getPasswordList()
-                  fs.writeSync(file.fd, JSON.stringify(array))
-                  fs.closeSync(file)
-                  promptAction.showToast({
-                    message: '导出成功'
-                  })
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
-                }
+                const documentSaveOptions = new picker.DocumentSaveOptions()
+                documentSaveOptions.newFileNames = ['password']
+                documentSaveOptions.fileSuffixChoices = ['.txt']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.save(documentSaveOptions)
+                const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
+                const array = await getPasswordList()
+                const arrayOut = array.map((item): PasswordOutItem => ({
+                  id: item.id,
+                  name: item.name,
+                  info: item.info,
+                  tag: item.tag.map(item => item.value),
+                  updateTime: item.updateTime,
+                  cloudBackupTime: item.cloudBackupTime
+                }))
+                fs.writeSync(file.fd, JSON.stringify(arrayOut))
+                fs.closeSync(file)
+                promptAction.showToast({
+                  message: '导出成功'
+                })
               })
 
               Divider()
@@ -300,7 +274,6 @@ struct DataInOut {
                 })
               Row() {
                 Text('常用信息')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -320,26 +293,18 @@ struct DataInOut {
               })
               .width('100%')
               .onClick(async () => {
-                try {
-                  const documentSaveOptions = new picker.DocumentSaveOptions()
-                  documentSaveOptions.newFileNames = ['info']
-                  documentSaveOptions.fileSuffixChoices = ['.txt']
-                  const context = getContext(this) as common.Context
-                  const documentViewPicker = new picker.DocumentViewPicker(context)
-                  const uris = await documentViewPicker.save(documentSaveOptions)
-                  const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
-                  const array = await getInfoList()
-                  fs.writeSync(file.fd, JSON.stringify(array))
-                  fs.closeSync(file)
-                  promptAction.showToast({
-                    message: '导出成功'
-                  })
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
-                }
+                const documentSaveOptions = new picker.DocumentSaveOptions()
+                documentSaveOptions.newFileNames = ['info']
+                documentSaveOptions.fileSuffixChoices = ['.txt']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.save(documentSaveOptions)
+                const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
+                const array = await getInfoList()
+                fs.writeSync(file.fd, JSON.stringify(array))
+                fs.closeSync(file)
+                promptAction.showToast({
+                  message: '导出成功'
+                })
               })
 
               Divider()
@@ -349,7 +314,6 @@ struct DataInOut {
                 })
               Row() {
                 Text('标签')
-                  .fontSize($r('sys.float.ohos_id_text_size_body1'))
                   .fontWeight('medium')
                 Blank()
                 Image($r('app.media.right'))
@@ -369,26 +333,18 @@ struct DataInOut {
               })
               .width('100%')
               .onClick(async () => {
-                try {
-                  const documentSaveOptions = new picker.DocumentSaveOptions()
-                  documentSaveOptions.newFileNames = ['tag']
-                  documentSaveOptions.fileSuffixChoices = ['.txt']
-                  const context = getContext(this) as common.Context
-                  const documentViewPicker = new picker.DocumentViewPicker(context)
-                  const uris = await documentViewPicker.save(documentSaveOptions)
-                  const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
-                  const array = await getTagList()
-                  fs.writeSync(file.fd, JSON.stringify(array))
-                  fs.closeSync(file)
-                  promptAction.showToast({
-                    message: '导出成功'
-                  })
-                } catch (err) {
-                  promptAction.showToast({
-                    message: '发生错误，错误码：' + (err as BusinessError).code + '，错误信息：' +
-                    (err as BusinessError).message
-                  })
-                }
+                const documentSaveOptions = new picker.DocumentSaveOptions()
+                documentSaveOptions.newFileNames = ['tag']
+                documentSaveOptions.fileSuffixChoices = ['.txt']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.save(documentSaveOptions)
+                const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
+                const array = await getTagList()
+                fs.writeSync(file.fd, JSON.stringify(array))
+                fs.closeSync(file)
+                promptAction.showToast({
+                  message: '导出成功'
+                })
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

@@ -9,6 +9,7 @@
 -print-namecache
 -apply-namecache
 -keep-property-name
+cloudBackupTime
 errFix
 color
 errMsg
@@ -16,7 +17,6 @@ updateTime
 requestIp
 type
 timeStamp
-cloudBackTime
 errCode
 name
 tag
@@ -37,6 +37,7 @@ src/main/ets/pages/Importkey.ets
 src/main/ets/pages/Clearsettings.ets
 src/main/ets/pages/Cloudbackupimport.ets
 src/main/ets/pages/Huaweiaccount.ets
+src/main/ets/pages/Infolist.ets
 src/main/ets/pages/DataBackupRecovery.ets
 src/main/ets/pages/ReportQoe.ets
 src/main/ets/pages/Commonsetting.ets

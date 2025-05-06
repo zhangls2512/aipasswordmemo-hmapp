@@ -1,8 +1,8 @@
 import { cryptoFramework } from '@kit.CryptoArchitectureKit'
 
-interface Otp {
+interface Totp {
   value: string,
-  secondsRemaining: string
+  secondsRemaining: number
 }
 
 function base32Decode(key: string): Uint8Array {
@@ -78,7 +78,7 @@ function numberToBigEndianUint8Array(num: bigint): Uint8Array {
   return new Uint8Array(buffer)
 }
 
-export function getOtp(key: string, step: number, digits: number): Otp {
+export function getTotp(key: string, step: number, digits: number): Totp {
   const keyArray = base32Decode(key)
   const time = Math.floor(Date.now() / 1000 / step)
   const timeArray = numberToBigEndianUint8Array(BigInt(time))
@@ -100,6 +100,6 @@ export function getOtp(key: string, step: number, digits: number): Otp {
   const otp = binary % Math.pow(10, digits)
   return {
     value: otp.toString().padStart(digits, '0'),
-    secondsRemaining: String(Math.ceil(step - (Date.now() / 1000 % step)))
+    secondsRemaining: Math.ceil(step - (Date.now() / 1000 % step))
   }
 }
