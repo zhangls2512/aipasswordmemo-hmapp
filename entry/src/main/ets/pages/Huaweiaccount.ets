@@ -219,10 +219,10 @@ struct Huaweiaccount {
                     controller: this.controller
                   })
                     .enabled(this.agree)
-                    .margin({
-                      top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                    })
                     .height(40)
+                    .margin({
+                      top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                    })
                 }
                 if (this.isBind) {
                   Button('解绑')

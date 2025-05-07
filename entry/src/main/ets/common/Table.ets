@@ -27,12 +27,12 @@ export async function syncTable(table: string, deviceId: string, syncMode: relat
   const res = await rdbStore.sync(syncMode, predicates)
   if (res[0][1] === 0) {
     promptAction.showToast({
-      message: '同步成功'
+      message: '同步成功，设备标识符：' + deviceId
     })
     return
   }
   promptAction.showToast({
-    message: '同步失败'
+    message: '同步失败，设备标识符：' + deviceId
   })
 }
 
