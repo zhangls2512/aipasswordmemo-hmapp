@@ -24,9 +24,9 @@ export default struct Newpassword {
   @Local passwordTagArray: string[] = []
   @Local passwordTag: string = ''
   @Local tagArray: string[] = []
+  @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  @Local cloudBackup: boolean = false
   context = getContext(this) as common.UIAbilityContext
   specialTypes: string[] = ['昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 

@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { window } from '@kit.ArkUI'
+import { emitter } from '@kit.BasicServicesKit'
 import { setCustomKey } from '../common/Crypto'
 
 @Builder
@@ -32,6 +33,7 @@ struct Importkey {
               .onClick(async () => {
                 await setCustomKey(this.keyValue)
                 this.pageInfos.pop()
+                emitter.emit('4')
               })
           }
           .width('100%')

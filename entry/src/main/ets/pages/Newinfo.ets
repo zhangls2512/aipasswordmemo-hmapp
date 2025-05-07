@@ -12,9 +12,9 @@ export default struct Newinfo {
   @Local infoTypeIndex: number = 0
   @Local infoTypeValue: string = '昵称'
   @Local infoValue: string = ''
+  @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  @Local cloudBackup: boolean = false
   specialTypes: string[] = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   build() {

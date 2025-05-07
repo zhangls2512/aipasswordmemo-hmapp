@@ -7,6 +7,8 @@ export function InfolistBuilder() {
 
 @ComponentV2
 struct Infolist {
+  pageInfos: NavPathStack = new NavPathStack()
+
   build() {
     NavDestination() {
       List() {
@@ -304,20 +306,31 @@ struct Infolist {
                   left: $r('sys.float.ohos_id_corner_radius_default_m'),
                   right: $r('sys.float.ohos_id_corner_radius_default_m')
                 })
-              Column() {
+              Row() {
                 Text('信息内容')
                   .fontWeight('medium')
-                Text('“我的”>“设置”>“关于”>双击 logo>“故障日志”')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
               }
-              .alignItems(HorizontalAlign.Start)
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
               .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Faultlog'
+                })
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -433,5 +446,8 @@ struct Infolist {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('已收集个人信息清单')
+    .onReady((context: NavDestinationContext) => {
+      this.pageInfos = context.pathStack
+    })
   }
 }

@@ -58,13 +58,21 @@ struct Vipcode {
           Column() {
             Text('如何获取兑换码？')
               .fontWeight('bold')
-            Text('· 提供反馈并被官方采纳')
+            Text('· 提供有效反馈')
               .fontWeight('medium')
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })
             Text('· 关注官方活动')
               .fontWeight('medium')
+              .margin({
+                top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+              })
+            Text('· 加入官方团队')
+              .fontWeight('medium')
+              .margin({
+                top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+              })
           }
           .alignItems(HorizontalAlign.Start)
         }

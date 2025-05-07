@@ -366,6 +366,14 @@ export default struct Filterpassword {
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       })
+      if (this.passwordTagArray.length > 0) {
+        ListItem() {
+          Divider()
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
+      }
       ForEach(this.passwordTagArray, (item: string, index) => {
         ListItem() {
           Column() {
