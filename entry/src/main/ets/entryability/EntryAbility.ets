@@ -252,8 +252,7 @@ export default class EntryAbility extends UIAbility {
     const checkVersionUpdate = commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
     try {
       if (checkVersionUpdate === 1) {
-        const wifiLinkedInfo = await wifiManager.getLinkedInfo()
-        if (wifiLinkedInfo.connState === 4) {
+        if (wifiManager.isConnected()) {
           const res = await updateManager.checkAppUpdate(this.context)
           if (res.updateAvailable === 1) {
             updateManager.showUpdateDialog(this.context)

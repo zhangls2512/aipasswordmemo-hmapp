@@ -116,12 +116,16 @@ struct About {
             .width('100%')
             .onClick(async () => {
               try {
-                this.updateLoading = true
-                const res = await updateManager.checkAppUpdate(this.context)
-                this.updateLoading = false
-                this.hasUpdate = res.updateAvailable
-                if (res.updateAvailable === 1) {
+                if (this.hasUpdate === 1) {
                   updateManager.showUpdateDialog(this.context)
+                } else {
+                  this.updateLoading = true
+                  const res = await updateManager.checkAppUpdate(this.context)
+                  this.updateLoading = false
+                  this.hasUpdate = res.updateAvailable
+                  if (res.updateAvailable === 1) {
+                    updateManager.showUpdateDialog(this.context)
+                  }
                 }
               } catch (err) {
                 this.updateLoading = false

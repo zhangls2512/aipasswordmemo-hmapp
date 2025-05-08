@@ -13,8 +13,8 @@ export function VipBuilder() {
 @ComponentV2
 struct Vip {
   @Local vipStatus: string = '未开通'
-  @Local vipStatusLoading: boolean = false
   @Local vipStatusColor: string = 'red'
+  @Local vipStatusLoading: boolean = false
   @Local vipEndDate: string = ''
   @Local uid: string = ''
   context = getContext(this) as common.UIAbilityContext

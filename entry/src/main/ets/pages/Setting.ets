@@ -11,12 +11,12 @@ import request from '../common/Request'
 @ComponentV2
 export default struct Setting {
   @Local allService: boolean = true
+  @Local agreedPrivacyAgreement: number | undefined = undefined
   @Local cloudService: boolean = false
   @Local cloudServiceLoading: boolean = false
   @Local vipStatus: string = '未开通'
-  @Local vipStatusLoading: boolean = false
   @Local vipStatusColor: string = 'red'
-  @Local agreedPrivacyAgreement: number | undefined = undefined
+  @Local vipStatusLoading: boolean = false
   context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
@@ -704,7 +704,15 @@ export default struct Setting {
               })
               .width('100%')
               .onClick(() => {
-                openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
+                try {
+                  const appPrivacyLink =
+                    privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
+                  openLink(appPrivacyLink?.url as string)
+                } catch (err) {
+                  promptAction.showToast({
+                    message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                  })
+                }
               })
 
               Divider()

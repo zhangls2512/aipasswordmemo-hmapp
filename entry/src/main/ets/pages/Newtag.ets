@@ -10,9 +10,9 @@ export default struct Newtag {
   @Consumer() isShowNewSheet: boolean = false
   @Local tagValue: string = ''
   @Local tagColor: string = 'rgba(0,0,0,0)'
+  @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  @Local cloudBackup: boolean = false
   colorArray: string[] = [
     '#000000',
     '#0000ff',
