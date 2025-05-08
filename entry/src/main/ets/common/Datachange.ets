@@ -258,7 +258,8 @@ export async function updateTag(id: number, data: TagInput) {
   const predicatesa = new relationalStore.RdbPredicates('tag')
   predicatesa.equalTo('value', data.value)
   const resultSet = await rdbStore.query(predicatesa)
-  if (resultSet.goToNextRow() && resultSet.getValue(resultSet.getColumnIndex('color')) as string === data.color) {
+  const colorIndex = resultSet.getColumnIndex('color')
+  if (resultSet.goToNextRow() && resultSet.getValue(colorIndex) as string === data.color) {
     promptAction.showToast({
       message: '修改失败：已存在'
     })

@@ -22,6 +22,25 @@ struct Viplog {
   build() {
     NavDestination() {
       List() {
+        if (this.loading) {
+          ListItem() {
+            LoadingProgress()
+              .width('20%')
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+          .width('100%')
+        }
+        if (this.viplogArray.length === 0 && !this.loading) {
+          ListItem() {
+            Text('无数据')
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+          .width('100%')
+        }
         ForEach(this.viplogArray, (item: Item) => {
           ListItem() {
             Column() {
@@ -114,25 +133,6 @@ struct Viplog {
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
-        if (this.loading) {
-          ListItem() {
-            LoadingProgress()
-              .width('20%')
-          }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-          .width('100%')
-        }
-        if (this.viplogArray.length === 0 && !this.loading) {
-          ListItem() {
-            Text('无数据')
-          }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-          .width('100%')
-        }
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

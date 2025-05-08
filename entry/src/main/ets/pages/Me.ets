@@ -4,11 +4,13 @@ import { promptAction, window } from '@kit.ArkUI'
 import { get, remove } from '../common/Accesstoken'
 import request from '../common/Request'
 import Login from './Login'
+import Passwordcheck from './Passwordcheck'
 import Setting from './Setting'
 
 @ComponentV2
 export default struct Me {
   @Provider() isShowLoginSheet: boolean = false
+  @Local isShowPasswordcheckSheet: boolean = false
   @Local isShowSettingSheet: boolean = false
   @Local loading: boolean = false
   @Local email: string = ''
@@ -31,6 +33,11 @@ export default struct Me {
   @Builder
   LoginSheetBuilder() {
     Login()
+  }
+
+  @Builder
+  PasswordcheckSheetBuilder() {
+    Passwordcheck()
   }
 
   @Builder
@@ -78,10 +85,8 @@ export default struct Me {
             }
           })
           .width('100%')
-          .onClick(async () => {
+          .onClick(() => {
             if (!this.email && !this.loading) {
-              const lastWindow = await window.getLastWindow(this.context)
-              await lastWindow.setWindowPrivacyMode(true)
               this.isShowLoginSheet = !this.isShowLoginSheet
             }
           })
@@ -91,10 +96,69 @@ export default struct Me {
             title: {
               title: '登录'
             },
+            onAppear: (async () => {
+              const lastWindow = await window.getLastWindow(this.context)
+              await lastWindow.setWindowPrivacyMode(true)
+            }),
             onDisappear: (async () => {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(false)
               this.getEmail()
+            })
+          })
+        }
+        .backgroundColor($r('sys.color.comp_background_primary'))
+        .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+        .padding($r('sys.float.ohos_id_corner_radius_mark'))
+      }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+      })
+
+      ListItem() {
+        Column() {
+          Row() {
+            Image($r('app.media.check'))
+              .fillColor($r('sys.color.icon_primary'))
+              .height(24)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
+              .width(24)
+            Text('密码安全检查')
+              .fontWeight('medium')
+            Blank()
+            Image($r('app.media.right'))
+              .fillColor($r('sys.color.icon_fourth'))
+              .height(12)
+              .width(12)
+          }
+          .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+          .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+          .stateStyles({
+            normal: {
+              .backgroundColor($r('sys.color.comp_background_primary'))
+            },
+            pressed: {
+              .backgroundColor($r('sys.color.comp_background_secondary'))
+            }
+          })
+          .width('100%')
+          .onClick(() => {
+            this.isShowPasswordcheckSheet = !this.isShowPasswordcheckSheet
+          })
+          .bindSheet($$this.isShowPasswordcheckSheet, this.PasswordcheckSheetBuilder(), {
+            preferType: SheetType.BOTTOM,
+            title: {
+              title: '密码安全检查'
+            },
+            onAppear: (async () => {
+              const lastWindow = await window.getLastWindow(this.context)
+              await lastWindow.setWindowPrivacyMode(true)
+            }),
+            onDisappear: (async () => {
+              const lastWindow = await window.getLastWindow(this.context)
+              await lastWindow.setWindowPrivacyMode(false)
             })
           })
         }
