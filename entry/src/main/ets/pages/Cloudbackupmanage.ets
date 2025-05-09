@@ -49,164 +49,168 @@ struct Cloudbackupmanage {
   build() {
     NavDestination() {
       List() {
-        ListItem() {
-          Column() {
-            if (!this.loading) {
+        if (this.loading) {
+          ListItem() {
+            LoadingProgress()
+              .width('50%')
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
+          .width('100%')
+        }
+        if (!this.loading) {
+          ListItem() {
+            Column() {
               Column() {
-                Column() {
-                  Row() {
-                    CheckboxGroup({
-                      group: 'type'
+                Row() {
+                  CheckboxGroup({
+                    group: 'type'
+                  })
+                    .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                      .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
-                      .margin({
-                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                      })
-                      .selectAll($$this.allSelected)
-                      .onChange((itemName: CheckboxGroupResult) => {
-                        this.types = itemName.name
-                      })
-                    Text('全部')
-                      .fontWeight('bold')
-                    Blank()
-                    Text(this.total)
-                      .fontColor($r('sys.color.font_secondary'))
-                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .width('100%')
-
-                  Divider()
-                    .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                    .selectAll($$this.allSelected)
+                    .onChange((itemName: CheckboxGroupResult) => {
+                      this.types = itemName.name
                     })
-                  Row() {
-                    Checkbox({
-                      name: 'password',
-                      group: 'type'
-                    })
-                      .shape(CheckBoxShape.ROUNDED_SQUARE)
-                      .margin({
-                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                      })
-                      .select($$this.passwordSelected)
-                    Text('密码')
-                      .fontWeight('medium')
-                    Blank()
-                    Text(this.password)
-                      .fontColor($r('sys.color.font_secondary'))
-                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .width('100%')
-
-                  Divider()
-                    .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_m')
-                    })
-                  Row() {
-                    Checkbox({
-                      name: 'info',
-                      group: 'type'
-                    })
-                      .shape(CheckBoxShape.ROUNDED_SQUARE)
-                      .margin({
-                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                      })
-                      .select($$this.infoSelected)
-                    Text('常用信息')
-                      .fontWeight('medium')
-                    Blank()
-                    Text(this.info)
-                      .fontColor($r('sys.color.font_secondary'))
-                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .width('100%')
-
-                  Divider()
-                    .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_m')
-                    })
-                  Row() {
-                    Checkbox({
-                      name: 'tag',
-                      group: 'type'
-                    })
-                      .shape(CheckBoxShape.ROUNDED_SQUARE)
-                      .margin({
-                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                      })
-                      .select($$this.tagSelected)
-                    Text('标签')
-                      .fontWeight('medium')
-                    Blank()
-                    Text(this.tag)
-                      .fontColor($r('sys.color.font_secondary'))
-                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .width('100%')
+                  Text('全部')
+                    .fontWeight('bold')
+                  Blank()
+                  Text(this.total)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
                 }
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-                .padding($r('sys.float.ohos_id_corner_radius_mark'))
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .width('100%')
 
-                Button('清理')
-                  .enabled(this.types.length > 0)
-                  .margin({
-                    top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                Divider()
+                  .padding({
+                    left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                    right: $r('sys.float.ohos_id_corner_radius_default_m')
                   })
-                  .role(ButtonRole.ERROR)
-                  .onClick(async () => {
-                    const data = await promptAction.showDialog({
-                      title: '提示',
-                      message: '清理成功后数据无法恢复。确定清理？',
-                      buttons: [
-                        {
-                          text: '取消',
-                          color: $r('sys.color.font_primary')
-                        },
-                        {
-                          text: '清理',
-                          color: $r('sys.color.warning')
-                        }
-                      ]
+                Row() {
+                  Checkbox({
+                    name: 'password',
+                    group: 'type'
+                  })
+                    .shape(CheckBoxShape.ROUNDED_SQUARE)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    if (data.index === 1) {
-                      this.dialogControllerProgress.open()
-                      const res = await request('/password/clearBackup', {
-                        accessToken: get(),
-                        types: this.types
-                      })
-                      this.dialogControllerProgress.close()
-                      if (res !== 'fail') {
-                        promptAction.showToast({
-                          message: '清理成功'
-                        })
-                        this.getCount()
-                      }
-                    }
+                    .select($$this.passwordSelected)
+                  Text('密码')
+                    .fontWeight('medium')
+                  Blank()
+                  Text(this.password)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                }
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .width('100%')
+
+                Divider()
+                  .padding({
+                    left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                    right: $r('sys.float.ohos_id_corner_radius_default_m')
                   })
+                Row() {
+                  Checkbox({
+                    name: 'info',
+                    group: 'type'
+                  })
+                    .shape(CheckBoxShape.ROUNDED_SQUARE)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+                    .select($$this.infoSelected)
+                  Text('常用信息')
+                    .fontWeight('medium')
+                  Blank()
+                  Text(this.info)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                }
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .width('100%')
+
+                Divider()
+                  .padding({
+                    left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                    right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  })
+                Row() {
+                  Checkbox({
+                    name: 'tag',
+                    group: 'type'
+                  })
+                    .shape(CheckBoxShape.ROUNDED_SQUARE)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+                    .select($$this.tagSelected)
+                  Text('标签')
+                    .fontWeight('medium')
+                  Blank()
+                  Text(this.tag)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                }
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .width('100%')
               }
-            }
-            if (this.loading) {
-              LoadingProgress()
-                .width('50%')
+              .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+              Button('清理')
+                .enabled(this.types.length > 0)
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                })
+                .role(ButtonRole.ERROR)
+                .onClick(async () => {
+                  const data = await promptAction.showDialog({
+                    title: '提示',
+                    message: '清理成功后数据无法恢复。确定清理？',
+                    buttons: [
+                      {
+                        text: '取消',
+                        color: $r('sys.color.font_primary')
+                      },
+                      {
+                        text: '清理',
+                        color: $r('sys.color.warning')
+                      }
+                    ]
+                  })
+                  if (data.index === 1) {
+                    this.dialogControllerProgress.open()
+                    const res = await request('/password/clearBackup', {
+                      accessToken: get(),
+                      types: this.types
+                    })
+                    this.dialogControllerProgress.close()
+                    if (res !== 'fail') {
+                      promptAction.showToast({
+                        message: '清理成功'
+                      })
+                      this.getCount()
+                    }
+                  }
+                })
             }
           }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
+          .width('100%')
         }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-        .width('100%')
       }
       .backgroundColor($r('app.color.sheet_background'))
       .padding({

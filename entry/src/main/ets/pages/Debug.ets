@@ -34,32 +34,8 @@ struct Debug {
       value: this.context.applicationInfo.name
     },
     {
-      name: '描述',
-      value: this.context.applicationInfo.description
-    },
-    {
-      name: '描述资源 ID',
-      value: String(this.context.applicationInfo.descriptionId)
-    },
-    {
       name: '是否可以使用',
       value: this.context.applicationInfo.enabled ? '是' : '否'
-    },
-    {
-      name: '标识名称',
-      value: this.context.applicationInfo.label
-    },
-    {
-      name: '名称资源 ID',
-      value: String(this.context.applicationInfo.labelId)
-    },
-    {
-      name: '图标',
-      value: this.context.applicationInfo.icon
-    },
-    {
-      name: '图标资源 ID',
-      value: String(this.context.applicationInfo.iconId)
     },
     {
       name: '进程名称',
@@ -106,10 +82,6 @@ struct Debug {
     {
       name: '数据是否可被删除',
       value: this.context.applicationInfo.dataUnclearable ? '是' : '否'
-    },
-    {
-      name: '本地库文件路径',
-      value: this.context.applicationInfo.nativeLibraryPath
     },
     {
       name: '多开最大个数',
@@ -218,10 +190,6 @@ struct Debug {
       value: this.context.config.hasPointerDevice ? '是' : '否'
     },
     {
-      name: '当前系统字体的唯一 ID',
-      value: String(this.context.config.fontId)
-    },
-    {
       name: '字体大小缩放比例',
       value: String(this.context.config.fontSizeScale)
     },
@@ -244,40 +212,8 @@ struct Debug {
       value: this.context.currentHapModuleInfo.name
     },
     {
-      name: '图标',
-      value: this.context.currentHapModuleInfo.icon
-    },
-    {
-      name: '图标资源 ID',
-      value: String(this.context.currentHapModuleInfo.iconId)
-    },
-    {
-      name: '标签',
-      value: this.context.currentHapModuleInfo.label
-    },
-    {
-      name: '标签资源 ID',
-      value: String(this.context.currentHapModuleInfo.labelId)
-    },
-    {
-      name: '描述',
-      value: this.context.currentHapModuleInfo.description
-    },
-    {
-      name: '描述资源 ID',
-      value: String(this.context.currentHapModuleInfo.descriptionId)
-    },
-    {
-      name: '入口 Ability 信息',
-      value: this.context.currentHapModuleInfo.mainElementName
-    },
-    {
       name: '是否支持免安装',
       value: this.context.currentHapModuleInfo.installationFree ? '是' : '否'
-    },
-    {
-      name: 'Hash 值',
-      value: this.context.currentHapModuleInfo.hashValue
     },
     {
       name: '类型',
@@ -287,16 +223,8 @@ struct Debug {
             'undefined'
     },
     {
-      name: '文件菜单配置',
-      value: this.context.currentHapModuleInfo.fileContextMenuConfig
-    },
-    {
       name: '安装路径',
       value: this.context.currentHapModuleInfo.codePath
-    },
-    {
-      name: '本地库文件路径',
-      value: this.context.currentHapModuleInfo.nativeLibraryPath
     }
   ]
   abilityInfoArray: Item[] = [
@@ -311,34 +239,6 @@ struct Debug {
     {
       name: '名称',
       value: this.context.abilityInfo.name
-    },
-    {
-      name: '对用户显示名称的资源描述符',
-      value: this.context.abilityInfo.label
-    },
-    {
-      name: '标签资源 ID',
-      value: String(this.context.abilityInfo.labelId)
-    },
-    {
-      name: '描述',
-      value: this.context.abilityInfo.description
-    },
-    {
-      name: '描述资源 ID',
-      value: String(this.context.abilityInfo.descriptionId)
-    },
-    {
-      name: '图标资源描述符',
-      value: this.context.abilityInfo.icon
-    },
-    {
-      name: '图标资源 ID',
-      value: String(this.context.abilityInfo.iconId)
-    },
-    {
-      name: '进程名称',
-      value: this.context.abilityInfo.process
     },
     {
       name: '是否可以被其他应用调用',
@@ -401,10 +301,6 @@ struct Debug {
     {
       name: '是否可以在 dock 区域隐藏图标',
       value: this.context.abilityInfo.excludeFromDock ? '是' : '否'
-    },
-    {
-      name: '显示模式资源 ID',
-      value: String(this.context.abilityInfo.orientationId)
     }
   ]
   bundleInfoArray: Item[] = []
@@ -467,7 +363,6 @@ struct Debug {
     { name: '设备类型', value: String(atomicService.getSystemInfoSync(this.stateArray).deviceModel) },
     { name: '屏幕宽度', value: String(atomicService.getSystemInfoSync(this.stateArray).screenWidth) + ' px' },
     { name: '屏幕高度', value: String(atomicService.getSystemInfoSync(this.stateArray).screenHeight) + ' px' },
-    { name: '状态栏高度', value: String(atomicService.getSystemInfoSync(this.stateArray).statusBarHeight) + ' px' },
     { name: '系统语言', value: String(atomicService.getSystemInfoSync(this.stateArray).language) },
     { name: '系统版本', value: String(atomicService.getSystemInfoSync(this.stateArray).osFullName) },
     { name: '显示设备逻辑像素密度', value: String(atomicService.getSystemInfoSync(this.stateArray).fontSizeSetting) },
@@ -488,9 +383,7 @@ struct Debug {
         atomicService.getSystemInfoSync(this.stateArray).theme === 0 ? '浅色模式' :
           atomicService.getSystemInfoSync(this.stateArray).theme === 1 ? '深色模式' :
             'undefined'
-    },
-    { name: '可使用窗口宽度', value: String(atomicService.getSystemInfoSync(this.stateArray).windowWidth) + ' px' },
-    { name: '可使用窗口高度', value: String(atomicService.getSystemInfoSync(this.stateArray).windowHeight) + ' px' }
+    }
   ]
   displayInfoArray: Item[] = [
     { name: 'id 号', value: String(display.getDefaultDisplaySync().id) },
@@ -2226,26 +2119,11 @@ struct Debug {
         name: '可用内存',
         value: String(memorySize) + ' MB'
       })
-      const runningProcessInformation = await appManager.getRunningProcessInformation()
-      this.applicationInfoArray.push({
-        name: '当前进程运行的包类型',
-        value: runningProcessInformation[0].bundleType === 0 ? '应用' :
-          runningProcessInformation[0].bundleType === 1 ? '元服务' :
-            'undefined'
-      })
-      this.applicationInfoArray.push({
-        name: '分身索引',
-        value: String(runningProcessInformation[0].appCloneIndex)
-      })
       const bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT |
       bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_SIGNATURE_INFO)
       this.bundleInfoArray.push({
         name: '名称',
         value: bundleInfo.name
-      })
-      this.bundleInfoArray.push({
-        name: '供应商',
-        value: bundleInfo.vendor
       })
       this.bundleInfoArray.push({
         name: '版本号',
