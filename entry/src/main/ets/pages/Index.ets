@@ -13,9 +13,9 @@ struct Index {
   context = getContext(this) as common.UIAbilityContext
 
   @Builder
-  tabBuilder(title: string, index: number, img: Resource) {
+  tabBuilder(index: number, image: Resource, title: string) {
     Column() {
-      Image(img)
+      Image(image)
         .fillColor(this.index !== index ? $r('sys.color.icon_secondary') : $r('sys.color.icon_emphasize'))
         .height(24)
         .width(24)
@@ -38,25 +38,25 @@ struct Index {
           Password()
             .height('100%')
         }
-        .tabBar(this.tabBuilder('密码', 0, $r('app.media.password')))
+        .tabBar(this.tabBuilder(0, $r('app.media.password'), '密码'))
 
         TabContent() {
           Info()
             .height('100%')
         }
-        .tabBar(this.tabBuilder('常用信息', 1, $r('app.media.info')))
+        .tabBar(this.tabBuilder(1, $r('app.media.info'), '常用信息'))
 
         TabContent() {
           Tag()
             .height('100%')
         }
-        .tabBar(this.tabBuilder('标签', 2, $r('app.media.tag')))
+        .tabBar(this.tabBuilder(2, $r('app.media.tag'), '标签'))
 
         TabContent() {
           Me()
             .height('100%')
         }
-        .tabBar(this.tabBuilder('我的', 3, $r('app.media.me')))
+        .tabBar(this.tabBuilder(3, $r('app.media.me'), '我的'))
       }
       .scrollable(false)
       .onAnimationStart(async (index: number, targetIndex: number) => {
