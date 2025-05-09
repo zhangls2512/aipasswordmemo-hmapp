@@ -18,6 +18,16 @@ struct Cloudservice {
   build() {
     NavDestination() {
       List() {
+        if (this.loading) {
+          ListItem() {
+            LoadingProgress()
+              .width('50%')
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
+          .width('100%')
+        }
         if (!this.loading) {
           ListItem() {
             Column() {
@@ -108,16 +118,6 @@ struct Cloudservice {
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
-        }
-        if (this.loading) {
-          ListItem() {
-            LoadingProgress()
-              .width('50%')
-          }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-          })
-          .width('100%')
         }
       }
       .backgroundColor($r('app.color.sheet_background'))

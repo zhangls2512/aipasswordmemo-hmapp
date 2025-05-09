@@ -1,5 +1,4 @@
-import { common } from '@kit.AbilityKit'
-import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { getInfoList, Info } from '../common/Dataget'
@@ -17,7 +16,6 @@ export default struct InfoPage {
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
-  context = getContext(this) as common.UIAbilityContext
   updateId: number = 0
 
   async getList() {
@@ -259,17 +257,11 @@ export default struct InfoPage {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      const lastWindow = await window.getLastWindow(this.context)
-      await lastWindow.setWindowPrivacyMode(true)
       await this.getList()
       const cloudServiceStatus = await getCloudServiceStatus()
       if (cloudServiceStatus && getKey()) {
         this.enableCloudBackup = true
       }
-    })
-    .onDisAppear(async () => {
-      const lastWindow = await window.getLastWindow(this.context)
-      await lastWindow.setWindowPrivacyMode(false)
     })
     .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.updateId), {
       height: SheetSize.FIT_CONTENT,

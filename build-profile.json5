@@ -20,11 +20,11 @@
         "material": {
           "certpath": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B86120E3BAFDFC76124CC61BF392789EFF4CB72DEC1BFD55DC3B74ABB5AE3F1DC464C0324D5D1FB",
+          "keyPassword": "0000001B24DEB72D0DE149F928FC3954FAC62F1DCC505AC81452465B6FAC54DB7196084279EF9C73AC4DEE",
           "profile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
-          "storePassword": "0000001BF791019031C50EEBF8D11E29956A8B12C36BD04F5AF02AA8FC2EBF06D112F001ADCE6AA83BE091"
+          "storePassword": "0000001B12AB803EDA10BA8E89582AA60D7E7BA68327CE9F51561C2A6AA58D95B367DB80D9D078F4C851B9"
         }
       }
     ],
@@ -32,6 +32,7 @@
       {
         "name": "default",
         "signingConfig": "debug",
+        "bundleName": "com.zhangxm.aipasswordmemo.debug",
         "buildOption": {
           "arkOptions": {
             "autoLazyImport": true,

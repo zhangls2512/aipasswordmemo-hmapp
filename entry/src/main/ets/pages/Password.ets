@@ -76,9 +76,7 @@ export default struct PasswordPage {
       ListItem() {
         Row() {
           Button('新增')
-            .onClick(async () => {
-              const lastWindow = await window.getLastWindow(this.context)
-              await lastWindow.setWindowPrivacyMode(true)
+            .onClick(() => {
               this.isShowNewSheet = !this.isShowNewSheet
             })
             .bindSheet($$this.isShowNewSheet, this.NewSheetBuilder(), {
@@ -87,6 +85,10 @@ export default struct PasswordPage {
               title: {
                 title: '新增密码'
               },
+              onAppear: (async () => {
+                const lastWindow = await window.getLastWindow(this.context)
+                await lastWindow.setWindowPrivacyMode(true)
+              }),
               onDisappear: (async () => {
                 const lastWindow = await window.getLastWindow(this.context)
                 await lastWindow.setWindowPrivacyMode(false)
@@ -138,9 +140,7 @@ export default struct PasswordPage {
             ])
           Button('筛选')
             .buttonStyle(ButtonStyleMode.NORMAL)
-            .onClick(async () => {
-              const lastWindow = await window.getLastWindow(this.context)
-              await lastWindow.setWindowPrivacyMode(true)
+            .onClick(() => {
               this.isShowFilterSheet = !this.isShowFilterSheet
             })
             .bindSheet($$this.isShowFilterSheet, this.FilterSheetBuilder(), {
@@ -149,6 +149,10 @@ export default struct PasswordPage {
               title: {
                 title: '筛选密码'
               },
+              onAppear: (async () => {
+                const lastWindow = await window.getLastWindow(this.context)
+                await lastWindow.setWindowPrivacyMode(true)
+              }),
               onDisappear: (async () => {
                 const lastWindow = await window.getLastWindow(this.context)
                 await lastWindow.setWindowPrivacyMode(false)
@@ -241,9 +245,7 @@ export default struct PasswordPage {
               {
                 value: '详情',
                 icon: $r('app.media.info'),
-                action: async () => {
-                  const lastWindow = await window.getLastWindow(this.context)
-                  await lastWindow.setWindowPrivacyMode(true)
+                action: () => {
                   this.passwordId = item.id
                   this.isShowInfoSheet = !this.isShowInfoSheet
                 }
@@ -251,9 +253,7 @@ export default struct PasswordPage {
               {
                 value: '修改',
                 icon: $r('app.media.edit'),
-                action: async () => {
-                  const lastWindow = await window.getLastWindow(this.context)
-                  await lastWindow.setWindowPrivacyMode(true)
+                action: () => {
                   this.passwordId = item.id
                   this.isShowUpdateSheet = !this.isShowUpdateSheet
                 }
@@ -361,6 +361,10 @@ export default struct PasswordPage {
           title: {
             title: '密码详情'
           },
+          onAppear: (async () => {
+            const lastWindow = await window.getLastWindow(this.context)
+            await lastWindow.setWindowPrivacyMode(true)
+          }),
           onDisappear: (async () => {
             const lastWindow = await window.getLastWindow(this.context)
             await lastWindow.setWindowPrivacyMode(false)
@@ -399,6 +403,10 @@ export default struct PasswordPage {
       title: {
         title: '修改密码'
       },
+      onAppear: (async () => {
+        const lastWindow = await window.getLastWindow(this.context)
+        await lastWindow.setWindowPrivacyMode(true)
+      }),
       onDisappear: (async () => {
         const lastWindow = await window.getLastWindow(this.context)
         await lastWindow.setWindowPrivacyMode(false)
