@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction, window } from '@kit.ArkUI'
+import { promptAction } from '@kit.ArkUI'
 import { getRepeatPasswordList, ListItem, RepeatItem } from '../common/Passwordcheck'
 import UpdatePassword from './Updatepassword'
 
@@ -25,8 +25,7 @@ export default struct Passwordcheck {
           .fontWeight('bold')
       }
       .margin({
-        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
 
       if (this.loading) {
@@ -122,14 +121,6 @@ export default struct Passwordcheck {
       title: {
         title: '修改密码'
       },
-      onAppear: (async () => {
-        const lastWindow = await window.getLastWindow(this.context)
-        await lastWindow.setWindowPrivacyMode(true)
-      }),
-      onDisappear: (async () => {
-        const lastWindow = await window.getLastWindow(this.context)
-        await lastWindow.setWindowPrivacyMode(false)
-      }),
       onWillDismiss: (async (DismissSheetAction: DismissSheetAction) => {
         const data = await promptAction.showDialog({
           title: '提示',
