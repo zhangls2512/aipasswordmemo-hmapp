@@ -39,6 +39,15 @@ export default struct Passwordcheck {
         })
         .width('100%')
       }
+      if (this.repeatArray.length === 0 && !this.loading) {
+        ListItem() {
+          Text('无数据')
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
+        .width('100%')
+      }
       ForEach(this.repeatArray, (item: RepeatItem) => {
         ListItem() {
           Column() {
