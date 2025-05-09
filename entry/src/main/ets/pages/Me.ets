@@ -260,6 +260,12 @@ export default struct Me {
     })
     .onAppear(() => {
       this.getEmail()
+      this.context.eventHub.on('refreshMe', () => {
+        this.getEmail()
+      })
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.off('refreshMe')
     })
   }
 }

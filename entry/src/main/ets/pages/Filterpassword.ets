@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { emitter } from '@kit.BasicServicesKit'
 import { getTagList, getTypeInfoList, PasswordInfoItem } from '../common/Dataget'
 
 @ComponentV2
@@ -412,9 +411,7 @@ export default struct Filterpassword {
               this.filterPasswordDataPreferences.putSync('nameKeyword', this.passwordNameKeyword)
               this.filterPasswordDataPreferences.putSync('info', this.passwordInfoArray)
               this.filterPasswordDataPreferences.putSync('tag', this.passwordTagArray)
-              emitter.emit('1', {
-                priority: emitter.EventPriority.IMMEDIATE
-              })
+              this.context.eventHub.emit('refreshFilterPassword')
             })
         }
         .width('100%')

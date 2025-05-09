@@ -2,7 +2,6 @@ import { common } from '@kit.AbilityKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { emitter } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
@@ -993,12 +992,12 @@ export default struct Setting {
     .titleMode(NavigationTitleMode.Mini)
     .onAppear(() => {
       this.getSetting()
-      emitter.on('2', () => {
+      this.context.eventHub.on('refreshSetting', () => {
         this.getSetting()
       })
     })
     .onDisAppear(() => {
-      emitter.off('2')
+      this.context.eventHub.off('refreshSetting')
     })
   }
 }

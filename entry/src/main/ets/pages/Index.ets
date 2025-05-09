@@ -66,17 +66,21 @@ struct Index {
         }
         if (targetIndex === 0) {
           this.title = '密码'
+          this.context.eventHub.emit('refreshPassword')
         }
         if (targetIndex === 1) {
           const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(true)
           this.title = '常用信息'
+          this.context.eventHub.emit('refreshInfo')
         }
         if (targetIndex === 2) {
           this.title = '标签'
+          this.context.eventHub.emit('refreshTag')
         }
         if (targetIndex === 3) {
           this.title = '我的'
+          this.context.eventHub.emit('refreshMe')
         }
       })
     }

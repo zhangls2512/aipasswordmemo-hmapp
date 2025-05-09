@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { emitter } from '@kit.BasicServicesKit'
 import { iap } from '@kit.IAPKit'
 import { get } from '../common/Accesstoken'
 import { copy } from '../common/Pasteboard'
@@ -216,18 +215,19 @@ struct Vip {
     .onReady(async (context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
       await this.getVipStatus()
-      emitter.on('3', () => {
-        this.getVipStatus()
-      })
       const res = await request('/account/getAccountInfo', {
         accessToken: get()
       })
       if (res !== 'fail') {
         this.uid = JSON.parse(res).data.uid as string
       }
+      this.context.eventHub.on('refreshVip', () => {
+        this.getVipStatus()
+      })
     })
     .onDisAppear(() => {
-      emitter.emit('2')
+      this.context.eventHub.off('refreshVip')
+      this.context.eventHub.emit('refreshSetting')
     })
   }
 }

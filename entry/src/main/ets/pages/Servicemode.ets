@@ -1,6 +1,5 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { emitter } from '@kit.BasicServicesKit'
 import openLink from '../common/Openlink'
 
 @Builder
@@ -125,7 +124,7 @@ struct Servicemode {
       this.allService = allService as boolean
     })
     .onDisAppear(() => {
-      emitter.emit('2')
+      this.context.eventHub.emit('refreshSetting')
     })
   }
 }

@@ -1,5 +1,5 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { emitter } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -13,6 +13,7 @@ export function CloudserviceBuilder() {
 struct Cloudservice {
   @Local cloudService: boolean = false
   @Local loading: boolean = false
+  context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
 
   build() {
@@ -83,7 +84,7 @@ struct Cloudservice {
                       })
                       this.cloudService = true
                       this.pageInfos.pop()
-                      emitter.emit('2')
+                      this.context.eventHub.emit('refreshSetting')
                     }
                   })
               }
@@ -108,7 +109,7 @@ struct Cloudservice {
                       })
                       this.cloudService = false
                       this.pageInfos.pop()
-                      emitter.emit('2')
+                      this.context.eventHub.emit('refreshSetting')
                     }
                   })
               }
