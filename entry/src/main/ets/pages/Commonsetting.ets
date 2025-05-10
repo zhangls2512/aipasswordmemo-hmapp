@@ -118,7 +118,7 @@ struct Commonsetting {
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
       .padding({

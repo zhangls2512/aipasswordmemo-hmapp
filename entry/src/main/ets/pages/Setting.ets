@@ -207,7 +207,7 @@ export default struct Setting {
             .alignItems(HorizontalAlign.Start)
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
 
           if (!this.cloudServiceLoading && this.cloudService) {

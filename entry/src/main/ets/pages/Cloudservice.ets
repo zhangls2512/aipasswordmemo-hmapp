@@ -25,7 +25,7 @@ struct Cloudservice {
               .width('50%')
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .width('100%')
         }
@@ -59,7 +59,7 @@ struct Cloudservice {
             .alignItems(HorizontalAlign.Start)
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
 
           ListItem() {
