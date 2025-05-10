@@ -54,5 +54,6 @@ export async function getRepeatPasswordList(): Promise<RepeatItem[]> {
     }
   }
   resultSet.close()
-  return Array.from(arrayMap.values())
+  const array = Array.from(arrayMap.values()).filter(item => item.count !== 1).sort((a, b) => b.count - a.count)
+  return array
 }

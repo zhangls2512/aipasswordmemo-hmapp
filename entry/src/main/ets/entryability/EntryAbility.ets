@@ -1,16 +1,19 @@
-import { AbilityConstant, appRecovery, ConfigurationConstant, errorManager, UIAbility } from '@kit.AbilityKit'
+import { AbilityConstant, appRecovery, ConfigurationConstant, errorManager, UIAbility, Want } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { preferences, relationalStore } from '@kit.ArkData'
+import { util } from '@kit.ArkTS'
 import { promptAction, window } from '@kit.ArkUI'
 import { wifiManager } from '@kit.ConnectivityKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
+import fs from '@ohos.file.fs'
 import { remove } from '../common/Accesstoken'
+import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import request from '../common/Request'
 
 export default class EntryAbility extends UIAbility {
-  async onCreate() {
+  async onCreate(want: Want) {
     const passwordRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'password',
       securityLevel: 4,
@@ -33,6 +36,48 @@ export default class EntryAbility extends UIAbility {
     })
     tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag (id INTEGER PRIMARY KEY AUTOINCREMENT, value, color, updateTime, cloudBackupTime)')
     appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
+    const uri = want.uri
+    if (uri) {
+      const file = fs.openSync(uri)
+      const size = fs.statSync(file.fd).size
+      const filebuffer = new ArrayBuffer(size)
+      fs.readSync(file.fd, filebuffer)
+      const decoder = util.TextDecoder.create()
+      const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
+      fs.closeSync(file)
+      const data = await promptAction.showActionMenu({
+        title: '选择导入类型',
+        buttons: [
+          {
+            text: '密码',
+            color: $r('sys.color.font_primary')
+          },
+          {
+            text: '常用信息',
+            color: $r('sys.color.font_primary')
+          },
+          {
+            text: '标签',
+            color: $r('sys.color.font_primary')
+          }
+        ]
+      })
+      if (data.index === 0) {
+        await importPassword(filestring, 0)
+        this.context.eventHub.emit('refreshPassword')
+      }
+      if (data.index === 1) {
+        await importInfo(filestring, 0)
+        this.context.eventHub.emit('refreshInfo')
+      }
+      if (data.index === 2) {
+        await importTag(filestring, 0)
+        this.context.eventHub.emit('refreshTag')
+      }
+      promptAction.showToast({
+        message: '导入成功'
+      })
+    }
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage) {
