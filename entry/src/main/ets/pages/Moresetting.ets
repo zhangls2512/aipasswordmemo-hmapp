@@ -139,5 +139,8 @@ struct Moresetting {
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
     })
+    .onDisAppear(() => {
+      this.context.eventHub.emit('refreshSetting')
+    })
   }
 }

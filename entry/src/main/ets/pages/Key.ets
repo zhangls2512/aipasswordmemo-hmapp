@@ -1,6 +1,5 @@
 import { common } from '@kit.AbilityKit'
 import { promptAction, window } from '@kit.ArkUI'
-import { emitter } from '@kit.BasicServicesKit'
 import { getKey, removeKey, setRandomKey } from '../common/Crypto'
 import { copy } from '../common/Pasteboard'
 
@@ -212,9 +211,12 @@ struct Keypage {
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
       this.keyValue = getKey()
-      emitter.on('4', () => {
+      this.context.eventHub.on('refreshKey', () => {
         this.keyValue = getKey()
       })
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.off('refreshKey')
     })
     .onShown(async () => {
       const lastWindow = await window.getLastWindow(this.context)
