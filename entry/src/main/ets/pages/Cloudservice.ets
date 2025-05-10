@@ -1,5 +1,5 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { emitter } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -13,6 +13,7 @@ export function CloudserviceBuilder() {
 struct Cloudservice {
   @Local cloudService: boolean = false
   @Local loading: boolean = false
+  context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
 
   build() {
@@ -24,7 +25,7 @@ struct Cloudservice {
               .width('50%')
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .width('100%')
         }
@@ -58,7 +59,7 @@ struct Cloudservice {
             .alignItems(HorizontalAlign.Start)
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
 
           ListItem() {
@@ -83,7 +84,7 @@ struct Cloudservice {
                       })
                       this.cloudService = true
                       this.pageInfos.pop()
-                      emitter.emit('2')
+                      this.context.eventHub.emit('refreshSetting')
                     }
                   })
               }
@@ -108,7 +109,7 @@ struct Cloudservice {
                       })
                       this.cloudService = false
                       this.pageInfos.pop()
-                      emitter.emit('2')
+                      this.context.eventHub.emit('refreshSetting')
                     }
                   })
               }

@@ -21,7 +21,7 @@ struct Infolist {
         .margin({
           left: $r('sys.float.ohos_id_corner_radius_default_m'),
           right: $r('sys.float.ohos_id_corner_radius_default_m'),
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
         ListItem() {

@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
@@ -15,6 +16,7 @@ export default struct TagPage {
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
   @Local orderColumnText: string = '修改时间'
+  context = getContext(this) as common.UIAbilityContext
   orderColumn: string = 'updateTime'
   updateId: number = 0
 
@@ -263,6 +265,17 @@ export default struct TagPage {
       if (cloudServiceStatus && getKey()) {
         this.enableCloudBackup = true
       }
+      this.context.eventHub.on('refreshTag', async () => {
+        this.enableCloudBackup = false
+        await this.getList()
+        const cloudServiceStatus = await getCloudServiceStatus()
+        if (cloudServiceStatus && getKey()) {
+          this.enableCloudBackup = true
+        }
+      })
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.off('refreshTag')
     })
     .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.updateId), {
       height: SheetSize.FIT_CONTENT,

@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
-import { emitter } from '@kit.BasicServicesKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import {
@@ -378,8 +377,22 @@ export default struct PasswordPage {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
+      this.filterPasswordDataPreferences.clearSync()
       await this.getList()
-      emitter.on('1', async () => {
+      const cloudServiceStatus = await getCloudServiceStatus()
+      if (cloudServiceStatus && getKey()) {
+        this.enableCloudBackup = true
+      }
+      this.context.eventHub.on('refreshPassword', async () => {
+        this.enableCloudBackup = false
+        this.filterPasswordDataPreferences.clearSync()
+        await this.getList()
+        const cloudServiceStatus = await getCloudServiceStatus()
+        if (cloudServiceStatus && getKey()) {
+          this.enableCloudBackup = true
+        }
+      })
+      this.context.eventHub.on('refreshFilterPassword', async () => {
         const data: Data = {
           nameKeyword: this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string,
           info: this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[],
@@ -389,13 +402,10 @@ export default struct PasswordPage {
         this.passwordArray = await getFilterPasswordList(data.nameKeyword, data.info, data.tag, this.orderColumn)
         this.loading = false
       })
-      const cloudServiceStatus = await getCloudServiceStatus()
-      if (cloudServiceStatus && getKey()) {
-        this.enableCloudBackup = true
-      }
     })
     .onDisAppear(() => {
-      emitter.off('1')
+      this.context.eventHub.off('refreshPassword')
+      this.context.eventHub.off('refreshFilterPassword')
     })
     .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.passwordId), {
       height: SheetSize.FIT_CONTENT,

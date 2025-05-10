@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
@@ -16,6 +17,7 @@ export default struct InfoPage {
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
+  context = getContext(this) as common.UIAbilityContext
   updateId: number = 0
 
   async getList() {
@@ -262,6 +264,17 @@ export default struct InfoPage {
       if (cloudServiceStatus && getKey()) {
         this.enableCloudBackup = true
       }
+      this.context.eventHub.on('refreshInfo', async () => {
+        this.enableCloudBackup = false
+        await this.getList()
+        const cloudServiceStatus = await getCloudServiceStatus()
+        if (cloudServiceStatus && getKey()) {
+          this.enableCloudBackup = true
+        }
+      })
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.off('refreshInfo')
     })
     .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.updateId), {
       height: SheetSize.FIT_CONTENT,

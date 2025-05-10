@@ -89,7 +89,7 @@ struct Moresetting {
           .alignItems(HorizontalAlign.Start)
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
         ListItem() {
@@ -138,6 +138,9 @@ struct Moresetting {
     .title('其他')
     .onReady((context: NavDestinationContext) => {
       this.pageInfos = context.pathStack
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.emit('refreshSetting')
     })
   }
 }

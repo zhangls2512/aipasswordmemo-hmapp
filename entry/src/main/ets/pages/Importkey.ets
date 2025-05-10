@@ -1,6 +1,5 @@
 import { common } from '@kit.AbilityKit'
 import { window } from '@kit.ArkUI'
-import { emitter } from '@kit.BasicServicesKit'
 import { setCustomKey } from '../common/Crypto'
 
 @Builder
@@ -33,13 +32,13 @@ struct Importkey {
               .onClick(async () => {
                 await setCustomKey(this.keyValue)
                 this.pageInfos.pop()
-                emitter.emit('4')
+                this.context.eventHub.emit('refreshKey')
               })
           }
           .width('100%')
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
       .padding({

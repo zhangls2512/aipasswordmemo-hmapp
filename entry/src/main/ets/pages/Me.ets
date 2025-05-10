@@ -111,9 +111,6 @@ export default struct Me {
         .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
         .padding($r('sys.float.ohos_id_corner_radius_mark'))
       }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
 
       ListItem() {
         Column() {
@@ -260,6 +257,12 @@ export default struct Me {
     })
     .onAppear(() => {
       this.getEmail()
+      this.context.eventHub.on('refreshMe', () => {
+        this.getEmail()
+      })
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.off('refreshMe')
     })
   }
 }

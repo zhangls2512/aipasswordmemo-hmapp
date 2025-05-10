@@ -1,5 +1,5 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { emitter } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -11,6 +11,7 @@ export function VipcodeBuilder() {
 @ComponentV2
 struct Vipcode {
   @Local vipcode: string = ''
+  context = getContext(this) as common.UIAbilityContext
   pageInfos: NavPathStack = new NavPathStack()
   dialogControllerProgress: CustomDialogController = new CustomDialogController({
     builder: LoadingDialog({
@@ -45,13 +46,13 @@ struct Vipcode {
                     message: '兑换成功'
                   })
                   this.pageInfos.pop()
-                  emitter.emit('3')
+                  this.context.eventHub.emit('refreshVip')
                 }
               })
           }
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
         ListItem() {
