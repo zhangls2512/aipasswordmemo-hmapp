@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { preferences } from '@kit.ArkData'
-import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
@@ -39,15 +39,13 @@ export default struct Login {
             const accessToken = JSON.parse(res).accessToken as string
             const endDate = JSON.parse(res).endDate as number
             set(accessToken)
-            const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-              name: 'commonSetting'
+            const loginDataPreferences = preferences.getPreferencesSync(this.context, {
+              name: 'login'
             })
-            commonSettingDataPreferences.putSync('loginEndDate', endDate)
+            loginDataPreferences.putSync('endDate', endDate)
             promptAction.showToast({
               message: '登录成功'
             })
-            const lastWindow = await window.getLastWindow(this.context)
-            await lastWindow.setWindowPrivacyMode(false)
             this.isShowLoginSheet = false
           }
         }
@@ -302,15 +300,13 @@ export default struct Login {
                 const accessToken = JSON.parse(res).accessToken as string
                 const endDate = JSON.parse(res).endDate as number
                 set(accessToken)
-                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                  name: 'commonSetting'
+                const loginDataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: 'login'
                 })
-                commonSettingDataPreferences.putSync('loginEndDate', endDate)
+                loginDataPreferences.putSync('endDate', endDate)
                 promptAction.showToast({
                   message: '登录成功'
                 })
-                const lastWindow = await window.getLastWindow(this.context)
-                await lastWindow.setWindowPrivacyMode(false)
                 this.isShowLoginSheet = false
               }
             })

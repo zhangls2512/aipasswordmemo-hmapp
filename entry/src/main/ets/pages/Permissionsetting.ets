@@ -15,6 +15,7 @@ struct Permissionsetting {
     name: 'permissionSetting'
   })
   dataSync: boolean = getPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+  microphone: boolean = getPermission('ohos.permission.MICROPHONE')
 
   build() {
     NavDestination() {
@@ -62,6 +63,51 @@ struct Permissionsetting {
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
+
+        ListItem() {
+          Column() {
+            Column() {
+              Row() {
+                Text('麦克风')
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.microphone
+                })
+                  .enabled(false)
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text() {
+              Span($r('app.string.MICROPHONE_reason'))
+                .fontColor($r('sys.color.font_secondary'))
+              Span('请前往')
+                .fontColor($r('sys.color.font_secondary'))
+              Span('系统设置')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontWeight('medium')
+              Span('管理此权限。')
+                .fontColor($r('sys.color.font_secondary'))
+            }
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
+            .margin({
+              top: 6,
+              left: $r('sys.float.ohos_id_corner_radius_default_m'),
+              right: $r('sys.float.ohos_id_corner_radius_default_m')
+            })
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
         ListItem() {

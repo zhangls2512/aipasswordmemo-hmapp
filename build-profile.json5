@@ -18,13 +18,13 @@
         "name": "debug",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer",
+          "storeFile": "C:/Users/zls25/.ohos/config/debugtwo_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
+          "storePassword": "0000001BE3ED73817D3E39A347788C2452EF20DD73E654FFA3B5FE69BD49323FA520D3F813C4F4253BFC88",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B24DEB72D0DE149F928FC3954FAC62F1DCC505AC81452465B6FAC54DB7196084279EF9C73AC4DEE",
-          "profile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p7b",
+          "keyPassword": "0000001B59DBB7128DE93607B4349F4DFA4701682FD6EA5E6FBFAF4ED419C9598065A4076A777661D0C587",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
-          "storePassword": "0000001B12AB803EDA10BA8E89582AA60D7E7BA68327CE9F51561C2A6AA58D95B367DB80D9D078F4C851B9"
+          "profile": "C:/Users/zls25/.ohos/config/轩铭密码智能备忘录调试Debug.p7b",
+          "certpath": "C:/Users/zls25/.ohos/config/debugtwo_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer"
         }
       }
     ],
@@ -32,7 +32,6 @@
       {
         "name": "default",
         "signingConfig": "debug",
-        "bundleName": "com.zhangxm.aipasswordmemo.debug",
         "buildOption": {
           "arkOptions": {
             "autoLazyImport": true,

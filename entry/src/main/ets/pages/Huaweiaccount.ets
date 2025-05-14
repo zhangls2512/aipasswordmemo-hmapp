@@ -282,7 +282,6 @@ struct Huaweiaccount {
                   })
               }
               if (!this.isBind) {
-                Blank()
                 Row() {
                   Column() {
                     Toggle({
@@ -355,8 +354,6 @@ struct Huaweiaccount {
             const account = JSON.parse(accountres).data as Account[]
             if (account.some(item => item.platform === 'huawei')) {
               this.isBind = true
-            } else {
-              this.isBind = false
             }
           }
         } else {
