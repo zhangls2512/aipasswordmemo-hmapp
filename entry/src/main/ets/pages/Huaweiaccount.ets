@@ -5,7 +5,7 @@ import { get } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 
-export interface Account {
+interface Account {
   platform: string,
   openid: string
 }
