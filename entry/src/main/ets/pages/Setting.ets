@@ -47,12 +47,17 @@ export default struct Setting {
       this.vipStatusLoading = false
       if (userres !== 'fail') {
         const vipenddate = JSON.parse(userres).data.vipEndDate as number
-        if (vipenddate > 0 && vipenddate < Date.now()) {
-          this.vipStatus = '已过期'
+        if (vipenddate < 0) {
+          this.vipStatus = '未开通'
+          this.vipStatusColor = 'red'
         }
         if (vipenddate === 0 || vipenddate >= Date.now()) {
           this.vipStatus = '已开通'
           this.vipStatusColor = '#FFD700'
+        }
+        if (vipenddate > 0 && vipenddate < Date.now()) {
+          this.vipStatus = '已过期'
+          this.vipStatusColor = 'red'
         }
       }
     }

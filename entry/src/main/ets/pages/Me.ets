@@ -232,10 +232,10 @@ export default struct Me {
               })
               if (data.index === 1) {
                 remove()
-                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                  name: 'commonSetting'
+                const loginDataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: 'login'
                 })
-                commonSettingDataPreferences.deleteSync('loginEndDate')
+                loginDataPreferences.deleteSync('endDate')
                 this.email = ''
                 promptAction.showToast({
                   message: '退出成功'

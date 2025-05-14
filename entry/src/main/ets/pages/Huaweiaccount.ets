@@ -5,7 +5,7 @@ import { get } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 
-interface Account {
+export interface Account {
   platform: string,
   openid: string
 }
@@ -282,7 +282,6 @@ struct Huaweiaccount {
                   })
               }
               if (!this.isBind) {
-                Blank()
                 Row() {
                   Column() {
                     Toggle({
@@ -355,8 +354,6 @@ struct Huaweiaccount {
             const account = JSON.parse(accountres).data as Account[]
             if (account.some(item => item.platform === 'huawei')) {
               this.isBind = true
-            } else {
-              this.isBind = false
             }
           }
         } else {
