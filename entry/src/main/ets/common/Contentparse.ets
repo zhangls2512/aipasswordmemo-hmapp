@@ -33,14 +33,93 @@ export default async function parseContent(content: string): Promise<string[]> {
     array.push('已设置为深色模式。')
   }
   if (content.includes('检查更新')) {
-    const res = await updateManager.checkAppUpdate(context)
-    const hasUpdate = res.updateAvailable
-    if (hasUpdate === 0) {
-      array.push('您目前使用的已经是最新版本了。')
+    try {
+      const res = await updateManager.checkAppUpdate(context)
+      const hasUpdate = res.updateAvailable
+      if (hasUpdate === 0) {
+        array.push('您目前使用的已经是最新版本了。')
+      }
+      if (hasUpdate === 1) {
+        updateManager.showUpdateDialog(context)
+        array.push('有新版本，您可在弹窗中立即更新。')
+      }
+    } catch {
+      array.push('很抱歉，帮您检查更新失败了。')
     }
-    if (hasUpdate === 1) {
-      updateManager.showUpdateDialog(context)
-      array.push('有新版本，您可在弹窗中立即更新。')
+  }
+  if (content.includes('开启密码同步')) {
+    const onTables = dataSettingDataPreferences.getSync('onTables', []) as string[]
+    if (onTables.includes('password')) {
+      array.push('密码同步已开启。')
+    }
+    if (!onTables.includes('password')) {
+      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+      if (!res) {
+        array.push('很抱歉，因您未授权，帮您开启密码同步失败了。')
+      }
+      if (res) {
+        const rdbStore = await relationalStore.getRdbStore(context, {
+          name: 'password',
+          securityLevel: 4,
+          encrypt: true,
+          allowRebuild: true
+        })
+        await rdbStore.setDistributedTables(['password'])
+        const newOnTables = [...onTables, 'password']
+        dataSettingDataPreferences.putSync('onTables', newOnTables)
+        dataSettingDataPreferences.flushSync()
+        array.push('已帮您开启密码同步。')
+      }
+    }
+  }
+  if (content.includes('开启常用信息同步')) {
+    const onTables = dataSettingDataPreferences.getSync('onTables', []) as string[]
+    if (onTables.includes('info')) {
+      array.push('常用信息同步已开启。')
+    }
+    if (!onTables.includes('info')) {
+      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+      if (!res) {
+        array.push('很抱歉，因您未授权，帮您开启常用信息同步失败了。')
+      }
+      if (res) {
+        const rdbStore = await relationalStore.getRdbStore(context, {
+          name: 'info',
+          securityLevel: 4,
+          encrypt: true,
+          allowRebuild: true
+        })
+        await rdbStore.setDistributedTables(['info'])
+        const newOnTables = [...onTables, 'info']
+        dataSettingDataPreferences.putSync('onTables', newOnTables)
+        dataSettingDataPreferences.flushSync()
+        array.push('已帮您开启常用信息同步。')
+      }
+    }
+  }
+  if (content.includes('开启标签同步')) {
+    const onTables = dataSettingDataPreferences.getSync('onTables', []) as string[]
+    if (onTables.includes('tag')) {
+      array.push('标签同步已开启。')
+    }
+    if (!onTables.includes('tag')) {
+      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+      if (!res) {
+        array.push('很抱歉，因您未授权，帮您开启标签同步失败了。')
+      }
+      if (res) {
+        const rdbStore = await relationalStore.getRdbStore(context, {
+          name: 'tag',
+          securityLevel: 1,
+          encrypt: true,
+          allowRebuild: true
+        })
+        await rdbStore.setDistributedTables(['tag'])
+        const newOnTables = [...onTables, 'tag']
+        dataSettingDataPreferences.putSync('onTables', newOnTables)
+        dataSettingDataPreferences.flushSync()
+        array.push('已帮您开启标签同步。')
+      }
     }
   }
   if (content.includes('开启密码自动同步')) {
@@ -131,81 +210,6 @@ export default async function parseContent(content: string): Promise<string[]> {
       dataSettingDataPreferences.putSync('autoSyncTables', newAutoSyncTables)
       dataSettingDataPreferences.flushSync()
       array.push('已帮您关闭标签自动同步。')
-    }
-  }
-  if (content.includes('开启密码同步')) {
-    const onTables = dataSettingDataPreferences.getSync('onTables', []) as string[]
-    if (onTables.includes('password')) {
-      array.push('密码同步已开启。')
-    }
-    if (!onTables.includes('password')) {
-      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
-      if (!res) {
-        array.push('很抱歉，因您未授权，帮您开启密码同步失败了。')
-      }
-      if (res) {
-        const rdbStore = await relationalStore.getRdbStore(context, {
-          name: 'password',
-          securityLevel: 4,
-          encrypt: true,
-          allowRebuild: true
-        })
-        await rdbStore.setDistributedTables(['password'])
-        const newOnTables = [...onTables, 'password']
-        dataSettingDataPreferences.putSync('onTables', newOnTables)
-        dataSettingDataPreferences.flushSync()
-        array.push('已帮您开启密码同步。')
-      }
-    }
-  }
-  if (content.includes('开启常用信息同步')) {
-    const onTables = dataSettingDataPreferences.getSync('onTables', []) as string[]
-    if (onTables.includes('info')) {
-      array.push('常用信息同步已开启。')
-    }
-    if (!onTables.includes('info')) {
-      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
-      if (!res) {
-        array.push('很抱歉，因您未授权，帮您开启常用信息同步失败了。')
-      }
-      if (res) {
-        const rdbStore = await relationalStore.getRdbStore(context, {
-          name: 'info',
-          securityLevel: 4,
-          encrypt: true,
-          allowRebuild: true
-        })
-        await rdbStore.setDistributedTables(['info'])
-        const newOnTables = [...onTables, 'info']
-        dataSettingDataPreferences.putSync('onTables', newOnTables)
-        dataSettingDataPreferences.flushSync()
-        array.push('已帮您开启常用信息同步。')
-      }
-    }
-  }
-  if (content.includes('开启标签同步')) {
-    const onTables = dataSettingDataPreferences.getSync('onTables', []) as string[]
-    if (onTables.includes('tag')) {
-      array.push('标签同步已开启。')
-    }
-    if (!onTables.includes('tag')) {
-      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
-      if (!res) {
-        array.push('很抱歉，因您未授权，帮您开启标签同步失败了。')
-      }
-      if (res) {
-        const rdbStore = await relationalStore.getRdbStore(context, {
-          name: 'tag',
-          securityLevel: 1,
-          encrypt: true,
-          allowRebuild: true
-        })
-        await rdbStore.setDistributedTables(['tag'])
-        const newOnTables = [...onTables, 'tag']
-        dataSettingDataPreferences.putSync('onTables', newOnTables)
-        dataSettingDataPreferences.flushSync()
-        array.push('已帮您开启标签同步。')
-      }
     }
   }
   if (content.includes('开启密码自动备份')) {
