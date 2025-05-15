@@ -1,3 +1,6 @@
+import { common } from '@kit.AbilityKit'
+import { promptAction } from '@kit.ArkUI'
+import { iap } from '@kit.IAPKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -22,16 +25,6 @@ struct Viplog {
   build() {
     NavDestination() {
       List() {
-        if (this.loading) {
-          ListItem() {
-            LoadingProgress()
-              .width('20%')
-          }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-          .width('100%')
-        }
         if (this.viplogArray.length === 0 && !this.loading) {
           ListItem() {
             Text('无数据')
@@ -124,6 +117,44 @@ struct Viplog {
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
               .padding($r('sys.float.ohos_id_corner_radius_default_m'))
               .width('100%')
+
+              if (item.type === 'pay') {
+                Divider()
+                  .padding({
+                    left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                    right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  })
+                Row() {
+                  Text('申请退款')
+                    .fontWeight('medium')
+                  Blank()
+                  Image($r('app.media.right'))
+                    .fillColor($r('sys.color.icon_fourth'))
+                    .height(12)
+                    .width(12)
+                }
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .stateStyles({
+                  normal: {
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  pressed: {
+                    .backgroundColor($r('sys.color.interactive_pressed'))
+                  }
+                })
+                .width('100%')
+                .onClick(() => {
+                  const context = getContext() as common.UIAbilityContext
+                  try {
+                    iap.createRefundRequest(context, item.info)
+                  } catch (err) {
+                    promptAction.showToast({
+                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                    })
+                  }
+                })
+              }
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -133,6 +164,16 @@ struct Viplog {
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
+        if (this.loading) {
+          ListItem() {
+            LoadingProgress()
+              .width('20%')
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+          .width('100%')
+        }
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

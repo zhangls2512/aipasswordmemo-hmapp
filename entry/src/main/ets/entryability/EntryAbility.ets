@@ -96,10 +96,13 @@ export default class EntryAbility extends UIAbility {
     if (colorMode === 2) {
       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
     }
-    const loginEndDate = commonSettingDataPreferences.getSync('loginEndDate', 0)
+    const loginDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'login'
+    })
+    const loginEndDate = loginDataPreferences.getSync('endDate', 0)
     if (loginEndDate !== 0 && loginEndDate < Date.now()) {
       remove()
-      commonSettingDataPreferences.deleteSync('loginEndDate')
+      loginDataPreferences.deleteSync('endDate')
       promptAction.showToast({
         message: '登录态过期，请重新登录'
       })

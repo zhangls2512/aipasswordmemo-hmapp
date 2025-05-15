@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { window } from '@kit.ArkUI'
 import Password from './Password'
 import Info from './Info'
+import Aihelper from './Aihelper'
 import Tag from './Tag'
 import Me from './Me'
 
@@ -47,16 +48,22 @@ struct Index {
         .tabBar(this.tabBuilder(1, $r('app.media.info'), '常用信息'))
 
         TabContent() {
+          Aihelper()
+            .height('100%')
+        }
+        .tabBar(this.tabBuilder(2, $r('app.media.microphone'), 'AI 助手'))
+
+        TabContent() {
           Tag()
             .height('100%')
         }
-        .tabBar(this.tabBuilder(2, $r('app.media.tag'), '标签'))
+        .tabBar(this.tabBuilder(3, $r('app.media.tag'), '标签'))
 
         TabContent() {
           Me()
             .height('100%')
         }
-        .tabBar(this.tabBuilder(3, $r('app.media.me'), '我的'))
+        .tabBar(this.tabBuilder(4, $r('app.media.me'), '我的'))
       }
       .scrollable(false)
       .onAnimationStart(async (index: number, targetIndex: number) => {
@@ -75,10 +82,13 @@ struct Index {
           this.context.eventHub.emit('refreshInfo')
         }
         if (targetIndex === 2) {
+          this.title = 'AI 助手'
+        }
+        if (targetIndex === 3) {
           this.title = '标签'
           this.context.eventHub.emit('refreshTag')
         }
-        if (targetIndex === 3) {
+        if (targetIndex === 4) {
           this.title = '我的'
           this.context.eventHub.emit('refreshMe')
         }
