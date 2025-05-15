@@ -220,7 +220,7 @@ struct Tablesync {
                 })
                   .enabled(this.onPassword)
                   .onChange((isOn: boolean) => {
-                    let autoSyncTables = [] as string[]
+                    let autoSyncTables: string[] = []
                     if (!isOn) {
                       autoSyncTables = this.autoSyncTables.filter(item => item !== 'password')
                     }
@@ -251,7 +251,7 @@ struct Tablesync {
                 })
                   .enabled(this.onInfo)
                   .onChange((isOn: boolean) => {
-                    let autoSyncTables = [] as string[]
+                    let autoSyncTables: string[] = []
                     if (!isOn) {
                       autoSyncTables = this.autoSyncTables.filter(item => item !== 'info')
                     }
@@ -282,7 +282,7 @@ struct Tablesync {
                 })
                   .enabled(this.onTag)
                   .onChange((isOn: boolean) => {
-                    let autoSyncTables = [] as string[]
+                    let autoSyncTables: string[] = []
                     if (!isOn) {
                       autoSyncTables = this.autoSyncTables.filter(item => item !== 'tag')
                     }

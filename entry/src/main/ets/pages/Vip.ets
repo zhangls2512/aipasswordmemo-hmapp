@@ -443,15 +443,20 @@ struct Vip {
       if (res !== 'fail') {
         this.uid = JSON.parse(res).data.uid as string
       }
-      try {
-        await iap.queryEnvironmentStatus(this.context)
+      if (this.vipEndDate === '终身') {
         this.iapStatusLoading = false
-        this.iapStatus = true
-      } catch (err) {
-        this.iapStatusLoading = false
-        promptAction.showToast({
-          message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-        })
+      }
+      if (this.vipEndDate !== '终身') {
+        try {
+          await iap.queryEnvironmentStatus(this.context)
+          this.iapStatusLoading = false
+          this.iapStatus = true
+        } catch (err) {
+          this.iapStatusLoading = false
+          promptAction.showToast({
+            message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+          })
+        }
       }
     })
     .onDisAppear(() => {
