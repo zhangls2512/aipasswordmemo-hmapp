@@ -1,5 +1,7 @@
 import { common } from '@kit.AbilityKit'
+import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
+import { promptAction } from '@kit.ArkUI'
 import openLink from '../common/Openlink'
 
 @Builder
@@ -51,7 +53,15 @@ struct Servicemode {
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontWeight('medium')
                 .onClick(() => {
-                  openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
+                  try {
+                    const appPrivacyLink =
+                      privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
+                    openLink(appPrivacyLink?.url as string)
+                  } catch (err) {
+                    promptAction.showToast({
+                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                    })
+                  }
                 })
               Span('。开启开关，即表示您知悉并同意我们向您提供本应用服务。')
                 .fontColor($r('sys.color.font_secondary'))

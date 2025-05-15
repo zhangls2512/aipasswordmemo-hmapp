@@ -68,7 +68,7 @@ struct DataBackupRecovery {
                   isOn: $$this.autoBackupPassword
                 })
                   .onChange((isOn: boolean) => {
-                    let autoBackupTables = [] as string[]
+                    let autoBackupTables: string[] = []
                     if (!isOn) {
                       autoBackupTables = this.autoBackupTables.filter(item => item !== 'password')
                     }
@@ -98,7 +98,7 @@ struct DataBackupRecovery {
                   isOn: $$this.autoBackupInfo
                 })
                   .onChange((isOn: boolean) => {
-                    let autoBackupTables = [] as string[]
+                    let autoBackupTables: string[] = []
                     if (!isOn) {
                       autoBackupTables = this.autoBackupTables.filter(item => item !== 'info')
                     }
@@ -128,7 +128,7 @@ struct DataBackupRecovery {
                   isOn: $$this.autoBackupTag
                 })
                   .onChange((isOn: boolean) => {
-                    let autoBackupTables = [] as string[]
+                    let autoBackupTables: string[] = []
                     if (!isOn) {
                       autoBackupTables = this.autoBackupTables.filter(item => item !== 'tag')
                     }
