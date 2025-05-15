@@ -7,7 +7,6 @@ import UpdatePassword from './Updatepassword'
 export default struct Passwordcheck {
   @Provider() isShowUpdateSheet: boolean = false
   @Local repeatArray: RepeatItem[] = []
-  @Local loading: boolean = false
   context = getContext(this) as common.UIAbilityContext
   passwordId: number = 0
 
@@ -28,17 +27,7 @@ export default struct Passwordcheck {
         bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
 
-      if (this.loading) {
-        ListItem() {
-          LoadingProgress()
-            .width('10%')
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
-        .width('100%')
-      }
-      if (this.repeatArray.length === 0 && !this.loading) {
+      if (this.repeatArray.length === 0) {
         ListItem() {
           Text('无数据')
         }
@@ -111,9 +100,7 @@ export default struct Passwordcheck {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      this.loading = true
       this.repeatArray = await getRepeatPasswordList()
-      this.loading = false
     })
     .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.passwordId), {
       height: SheetSize.FIT_CONTENT,

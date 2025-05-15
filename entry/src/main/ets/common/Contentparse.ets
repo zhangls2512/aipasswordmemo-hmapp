@@ -10,7 +10,7 @@ import request from './Request'
 import { backupTable, recoveryTable } from './Table'
 
 export default async function parseContent(content: string): Promise<string[]> {
-  const array = [] as string[]
+  const array: string[] = []
   const context = getContext() as common.UIAbilityContext
   const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'commonSetting'

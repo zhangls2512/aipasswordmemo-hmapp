@@ -49,6 +49,16 @@ struct Permissionsetting {
               Span('系统设置')
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontWeight('medium')
+                .onClick(() => {
+                  this.context.startAbility({
+                    bundleName: 'com.huawei.hmos.settings',
+                    abilityName: 'com.huawei.hmos.settings.MainAbility',
+                    uri: 'application_info_entry',
+                    parameters: {
+                      pushParams: 'com.zhangxm.aipasswordmemo'
+                    }
+                  })
+                })
               Span('管理此权限。')
                 .fontColor($r('sys.color.font_secondary'))
             }
@@ -94,6 +104,16 @@ struct Permissionsetting {
               Span('系统设置')
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontWeight('medium')
+                .onClick(() => {
+                  this.context.startAbility({
+                    bundleName: 'com.huawei.hmos.settings',
+                    abilityName: 'com.huawei.hmos.settings.MainAbility',
+                    uri: 'application_info_entry',
+                    parameters: {
+                      pushParams: 'com.zhangxm.aipasswordmemo'
+                    }
+                  })
+                })
               Span('管理此权限。')
                 .fontColor($r('sys.color.font_secondary'))
             }

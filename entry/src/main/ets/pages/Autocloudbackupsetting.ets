@@ -40,7 +40,7 @@ struct Autocloudbackupsetting {
                 isOn: this.password
               })
                 .onChange((isOn: boolean) => {
-                  let autoOn = [] as string[]
+                  let autoOn: string[] = []
                   if (!isOn) {
                     autoOn = this.autoOn.filter(item => item !== 'password')
                   }
@@ -70,7 +70,7 @@ struct Autocloudbackupsetting {
                 isOn: this.info
               })
                 .onChange((isOn: boolean) => {
-                  let autoOn = [] as string[]
+                  let autoOn: string[] = []
                   if (!isOn) {
                     autoOn = this.autoOn.filter(item => item !== 'info')
                   }
@@ -100,7 +100,7 @@ struct Autocloudbackupsetting {
                 isOn: this.tag
               })
                 .onChange((isOn: boolean) => {
-                  let autoOn = [] as string[]
+                  let autoOn: string[] = []
                   if (!isOn) {
                     autoOn = this.autoOn.filter(item => item !== 'tag')
                   }

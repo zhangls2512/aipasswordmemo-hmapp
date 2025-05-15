@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
+import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
@@ -355,12 +356,28 @@ export default struct Login {
               Span('《轩铭密码智能备忘录用户服务条款与条件》')
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(() => {
-                  openLink('https://docs.qq.com/doc/p/575bbc2072a149822917882aa974fcba0e111dac')
+                  try {
+                    const appPrivacyLink =
+                      privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 2)
+                    openLink(appPrivacyLink?.url as string)
+                  } catch (err) {
+                    promptAction.showToast({
+                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                    })
+                  }
                 })
               Span('《关于轩铭密码智能备忘录与隐私的声明》')
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(() => {
-                  openLink('https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1657460888438843904')
+                  try {
+                    const appPrivacyLink =
+                      privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
+                    openLink(appPrivacyLink?.url as string)
+                  } catch (err) {
+                    promptAction.showToast({
+                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                    })
+                  }
                 })
               Span('。如果使用华为账号登录，已阅读并同意')
               Span('《华为账号用户认证协议》')
