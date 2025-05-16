@@ -259,19 +259,19 @@ export default struct InfoPage {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      await this.getList()
-      const cloudServiceStatus = await getCloudServiceStatus()
-      if (cloudServiceStatus && getKey()) {
-        this.enableCloudBackup = true
-      }
       this.context.eventHub.on('refreshInfo', async () => {
         this.enableCloudBackup = false
-        await this.getList()
+        this.getList()
         const cloudServiceStatus = await getCloudServiceStatus()
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
       })
+      this.getList()
+      const cloudServiceStatus = await getCloudServiceStatus()
+      if (cloudServiceStatus && getKey()) {
+        this.enableCloudBackup = true
+      }
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshInfo')

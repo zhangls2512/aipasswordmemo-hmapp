@@ -1,0 +1,32 @@
+{
+  "shortcuts": [
+    {
+      "shortcutId": "newPassword",
+      "label": "$string:newPassword",
+      "icon": "$media:new",
+      "wants": [
+        {
+          "bundleName": "com.zhangxm.aipasswordmemo",
+          "abilityName": "EntryAbility",
+          "parameters": {
+            "shortcutId": "newPassword"
+          }
+        }
+      ]
+    },
+    {
+      "shortcutId": "searchPassword",
+      "label": "$string:searchPassword",
+      "icon": "$media:search",
+      "wants": [
+        {
+          "bundleName": "com.zhangxm.aipasswordmemo",
+          "abilityName": "EntryAbility",
+          "parameters": {
+            "shortcutId": "searchPassword"
+          }
+        }
+      ]
+    }
+  ]
+}
