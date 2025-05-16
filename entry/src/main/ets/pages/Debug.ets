@@ -2353,6 +2353,19 @@ struct Debug {
       systemLoad.getLevel().then((res: systemLoad.SystemLoadLevel) => {
         this.systemLoadValue = res
       })
+      const storageStatisticsInfo = await storageStatistics.getCurrentBundleStats()
+      this.storageStatisticsInfoArray.push({
+        name: '应用安装文件',
+        value: String(storageStatisticsInfo.appSize) + ' B'
+      })
+      this.storageStatisticsInfoArray.push({
+        name: '应用缓存文件',
+        value: String(storageStatisticsInfo.cacheSize) + ' B'
+      })
+      this.storageStatisticsInfoArray.push({
+        name: '应用其他文件',
+        value: String(storageStatisticsInfo.dataSize) + ' B'
+      })
       try {
         const connectionProperties = connection.getConnectionPropertiesSync(connection.getDefaultNetSync())
         this.networkInfoArray.concat([
@@ -2531,19 +2544,6 @@ struct Debug {
               cellularDataState === 2 ? '已连接' :
                 cellularDataState === 3 ? '被挂起' :
                   'undefined'
-      })
-      const storageStatisticsInfo = await storageStatistics.getCurrentBundleStats()
-      this.storageStatisticsInfoArray.push({
-        name: '应用安装文件',
-        value: String(storageStatisticsInfo.appSize) + ' B'
-      })
-      this.storageStatisticsInfoArray.push({
-        name: '应用缓存文件',
-        value: String(storageStatisticsInfo.cacheSize) + ' B'
-      })
-      this.storageStatisticsInfoArray.push({
-        name: '应用其他文件',
-        value: String(storageStatisticsInfo.dataSize) + ' B'
       })
     })
   }

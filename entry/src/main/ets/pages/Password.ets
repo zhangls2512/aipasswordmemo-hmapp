@@ -34,6 +34,9 @@ export default struct PasswordPage {
   @Local enableCloudBackup: boolean = false
   @Local orderColumnText: string = '修改时间'
   context = getContext(this) as common.UIAbilityContext
+  shortcutDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'shortcut'
+  })
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
   })
@@ -377,20 +380,29 @@ export default struct PasswordPage {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      this.filterPasswordDataPreferences.clearSync()
-      await this.getList()
-      const cloudServiceStatus = await getCloudServiceStatus()
-      if (cloudServiceStatus && getKey()) {
-        this.enableCloudBackup = true
-      }
       this.context.eventHub.on('refreshPassword', async () => {
         this.enableCloudBackup = false
         this.filterPasswordDataPreferences.clearSync()
-        await this.getList()
+        this.getList()
         const cloudServiceStatus = await getCloudServiceStatus()
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
+      })
+      const shortcutId = this.shortcutDataPreferences.getSync('shortcutId', '') as string
+      if (shortcutId === 'newPassword') {
+        this.isShowNewSheet = !this.isShowNewSheet
+        this.shortcutDataPreferences.deleteSync('shortcutId')
+      }
+      if (shortcutId === 'searchPassword') {
+        this.isShowFilterSheet = !this.isShowFilterSheet
+        this.shortcutDataPreferences.deleteSync('shortcutId')
+      }
+      this.context.eventHub.on('newPassword', async () => {
+        this.isShowNewSheet = !this.isShowNewSheet
+      })
+      this.context.eventHub.on('searchPassword', async () => {
+        this.isShowFilterSheet = !this.isShowFilterSheet
       })
       this.context.eventHub.on('refreshFilterPassword', async () => {
         const data: Data = {
@@ -402,6 +414,12 @@ export default struct PasswordPage {
         this.passwordArray = await getFilterPasswordList(data.nameKeyword, data.info, data.tag, this.orderColumn)
         this.loading = false
       })
+      this.filterPasswordDataPreferences.clearSync()
+      this.getList()
+      const cloudServiceStatus = await getCloudServiceStatus()
+      if (cloudServiceStatus && getKey()) {
+        this.enableCloudBackup = true
+      }
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshPassword')

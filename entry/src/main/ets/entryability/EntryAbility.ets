@@ -36,7 +36,84 @@ export default class EntryAbility extends UIAbility {
     })
     tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag (id INTEGER PRIMARY KEY AUTOINCREMENT, value, color, updateTime, cloudBackupTime)')
     appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
-    const uri = want.uri
+    if (want.parameters?.shortcutId) {
+      const shortcutDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'shortcut'
+      })
+      shortcutDataPreferences.putSync('shortcutId', want.parameters?.shortcutId)
+    }
+    if (want.parameters?.shortcutId === 'newPassword') {
+      this.context.eventHub.emit('newPassword')
+    }
+    if (want.parameters?.shortcutId === 'searchPassword') {
+      this.context.eventHub.emit('searchPassword')
+    }
+    let uri = ''
+    if (want.uri) {
+      uri = want.uri
+    }
+    if (want.parameters?.menuHandler === 'openMenu') {
+      const uriList = want.parameters.uriList as string[]
+      uri = uriList[0] as string
+    }
+    if (uri) {
+      const file = fs.openSync(uri)
+      const size = fs.statSync(file.fd).size
+      const filebuffer = new ArrayBuffer(size)
+      fs.readSync(file.fd, filebuffer)
+      const decoder = util.TextDecoder.create()
+      const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
+      fs.closeSync(file)
+      const data = await promptAction.showActionMenu({
+        title: '选择导入类型',
+        buttons: [
+          {
+            text: '密码',
+            color: $r('sys.color.font_primary')
+          },
+          {
+            text: '常用信息',
+            color: $r('sys.color.font_primary')
+          },
+          {
+            text: '标签',
+            color: $r('sys.color.font_primary')
+          }
+        ]
+      })
+      if (data.index === 0) {
+        await importPassword(filestring, 0)
+        this.context.eventHub.emit('refreshPassword')
+      }
+      if (data.index === 1) {
+        await importInfo(filestring, 0)
+        this.context.eventHub.emit('refreshInfo')
+      }
+      if (data.index === 2) {
+        await importTag(filestring, 0)
+        this.context.eventHub.emit('refreshTag')
+      }
+      promptAction.showToast({
+        message: '导入成功'
+      })
+    }
+  }
+
+  async onNewWant(want: Want) {
+    if (want.parameters?.shortcutId === 'newPassword') {
+      this.context.eventHub.emit('newPassword')
+    }
+    if (want.parameters?.shortcutId === 'searchPassword') {
+      this.context.eventHub.emit('searchPassword')
+    }
+    let uri = ''
+    if (want.uri) {
+      uri = want.uri
+    }
+    if (want.parameters?.menuHandler === 'openMenu') {
+      const uriList = want.parameters.uriList as string[]
+      uri = uriList[0] as string
+    }
     if (uri) {
       const file = fs.openSync(uri)
       const size = fs.statSync(file.fd).size
