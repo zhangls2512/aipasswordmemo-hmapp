@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { Info, Password, Tag } from './Dataget'
@@ -7,7 +6,7 @@ import { autoBackupTable, autoSyncTable } from './Table'
 export async function importPassword(data: string, conflict: relationalStore.ConflictResolution) {
   try {
     const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as Password[]
-    const context = getContext() as common.UIAbilityContext
+    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'password',
       securityLevel: 4,
@@ -36,7 +35,7 @@ export async function importPassword(data: string, conflict: relationalStore.Con
 export async function importInfo(data: string, conflict: relationalStore.ConflictResolution) {
   try {
     const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as Info[]
-    const context = getContext() as common.UIAbilityContext
+    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
       securityLevel: 4,
@@ -64,7 +63,7 @@ export async function importInfo(data: string, conflict: relationalStore.Conflic
 export async function importTag(data: string, conflict: relationalStore.ConflictResolution) {
   try {
     const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as Tag[]
-    const context = getContext() as common.UIAbilityContext
+    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'tag',
       securityLevel: 1,

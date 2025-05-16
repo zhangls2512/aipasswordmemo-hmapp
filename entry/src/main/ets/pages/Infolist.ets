@@ -7,7 +7,7 @@ export function InfolistBuilder() {
 
 @ComponentV2
 struct Infolist {
-  pageInfos: NavPathStack = new NavPathStack()
+  pageInfos = new NavPathStack()
 
   build() {
     NavDestination() {
@@ -16,7 +16,7 @@ struct Infolist {
           Text('张轩铭 (以下简称我) 会严格遵从国家的法规要求，将合法合规融入产品设计和业务流程中，并采用业界先进的安全技术保证数据安全。\n在新的服务需求及业务功能变更时，我可能会调整我收集信息的范围，并及时在本说明中向您说明情况。')
             .fontColor($r('sys.color.font_secondary'))
             .fontSize($r('sys.float.ohos_id_text_size_body2'))
-            .fontWeight('medium')
+            .fontWeight(FontWeight.Medium)
         }
         .margin({
           left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -29,7 +29,7 @@ struct Infolist {
             Text('华为账号 UnionID')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -37,7 +37,7 @@ struct Infolist {
             Column() {
               Column() {
                 Text('使用场景')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('华为账号登录时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -57,7 +57,7 @@ struct Infolist {
                 })
               Column() {
                 Text('使用目的')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('关联华为账号与轩铭 2512 统一账号')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -77,7 +77,7 @@ struct Infolist {
                 })
               Column() {
                 Text('收集时机')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('绑定华为账号时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -98,7 +98,7 @@ struct Infolist {
               Row() {
                 Column() {
                   Text('信息内容')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text('https://www.zhangls2512.cn/product/account/info')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -144,7 +144,7 @@ struct Infolist {
             Text('云备份数据')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -152,7 +152,7 @@ struct Infolist {
             Column() {
               Column() {
                 Text('使用场景')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('导入云备份时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -172,7 +172,7 @@ struct Infolist {
                 })
               Column() {
                 Text('使用目的')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('备份数据到云服务器')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -192,7 +192,7 @@ struct Infolist {
                 })
               Column() {
                 Text('收集时机')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('云备份时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -212,7 +212,7 @@ struct Infolist {
                 })
               Column() {
                 Text('信息内容')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('数据类型、数据行 ID、数据密文、密钥初始向量')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -240,7 +240,7 @@ struct Infolist {
             Text('故障日志')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -248,7 +248,7 @@ struct Infolist {
             Column() {
               Column() {
                 Text('使用场景')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('开发者分析故障时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -268,7 +268,7 @@ struct Infolist {
                 })
               Column() {
                 Text('使用目的')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('让开发者知晓故障，以便尽快修复，保障应用稳定运行')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -288,7 +288,7 @@ struct Infolist {
                 })
               Column() {
                 Text('收集时机')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('发生故障时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -308,7 +308,7 @@ struct Infolist {
                 })
               Row() {
                 Text('信息内容')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -347,7 +347,7 @@ struct Infolist {
             Text('意见反馈')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -355,7 +355,7 @@ struct Infolist {
             Column() {
               Column() {
                 Text('使用场景')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('开发者处理意见反馈时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -375,7 +375,7 @@ struct Infolist {
                 })
               Column() {
                 Text('使用目的')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('让开发者知晓意见反馈，以处理')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -395,7 +395,7 @@ struct Infolist {
                 })
               Column() {
                 Text('收集时机')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('提交意见反馈时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -415,7 +415,7 @@ struct Infolist {
                 })
               Column() {
                 Text('信息内容')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('内容、联系方式 (可选)')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))

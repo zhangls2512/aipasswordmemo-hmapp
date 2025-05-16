@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -13,8 +12,8 @@ export function CloudserviceBuilder() {
 struct Cloudservice {
   @Local cloudService: boolean = false
   @Local loading: boolean = false
-  context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
+  context = getContext(this)
+  pageInfos = new NavPathStack()
 
   build() {
     NavDestination() {
@@ -34,23 +33,23 @@ struct Cloudservice {
             Column() {
               if (!this.cloudService) {
                 Text('开通云服务后，可使用以下功能：')
-                  .fontWeight('bold')
+                  .fontWeight(FontWeight.Bold)
                 Text('· 云备份')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .margin({
                     top: $r('sys.float.ohos_id_text_paragraph_margin_m')
                   })
               }
               if (this.cloudService) {
                 Text('取消开通云服务前，需：')
-                  .fontWeight('bold')
+                  .fontWeight(FontWeight.Bold)
                 Text('· 清空云备份')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .margin({
                     top: $r('sys.float.ohos_id_text_paragraph_margin_m')
                   })
                 Text('· 无会员开通记录')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .margin({
                     top: $r('sys.float.ohos_id_text_paragraph_margin_s')
                   })
@@ -67,7 +66,7 @@ struct Cloudservice {
               if (!this.cloudService) {
                 Button('开通')
                   .onClick(async () => {
-                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                    const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
                         content: '开通中...'
                       })
@@ -92,7 +91,7 @@ struct Cloudservice {
                 Button('取消开通')
                   .role(ButtonRole.ERROR)
                   .onClick(async () => {
-                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                    const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
                         content: '取消开通中...'
                       })

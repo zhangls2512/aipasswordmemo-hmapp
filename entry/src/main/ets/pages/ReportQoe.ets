@@ -8,7 +8,7 @@ export function ReportQoeBuilder() {
 
 @ComponentV2
 struct ReportQoe {
-  pageInfos: NavPathStack = new NavPathStack()
+  pageInfos = new NavPathStack()
   serviceType: netQuality.ServiceType = 'default'
   qoeType: netQuality.QoeType = 'good'
 
@@ -20,7 +20,7 @@ struct ReportQoe {
             Column() {
               Row() {
                 Text('业务类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Select([
                   { value: '默认' },
@@ -56,7 +56,7 @@ struct ReportQoe {
                 })
               Row() {
                 Text('体验类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Select([
                   { value: '良好' },

@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
 import { get, remove } from '../common/Accesstoken'
@@ -16,7 +15,7 @@ export default struct Me {
   @Local isShowSettingSheet: boolean = false
   @Local loading: boolean = false
   @Local email: string = ''
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
 
   async getEmail() {
     const accessToken = get()
@@ -72,12 +71,12 @@ export default struct Me {
               if (!this.email) {
                 Text('登录')
                   .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-                  .fontWeight('bold')
+                  .fontWeight(FontWeight.Bold)
               }
               if (this.email) {
                 Text(this.email)
                   .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-                  .fontWeight('bold')
+                  .fontWeight(FontWeight.Bold)
               }
             }
           }
@@ -124,7 +123,7 @@ export default struct Me {
           Text('密码工具')
             .fontColor($r('sys.color.font_secondary'))
             .fontSize($r('sys.float.ohos_id_text_size_body2'))
-            .fontWeight('medium')
+            .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
               left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -138,7 +137,7 @@ export default struct Me {
                 })
                 .width(24)
               Text('安全检查')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -188,7 +187,7 @@ export default struct Me {
                 })
                 .width(24)
               Text('随机生成')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -245,7 +244,7 @@ export default struct Me {
               })
               .width(24)
             Text('设置')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
             Blank()
             Image($r('app.media.right'))
               .fillColor($r('sys.color.icon_fourth'))
@@ -324,10 +323,10 @@ export default struct Me {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(() => {
-      this.getEmail()
       this.context.eventHub.on('refreshMe', () => {
         this.getEmail()
       })
+      this.getEmail()
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshMe')

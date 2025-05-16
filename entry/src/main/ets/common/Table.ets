@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { batteryInfo, power } from '@kit.BasicServicesKit'
@@ -11,7 +10,7 @@ interface Item {
 }
 
 export async function syncTable(table: string, deviceId: string, syncMode: relationalStore.SyncMode) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   let securityLevel = 4
   if (table === 'tag') {
     securityLevel = 1
@@ -37,19 +36,17 @@ export async function syncTable(table: string, deviceId: string, syncMode: relat
 }
 
 export async function autoSyncTable(table: string) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
   })
   const debugSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'debugSetting'
   })
-  const pauseAutoSyncWhenLowBatteryCapacityLevel: preferences.ValueType =
+  const pauseAutoSyncWhenLowBatteryCapacityLevel =
     dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false) as boolean
-  const pauseAutoSyncWhenPowerSave: preferences.ValueType =
-    dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false) as boolean
-  const lowBatteryCapacityLevel: preferences.ValueType =
-    debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4) as number
+  const pauseAutoSyncWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false) as boolean
+  const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4) as number
   if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
     promptAction.showToast({
       message: '电池电量低，自动暂停同步'
@@ -77,7 +74,7 @@ export async function autoSyncTable(table: string) {
 }
 
 export async function backupTable(table: string) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   let securityLevel = 4
   if (table === 'tag') {
     securityLevel = 1
@@ -101,19 +98,18 @@ export async function backupTable(table: string) {
 }
 
 export async function autoBackupTable(table: string) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
   })
   const debugSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'debugSetting'
   })
-  const pauseAutoBackupWhenLowBatteryCapacityLevel: preferences.ValueType =
+  const pauseAutoBackupWhenLowBatteryCapacityLevel =
     dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false) as boolean
-  const pauseAutoBackupWhenPowerSave: preferences.ValueType =
+  const pauseAutoBackupWhenPowerSave =
     dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false) as boolean
-  const lowBatteryCapacityLevel: preferences.ValueType =
-    debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4) as number
+  const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4) as number
   if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
     promptAction.showToast({
       message: '电池电量低，自动暂停同步'
@@ -137,7 +133,7 @@ export async function autoBackupTable(table: string) {
 }
 
 export async function recoveryTable(table: string) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   let securityLevel = 4
   if (table === 'tag') {
     securityLevel = 1

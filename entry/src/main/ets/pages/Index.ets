@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { window } from '@kit.ArkUI'
 import Password from './Password'
 import Info from './Info'
@@ -11,7 +10,7 @@ import Me from './Me'
 struct Index {
   @Local index: number = 0
   @Local title: string = '密码'
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
 
   @Builder
   tabBuilder(index: number, image: Resource, title: string) {
@@ -30,7 +29,14 @@ struct Index {
   }
 
   build() {
-    Navigation() {
+    Column() {
+      Text(this.title)
+        .fontSize(24)
+        .fontWeight(FontWeight.Bold)
+        .margin({
+          bottom: $r('sys.float.ohos_id_elements_margin_vertical_l'),
+          left: $r('sys.float.ohos_id_default_padding_start')
+        })
       Tabs({
         barPosition: BarPosition.End,
         index: $$this.index
@@ -94,9 +100,12 @@ struct Index {
         }
       })
     }
+    .alignItems(HorizontalAlign.Start)
     .backgroundColor($r('sys.color.background_secondary'))
-    .hideBackButton(true)
-    .title(this.title)
-    .titleMode(NavigationTitleMode.Mini)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+    .padding({
+      bottom: 36,
+      top: 12
+    })
   }
 }

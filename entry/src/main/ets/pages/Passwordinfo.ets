@@ -17,12 +17,12 @@ export default struct Passwordinfo {
     List() {
       ListItem() {
         Text(this.passwordName)
-          .fontWeight('bold')
+          .fontWeight(FontWeight.Bold)
       }
 
       ListItem() {
         Text('信息')
-          .fontWeight('medium')
+          .fontWeight(FontWeight.Medium)
       }
       .margin({
         bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
@@ -35,7 +35,7 @@ export default struct Passwordinfo {
             Column() {
               Row() {
                 Text(item.type)
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -74,7 +74,7 @@ export default struct Passwordinfo {
               Row() {
                 Column() {
                   Text(this.mfaValue)
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text(item.type)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -119,7 +119,7 @@ export default struct Passwordinfo {
       if (this.passwordTag.length > 0) {
         ListItem() {
           Text('标签')
-            .fontWeight('medium')
+            .fontWeight(FontWeight.Medium)
         }
         .margin({
           bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
@@ -141,7 +141,7 @@ export default struct Passwordinfo {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                 Text(item.value)
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
               }
               .width('95%')
             }

@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { get } from '../common/Accesstoken'
@@ -39,7 +38,7 @@ struct Viplog {
             Column() {
               Row() {
                 Text('时长')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -60,7 +59,7 @@ struct Viplog {
                 })
               Row() {
                 Text('类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -83,7 +82,7 @@ struct Viplog {
                 })
               Row() {
                 Text('详情')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -104,7 +103,7 @@ struct Viplog {
                 })
               Row() {
                 Text('时间')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -126,7 +125,7 @@ struct Viplog {
                   })
                 Row() {
                   Text('申请退款')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Blank()
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
@@ -145,7 +144,7 @@ struct Viplog {
                 })
                 .width('100%')
                 .onClick(() => {
-                  const context = getContext() as common.UIAbilityContext
+                  const context = getContext()
                   try {
                     iap.createRefundRequest(context, item.info)
                   } catch (err) {

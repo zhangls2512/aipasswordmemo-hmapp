@@ -3,6 +3,7 @@ import { updateManager } from '@kit.AppGalleryKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { util } from '@kit.ArkTS'
 import { promptAction, window } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import { wifiManager } from '@kit.ConnectivityKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
@@ -52,7 +53,7 @@ export default class EntryAbility extends UIAbility {
     if (want.uri) {
       uri = want.uri
     }
-    if (want.parameters?.menuHandler === 'openMenu') {
+    if (want.parameters?.menuHandler === 'clickMenu') {
       const uriList = want.parameters.uriList as string[]
       uri = uriList[0] as string
     }
@@ -110,7 +111,7 @@ export default class EntryAbility extends UIAbility {
     if (want.uri) {
       uri = want.uri
     }
-    if (want.parameters?.menuHandler === 'openMenu') {
+    if (want.parameters?.menuHandler === 'clickMenu') {
       const uriList = want.parameters.uriList as string[]
       uri = uriList[0] as string
     }
@@ -172,6 +173,13 @@ export default class EntryAbility extends UIAbility {
     }
     if (colorMode === 2) {
       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
+    }
+    if (deviceInfo.deviceType === '2in1') {
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const isWindowRectAutoSave = commonSettingDataPreferences.getSync('isWindowRectAutoSave', false) as boolean
+      await windowStage.setWindowRectAutoSave(isWindowRectAutoSave)
     }
     const loginDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'login'

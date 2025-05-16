@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 
 @Builder
@@ -11,15 +10,14 @@ struct Autocloudbackupsetting {
   @Local password: boolean = false
   @Local info: boolean = false
   @Local tag: boolean = false
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'cloudbackupSetting'
   })
   autoOn: string[] = []
 
   getSetting() {
-    const autoOn: preferences.ValueType =
-      this.cloudbackupSettingDataPreferences.getSync('autoOn', [])
+    const autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', [])
     this.autoOn = autoOn as string[]
     this.password = this.autoOn.includes('password')
     this.info = this.autoOn.includes('info')
@@ -33,7 +31,7 @@ struct Autocloudbackupsetting {
           Column() {
             Row() {
               Text('密码')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Toggle({
                 type: ToggleType.Switch,
@@ -63,7 +61,7 @@ struct Autocloudbackupsetting {
               })
             Row() {
               Text('常用信息')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Toggle({
                 type: ToggleType.Switch,
@@ -93,7 +91,7 @@ struct Autocloudbackupsetting {
               })
             Row() {
               Text('标签')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Toggle({
                 type: ToggleType.Switch,

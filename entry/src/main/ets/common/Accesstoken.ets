@@ -20,8 +20,8 @@ export function get() {
   query.set(asset.Tag.ALIAS, stringToArray('accessToken'))
   query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
   try {
-    const res: asset.AssetMap[] = asset.querySync(query)
-    const accessToken: Uint8Array = res[0].get(asset.Tag.SECRET) as Uint8Array
+    const res = asset.querySync(query)
+    const accessToken = res[0].get(asset.Tag.SECRET) as Uint8Array
     return arrayToString(accessToken)
   } catch {
     return ''

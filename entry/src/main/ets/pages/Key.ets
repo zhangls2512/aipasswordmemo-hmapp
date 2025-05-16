@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { promptAction, window } from '@kit.ArkUI'
 import { getKey, removeKey, setRandomKey } from '../common/Crypto'
 import { copy } from '../common/Pasteboard'
@@ -11,8 +10,8 @@ export function KeyBuilder() {
 @ComponentV2
 struct Keypage {
   @Local keyValue: string = ''
-  context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
+  context = getContext(this)
+  pageInfos = new NavPathStack()
 
   build() {
     NavDestination() {
@@ -22,7 +21,7 @@ struct Keypage {
             Column() {
               Row() {
                 Text('密钥')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -59,7 +58,7 @@ struct Keypage {
           Column() {
             Row() {
               Text('导入')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -152,7 +151,7 @@ struct Keypage {
               Row() {
                 Text('删除')
                   .fontColor($r('sys.color.warning'))
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))

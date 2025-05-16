@@ -48,7 +48,7 @@ struct Faultlog {
             Column() {
               Row() {
                 Text('进程 ID')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -69,7 +69,7 @@ struct Faultlog {
                 })
               Row() {
                 Text('用户 ID')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -90,7 +90,7 @@ struct Faultlog {
                 })
               Row() {
                 Text('类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -116,7 +116,7 @@ struct Faultlog {
                 })
               Row() {
                 Text('日志生成时的毫秒级时间戳')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -137,7 +137,7 @@ struct Faultlog {
                 })
               Row() {
                 Text('原因')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -158,7 +158,7 @@ struct Faultlog {
                 })
               Row() {
                 Text('模块')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -179,7 +179,7 @@ struct Faultlog {
                 })
               Row() {
                 Text('概要')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -200,7 +200,7 @@ struct Faultlog {
                 })
               Row() {
                 Text('日志全文')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')

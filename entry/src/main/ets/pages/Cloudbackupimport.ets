@@ -42,7 +42,7 @@ export function CloudbackupimportBuilder() {
 struct Cloudbackupimport {
   @Local index: number = 0
   @Local value: string = '保留'
-  dialogControllerProgress: CustomDialogController = new CustomDialogController({
+  dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '导入中...'
     })
@@ -55,7 +55,7 @@ struct Cloudbackupimport {
           Column() {
             Row() {
               Text('冲突解决模式')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Select([
                 { value: '保留' },
@@ -81,7 +81,7 @@ struct Cloudbackupimport {
             Text('导入')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -89,7 +89,7 @@ struct Cloudbackupimport {
             Column() {
               Row() {
                 Text('密码')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -179,7 +179,7 @@ struct Cloudbackupimport {
                 })
               Row() {
                 Text('常用信息')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -268,7 +268,7 @@ struct Cloudbackupimport {
                 })
               Row() {
                 Text('标签')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))

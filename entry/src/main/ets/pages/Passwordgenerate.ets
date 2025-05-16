@@ -15,7 +15,7 @@ export default struct Passwordgenerate {
         Column() {
           Row() {
             Text('长度')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
             Blank()
             Counter() {
               Text(String(this.length))
@@ -40,7 +40,7 @@ export default struct Passwordgenerate {
             })
           Row() {
             Text('数字')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
             Blank()
             Toggle({
               type: ToggleType.Switch,
@@ -58,7 +58,7 @@ export default struct Passwordgenerate {
             })
           Row() {
             Text('小写字母')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
             Blank()
             Toggle({
               type: ToggleType.Switch,
@@ -76,7 +76,7 @@ export default struct Passwordgenerate {
             })
           Row() {
             Text('大写字母')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
             Blank()
             Toggle({
               type: ToggleType.Switch,
@@ -94,7 +94,7 @@ export default struct Passwordgenerate {
             })
           Row() {
             Text('特殊符号')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
             Blank()
             Toggle({
               type: ToggleType.Switch,
