@@ -260,19 +260,19 @@ export default struct TagPage {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      await this.getList()
-      const cloudServiceStatus = await getCloudServiceStatus()
-      if (cloudServiceStatus && getKey()) {
-        this.enableCloudBackup = true
-      }
       this.context.eventHub.on('refreshTag', async () => {
         this.enableCloudBackup = false
-        await this.getList()
+        this.getList()
         const cloudServiceStatus = await getCloudServiceStatus()
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
       })
+      this.getList()
+      const cloudServiceStatus = await getCloudServiceStatus()
+      if (cloudServiceStatus && getKey()) {
+        this.enableCloudBackup = true
+      }
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshTag')

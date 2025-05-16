@@ -15,6 +15,18 @@
     {
       "name": "WRITE_PASTEBOARD_reason",
       "value": "用于写入数据到剪贴板，便于在外部环境使用。"
+    },
+    {
+      "name": "menu",
+      "value": "用轩铭密码智能备忘录打开"
+    },
+    {
+      "name": "newPassword",
+      "value": "新增密码"
+    },
+    {
+      "name": "searchPassword",
+      "value": "搜索密码"
     }
   ]
 }

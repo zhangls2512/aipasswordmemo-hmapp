@@ -21,6 +21,12 @@
         "srcEntry": "./ets/entryability/EntryAbility.ets",
         "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
+        "metadata": [
+          {
+            "name": "ohos.ability.shortcuts",
+            "resource": "$profile:shortcuts_config"
+          }
+        ],
         "exported": true,
         "skills": [
           {
@@ -98,6 +104,7 @@
         }
       }
     ],
+    "fileContextMenu": "$profile:menu",
     "routerMap": "$profile:router_map"
   }
 }
