@@ -12,8 +12,8 @@ struct Feedback {
   @Local contactType: string = '邮箱'
   @Local contactTypeIndex: number = 0
   @Local contactValue: string = ''
-  pageInfos: NavPathStack = new NavPathStack()
-  dialogControllerProgress: CustomDialogController = new CustomDialogController({
+  pageInfos = new NavPathStack()
+  dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '提交中...'
     })
@@ -31,7 +31,7 @@ struct Feedback {
               .maxLength(200)
               .showCounter(true)
             Text('联系方式 (可选)')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -126,7 +126,7 @@ struct Feedback {
         ListItem() {
           Column() {
             Text('建议填写联系方式，以便开发人员在需要时联系您。')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
           }
           .alignItems(HorizontalAlign.Start)
         }

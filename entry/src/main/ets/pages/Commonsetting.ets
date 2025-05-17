@@ -1,5 +1,7 @@
-import { common, ConfigurationConstant } from '@kit.AbilityKit'
+import { ConfigurationConstant } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
+import { promptAction } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 
 @Builder
 export function CommonsettingBuilder() {
@@ -10,11 +12,12 @@ export function CommonsettingBuilder() {
 struct Commonsetting {
   @Local colorModeIndex: number = 0
   @Local colorModeValue: string = '跟随系统'
+  @Local isWindowRectAutoSave: boolean = false
   @Local checkVersionUpdateIndex: number = 1
   @Local checkVersionUpdateValue: string = '仅 WLAN 下'
   @Local openLinkTypeIndex: number = 0
   @Local openLinkTypeValue: string = '系统默认'
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
@@ -26,7 +29,7 @@ struct Commonsetting {
           Column() {
             Row() {
               Text('深色模式')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Select([
                 { value: '跟随系统' },
@@ -54,6 +57,51 @@ struct Commonsetting {
             .padding($r('sys.float.ohos_id_corner_radius_default_m'))
             .width('100%')
 
+            if (deviceInfo.deviceType === '2in1') {
+              Divider()
+                .padding({
+                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
+                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                })
+              Row() {
+                Text('记忆主窗口尺寸')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.isWindowRectAutoSave
+                })
+                  .onChange(async (isOn: boolean) => {
+                    this.commonSettingDataPreferences.putSync('isWindowRectAutoSave', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                    const data = await promptAction.showDialog({
+                      title: '提示',
+                      message: '设置成功，需重启应用生效，是否重启？',
+                      buttons: [
+                        {
+                          text: '取消',
+                          color: $r('sys.color.font_primary')
+                        },
+                        {
+                          text: '重启',
+                          color: $r('sys.color.font_emphasize')
+                        }
+                      ]
+                    })
+                    if (data.index === 1) {
+                      const applicationContext = this.context.getApplicationContext()
+                      applicationContext.restartApp({
+                        bundleName: 'com.zhangxm.aipasswordmemo',
+                        abilityName: 'EntryAbility'
+                      })
+                    }
+                  })
+              }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .width('100%')
+            }
+
             Divider()
               .padding({
                 left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -61,7 +109,7 @@ struct Commonsetting {
               })
             Row() {
               Text('启动时检查更新')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Select([
                 { value: '从不' },
@@ -86,7 +134,7 @@ struct Commonsetting {
               })
             Row() {
               Text('使用')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
@@ -104,7 +152,7 @@ struct Commonsetting {
                   this.commonSettingDataPreferences.flushSync()
                 })
               Text('浏览器打开链接')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
@@ -130,8 +178,7 @@ struct Commonsetting {
     .backgroundColor($r('app.color.sheet_background'))
     .title('通用')
     .onReady(() => {
-      const colorMode: preferences.ValueType =
-        this.commonSettingDataPreferences.getSync('colorMode', 0)
+      const colorMode = this.commonSettingDataPreferences.getSync('colorMode', 0)
       this.colorModeIndex = colorMode as number
       if (colorMode === 0) {
         this.colorModeValue = '跟随系统'
@@ -142,8 +189,9 @@ struct Commonsetting {
       if (colorMode === 2) {
         this.colorModeValue = '深色模式'
       }
-      const checkVersionUpdate: preferences.ValueType =
-        this.commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
+      const isWindowRectAutoSave = this.commonSettingDataPreferences.getSync('isWindowRectAutoSave', false)
+      this.isWindowRectAutoSave = isWindowRectAutoSave as boolean
+      const checkVersionUpdate = this.commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
       this.checkVersionUpdateIndex = checkVersionUpdate as number
       if (checkVersionUpdate === 0) {
         this.checkVersionUpdateValue = '从不'
@@ -154,8 +202,7 @@ struct Commonsetting {
       if (checkVersionUpdate === 2) {
         this.checkVersionUpdateValue = '始终'
       }
-      const openLinkType: preferences.ValueType =
-        this.commonSettingDataPreferences.getSync('openLinkType', 0)
+      const openLinkType = this.commonSettingDataPreferences.getSync('openLinkType', 0)
       this.openLinkTypeIndex = openLinkType as number
       if (openLinkType === 0) {
         this.openLinkTypeValue = '系统默认'

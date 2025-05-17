@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
@@ -19,13 +18,13 @@ export default struct Login {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
         response: loginComponentManager.HuaweiIDCredential) => {
         if (response) {
-          const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+          const dialogControllerProgress = new CustomDialogController({
             builder: LoadingDialog({
               content: '登录中...'
             })
@@ -63,7 +62,7 @@ export default struct Login {
         Column() {
           Row() {
             Text('方式')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
@@ -123,7 +122,7 @@ export default struct Login {
 
           Row() {
             Text('邮箱')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
@@ -143,7 +142,7 @@ export default struct Login {
           if (this.type === 'password') {
             Row() {
               Text('密码')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
@@ -164,7 +163,7 @@ export default struct Login {
           if (this.type === 'mfa') {
             Row() {
               Text('MFA')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
@@ -184,7 +183,7 @@ export default struct Login {
           if (this.type === 'emailcode') {
             Row() {
               Text('验证码')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
@@ -215,7 +214,7 @@ export default struct Login {
                   })
                   return
                 }
-                const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                const dialogControllerProgress = new CustomDialogController({
                   builder: LoadingDialog({
                     content: '发送中...'
                   })
@@ -285,7 +284,7 @@ export default struct Login {
               if (this.type === 'emailcode') {
                 code = this.emailcode
               }
-              const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+              const dialogControllerProgress = new CustomDialogController({
                 builder: LoadingDialog({
                   content: '登录中...'
                 })
@@ -329,7 +328,7 @@ export default struct Login {
             })
           Text('注册账号')
             .fontColor($r('sys.color.font_emphasize'))
-            .fontWeight('medium')
+            .fontWeight(FontWeight.Medium)
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_l')
             })

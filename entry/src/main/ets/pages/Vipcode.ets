@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -11,9 +10,9 @@ export function VipcodeBuilder() {
 @ComponentV2
 struct Vipcode {
   @Local vipcode: string = ''
-  context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
-  dialogControllerProgress: CustomDialogController = new CustomDialogController({
+  context = getContext(this)
+  pageInfos = new NavPathStack()
+  dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '验证中...'
     })
@@ -58,19 +57,19 @@ struct Vipcode {
         ListItem() {
           Column() {
             Text('如何获取兑换码？')
-              .fontWeight('bold')
+              .fontWeight(FontWeight.Bold)
             Text('· 提供有效反馈')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })
             Text('· 关注官方活动')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
               })
             Text('· 加入官方团队')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
               })

@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { backupTable, recoveryTable } from '../common/Table'
 
@@ -18,30 +17,27 @@ struct DataBackupRecovery {
   @Local pauseAutoBackupWhenLowBatteryCapacityLevel: boolean = false
   @Local pauseAutoBackupWhenPowerSave: boolean = false
   @Local isBackupTables: string[] = []
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
   autoBackupTables: string[] = []
 
   getSetting() {
-    const isBackupTables: preferences.ValueType =
-      this.dataSettingDataPreferences.getSync('isBackupTables', [])
+    const isBackupTables = this.dataSettingDataPreferences.getSync('isBackupTables', [])
     this.isBackupTables = isBackupTables as string[]
     this.isBackupPassword = this.isBackupTables.includes('password')
     this.isBackupInfo = this.isBackupTables.includes('info')
     this.isBackupTag = this.isBackupTables.includes('tag')
-    const autoBackupTables: preferences.ValueType =
-      this.dataSettingDataPreferences.getSync('autoBackupTables', [])
+    const autoBackupTables = this.dataSettingDataPreferences.getSync('autoBackupTables', [])
     this.autoBackupTables = autoBackupTables as string[]
     this.autoBackupPassword = this.autoBackupTables.includes('password')
     this.autoBackupInfo = this.autoBackupTables.includes('info')
     this.autoBackupTag = this.autoBackupTables.includes('tag')
-    const pauseAutoBackupWhenLowBatteryCapacityLevel: preferences.ValueType =
+    const pauseAutoBackupWhenLowBatteryCapacityLevel =
       this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false)
     this.pauseAutoBackupWhenLowBatteryCapacityLevel = pauseAutoBackupWhenLowBatteryCapacityLevel as boolean
-    const pauseAutoBackupWhenPowerSave: preferences.ValueType =
-      this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false)
+    const pauseAutoBackupWhenPowerSave = this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false)
     this.pauseAutoBackupWhenPowerSave = pauseAutoBackupWhenPowerSave as boolean
   }
 
@@ -53,7 +49,7 @@ struct DataBackupRecovery {
             Text('自动备份')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -61,7 +57,7 @@ struct DataBackupRecovery {
             Column() {
               Row() {
                 Text('密码')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -91,7 +87,7 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('常用信息')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -121,7 +117,7 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('标签')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -159,7 +155,7 @@ struct DataBackupRecovery {
             Text('暂停自动备份')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -167,7 +163,7 @@ struct DataBackupRecovery {
             Column() {
               Row() {
                 Text('电池电量低')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -190,7 +186,7 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('系统开启 (超级) 省电模式')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -221,7 +217,7 @@ struct DataBackupRecovery {
             Text('手动备份')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -229,7 +225,7 @@ struct DataBackupRecovery {
             Column() {
               Row() {
                 Text('密码')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -259,7 +255,7 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('常用信息')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -289,7 +285,7 @@ struct DataBackupRecovery {
                 })
               Row() {
                 Text('标签')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -328,7 +324,7 @@ struct DataBackupRecovery {
               Text('恢复')
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
                   left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -347,7 +343,7 @@ struct DataBackupRecovery {
                       item === 'info' ? '常用信息' :
                         item === 'tag' ? '标签' :
                           'undefined')
-                      .fontWeight('medium')
+                      .fontWeight(FontWeight.Medium)
                     Blank()
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))

@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
@@ -17,8 +16,8 @@ export default struct InfoPage {
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
-  context = getContext(this) as common.UIAbilityContext
-  updateId: number = 0
+  context = getContext(this)
+  updateId = 0
 
   async getList() {
     this.loading = true
@@ -127,7 +126,7 @@ export default struct InfoPage {
               }
               Column() {
                 Text(item.value)
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text(item.type)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -187,7 +186,7 @@ export default struct InfoPage {
                 icon: $r('app.media.cloud'),
                 enabled: this.enableCloudBackup && item.cloudBackupTime < item.updateTime,
                 action: async () => {
-                  const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                  const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
                       content: '云备份中...'
                     })
@@ -227,7 +226,7 @@ export default struct InfoPage {
                     ]
                   })
                   if (data.index === 1) {
-                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                    const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
                         content: '删除云备份中...'
                       })

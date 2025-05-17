@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
@@ -29,7 +28,7 @@ struct Tablesync {
   @Local pauseAutoSyncWhenPowerSave: boolean = false
   @Local autoSyncDevices: Item[] = []
   @Local availableDeviceArray: Item[] = []
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
@@ -37,26 +36,22 @@ struct Tablesync {
   autoSyncTables: string[] = []
 
   getSetting() {
-    const onTables: preferences.ValueType =
-      this.dataSettingDataPreferences.getSync('onTables', [])
+    const onTables = this.dataSettingDataPreferences.getSync('onTables', [])
     this.onTables = onTables as string[]
     this.onPassword = this.onTables.includes('password')
     this.onInfo = this.onTables.includes('info')
     this.onTag = this.onTables.includes('tag')
-    const autoSyncTables: preferences.ValueType =
-      this.dataSettingDataPreferences.getSync('autoSyncTables', [])
+    const autoSyncTables = this.dataSettingDataPreferences.getSync('autoSyncTables', [])
     this.autoSyncTables = autoSyncTables as string[]
     this.autoSyncPassword = this.autoSyncTables.includes('password')
     this.autoSyncInfo = this.autoSyncTables.includes('info')
     this.autoSyncTag = this.autoSyncTables.includes('tag')
-    const autoSyncDevices: preferences.ValueType =
-      this.dataSettingDataPreferences.getSync('autoSyncDevices', [])
+    const autoSyncDevices = this.dataSettingDataPreferences.getSync('autoSyncDevices', [])
     this.autoSyncDevices = autoSyncDevices as Item[]
-    const pauseAutoSyncWhenLowBatteryCapacityLevel: preferences.ValueType =
+    const pauseAutoSyncWhenLowBatteryCapacityLevel =
       this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false)
     this.pauseAutoSyncWhenLowBatteryCapacityLevel = pauseAutoSyncWhenLowBatteryCapacityLevel as boolean
-    const pauseAutoSyncWhenPowerSave: preferences.ValueType =
-      this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
+    const pauseAutoSyncWhenPowerSave = this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
     this.pauseAutoSyncWhenPowerSave = pauseAutoSyncWhenPowerSave as boolean
   }
 
@@ -68,7 +63,7 @@ struct Tablesync {
             Text('状态')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -76,7 +71,7 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('密码')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -116,7 +111,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('常用信息')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -156,7 +151,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('标签')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -204,7 +199,7 @@ struct Tablesync {
             Text('自动同步')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -212,7 +207,7 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('密码')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -243,7 +238,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('常用信息')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -274,7 +269,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('标签')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -310,7 +305,7 @@ struct Tablesync {
 
         ListItem() {
           Text('自动同步 (推送) 到以下设备')
-            .fontWeight('medium')
+            .fontWeight(FontWeight.Medium)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -321,7 +316,7 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('标识符')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -342,7 +337,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('名称')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -363,7 +358,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -384,7 +379,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('网络标识')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -406,7 +401,7 @@ struct Tablesync {
               Row() {
                 Text('关闭自动同步')
                   .fontColor($r('sys.color.warning'))
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -456,7 +451,7 @@ struct Tablesync {
             Text('暂停自动同步')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -464,7 +459,7 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('电池电量低')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -487,7 +482,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('系统开启 (超级) 省电模式')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -515,7 +510,7 @@ struct Tablesync {
 
         ListItem() {
           Text('可信设备')
-            .fontWeight('medium')
+            .fontWeight(FontWeight.Medium)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -526,7 +521,7 @@ struct Tablesync {
             Column() {
               Row() {
                 Text('标识符')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -547,7 +542,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('名称')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -568,7 +563,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -589,7 +584,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('网络标识')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -612,7 +607,7 @@ struct Tablesync {
                 Row() {
                   Text('开启自动同步')
                     .fontColor($r('sys.color.font_emphasize'))
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Blank()
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
@@ -647,7 +642,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('推送')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -701,7 +696,7 @@ struct Tablesync {
                 })
               Row() {
                 Text('拉取')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))

@@ -6,7 +6,7 @@ export default function openLink(link: string) {
   const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'commonSetting'
   })
-  const openLinkType: preferences.ValueType = commonSettingDataPreferences.getSync('openLinkType', 0)
+  const openLinkType = commonSettingDataPreferences.getSync('openLinkType', 0)
   if (openLinkType === 0) {
     context.openLink(link)
   }

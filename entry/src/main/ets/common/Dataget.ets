@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { relationalStore } from '@kit.ArkData'
 
 export interface PasswordInfoItem {
@@ -46,7 +45,7 @@ export interface Tag {
 }
 
 export async function getPasswordInfo(id: number): Promise<PasswordOut | string> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
     securityLevel: 4,
@@ -93,7 +92,7 @@ export async function getPasswordInfo(id: number): Promise<PasswordOut | string>
 }
 
 export async function getPasswordList(orderColumn?: string): Promise<PasswordOut[]> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
     securityLevel: 4,
@@ -138,7 +137,7 @@ export async function getPasswordList(orderColumn?: string): Promise<PasswordOut
 
 export async function getFilterPasswordList(nameKeyword: string, info: PasswordInfoItem[], tag: string[],
   orderColumn?: string): Promise<PasswordOut[]> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
     securityLevel: 4,
@@ -197,7 +196,7 @@ export async function getFilterPasswordList(nameKeyword: string, info: PasswordI
 }
 
 export async function getInfoInfo(id: number): Promise<Info | string> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
     securityLevel: 4,
@@ -228,7 +227,7 @@ export async function getInfoInfo(id: number): Promise<Info | string> {
 }
 
 export async function getInfoList(): Promise<Info[]> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
     securityLevel: 4,
@@ -258,7 +257,7 @@ export async function getInfoList(): Promise<Info[]> {
 }
 
 export async function getTypeInfoList(type: string): Promise<string[]> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
     securityLevel: 4,
@@ -278,7 +277,7 @@ export async function getTypeInfoList(type: string): Promise<string[]> {
 }
 
 async function getTagColor(value: string): Promise<string> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: 1,
@@ -299,7 +298,7 @@ async function getTagColor(value: string): Promise<string> {
 }
 
 export async function getTagInfo(id: number): Promise<Tag | string> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: 1,
@@ -330,7 +329,7 @@ export async function getTagInfo(id: number): Promise<Tag | string> {
 }
 
 export async function getTagList(orderColumn?: string): Promise<Tag[]> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: 1,

@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
@@ -16,9 +15,9 @@ export default struct TagPage {
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
   @Local orderColumnText: string = '修改时间'
-  context = getContext(this) as common.UIAbilityContext
-  orderColumn: string = 'updateTime'
-  updateId: number = 0
+  context = getContext(this)
+  orderColumn = 'updateTime'
+  updateId = 0
 
   async getList() {
     this.loading = true
@@ -135,7 +134,7 @@ export default struct TagPage {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                 Text(item.value)
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
               }
               .width('90%')
             }
@@ -188,7 +187,7 @@ export default struct TagPage {
                 icon: $r('app.media.cloud'),
                 enabled: this.enableCloudBackup && item.cloudBackupTime < item.updateTime,
                 action: async () => {
-                  const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                  const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
                       content: '云备份中...'
                     })
@@ -228,7 +227,7 @@ export default struct TagPage {
                     ]
                   })
                   if (data.index === 1) {
-                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                    const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
                         content: '删除云备份中...'
                       })

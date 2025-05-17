@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -137,7 +136,7 @@ export default struct Updateinfo {
           Column() {
             Row() {
               Text('云备份')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Toggle({
                 type: ToggleType.Switch,
@@ -221,7 +220,7 @@ export default struct Updateinfo {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const abilityContext = getContext(this) as common.UIAbilityContext
+          const abilityContext = getContext(this)
           const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(abilityContext, {
             name: 'cloudbackupSetting'
           })

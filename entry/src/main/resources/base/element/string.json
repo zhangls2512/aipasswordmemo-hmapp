@@ -10,7 +10,7 @@
     },
     {
       "name": "MICROPHONE_reason",
-      "value": "用于 AI 助手。"
+      "value": "用于与 AI 助手对话时录音。"
     },
     {
       "name": "WRITE_PASTEBOARD_reason",

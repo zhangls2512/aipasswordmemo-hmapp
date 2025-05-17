@@ -29,7 +29,7 @@ struct Vip {
   @Local iapStatusLoading: boolean = false
   @Local agree: boolean = false
   context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
+  pageInfos = new NavPathStack()
   vipArray: VipItem[] = [
     {
       id: 'CG3_PfAJZa84niLQ',
@@ -150,10 +150,10 @@ struct Vip {
               Text(this.vipStatus)
                 .fontColor(this.vipStatusColor)
                 .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-                .fontWeight('bold')
+                .fontWeight(FontWeight.Bold)
               if (this.vipEndDate) {
                 Text('到期时间：' + this.vipEndDate)
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .margin({
                     top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                   })
@@ -203,7 +203,7 @@ struct Vip {
               Text('付费开通')
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
                   left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -220,7 +220,7 @@ struct Vip {
                     }
                     Row() {
                       Text(item.name)
-                        .fontWeight('medium')
+                        .fontWeight(FontWeight.Medium)
                       Blank()
                       Text(item.price)
                         .fontColor($r('sys.color.font_secondary'))
@@ -272,6 +272,7 @@ struct Vip {
                       .onClick(() => {
                         openLink('https://docs.qq.com/doc/p/4e810651bda479462dc9a5e8677273e5e1b72383')
                       })
+                    Span('。如果购买连续包月/季/年，已阅读并同意')
                     Span('《轩铭密码智能备忘录会员自动续订服务协议》')
                       .fontColor($r('sys.color.font_emphasize'))
                       .onClick(() => {
@@ -297,9 +298,9 @@ struct Vip {
         ListItem() {
           Column() {
             Text('会员权益')
-              .fontWeight('bold')
+              .fontWeight(FontWeight.Bold)
             Text('· 云备份不限个数')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -315,7 +316,7 @@ struct Vip {
             Text('更多')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -324,7 +325,7 @@ struct Vip {
               if (this.iapStatus) {
                 Row() {
                   Text('订阅管理')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Blank()
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
@@ -357,7 +358,7 @@ struct Vip {
               }
               Row() {
                 Text('兑换码')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -388,7 +389,7 @@ struct Vip {
                 })
               Row() {
                 Text('开通记录')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))

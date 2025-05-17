@@ -26,8 +26,30 @@ export function DebugBuilder() {
 
 @ComponentV2
 struct Debug {
+  @Local globalErrorShowTypeIndex: number = 0
+  @Local globalErrorShowTypeValue: string = 'Toast'
+  @Local autoUploadErrorLog: boolean = true
+  @Local showMemoryLevelChange: boolean = false
+  @Local lowBatteryCapacityLevelIndex: number = 3
+  @Local lowBatteryCapacityLevelValue: string = '低'
+  @Local showNetAvailableStatusChange: boolean = false
+  @Local showNetBlockStatusChange: boolean = false
+  @Local showNetLost: boolean = false
+  @Local showNetCapabilitiesChange: boolean = false
+  @Local showNetQosChange: boolean = false
+  @Local showNetSceneChange: boolean = false
+  @Local autoReportHighLatency: boolean = true
+  @Local highLatencyThreshold: string = '200'
+  @Local allService: boolean = true
+  @Local systemLoadValue: number = -1
   context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
+  pageInfos = new NavPathStack()
+  debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'debugSetting'
+  })
+  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'commonSetting'
+  })
   applicationInfoArray: Item[] = [
     {
       name: '名称',
@@ -429,7 +451,6 @@ struct Debug {
     { name: '设备是否可折叠', value: display.isFoldable() ? '是' : '否' },
     { name: '是否正在截屏、投屏、录屏', value: display.isCaptured() ? '是' : '否' }
   ]
-  windowClass: window.Window | undefined = undefined
   windowInfoArray: Item[] = []
   batteryInfoArray: Item[] = [
     { name: '剩余电池电量百分比', value: String(batteryInfo.batterySOC) + '%' },
@@ -476,7 +497,6 @@ struct Debug {
     },
     { name: '电池电流', value: String(batteryInfo.nowCurrent) + ' mA' }
   ]
-  @Local systemLoadValue: number = -1
   networkInfoArray: Item[] = [
     { name: '数据网络句柄', value: String(connection.getDefaultNetSync().netId) },
     { name: '当前网络上的数据流量使用是否被计量', value: connection.isDefaultNetMeteredSync() ? '是' : '否' },
@@ -512,31 +532,9 @@ struct Debug {
     { name: '从系统启动到进程启动所经过的时间', value: String(process.getStartRealtime()) + ' ms' },
     { name: '进程启动到当前时间的 CPU 时间', value: String(process.getPastCpuTime()) + ' ms' }
   ]
-  @Local globalErrorShowTypeIndex: number = 0
-  @Local globalErrorShowTypeValue: string = 'Toast'
-  @Local autoUploadErrorLog: boolean = true
-  @Local showMemoryLevelChange: boolean = false
-  @Local lowBatteryCapacityLevelIndex: number = 3
-  @Local lowBatteryCapacityLevelValue: string = '低'
-  @Local showNetAvailableStatusChange: boolean = false
-  @Local showNetBlockStatusChange: boolean = false
-  @Local showNetLost: boolean = false
-  @Local showNetCapabilitiesChange: boolean = false
-  @Local showNetQosChange: boolean = false
-  @Local showNetSceneChange: boolean = false
-  @Local autoReportHighLatency: boolean = true
-  @Local highLatencyThreshold: string = '200'
-  @Local allService: boolean = true
-  debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'debugSetting'
-  })
-  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'commonSetting'
-  })
 
   getSetting() {
-    const globalErrorShowType: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('globalErrorShowType', 0)
+    const globalErrorShowType = this.debugSettingDataPreferences.getSync('globalErrorShowType', 0)
     this.globalErrorShowTypeIndex = globalErrorShowType as number
     if (globalErrorShowType === 0) {
       this.globalErrorShowTypeValue = 'Toast'
@@ -544,18 +542,14 @@ struct Debug {
     if (globalErrorShowType === 1) {
       this.globalErrorShowTypeValue = 'Dialog'
     }
-    const autoUploadErrorLog: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('autoUploadErrorLog', true)
+    const autoUploadErrorLog = this.debugSettingDataPreferences.getSync('autoUploadErrorLog', true)
     this.autoUploadErrorLog = autoUploadErrorLog as boolean
-    const allService: preferences.ValueType =
-      this.commonSettingDataPreferences.getSync('allService', true)
+    const allService = this.commonSettingDataPreferences.getSync('allService', true)
     this.allService = allService as boolean
-    const showMemoryLevelChange: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
+    const showMemoryLevelChange = this.debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
     this.showMemoryLevelChange = showMemoryLevelChange as boolean
     this.autoUploadErrorLog = autoUploadErrorLog as boolean
-    const lowBatteryCapacityLevel: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
+    const lowBatteryCapacityLevel = this.debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
     this.lowBatteryCapacityLevelIndex = (lowBatteryCapacityLevel as number) - 1
     if (lowBatteryCapacityLevel === 1) {
       this.lowBatteryCapacityLevelValue = '满'
@@ -578,29 +572,21 @@ struct Debug {
     if (lowBatteryCapacityLevel === 7) {
       this.lowBatteryCapacityLevelValue = '关机'
     }
-    const autoReportHighLatency: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('autoReportHighLatency', true)
+    const autoReportHighLatency = this.debugSettingDataPreferences.getSync('autoReportHighLatency', true)
     this.autoReportHighLatency = autoReportHighLatency as boolean
-    const showNetAvailableStatusChange: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('showNetAvailableStatusChange', false)
+    const showNetAvailableStatusChange = this.debugSettingDataPreferences.getSync('showNetAvailableStatusChange', false)
     this.showNetAvailableStatusChange = showNetAvailableStatusChange as boolean
-    const showNetBlockStatusChange: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('showNetBlockStatusChange', false)
+    const showNetBlockStatusChange = this.debugSettingDataPreferences.getSync('showNetBlockStatusChange', false)
     this.showNetBlockStatusChange = showNetBlockStatusChange as boolean
-    const showNetLost: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('showNetLost', false)
+    const showNetLost = this.debugSettingDataPreferences.getSync('showNetLost', false)
     this.showNetLost = showNetLost as boolean
-    const showNetCapabilitiesChange: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('showNetCapabilitiesChange', false)
+    const showNetCapabilitiesChange = this.debugSettingDataPreferences.getSync('showNetCapabilitiesChange', false)
     this.showNetCapabilitiesChange = showNetCapabilitiesChange as boolean
-    const showNetQosChange: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('showNetQosChange', false)
+    const showNetQosChange = this.debugSettingDataPreferences.getSync('showNetQosChange', false)
     this.showNetQosChange = showNetQosChange as boolean
-    const showNetSceneChange: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('showNetSceneChange', false)
+    const showNetSceneChange = this.debugSettingDataPreferences.getSync('showNetSceneChange', false)
     this.showNetSceneChange = showNetSceneChange as boolean
-    const highLatencyThreshold: preferences.ValueType =
-      this.debugSettingDataPreferences.getSync('highLatencyThreshold', 200)
+    const highLatencyThreshold = this.debugSettingDataPreferences.getSync('highLatencyThreshold', 200)
     this.highLatencyThreshold = String(highLatencyThreshold)
   }
 
@@ -2170,189 +2156,191 @@ struct Debug {
         value: String(bundleInfo.appIndex)
       })
       const lastWindow = await window.getLastWindow(this.context)
-      this.windowClass = lastWindow
       this.windowInfoArray = this.windowInfoArray.concat([
-        { name: '尺寸左边界', value: String(this.windowClass?.getWindowProperties().windowRect.left) + ' px' },
-        { name: '尺寸上边界', value: String(this.windowClass?.getWindowProperties().windowRect.top) + ' px' },
-        { name: '尺寸宽度', value: String(this.windowClass?.getWindowProperties().windowRect.width) + ' px' },
-        { name: '尺寸高度', value: String(this.windowClass?.getWindowProperties().windowRect.height) + ' px' },
+        { name: '尺寸左边界', value: String(lastWindow.getWindowProperties().windowRect.left) + ' px' },
+        { name: '尺寸上边界', value: String(lastWindow.getWindowProperties().windowRect.top) + ' px' },
+        { name: '尺寸宽度', value: String(lastWindow.getWindowProperties().windowRect.width) + ' px' },
+        { name: '尺寸高度', value: String(lastWindow.getWindowProperties().windowRect.height) + ' px' },
         {
           name: '可绘制区域尺寸左边界',
-          value: String(this.windowClass?.getWindowProperties().drawableRect.left) + ' px'
+          value: String(lastWindow.getWindowProperties().drawableRect.left) + ' px'
         },
         {
           name: '可绘制区域尺寸上边界',
-          value: String(this.windowClass?.getWindowProperties().drawableRect.top) + ' px'
+          value: String(lastWindow.getWindowProperties().drawableRect.top) + ' px'
         },
         {
           name: '可绘制区域尺寸宽度',
-          value: String(this.windowClass?.getWindowProperties().drawableRect.width) + ' px'
+          value: String(lastWindow.getWindowProperties().drawableRect.width) + ' px'
         },
         {
           name: '可绘制区域尺寸高度',
-          value: String(this.windowClass?.getWindowProperties().drawableRect.height) + ' px'
+          value: String(lastWindow.getWindowProperties().drawableRect.height) + ' px'
         },
         {
           name: '类型',
-          value: this.windowClass?.getWindowProperties().type === 0 ? '应用子窗口' :
-            this.windowClass?.getWindowProperties().type === 1 ? '系统告警窗口' :
-              this.windowClass?.getWindowProperties().type === 8 ? '悬浮窗' :
-                this.windowClass?.getWindowProperties().type === 16 ? '模态窗口' :
+          value: lastWindow.getWindowProperties().type === 0 ? '应用子窗口' :
+            lastWindow.getWindowProperties().type === 1 ? '系统告警窗口' :
+              lastWindow.getWindowProperties().type === 8 ? '悬浮窗' :
+                lastWindow.getWindowProperties().type === 16 ? '模态窗口' :
                   'undefined'
         },
-        { name: '是否全屏', value: this.windowClass?.getWindowProperties().isFullScreen ? '是' : '否' },
-        { name: '是否为沉浸式', value: this.windowClass?.getWindowProperties().isLayoutFullScreen ? '是' : '否' },
-        { name: '是否可聚焦', value: this.windowClass?.getWindowProperties().focusable ? '是' : '否' },
-        { name: '是否可触摸', value: this.windowClass?.getWindowProperties().touchable ? '是' : '否' },
-        { name: '屏幕亮度', value: String(this.windowClass?.getWindowProperties().brightness) },
-        { name: '屏幕是否常亮', value: this.windowClass?.getWindowProperties().isKeepScreenOn ? '是' : '否' },
-        { name: '隐私模式', value: this.windowClass?.getWindowProperties().isPrivacyMode ? '开启' : '关闭' },
-        { name: '是否透明', value: this.windowClass?.getWindowProperties().isTransparent ? '是' : '否' },
-        { name: 'ID', value: String(this.windowClass?.getWindowProperties().id) },
-        { name: '所在屏幕 ID', value: String(this.windowClass?.getWindowProperties().displayId) },
+        { name: '是否全屏', value: lastWindow.getWindowProperties().isFullScreen ? '是' : '否' },
+        { name: '是否为沉浸式', value: lastWindow.getWindowProperties().isLayoutFullScreen ? '是' : '否' },
+        { name: '是否可聚焦', value: lastWindow.getWindowProperties().focusable ? '是' : '否' },
+        { name: '是否可触摸', value: lastWindow.getWindowProperties().touchable ? '是' : '否' },
+        { name: '屏幕亮度', value: String(lastWindow.getWindowProperties().brightness) },
+        { name: '屏幕是否常亮', value: lastWindow.getWindowProperties().isKeepScreenOn ? '是' : '否' },
+        { name: '隐私模式', value: lastWindow.getWindowProperties().isPrivacyMode ? '开启' : '关闭' },
+        { name: '是否透明', value: lastWindow.getWindowProperties().isTransparent ? '是' : '否' },
+        { name: 'ID', value: String(lastWindow.getWindowProperties().id) },
+        { name: '所在屏幕 ID', value: String(lastWindow.getWindowProperties().displayId) },
         {
           name: '所在屏幕的系统显示大小缩放系数',
-          value: String(this.windowClass?.getWindowDensityInfo().systemDensity)
+          value: String(lastWindow.getWindowDensityInfo().systemDensity)
         },
         {
           name: '所在屏幕的系统默认显示大小缩放系数',
-          value: String(this.windowClass?.getWindowDensityInfo().defaultDensity)
+          value: String(lastWindow.getWindowDensityInfo().defaultDensity)
         },
-        { name: '自定义设置的显示大小缩放系数', value: String(this.windowClass?.getWindowDensityInfo().customDensity) },
+        { name: '自定义设置的显示大小缩放系数', value: String(lastWindow.getWindowDensityInfo().customDensity) },
         {
           name: '在屏幕上的真实显示区域距离屏幕左上角的 x 坐标',
-          value: String(this.windowClass?.getGlobalRect().left) + ' px'
+          value: String(lastWindow.getGlobalRect().left) + ' px'
         },
         {
           name: '在屏幕上的真实显示区域距离屏幕左上角的 y 坐标',
-          value: String(this.windowClass?.getGlobalRect().top) + ' px'
+          value: String(lastWindow.getGlobalRect().top) + ' px'
         },
         {
           name: '在屏幕上的真实显示区域宽度',
-          value: String(this.windowClass?.getGlobalRect().width) + ' px'
+          value: String(lastWindow.getGlobalRect().width) + ' px'
         },
         {
           name: '在屏幕上的真实显示区域高度',
-          value: String(this.windowClass?.getGlobalRect().height) + ' px'
+          value: String(lastWindow.getGlobalRect().height) + ' px'
         },
         {
           name: '系统默认内容规避区域是否可见',
-          value: this.windowClass?.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).visible ? '是' : '否'
+          value: lastWindow.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).visible ? '是' : '否'
         },
         {
           name: '是否已经开启沉浸式布局',
-          value: this.windowClass?.getImmersiveModeEnabledState() ? '是' : '否'
+          value: lastWindow.getImmersiveModeEnabledState() ? '是' : '否'
         },
         {
           name: '状态栏背景颜色',
-          value: String(this.windowClass?.getWindowSystemBarProperties().statusBarColor)
+          value: String(lastWindow.getWindowSystemBarProperties().statusBarColor)
         },
         {
           name: '状态栏图标是否为高亮状态',
-          value: this.windowClass?.getWindowSystemBarProperties().isStatusBarLightIcon ? '是' : '否'
+          value: lastWindow.getWindowSystemBarProperties().isStatusBarLightIcon ? '是' : '否'
         },
         {
           name: '状态栏文字颜色',
-          value: String(this.windowClass?.getWindowSystemBarProperties().statusBarContentColor)
+          value: String(lastWindow.getWindowSystemBarProperties().statusBarContentColor)
         },
         {
           name: '导航栏背景颜色',
-          value: String(this.windowClass?.getWindowSystemBarProperties().navigationBarColor)
+          value: String(lastWindow.getWindowSystemBarProperties().navigationBarColor)
         },
         {
           name: '导航栏图标是否为高亮状态',
-          value: this.windowClass?.getWindowSystemBarProperties().isNavigationBarLightIcon ? '是' : '否'
+          value: lastWindow.getWindowSystemBarProperties().isNavigationBarLightIcon ? '是' : '否'
         },
         {
           name: '导航栏文字颜色',
-          value: String(this.windowClass?.getWindowSystemBarProperties().navigationBarContentColor)
+          value: String(lastWindow.getWindowSystemBarProperties().navigationBarContentColor)
         },
         {
           name: '是否使能状态栏属性变化时动画效果',
-          value: this.windowClass?.getWindowSystemBarProperties().enableStatusBarAnimation ? '是' : '否'
+          value: lastWindow.getWindowSystemBarProperties().enableStatusBarAnimation ? '是' : '否'
         },
         {
           name: '是否使能导航栏属性变化时动画效果',
-          value: this.windowClass?.getWindowSystemBarProperties().enableNavigationBarAnimation ? '是' : '否'
+          value: lastWindow.getWindowSystemBarProperties().enableNavigationBarAnimation ? '是' : '否'
         },
         {
           name: '显示方向',
-          value: this.windowClass?.getPreferredOrientation() === 0 ? '未定义方向模式，由系统判定' :
-            this.windowClass?.getPreferredOrientation() === 1 ? '竖屏显示模式' :
-              this.windowClass?.getPreferredOrientation() === 2 ? '横屏显示模式' :
-                this.windowClass?.getPreferredOrientation() === 3 ? '反向竖屏显示模式' :
-                  this.windowClass?.getPreferredOrientation() === 4 ? '反向横屏显示模式' :
-                    this.windowClass?.getPreferredOrientation() === 5 ?
+          value: lastWindow.getPreferredOrientation() === 0 ? '未定义方向模式，由系统判定' :
+            lastWindow.getPreferredOrientation() === 1 ? '竖屏显示模式' :
+              lastWindow.getPreferredOrientation() === 2 ? '横屏显示模式' :
+                lastWindow.getPreferredOrientation() === 3 ? '反向竖屏显示模式' :
+                  lastWindow.getPreferredOrientation() === 4 ? '反向横屏显示模式' :
+                    lastWindow.getPreferredOrientation() === 5 ?
                       '跟随传感器自动旋转，可以旋转到竖屏、横屏、反向竖屏、反向横屏四个方向' :
-                      this.windowClass?.getPreferredOrientation() === 6 ?
+                      lastWindow.getPreferredOrientation() === 6 ?
                         '跟随传感器自动竖向旋转，可以旋转到竖屏、反向竖屏，无法旋转到横屏、反向横屏' :
-                        this.windowClass?.getPreferredOrientation() === 7 ?
+                        lastWindow.getPreferredOrientation() === 7 ?
                           '跟随传感器自动横向旋转，可以旋转到横屏、反向横屏，无法旋转到竖屏、反向竖屏' :
-                          this.windowClass?.getPreferredOrientation() === 8 ?
+                          lastWindow.getPreferredOrientation() === 8 ?
                             '跟随传感器自动旋转，可以旋转到竖屏、横屏、反向竖屏、反向横屏四个方向，且受控制中心的旋转开关控制' :
-                            this.windowClass?.getPreferredOrientation() === 9 ?
+                            lastWindow.getPreferredOrientation() === 9 ?
                               '跟随传感器自动竖向旋转，可以旋转到竖屏、反向竖屏，无法旋转到横屏、反向横屏，且受控制中心的旋转开关控制' :
-                              this.windowClass?.getPreferredOrientation() === 10 ?
+                              lastWindow.getPreferredOrientation() === 10 ?
                                 '跟随传感器自动横向旋转，可以旋转到横屏、反向横屏，无法旋转到竖屏、反向竖屏，且受控制中心的旋转开关控制' :
-                                this.windowClass?.getPreferredOrientation() === 11 ? '锁定模式' :
-                                  this.windowClass?.getPreferredOrientation() === 12 ?
+                                lastWindow.getPreferredOrientation() === 11 ? '锁定模式' :
+                                  lastWindow.getPreferredOrientation() === 12 ?
                                     '跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定' :
-                                    this.windowClass?.getPreferredOrientation() === 13 ?
+                                    lastWindow.getPreferredOrientation() === 13 ?
                                       '调用时临时旋转到竖屏，之后跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定' :
-                                      this.windowClass?.getPreferredOrientation() === 14 ?
+                                      lastWindow.getPreferredOrientation() === 14 ?
                                         '调用时临时旋转到横屏，之后跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定' :
-                                        this.windowClass?.getPreferredOrientation() === 15 ?
+                                        lastWindow.getPreferredOrientation() === 15 ?
                                           '调用时临时旋转到反向竖屏，之后跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定'
-                                          : this.windowClass?.getPreferredOrientation() === 16 ?
+                                          : lastWindow.getPreferredOrientation() === 16 ?
                                           '调用时临时旋转到反向横屏，之后跟随传感器自动旋转，受控制中心的旋转开关控制，且可旋转方向受系统判定' :
-                                          this.windowClass?.getPreferredOrientation() === 17 ? '跟随桌面的旋转模式' :
+                                          lastWindow.getPreferredOrientation() === 17 ? '跟随桌面的旋转模式' :
                                             'undefined'
         },
-        { name: '是否已显示', value: this.windowClass?.isWindowShowing() ? '是' : '否' },
+        { name: '是否已显示', value: lastWindow.isWindowShowing() ? '是' : '否' },
         {
           name: '色域模式',
-          value: this.windowClass?.getWindowColorSpace() === 0 ? '默认 SRGB 色域' :
-            this.windowClass?.getWindowColorSpace() === 1 ? '广色域' :
+          value: lastWindow.getWindowColorSpace() === 0 ? '默认 SRGB 色域' :
+            lastWindow.getWindowColorSpace() === 1 ? '广色域' :
               'undefined'
         },
         {
           name: '最大宽度',
-          value: String(this.windowClass?.getWindowLimits().maxWidth) + ' px'
+          value: String(lastWindow.getWindowLimits().maxWidth) + ' px'
         },
         {
           name: '最大高度',
-          value: String(this.windowClass?.getWindowLimits().maxHeight) + ' px'
+          value: String(lastWindow.getWindowLimits().maxHeight) + ' px'
         },
         {
           name: '最小宽度',
-          value: String(this.windowClass?.getWindowLimits().minWidth) + ' px'
+          value: String(lastWindow.getWindowLimits().minWidth) + ' px'
         },
         {
           name: '最小高度',
-          value: String(this.windowClass?.getWindowLimits().minHeight) + ' px'
+          value: String(lastWindow.getWindowLimits().minHeight) + ' px'
         },
         {
           name: '模式',
-          value: this.windowClass?.getWindowStatus() === 0 ? '未定义' :
-            this.windowClass?.getWindowStatus() === 1 ? '全屏' :
-              this.windowClass?.getWindowStatus() === 2 ? '最大化' :
-                this.windowClass?.getWindowStatus() === 3 ? '最小化' :
-                  this.windowClass?.getWindowStatus() === 4 ? '自由悬浮形式' :
-                    this.windowClass?.getWindowStatus() === 5 ?
-                      '分屏' :
+          value: lastWindow.getWindowStatus() === 0 ? '未定义' :
+            lastWindow.getWindowStatus() === 1 ? '全屏' :
+              lastWindow.getWindowStatus() === 2 ? '最大化' :
+                lastWindow.getWindowStatus() === 3 ? '最小化' :
+                  lastWindow.getWindowStatus() === 4 ? '自由悬浮形式' :
+                    lastWindow.getWindowStatus() === 5 ? '分屏' :
                       'undefined'
         },
-        { name: '是否已获焦', value: this.windowClass?.isFocused() ? '是' : '否' },
-        { name: '是否禁用返回手势功能', value: this.windowClass?.isGestureBackEnabled() ? '是' : '否' }
+        { name: '是否已获焦', value: lastWindow.isFocused() ? '是' : '否' },
+        { name: '是否禁用返回手势功能', value: lastWindow.isGestureBackEnabled() ? '是' : '否' }
       ])
-      const isWindowSupportWideGamut = await this.windowClass?.isWindowSupportWideGamut()
+      const isWindowSupportWideGamut = await lastWindow.isWindowSupportWideGamut()
       this.windowInfoArray.push({
         name: '是否支持广色域模式',
         value: isWindowSupportWideGamut ? '是' : '否'
       })
-      systemLoad.getLevel().then((res: systemLoad.SystemLoadLevel) => {
-        this.systemLoadValue = res
-      })
+      if (deviceInfo.deviceType === '2in1') {
+        this.windowInfoArray.push({
+          name: '是否已经启用尺寸记忆',
+          value: this.commonSettingDataPreferences.getSync('isWindowRectAutoSave', false) ? '是' : '否'
+        })
+      }
+      this.systemLoadValue = await systemLoad.getLevel()
       const storageStatisticsInfo = await storageStatistics.getCurrentBundleStats()
       this.storageStatisticsInfoArray.push({
         name: '应用安装文件',

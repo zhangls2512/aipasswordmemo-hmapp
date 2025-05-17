@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getTagList, getTypeInfoList, PasswordInfoItem } from '../common/Dataget'
@@ -15,7 +14,7 @@ export default struct Filterpassword {
   @Local infoArray: string[] = []
   @Local passwordTagArray: string[] = []
   @Local tagArray: string[] = []
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
   })
@@ -32,7 +31,7 @@ export default struct Filterpassword {
 
       ListItem() {
         Text('信息')
-          .fontWeight('medium')
+          .fontWeight(FontWeight.Medium)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -274,7 +273,7 @@ export default struct Filterpassword {
             Row() {
               Column() {
                 Text(item.value)
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text(item.type)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -311,7 +310,7 @@ export default struct Filterpassword {
       })
       ListItem() {
         Text('标签')
-          .fontWeight('medium')
+          .fontWeight(FontWeight.Medium)
       }
       .margin({
         bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),

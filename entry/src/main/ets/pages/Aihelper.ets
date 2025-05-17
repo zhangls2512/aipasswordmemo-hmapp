@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
@@ -24,7 +23,7 @@ export default struct Aihelper {
   @Local isThinking: boolean = false
   @Local allowSpeak: boolean = true
   @Local autoContinueRecording: boolean = false
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   speakSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'speakSetting'
   })
@@ -122,7 +121,7 @@ export default struct Aihelper {
       this.isRecording = true
       this.array.push({
         role: '我',
-        content: '请说，正在录音...'
+        content: '正在录音，请说出需要我帮您执行的操作...'
       })
       asrEngine.startListening({
         sessionId: '0',
@@ -145,7 +144,7 @@ export default struct Aihelper {
         Column() {
           Row() {
             Text('语音播报')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
             Blank()
             Toggle({
               type: ToggleType.Switch,
@@ -167,7 +166,7 @@ export default struct Aihelper {
             })
           Row() {
             Text('连续对话')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
             Blank()
             Toggle({
               type: ToggleType.Switch,
@@ -186,10 +185,13 @@ export default struct Aihelper {
         .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
         .padding($r('sys.float.ohos_id_corner_radius_mark'))
       }
+      .margin({
+        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
 
-      ListItem() {
-        Column() {
-          if (!this.isRecording) {
+      if (!this.isRecording) {
+        ListItem() {
+          Column() {
             Button('点击开始说话')
               .onClick(() => {
                 this.startRecording()
@@ -197,17 +199,17 @@ export default struct Aihelper {
           }
         }
         .width('100%')
+        .margin({
+          bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
       }
-      .margin({
-        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
 
       ForEach(this.array, (item: Item) => {
         ListItem() {
           Text() {
             Span(item.role + '：')
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
             Span(item.content)
           }
         }
@@ -239,10 +241,9 @@ export default struct Aihelper {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(() => {
-      const allowSpeak: preferences.ValueType = this.speakSettingDataPreferences.getSync('allowSpeak', true)
+      const allowSpeak = this.speakSettingDataPreferences.getSync('allowSpeak', true)
       this.allowSpeak = allowSpeak as boolean
-      const autoContinueRecording: preferences.ValueType =
-        this.speakSettingDataPreferences.getSync('autoContinueRecording', false)
+      const autoContinueRecording = this.speakSettingDataPreferences.getSync('autoContinueRecording', false)
       this.autoContinueRecording = autoContinueRecording as boolean
     })
   }

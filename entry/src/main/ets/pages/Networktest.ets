@@ -27,7 +27,7 @@ struct Networktest {
   @Local startTransferTimeMs: number = 0
   @Local totalTimeMs: number = 0
   @Local redirectTimeMs: number = 0
-  dialogControllerProgress: CustomDialogController = new CustomDialogController({
+  dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '测试中...'
     })
@@ -83,7 +83,7 @@ struct Networktest {
             Column() {
               Row() {
                 Text('错误码')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -104,7 +104,7 @@ struct Networktest {
                 })
               Row() {
                 Text('错误信息')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -125,7 +125,7 @@ struct Networktest {
                 })
               Row() {
                 Text('请求 IP')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -146,7 +146,7 @@ struct Networktest {
                 })
               Row() {
                 Text('请求时间戳')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -167,7 +167,7 @@ struct Networktest {
                 })
               Row() {
                 Text('HTTP 版本')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -188,7 +188,7 @@ struct Networktest {
                 })
               Row() {
                 Text('DNS 解析所需的时间')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -209,7 +209,7 @@ struct Networktest {
                 })
               Row() {
                 Text('建立连接时间')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -230,7 +230,7 @@ struct Networktest {
                 })
               Row() {
                 Text('从开始到远程主机 (或代理) 的 TLS 握手完成的时间')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -251,7 +251,7 @@ struct Networktest {
                 })
               Row() {
                 Text('传输开始前的时间')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -272,7 +272,7 @@ struct Networktest {
                 })
               Row() {
                 Text('传输开始时间')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -293,7 +293,7 @@ struct Networktest {
                 })
               Row() {
                 Text('请求总耗时')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -314,7 +314,7 @@ struct Networktest {
                 })
               Row() {
                 Text('重定向所需的时间')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')

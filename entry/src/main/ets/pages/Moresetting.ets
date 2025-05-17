@@ -8,7 +8,7 @@ export function MoresettingBuilder() {
 @ComponentV2
 struct Moresetting {
   context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
+  pageInfos = new NavPathStack()
 
   build() {
     NavDestination() {
@@ -18,7 +18,7 @@ struct Moresetting {
             Text('应用')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -26,7 +26,7 @@ struct Moresetting {
             Column() {
               Row() {
                 Text('重启')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -60,7 +60,7 @@ struct Moresetting {
               Row() {
                 Text('退出')
                   .fontColor($r('sys.color.warning'))
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -96,7 +96,7 @@ struct Moresetting {
           Column() {
             Row() {
               Text('清除设置数据')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
