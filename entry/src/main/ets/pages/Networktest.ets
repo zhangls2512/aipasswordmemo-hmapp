@@ -27,11 +27,6 @@ struct Networktest {
   @Local startTransferTimeMs: number = 0
   @Local totalTimeMs: number = 0
   @Local redirectTimeMs: number = 0
-  dialogControllerProgress = new CustomDialogController({
-    builder: LoadingDialog({
-      content: '测试中...'
-    })
-  })
 
   build() {
     NavDestination() {
@@ -40,12 +35,17 @@ struct Networktest {
           Column() {
             Button('测试')
               .onClick(async () => {
-                this.dialogControllerProgress.open()
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '测试中...'
+                  })
+                })
+                dialogControllerProgress.open()
                 const session = rcp.createSession()
                 try {
                   const response = await session.get('https://api.zhangls2512.cn/test')
                   session.close()
-                  this.dialogControllerProgress.close()
+                  dialogControllerProgress.close()
                   if (response.statusCode === 200) {
                     let body = ''
                     if (response.toString()) {
@@ -74,7 +74,7 @@ struct Networktest {
                   }
                 } catch (err) {
                   session.close()
-                  this.dialogControllerProgress.close()
+                  dialogControllerProgress.close()
                   promptAction.showToast({
                     message: '发生错误，错误码：' + err.code
                   })

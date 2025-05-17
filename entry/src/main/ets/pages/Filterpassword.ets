@@ -195,9 +195,6 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .width('75%')
               Blank()
                 .width('5%')
@@ -282,9 +279,6 @@ export default struct Filterpassword {
                   })
               }
               .alignItems(HorizontalAlign.Start)
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
               .width('75%')
 
               Blank()
@@ -328,15 +322,11 @@ export default struct Filterpassword {
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
-
       ForEach(this.tagArray, (item: string) => {
         ListItem() {
           Column() {
             Row() {
               Text(item)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .width('75%')
               Blank()
                 .width('5%')
@@ -377,9 +367,6 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .width('75%')
               Blank()
                 .width('5%')
