@@ -6,12 +6,14 @@ import Login from './Login'
 import Passwordcheck from './Passwordcheck'
 import Passwordgenerate from './Passwordgenerate'
 import Setting from './Setting'
+import Urlcheck from './Urlcheck'
 
 @ComponentV2
 export default struct Me {
   @Provider() isShowLoginSheet: boolean = false
   @Local isShowPasswordcheckSheet: boolean = false
   @Local isShowPasswordgenerateSheet: boolean = false
+  @Local isShowUrlcheckSheet: boolean = false
   @Local isShowSettingSheet: boolean = false
   @Local loading: boolean = false
   @Local email: string = ''
@@ -44,6 +46,11 @@ export default struct Me {
   @Builder
   PasswordgenerateSheetBuilder() {
     Passwordgenerate()
+  }
+
+  @Builder
+  UrlcheckSheetBuilder() {
+    Urlcheck()
   }
 
   @Builder
@@ -221,6 +228,63 @@ export default struct Me {
                 const lastWindow = await window.getLastWindow(this.context)
                 await lastWindow.setWindowPrivacyMode(false)
               })
+            })
+          }
+          .backgroundColor($r('sys.color.comp_background_primary'))
+          .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+          .padding($r('sys.float.ohos_id_corner_radius_mark'))
+        }
+        .alignItems(HorizontalAlign.Start)
+      }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+      })
+
+      ListItem() {
+        Column() {
+          Text('更多工具')
+            .fontColor($r('sys.color.font_secondary'))
+            .fontSize($r('sys.float.ohos_id_text_size_body2'))
+            .fontWeight(FontWeight.Medium)
+            .margin({
+              bottom: 6,
+              left: $r('sys.float.ohos_id_corner_radius_default_m')
+            })
+          Column() {
+            Row() {
+              Image($r('app.media.dangerurl'))
+                .height(24)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+                .width(24)
+              Text('恶意 URL 检测')
+                .fontWeight(FontWeight.Medium)
+              Blank()
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
+            }
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
+            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.comp_background_primary'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.comp_background_secondary'))
+              }
+            })
+            .width('100%')
+            .onClick(() => {
+              this.isShowUrlcheckSheet = !this.isShowUrlcheckSheet
+            })
+            .bindSheet($$this.isShowUrlcheckSheet, this.UrlcheckSheetBuilder(), {
+              preferType: SheetType.BOTTOM,
+              title: {
+                title: '恶意 URL 检测'
+              }
             })
           }
           .backgroundColor($r('sys.color.comp_background_primary'))

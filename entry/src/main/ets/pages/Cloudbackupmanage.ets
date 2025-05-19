@@ -25,11 +25,6 @@ struct Cloudbackupmanage {
   @Local infoSelected: boolean = false
   @Local tagSelected: boolean = false
   @Local types: string[] = []
-  dialogControllerProgress = new CustomDialogController({
-    builder: LoadingDialog({
-      content: '清理中...'
-    })
-  })
 
   async getCount() {
     this.loading = true
@@ -190,12 +185,17 @@ struct Cloudbackupmanage {
                     ]
                   })
                   if (data.index === 1) {
-                    this.dialogControllerProgress.open()
+                    const dialogControllerProgress = new CustomDialogController({
+                      builder: LoadingDialog({
+                        content: '清理中...'
+                      })
+                    })
+                    dialogControllerProgress.open()
                     const res = await request('/password/clearBackup', {
                       accessToken: get(),
                       types: this.types
                     })
-                    this.dialogControllerProgress.close()
+                    dialogControllerProgress.close()
                     if (res !== 'fail') {
                       promptAction.showToast({
                         message: '清理成功'

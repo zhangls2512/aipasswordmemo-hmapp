@@ -231,9 +231,6 @@ export default struct Newpassword {
           Column() {
             Row() {
               Text(item)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .width('75%')
               Blank()
                 .width('5%')
@@ -393,9 +390,6 @@ export default struct Newpassword {
                   })
               }
               .alignItems(HorizontalAlign.Start)
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
               .width('75%')
 
               Blank()
@@ -442,9 +436,6 @@ export default struct Newpassword {
           Column() {
             Row() {
               Text(item)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .width('75%')
               Blank()
                 .width('5%')
@@ -503,9 +494,6 @@ export default struct Newpassword {
           Column() {
             Row() {
               Text(item)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .width('75%')
               Blank()
                 .width('5%')

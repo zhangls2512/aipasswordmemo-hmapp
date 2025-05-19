@@ -13,11 +13,6 @@ struct Feedback {
   @Local contactTypeIndex: number = 0
   @Local contactValue: string = ''
   pageInfos = new NavPathStack()
-  dialogControllerProgress = new CustomDialogController({
-    builder: LoadingDialog({
-      content: '提交中...'
-    })
-  })
 
   build() {
     NavDestination() {
@@ -100,7 +95,12 @@ struct Feedback {
             Button('提交')
               .enabled(this.content ? true : false)
               .onClick(async () => {
-                this.dialogControllerProgress.open()
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '提交中...'
+                  })
+                })
+                dialogControllerProgress.open()
                 const res = await request('/debug/sendFeedbackEmail', {
                   key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
                   product: '密码智能备忘录',
@@ -108,7 +108,7 @@ struct Feedback {
                   contactType: this.contactType,
                   contactValue: this.contactValue
                 })
-                this.dialogControllerProgress.close()
+                dialogControllerProgress.close()
                 if (res !== 'fail') {
                   promptAction.showToast({
                     message: '提交成功'
