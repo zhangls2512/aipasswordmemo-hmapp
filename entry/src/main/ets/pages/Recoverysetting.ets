@@ -8,7 +8,7 @@ export function RecoverysettingBuilder() {
 
 @ComponentV2
 struct Recoverysetting {
-  pageInfos: NavPathStack = new NavPathStack()
+  pageInfos = new NavPathStack()
   restart: appRecovery.RestartFlag = appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE
   saveOccasion: appRecovery.SaveOccasionFlag = appRecovery.SaveOccasionFlag.SAVE_WHEN_ERROR
   saveMode: appRecovery.SaveModeFlag = appRecovery.SaveModeFlag.SAVE_WITH_FILE
@@ -21,7 +21,7 @@ struct Recoverysetting {
             Column() {
               Row() {
                 Text('重启时机')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Select([
                   { value: '总是' },
@@ -57,7 +57,7 @@ struct Recoverysetting {
                 })
               Row() {
                 Text('状态保存时机')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Select([
                   { value: '发生故障' },
@@ -85,7 +85,7 @@ struct Recoverysetting {
                 })
               Row() {
                 Text('状态保存方式')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Select([
                   { value: '写入到本地文件缓存' },

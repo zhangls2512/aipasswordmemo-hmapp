@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { window } from '@kit.ArkUI'
 import { setCustomKey } from '../common/Crypto'
 
@@ -10,8 +9,8 @@ export function ImportkeyBuilder() {
 @ComponentV2
 struct Importkey {
   @Local keyValue: string = ''
-  context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
+  context = getContext(this)
+  pageInfos = new NavPathStack()
 
   build() {
     NavDestination() {

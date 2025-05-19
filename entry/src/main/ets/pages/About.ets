@@ -15,7 +15,7 @@ struct About {
   @Local hasUpdate: number = -1
   @Local updateLoading: boolean = false
   context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
+  pageInfos = new NavPathStack()
 
   build() {
     NavDestination() {
@@ -39,7 +39,7 @@ struct About {
               )
             Text($r('app.string.app_name'))
               .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-              .fontWeight('bold')
+              .fontWeight(FontWeight.Bold)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -53,7 +53,7 @@ struct About {
             Row() {
               Column() {
                 Text('版本信息')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text($r('app.string.app_version'))
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -141,7 +141,7 @@ struct About {
             Row() {
               Column() {
                 Text('更新日志')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text('https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -179,7 +179,7 @@ struct About {
               })
             Row() {
               Text('应用详情')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -208,7 +208,7 @@ struct About {
               })
             Row() {
               Text('评论应用')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -237,7 +237,7 @@ struct About {
               })
             Row() {
               Text('意见反馈')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -274,7 +274,7 @@ struct About {
             Text('客服')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -283,7 +283,7 @@ struct About {
               Row() {
                 Column() {
                   Text('在线')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text('https://chatbot.weixin.qq.com/webapp/5e2JglFAERGl06z0FkTK6eWL6D1Oa5?robotName=轩铭2512产品客服')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -322,7 +322,7 @@ struct About {
               Row() {
                 Column() {
                   Text('电话')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text('18846496985')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -361,7 +361,7 @@ struct About {
               Row() {
                 Column() {
                   Text('邮箱')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text('2300990296@qq.com')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -405,7 +405,7 @@ struct About {
               Row() {
                 Column() {
                   Text('微信')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text('gerenyinsi_z07x17m')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -444,7 +444,7 @@ struct About {
               Row() {
                 Column() {
                   Text('腾讯频道')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text('https://pd.qq.com/s/cnx7f1zdm')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -490,7 +490,7 @@ struct About {
             Text('媒体')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -499,7 +499,7 @@ struct About {
               Row() {
                 Column() {
                   Text('官网')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text('https://www.zhangls2512.cn/index')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -538,7 +538,7 @@ struct About {
               Row() {
                 Column() {
                   Text('哔哩哔哩')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text('https://space.bilibili.com/448824492')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -577,7 +577,7 @@ struct About {
               Row() {
                 Column() {
                   Text('Gitcode')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Text('https://gitcode.com/zhangls2512/aipasswordmemo-hmapp')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))

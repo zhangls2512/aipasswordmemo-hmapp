@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { relationalStore } from '@kit.ArkData'
 import { PasswordInfoItem } from './Dataget'
 
@@ -14,7 +13,7 @@ export interface RepeatItem {
 }
 
 export async function getRepeatPasswordList(): Promise<RepeatItem[]> {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
     securityLevel: 4,

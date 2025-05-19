@@ -17,7 +17,7 @@ struct Notice {
           Column() {
             Row() {
               Text('通知管理')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))

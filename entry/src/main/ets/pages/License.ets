@@ -24,7 +24,7 @@ struct License {
     { property: '主体类型', value: '个人' },
     { property: '开办者名称', value: '张**' },
     { property: '注册地公安机关', value: '萨尔图区网安大队' },
-    { property: '注册时间', value: '2025-05-？' }
+    { property: '注册时间', value: '2025-05-14' }
   ]
   tscjInfoArray: ItemWithDesc[] = [
     {
@@ -75,7 +75,7 @@ struct License {
           Column() {
             Text('公安备案')
               .fontColor($r('sys.color.font_emphasize'))
-              .fontWeight('bold')
+              .fontWeight(FontWeight.Bold)
               .onClick(() => {
                 openLink('https://beian.mps.gov.cn/#/query/appSearch')
               })
@@ -86,7 +86,7 @@ struct License {
               ForEach(this.gabaInfoArray, (item: Item) => {
                 Column() {
                   Text(item.property)
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                     .textAlign(TextAlign.Center)
                 }
                 .border({
@@ -149,14 +149,14 @@ struct License {
         ListItem() {
           Column() {
             Text('许可')
-              .fontWeight('bold')
+              .fontWeight(FontWeight.Bold)
             Flex({
               alignItems: ItemAlign.Stretch,
               wrap: FlexWrap.Wrap
             }) {
               Column() {
                 Text('类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
               }
               .border({
@@ -172,7 +172,7 @@ struct License {
 
               Column() {
                 Text('许可号')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
               }
               .border({
@@ -238,14 +238,14 @@ struct License {
         ListItem() {
           Column() {
             Text('特殊场景适配备案')
-              .fontWeight('bold')
+              .fontWeight(FontWeight.Bold)
             Flex({
               alignItems: ItemAlign.Stretch,
               wrap: FlexWrap.Wrap
             }) {
               Column() {
                 Text('类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
               }
               .border({
@@ -261,7 +261,7 @@ struct License {
 
               Column() {
                 Text('备案号')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
               }
               .border({
@@ -342,14 +342,14 @@ struct License {
         ListItem() {
           Column() {
             Text('隐私安全备案')
-              .fontWeight('bold')
+              .fontWeight(FontWeight.Bold)
             Flex({
               alignItems: ItemAlign.Stretch,
               wrap: FlexWrap.Wrap
             }) {
               Column() {
                 Text('描述')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
               }
               .border({
@@ -365,7 +365,7 @@ struct License {
 
               Column() {
                 Text('备案号')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
               }
               .border({

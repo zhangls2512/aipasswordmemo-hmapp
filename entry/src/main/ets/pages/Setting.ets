@@ -17,14 +17,14 @@ export default struct Setting {
   @Local vipStatusColor: string = 'red'
   @Local vipStatusLoading: boolean = false
   context = getContext(this) as common.UIAbilityContext
-  pageInfos: NavPathStack = new NavPathStack()
+  pageInfos = new NavPathStack()
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
-  accessToken: string = get()
+  accessToken = get()
 
   async getSetting() {
-    const allService: preferences.ValueType = this.commonSettingDataPreferences.getSync('allService', true)
+    const allService = this.commonSettingDataPreferences.getSync('allService', true)
     this.allService = allService as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
@@ -72,7 +72,7 @@ export default struct Setting {
               Text('账号')
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
                   left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -80,7 +80,7 @@ export default struct Setting {
               Column() {
                 Row() {
                   Text('绑定华为账号')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Blank()
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
@@ -114,12 +114,12 @@ export default struct Setting {
                     if (!this.cloudService) {
                       Text('开通云服务')
                         .fontColor($r('sys.color.font_emphasize'))
-                        .fontWeight('medium')
+                        .fontWeight(FontWeight.Medium)
                     }
                     if (this.cloudService) {
                       Text('取消开通云服务')
                         .fontColor($r('sys.color.warning'))
-                        .fontWeight('medium')
+                        .fontWeight(FontWeight.Medium)
                     }
                     Blank()
                     Image($r('app.media.right'))
@@ -153,7 +153,7 @@ export default struct Setting {
                     Row() {
                       Text('会员中心')
                         .fontColor('#FFD700')
-                        .fontWeight('medium')
+                        .fontWeight(FontWeight.Medium)
                       Blank()
                       if (!this.vipStatusLoading) {
                         Text(this.vipStatus)
@@ -221,7 +221,7 @@ export default struct Setting {
                 Text('云备份')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .margin({
                     bottom: 6,
                     left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -229,7 +229,7 @@ export default struct Setting {
                 Column() {
                   Row() {
                     Text('自动开启')
-                      .fontWeight('medium')
+                      .fontWeight(FontWeight.Medium)
                     Blank()
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
@@ -260,7 +260,7 @@ export default struct Setting {
                     })
                   Row() {
                     Text('管理')
-                      .fontWeight('medium')
+                      .fontWeight(FontWeight.Medium)
                     Blank()
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
@@ -291,7 +291,7 @@ export default struct Setting {
                     })
                   Row() {
                     Text('导入')
-                      .fontWeight('medium')
+                      .fontWeight(FontWeight.Medium)
                     Blank()
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
@@ -322,7 +322,7 @@ export default struct Setting {
                     })
                   Row() {
                     Text('密钥')
-                      .fontWeight('medium')
+                      .fontWeight(FontWeight.Medium)
                     Blank()
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
@@ -353,7 +353,7 @@ export default struct Setting {
                 Text('安全保障说明')
                   .fontColor($r('sys.color.font_emphasize'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .margin({
                     top: 6,
                     left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -374,7 +374,7 @@ export default struct Setting {
             Text('数据')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -382,7 +382,7 @@ export default struct Setting {
             Column() {
               Row() {
                 Text('设备间同步')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -413,7 +413,7 @@ export default struct Setting {
                 })
               Row() {
                 Text('导入与导出')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -444,7 +444,7 @@ export default struct Setting {
                 })
               Row() {
                 Text('备份与恢复')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -483,7 +483,7 @@ export default struct Setting {
           Column() {
             Row() {
               Text('通用')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -519,7 +519,7 @@ export default struct Setting {
           Column() {
             Row() {
               Text('消息通知')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -556,7 +556,7 @@ export default struct Setting {
             Text('数据与隐私')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -564,7 +564,7 @@ export default struct Setting {
             Column() {
               Row() {
                 Text('权限管理')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -599,7 +599,7 @@ export default struct Setting {
                 Row() {
                   if (this.agreedPrivacyAgreement === 0) {
                     Text('阅读并签署隐私协议')
-                      .fontWeight('medium')
+                      .fontWeight(FontWeight.Medium)
                   }
                   if (this.agreedPrivacyAgreement === 2) {
                     Badge({
@@ -611,7 +611,7 @@ export default struct Setting {
                       }
                     }) {
                       Text('阅读并签署隐私协议')
-                        .fontWeight('medium')
+                        .fontWeight(FontWeight.Medium)
                         .margin({
                           right: 16
                         })
@@ -643,7 +643,7 @@ export default struct Setting {
                 Row() {
                   Text('撤回同意隐私协议')
                     .fontColor($r('sys.color.warning'))
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Blank()
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
@@ -682,7 +682,7 @@ export default struct Setting {
             Text('了解我们如何使用您的数据')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -690,7 +690,7 @@ export default struct Setting {
             Column() {
               Row() {
                 Text('业务与隐私的声明')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -727,7 +727,7 @@ export default struct Setting {
                 })
               Row() {
                 Text('第三方 SDK 列表')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -756,7 +756,7 @@ export default struct Setting {
                 })
               Row() {
                 Text('已收集个人信息清单')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -787,7 +787,7 @@ export default struct Setting {
                 })
               Row() {
                 Text('隐私声明摘要')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -824,7 +824,7 @@ export default struct Setting {
             Text('更多')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m')
@@ -832,7 +832,7 @@ export default struct Setting {
             Column() {
               Row() {
                 Text('应用服务模式')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Text(this.allService ? '全量模式' : '基本模式')
                   .fontColor($r('sys.color.font_secondary'))
@@ -869,7 +869,7 @@ export default struct Setting {
                 })
               Row() {
                 Text('其他')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -907,7 +907,7 @@ export default struct Setting {
           Column() {
             Row() {
               Text('关于')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Text('版本 ')
                 .fontColor($r('sys.color.font_secondary'))
@@ -947,7 +947,7 @@ export default struct Setting {
               })
             Row() {
               Text('服务协议与规则')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))

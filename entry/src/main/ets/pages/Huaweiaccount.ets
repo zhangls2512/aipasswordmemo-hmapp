@@ -26,7 +26,7 @@ struct Huaweiaccount {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  pageInfos: NavPathStack = new NavPathStack()
+  pageInfos = new NavPathStack()
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
@@ -51,7 +51,7 @@ struct Huaweiaccount {
           code = this.emailcode
         }
         if (response) {
-          const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+          const dialogControllerProgress = new CustomDialogController({
             builder: LoadingDialog({
               content: '绑定中...'
             })
@@ -97,7 +97,7 @@ struct Huaweiaccount {
             Column() {
               Row() {
                 Text('方式')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
@@ -141,7 +141,7 @@ struct Huaweiaccount {
               if (this.type === 'mfa') {
                 Row() {
                   Text('MFA')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
@@ -161,7 +161,7 @@ struct Huaweiaccount {
               if (this.type === 'emailcode') {
                 Row() {
                   Text('验证码')
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
@@ -186,7 +186,7 @@ struct Huaweiaccount {
                   })
                   .width('100%')
                   .onClick(async () => {
-                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                    const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
                         content: '发送中...'
                       })
@@ -260,7 +260,7 @@ struct Huaweiaccount {
                     if (this.type === 'emailcode') {
                       code = this.emailcode
                     }
-                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                    const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
                         content: '解绑中...'
                       })

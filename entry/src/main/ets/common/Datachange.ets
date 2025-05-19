@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { get } from './Accesstoken'
@@ -37,7 +36,7 @@ interface CloudBackupItem {
 }
 
 export async function newPassword(data: PasswordInput) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
     securityLevel: 4,
@@ -73,7 +72,7 @@ export async function newPassword(data: PasswordInput) {
 }
 
 export async function updatePassword(id: number, data: PasswordInput) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
     securityLevel: 4,
@@ -110,7 +109,7 @@ export async function updatePassword(id: number, data: PasswordInput) {
 }
 
 export async function newInfo(data: InfoInput) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
     securityLevel: 4,
@@ -155,7 +154,7 @@ export async function newInfo(data: InfoInput) {
 }
 
 export async function updateInfo(id: number, data: InfoInput) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
     securityLevel: 4,
@@ -201,7 +200,7 @@ export async function updateInfo(id: number, data: InfoInput) {
 }
 
 export async function newTag(data: TagInput) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: 1,
@@ -245,7 +244,7 @@ export async function newTag(data: TagInput) {
 }
 
 export async function updateTag(id: number, data: TagInput) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: 1,
@@ -291,7 +290,7 @@ export async function updateTag(id: number, data: TagInput) {
 }
 
 export async function deleteData(type: string, id: number) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   let securityLevel = 4
   if (type === 'tag') {
     securityLevel = 1
@@ -324,7 +323,7 @@ export async function setCloudBackup(data: CloudBackupItem) {
     iv: encryptData.iv
   })
   if (res !== 'fail') {
-    const context = getContext() as common.UIAbilityContext
+    const context = getContext()
     let securityLevel = 4
     if (data.type === 'tag') {
       securityLevel = 1
@@ -353,7 +352,7 @@ export async function deleteCloudBackup(data: CloudBackupItem) {
     id: data.id
   })
   if (res !== 'fail') {
-    const context = getContext() as common.UIAbilityContext
+    const context = getContext()
     let securityLevel = 4
     if (data.type === 'tag') {
       securityLevel = 1

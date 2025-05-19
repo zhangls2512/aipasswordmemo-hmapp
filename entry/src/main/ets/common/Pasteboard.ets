@@ -1,10 +1,9 @@
-import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { pasteboard } from '@kit.BasicServicesKit'
 
 export async function copy(text: string) {
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const permissionSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'permissionSetting'
   })

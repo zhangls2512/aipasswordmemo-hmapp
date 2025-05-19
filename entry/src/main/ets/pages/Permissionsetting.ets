@@ -14,8 +14,8 @@ struct Permissionsetting {
   permissionSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'permissionSetting'
   })
-  dataSync: boolean = getPermission('ohos.permission.DISTRIBUTED_DATASYNC')
-  microphone: boolean = getPermission('ohos.permission.MICROPHONE')
+  dataSync = getPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+  microphone = getPermission('ohos.permission.MICROPHONE')
 
   build() {
     NavDestination() {
@@ -25,7 +25,7 @@ struct Permissionsetting {
             Column() {
               Row() {
                 Text('设备发现和连接')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -48,7 +48,7 @@ struct Permissionsetting {
                 .fontColor($r('sys.color.font_secondary'))
               Span('系统设置')
                 .fontColor($r('sys.color.font_emphasize'))
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .onClick(() => {
                   this.context.startAbility({
                     bundleName: 'com.huawei.hmos.settings',
@@ -80,7 +80,7 @@ struct Permissionsetting {
             Column() {
               Row() {
                 Text('麦克风')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -103,7 +103,7 @@ struct Permissionsetting {
                 .fontColor($r('sys.color.font_secondary'))
               Span('系统设置')
                 .fontColor($r('sys.color.font_emphasize'))
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .onClick(() => {
                   this.context.startAbility({
                     bundleName: 'com.huawei.hmos.settings',
@@ -135,7 +135,7 @@ struct Permissionsetting {
             Column() {
               Row() {
                 Text('写入剪贴板')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -178,8 +178,7 @@ struct Permissionsetting {
     .backgroundColor($r('app.color.sheet_background'))
     .title('权限管理')
     .onReady(() => {
-      const writePasteBoard: preferences.ValueType =
-        this.permissionSettingDataPreferences.getSync('writePasteBoard', false)
+      const writePasteBoard = this.permissionSettingDataPreferences.getSync('writePasteBoard', false)
       this.writePasteBoard = writePasteBoard as boolean
     })
   }

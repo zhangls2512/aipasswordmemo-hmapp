@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -33,15 +32,15 @@ export default struct PasswordPage {
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
   @Local orderColumnText: string = '修改时间'
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   shortcutDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'shortcut'
   })
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
   })
-  orderColumn: string = 'updateTime'
-  passwordId: number = 0
+  orderColumn = 'updateTime'
+  passwordId = 0
 
   async getList() {
     this.loading = true
@@ -210,7 +209,7 @@ export default struct PasswordPage {
               }
               Column() {
                 Text(item.name)
-                  .fontWeight('bold')
+                  .fontWeight(FontWeight.Bold)
                 ForEach(item.tag, (item: PasswordTagItem) => {
                   Row() {
                     Circle({
@@ -222,7 +221,7 @@ export default struct PasswordPage {
                         right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                       })
                     Text(item.value)
-                      .fontWeight('medium')
+                      .fontWeight(FontWeight.Medium)
                   }
                   .margin({
                     top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -289,7 +288,7 @@ export default struct PasswordPage {
                 icon: $r('app.media.cloud'),
                 enabled: this.enableCloudBackup && item.cloudBackupTime < item.updateTime,
                 action: async () => {
-                  const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                  const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
                       content: '云备份中...'
                     })
@@ -331,7 +330,7 @@ export default struct PasswordPage {
                     ]
                   })
                   if (data.index === 1) {
-                    const dialogControllerProgress: CustomDialogController = new CustomDialogController({
+                    const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
                         content: '删除云备份中...'
                       })

@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { getRepeatPasswordList, ListItem, RepeatItem } from '../common/Passwordcheck'
 import UpdatePassword from './Updatepassword'
@@ -7,8 +6,8 @@ import UpdatePassword from './Updatepassword'
 export default struct Passwordcheck {
   @Provider() isShowUpdateSheet: boolean = false
   @Local repeatArray: RepeatItem[] = []
-  context = getContext(this) as common.UIAbilityContext
-  passwordId: number = 0
+  context = getContext(this)
+  passwordId = 0
 
   @Builder
   UpdateSheetBuilder(id: number) {
@@ -21,7 +20,7 @@ export default struct Passwordcheck {
     List() {
       ListItem() {
         Text('重复')
-          .fontWeight('bold')
+          .fontWeight(FontWeight.Bold)
       }
       .margin({
         bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -42,7 +41,7 @@ export default struct Passwordcheck {
             Text('使用 ' + item.password + ' 的 ' + item.count + ' 账号')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
+              .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
                 left: $r('sys.float.ohos_id_corner_radius_default_m'),
@@ -59,7 +58,7 @@ export default struct Passwordcheck {
                 }
                 Row() {
                   Text(item.name)
-                    .fontWeight('medium')
+                    .fontWeight(FontWeight.Medium)
                   Blank()
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))

@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { camera, cameraPicker as picker } from '@kit.CameraKit'
 import { fileIo } from '@kit.CoreFileKit'
@@ -20,7 +19,7 @@ export default struct Ainewinfo {
   @Local list: Item[] = []
   @Local text: string = ''
   @Local showCard: boolean = false
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
 
   async getList(value: string) {
     this.list = []
@@ -199,7 +198,7 @@ export default struct Ainewinfo {
 
       ListItem() {
         Text('AI 识别结果')
-          .fontWeight('medium')
+          .fontWeight(FontWeight.Medium)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -210,7 +209,7 @@ export default struct Ainewinfo {
           Column() {
             Row() {
               Text('类型')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .width('45%')
               Blank()
                 .width('5%')
@@ -231,7 +230,7 @@ export default struct Ainewinfo {
               })
             Row() {
               Text('内容')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .width('45%')
               Blank()
                 .width('5%')
@@ -253,7 +252,7 @@ export default struct Ainewinfo {
             Row() {
               Text('新增')
                 .fontColor($r('sys.color.font_emphasize'))
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))

@@ -1,4 +1,4 @@
-import { abilityAccessCtrl, bundleManager, common, Permissions } from '@kit.AbilityKit'
+import { abilityAccessCtrl, bundleManager, Permissions } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 
 export function getPermission(permission: Permissions): boolean {
@@ -24,7 +24,7 @@ export async function checkPermission(permission: Permissions): Promise<boolean>
   if (status === 0) {
     return true
   }
-  const context = getContext() as common.UIAbilityContext
+  const context = getContext()
   const resa = await atManager.requestPermissionsFromUser(context, [permission])
   const authResulta = resa.authResults[0]
   if (authResulta === 0) {

@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
@@ -12,7 +11,7 @@ export function ServicemodeBuilder() {
 @ComponentV2
 struct Servicemode {
   @Local allService: boolean = true
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
@@ -25,7 +24,7 @@ struct Servicemode {
             Column() {
               Row() {
                 Text('全量模式')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -51,7 +50,7 @@ struct Servicemode {
                 .fontColor($r('sys.color.font_secondary'))
               Span('关于轩铭密码智能备忘录与隐私的声明')
                 .fontColor($r('sys.color.font_emphasize'))
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
                 .onClick(() => {
                   try {
                     const appPrivacyLink =
@@ -84,7 +83,7 @@ struct Servicemode {
             Column() {
               Row() {
                 Text('基本模式')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -129,8 +128,7 @@ struct Servicemode {
     .backgroundColor($r('app.color.sheet_background'))
     .title('应用服务模式')
     .onReady(() => {
-      const allService: preferences.ValueType =
-        this.commonSettingDataPreferences.getSync('allService', true)
+      const allService = this.commonSettingDataPreferences.getSync('allService', true)
       this.allService = allService as boolean
     })
     .onDisAppear(() => {

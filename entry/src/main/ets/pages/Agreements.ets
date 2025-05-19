@@ -16,7 +16,7 @@ struct Agreements {
           Column() {
             Row() {
               Text('用户服务条款与条件')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))

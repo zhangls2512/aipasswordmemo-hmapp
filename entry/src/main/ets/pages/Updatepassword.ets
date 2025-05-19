@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
@@ -27,7 +26,7 @@ export default struct Newpassword {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  context = getContext(this) as common.UIAbilityContext
+  context = getContext(this)
   specialTypes: string[] = ['昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   build() {
@@ -41,7 +40,7 @@ export default struct Newpassword {
 
       ListItem() {
         Text('信息')
-          .fontWeight('medium')
+          .fontWeight(FontWeight.Medium)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -386,7 +385,7 @@ export default struct Newpassword {
             Row() {
               Column() {
                 Text(item.value)
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                 Text(item.type)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -423,7 +422,7 @@ export default struct Newpassword {
       })
       ListItem() {
         Text('标签')
-          .fontWeight('medium')
+          .fontWeight(FontWeight.Medium)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -535,7 +534,7 @@ export default struct Newpassword {
           Column() {
             Row() {
               Text('云备份')
-                .fontWeight('medium')
+                .fontWeight(FontWeight.Medium)
               Blank()
               Toggle({
                 type: ToggleType.Switch,
