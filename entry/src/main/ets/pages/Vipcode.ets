@@ -12,11 +12,6 @@ struct Vipcode {
   @Local vipcode: string = ''
   context = getContext(this)
   pageInfos = new NavPathStack()
-  dialogControllerProgress = new CustomDialogController({
-    builder: LoadingDialog({
-      content: '验证中...'
-    })
-  })
 
   build() {
     NavDestination() {
@@ -34,12 +29,17 @@ struct Vipcode {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
               .onClick(async () => {
-                this.dialogControllerProgress.open()
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '验证中...'
+                  })
+                })
+                dialogControllerProgress.open()
                 const res = await request('/product/useVipcode', {
                   accessToken: get(),
                   vipcode: this.vipcode
                 })
-                this.dialogControllerProgress.close()
+                dialogControllerProgress.close()
                 if (res !== 'fail') {
                   promptAction.showToast({
                     message: '兑换成功'
