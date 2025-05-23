@@ -66,7 +66,7 @@ export default struct Newtag {
               placeholder: '请输入颜色',
               text: $$this.tagColor
             })
-              .width('85%')
+              .width('90%')
           }
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -77,6 +77,7 @@ export default struct Newtag {
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
         }
+        .alignItems(HorizontalAlign.Start)
       }
 
       ListItem() {
