@@ -212,6 +212,7 @@ struct Clearsettings {
                       ]
                       keys.forEach((item) => {
                         dataPreferences.deleteSync(item)
+                        dataPreferences.flushSync()
                       })
                       return
                     }

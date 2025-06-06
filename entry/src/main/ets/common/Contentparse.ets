@@ -45,10 +45,9 @@ export default async function parseContent(content: string): Promise<string[]> {
     }
     if (get()) {
       remove()
-      const loginDataPreferences = preferences.getPreferencesSync(context, {
+      await preferences.deletePreferences(context, {
         name: 'login'
       })
-      loginDataPreferences.deleteSync('endDate')
       array.push('已退出登录。')
     }
   }

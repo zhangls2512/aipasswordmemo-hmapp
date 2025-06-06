@@ -187,7 +187,9 @@ export default class EntryAbility extends UIAbility {
     const loginEndDate = loginDataPreferences.getSync('endDate', 0)
     if (loginEndDate !== 0 && loginEndDate < Date.now()) {
       remove()
-      loginDataPreferences.deleteSync('endDate')
+      await preferences.deletePreferences(this.context, {
+        name: 'login'
+      })
       promptAction.showToast({
         message: '登录态过期，请重新登录'
       })

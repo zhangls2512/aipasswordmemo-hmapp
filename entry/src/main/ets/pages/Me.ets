@@ -363,10 +363,9 @@ export default struct Me {
               })
               if (data.index === 1) {
                 remove()
-                const loginDataPreferences = preferences.getPreferencesSync(this.context, {
+                await preferences.deletePreferences(this.context, {
                   name: 'login'
                 })
-                loginDataPreferences.deleteSync('endDate')
                 this.email = ''
                 promptAction.showToast({
                   message: '退出成功'
