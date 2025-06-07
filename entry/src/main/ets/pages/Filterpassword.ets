@@ -213,8 +213,8 @@ export default struct Filterpassword {
                   })
                 })
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -290,8 +290,8 @@ export default struct Filterpassword {
                   this.passwordInfoArray.splice(index, 1)
                 })
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -342,8 +342,8 @@ export default struct Filterpassword {
                   this.passwordTagArray.push(item)
                 })
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -377,8 +377,8 @@ export default struct Filterpassword {
                   this.passwordTagArray.splice(index, 1)
                 })
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

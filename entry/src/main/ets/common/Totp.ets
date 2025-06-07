@@ -78,7 +78,7 @@ function numberToBigEndianUint8Array(num: bigint): Uint8Array {
   return new Uint8Array(buffer)
 }
 
-export function getTotp(key: string, step: number, digits: number): Totp {
+export default function getTotp(key: string, step: number, digits: number): Totp {
   const keyArray = base32Decode(key)
   const time = Math.floor(Date.now() / 1000 / step)
   const timeArray = numberToBigEndianUint8Array(BigInt(time))
