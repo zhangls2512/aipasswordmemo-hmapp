@@ -66,7 +66,7 @@ struct Tablesync {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -100,14 +100,14 @@ struct Tablesync {
                     }
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('常用信息')
@@ -140,14 +140,14 @@ struct Tablesync {
                     }
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('标签')
@@ -180,8 +180,8 @@ struct Tablesync {
                     }
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -202,7 +202,7 @@ struct Tablesync {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -227,14 +227,14 @@ struct Tablesync {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('常用信息')
@@ -258,14 +258,14 @@ struct Tablesync {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('标签')
@@ -289,8 +289,8 @@ struct Tablesync {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -326,14 +326,14 @@ struct Tablesync {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('名称')
@@ -347,14 +347,14 @@ struct Tablesync {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('类型')
@@ -368,14 +368,14 @@ struct Tablesync {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('网络标识')
@@ -389,14 +389,14 @@ struct Tablesync {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('关闭自动同步')
@@ -408,8 +408,8 @@ struct Tablesync {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -454,7 +454,7 @@ struct Tablesync {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -471,14 +471,14 @@ struct Tablesync {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('系统开启 (超级) 省电模式')
@@ -494,8 +494,8 @@ struct Tablesync {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -531,14 +531,14 @@ struct Tablesync {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('名称')
@@ -552,14 +552,14 @@ struct Tablesync {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('类型')
@@ -573,14 +573,14 @@ struct Tablesync {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('网络标识')
@@ -594,15 +594,15 @@ struct Tablesync {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
-              if (!this.autoSyncDevices.find(device => device.deviceId = item.deviceId)) {
+              if (!this.autoSyncDevices.find(device => device.deviceId === item.deviceId)) {
                 Divider()
                   .padding({
-                    left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                    right: $r('sys.float.ohos_id_corner_radius_default_m')
+                    left: 12,
+                    right: 12
                   })
                 Row() {
                   Text('开启自动同步')
@@ -614,8 +614,8 @@ struct Tablesync {
                     .height(12)
                     .width(12)
                 }
-                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .borderRadius(12)
+                .padding(12)
                 .stateStyles({
                   normal: {
                     .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -637,8 +637,8 @@ struct Tablesync {
               }
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('推送')
@@ -649,8 +649,8 @@ struct Tablesync {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -679,20 +679,20 @@ struct Tablesync {
                   ]
                 })
                 if (data.index === 0) {
-                  syncTable('password', item.deviceId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  syncTable('password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
                 }
                 if (data.index === 1) {
-                  syncTable('info', item.deviceId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  syncTable('info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
                 }
                 if (data.index === 2) {
-                  syncTable('tag', item.deviceId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  syncTable('tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
                 }
               })
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('拉取')
@@ -703,8 +703,8 @@ struct Tablesync {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -733,13 +733,13 @@ struct Tablesync {
                   ]
                 })
                 if (data.index === 0) {
-                  syncTable('password', item.deviceId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  syncTable('password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
                 }
                 if (data.index === 1) {
-                  syncTable('info', item.deviceId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  syncTable('info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
                 }
                 if (data.index === 2) {
-                  syncTable('tag', item.deviceId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  syncTable('tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
                 }
               })
             }

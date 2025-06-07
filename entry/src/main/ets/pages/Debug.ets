@@ -41,6 +41,7 @@ struct Debug {
   @Local autoReportHighLatency: boolean = true
   @Local highLatencyThreshold: string = '200'
   @Local allService: boolean = true
+  @Local windowInfoArray: Item[] = []
   @Local systemLoadValue: number = -1
   context = getContext(this) as common.UIAbilityContext
   pageInfos = new NavPathStack()
@@ -451,7 +452,6 @@ struct Debug {
     { name: '设备是否可折叠', value: display.isFoldable() ? '是' : '否' },
     { name: '是否正在截屏、投屏、录屏', value: display.isCaptured() ? '是' : '否' }
   ]
-  windowInfoArray: Item[] = []
   batteryInfoArray: Item[] = [
     { name: '剩余电池电量百分比', value: String(batteryInfo.batterySOC) + '%' },
     {
@@ -544,11 +544,8 @@ struct Debug {
     }
     const autoUploadErrorLog = this.debugSettingDataPreferences.getSync('autoUploadErrorLog', true)
     this.autoUploadErrorLog = autoUploadErrorLog as boolean
-    const allService = this.commonSettingDataPreferences.getSync('allService', true)
-    this.allService = allService as boolean
     const showMemoryLevelChange = this.debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
     this.showMemoryLevelChange = showMemoryLevelChange as boolean
-    this.autoUploadErrorLog = autoUploadErrorLog as boolean
     const lowBatteryCapacityLevel = this.debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
     this.lowBatteryCapacityLevelIndex = (lowBatteryCapacityLevel as number) - 1
     if (lowBatteryCapacityLevel === 1) {
@@ -588,6 +585,11 @@ struct Debug {
     this.showNetSceneChange = showNetSceneChange as boolean
     const highLatencyThreshold = this.debugSettingDataPreferences.getSync('highLatencyThreshold', 200)
     this.highLatencyThreshold = String(highLatencyThreshold)
+    const allService = this.commonSettingDataPreferences.getSync('allService', true)
+    this.allService = allService as boolean
+    if (!allService) {
+      this.autoUploadErrorLog = false
+    }
   }
 
   build() {
@@ -601,7 +603,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -619,14 +621,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('自动上传故障日志')
@@ -642,14 +644,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('故障日志')
@@ -660,8 +662,8 @@ struct Debug {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -679,8 +681,8 @@ struct Debug {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('内存占用级别变化时弹窗')
@@ -695,14 +697,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('电池电量低阈值')
@@ -724,8 +726,8 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -746,7 +748,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -758,8 +760,8 @@ struct Debug {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -775,8 +777,8 @@ struct Debug {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('保存当前状态')
@@ -787,8 +789,8 @@ struct Debug {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -809,8 +811,8 @@ struct Debug {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('设置')
@@ -821,8 +823,8 @@ struct Debug {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -856,7 +858,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -872,14 +874,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('阻塞状态变化时弹窗')
@@ -894,14 +896,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('丢失时弹窗')
@@ -916,14 +918,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('能力变化时弹窗')
@@ -938,14 +940,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('质量变化时弹窗')
@@ -960,14 +962,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('场景变化时弹窗')
@@ -982,14 +984,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('高时延时自动反馈传输体验')
@@ -1004,14 +1006,14 @@ struct Debug {
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('时延达到')
@@ -1041,14 +1043,14 @@ struct Debug {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('反馈传输体验')
@@ -1059,8 +1061,8 @@ struct Debug {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1078,8 +1080,8 @@ struct Debug {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('测试')
@@ -1090,8 +1092,8 @@ struct Debug {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1125,7 +1127,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -1138,8 +1140,8 @@ struct Debug {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1172,8 +1174,8 @@ struct Debug {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('终止所有进程并退出')
@@ -1185,8 +1187,8 @@ struct Debug {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1271,7 +1273,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.applicationInfoArray, (item: Item, index: number) => {
@@ -1279,8 +1281,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -1295,8 +1297,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -1319,7 +1321,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.hapModuleInfoArray, (item: Item, index: number) => {
@@ -1327,8 +1329,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -1343,8 +1345,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -1367,7 +1369,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.abilityInfoArray, (item: Item, index: number) => {
@@ -1375,8 +1377,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -1391,8 +1393,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -1415,7 +1417,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.bundleInfoArray, (item: Item, index: number) => {
@@ -1423,8 +1425,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -1439,8 +1441,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -1463,7 +1465,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.deviceInfoArray, (item: Item, index: number) => {
@@ -1471,8 +1473,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -1487,8 +1489,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -1511,7 +1513,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.systemInfoArray, (item: Item, index: number) => {
@@ -1519,8 +1521,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -1535,8 +1537,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -1559,7 +1561,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.displayInfoArray, (item: Item, index: number) => {
@@ -1567,8 +1569,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -1583,8 +1585,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -1599,53 +1601,55 @@ struct Debug {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
-        ListItem() {
-          Column() {
-            Text('窗口信息')
-              .fontColor($r('sys.color.font_secondary'))
-              .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
-              .margin({
-                bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
-              })
+        if (this.windowInfoArray.length > 0) {
+          ListItem() {
             Column() {
-              ForEach(this.windowInfoArray, (item: Item, index: number) => {
-                if (item.value) {
-                  if (index !== 0) {
-                    Divider()
-                      .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
-                      })
+              Text('窗口信息')
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .fontWeight('medium')
+                .margin({
+                  bottom: 6,
+                  left: 12
+                })
+              Column() {
+                ForEach(this.windowInfoArray, (item: Item, index: number) => {
+                  if (item.value) {
+                    if (index !== 0) {
+                      Divider()
+                        .padding({
+                          left: 12,
+                          right: 12
+                        })
+                    }
+                    Row() {
+                      Text(item.name)
+                        .fontWeight('medium')
+                        .width('45%')
+                      Blank()
+                        .width('5%')
+                      Text(item.value)
+                        .fontColor($r('sys.color.font_secondary'))
+                        .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                        .textAlign(TextAlign.End)
+                        .width('50%')
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .width('100%')
                   }
-                  Row() {
-                    Text(item.name)
-                      .fontWeight('medium')
-                      .width('45%')
-                    Blank()
-                      .width('5%')
-                    Text(item.value)
-                      .fontColor($r('sys.color.font_secondary'))
-                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                      .textAlign(TextAlign.End)
-                      .width('50%')
-                  }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .width('100%')
-                }
-              })
+                })
+              }
+              .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .padding($r('sys.float.ohos_id_corner_radius_mark'))
             }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+            .alignItems(HorizontalAlign.Start)
           }
-          .alignItems(HorizontalAlign.Start)
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
         }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
 
         ListItem() {
           Column() {
@@ -1655,7 +1659,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.batteryInfoArray, (item: Item, index: number) => {
@@ -1663,8 +1667,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -1679,8 +1683,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -1703,7 +1707,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -1718,14 +1722,14 @@ struct Debug {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('是否进入待机低功耗续航模式')
@@ -1739,14 +1743,14 @@ struct Debug {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('电源模式')
@@ -1766,8 +1770,8 @@ struct Debug {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1788,7 +1792,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -1813,8 +1817,8 @@ struct Debug {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1835,7 +1839,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -1863,8 +1867,8 @@ struct Debug {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1885,7 +1889,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.networkInfoArray, (item: Item, index: number) => {
@@ -1893,8 +1897,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -1909,8 +1913,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -1933,7 +1937,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -1948,14 +1952,14 @@ struct Debug {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('触摸浏览模式')
@@ -1969,8 +1973,8 @@ struct Debug {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1991,7 +1995,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.storageStatisticsInfoArray, (item: Item, index: number) => {
@@ -1999,8 +2003,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -2015,8 +2019,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })
@@ -2039,7 +2043,7 @@ struct Debug {
               .fontWeight('medium')
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               ForEach(this.processInfoArray, (item: Item, index: number) => {
@@ -2047,8 +2051,8 @@ struct Debug {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -2063,8 +2067,8 @@ struct Debug {
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .width('100%')
                 }
               })

@@ -35,6 +35,7 @@
         "buildOption": {
           "arkOptions": {
             "autoLazyImport": true,
+            "reExportCheckMode": "strict",
             "branchElimination": true
           },
           "strictMode": {

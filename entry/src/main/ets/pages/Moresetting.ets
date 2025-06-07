@@ -21,7 +21,7 @@ struct Moresetting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -33,8 +33,8 @@ struct Moresetting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -54,8 +54,8 @@ struct Moresetting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('退出')
@@ -67,8 +67,8 @@ struct Moresetting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -103,8 +103,8 @@ struct Moresetting {
                 .height(12)
                 .width(12)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

@@ -46,14 +46,14 @@ struct Recoverysetting {
                     }
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('状态保存时机')
@@ -74,14 +74,14 @@ struct Recoverysetting {
                     }
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('状态保存方式')
@@ -102,8 +102,8 @@ struct Recoverysetting {
                     }
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

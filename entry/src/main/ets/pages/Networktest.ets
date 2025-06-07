@@ -93,14 +93,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('错误信息')
@@ -114,14 +114,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('请求 IP')
@@ -135,14 +135,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('请求时间戳')
@@ -156,14 +156,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('HTTP 版本')
@@ -177,14 +177,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('DNS 解析所需的时间')
@@ -198,14 +198,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('建立连接时间')
@@ -219,14 +219,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('从开始到远程主机 (或代理) 的 TLS 握手完成的时间')
@@ -240,14 +240,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('传输开始前的时间')
@@ -261,14 +261,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('传输开始时间')
@@ -282,14 +282,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('请求总耗时')
@@ -303,14 +303,14 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('重定向所需的时间')
@@ -324,8 +324,8 @@ struct Networktest {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

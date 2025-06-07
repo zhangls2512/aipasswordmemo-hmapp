@@ -9,7 +9,7 @@ interface Item {
   networkId: string
 }
 
-export async function syncTable(table: string, deviceId: string, syncMode: relationalStore.SyncMode) {
+export async function syncTable(table: string, networkId: string, syncMode: relationalStore.SyncMode) {
   const context = getContext()
   let securityLevel = 4
   if (table === 'tag') {
@@ -22,17 +22,23 @@ export async function syncTable(table: string, deviceId: string, syncMode: relat
     allowRebuild: true
   })
   const predicates = new relationalStore.RdbPredicates(table)
-  predicates.inDevices([deviceId])
-  const res = await rdbStore.sync(syncMode, predicates)
-  if (res[0][1] === 0) {
+  predicates.inDevices([networkId])
+  try {
+    const res = await rdbStore.sync(syncMode, predicates)
+    if (res[0][1] === 0) {
+      promptAction.showToast({
+        message: '同步成功，设备网络标识：' + networkId
+      })
+      return
+    }
     promptAction.showToast({
-      message: '同步成功，设备标识符：' + deviceId
+      message: '同步失败，设备网络标识：' + networkId
     })
-    return
+  } catch (err) {
+    promptAction.showToast({
+      message: '发生错误，错误码：' + err.code
+    })
   }
-  promptAction.showToast({
-    message: '同步失败，设备标识符：' + deviceId
-  })
 }
 
 export async function autoSyncTable(table: string) {
@@ -67,7 +73,7 @@ export async function autoSyncTable(table: string) {
   if (autoSyncTables.includes(table)) {
     const autoSyncDevices: Item[] = dataSettingDataPreferences.getSync('autoSyncDevices', []) as Item[]
     const promises = autoSyncDevices.map(async (item) => {
-      await syncTable(table, item.deviceId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+      await syncTable(table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
     })
     await Promise.all(promises)
   }

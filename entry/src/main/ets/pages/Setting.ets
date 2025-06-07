@@ -75,7 +75,7 @@ export default struct Setting {
                 .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
-                  left: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12
                 })
               Column() {
                 Row() {
@@ -87,8 +87,8 @@ export default struct Setting {
                     .height(12)
                     .width(12)
                 }
-                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .borderRadius(12)
+                .padding(12)
                 .stateStyles({
                   normal: {
                     .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -107,8 +107,8 @@ export default struct Setting {
                 if (!this.cloudServiceLoading) {
                   Divider()
                     .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      left: 12,
+                      right: 12
                     })
                   Row() {
                     if (!this.cloudService) {
@@ -127,8 +127,8 @@ export default struct Setting {
                       .height(12)
                       .width(12)
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .stateStyles({
                     normal: {
                       .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -147,8 +147,8 @@ export default struct Setting {
                   if (this.cloudService) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                     Row() {
                       Text('会员中心')
@@ -176,8 +176,8 @@ export default struct Setting {
                         .height(12)
                         .width(12)
                     }
-                    .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                    .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                    .borderRadius(12)
+                    .padding(12)
                     .stateStyles({
                       normal: {
                         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -204,7 +204,7 @@ export default struct Setting {
                   .height(20)
                   .margin({
                     top: 6,
-                    left: $r('sys.float.ohos_id_corner_radius_default_m')
+                    left: 12
                   })
                   .width(20)
               }
@@ -224,7 +224,7 @@ export default struct Setting {
                   .fontWeight(FontWeight.Medium)
                   .margin({
                     bottom: 6,
-                    left: $r('sys.float.ohos_id_corner_radius_default_m')
+                    left: 12
                   })
                 Column() {
                   Row() {
@@ -236,8 +236,8 @@ export default struct Setting {
                       .height(12)
                       .width(12)
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .stateStyles({
                     normal: {
                       .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -255,8 +255,8 @@ export default struct Setting {
 
                   Divider()
                     .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      left: 12,
+                      right: 12
                     })
                   Row() {
                     Text('管理')
@@ -267,8 +267,8 @@ export default struct Setting {
                       .height(12)
                       .width(12)
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .stateStyles({
                     normal: {
                       .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -286,8 +286,8 @@ export default struct Setting {
 
                   Divider()
                     .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      left: 12,
+                      right: 12
                     })
                   Row() {
                     Text('导入')
@@ -298,8 +298,8 @@ export default struct Setting {
                       .height(12)
                       .width(12)
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .stateStyles({
                     normal: {
                       .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -317,8 +317,8 @@ export default struct Setting {
 
                   Divider()
                     .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      left: 12,
+                      right: 12
                     })
                   Row() {
                     Text('密钥')
@@ -329,8 +329,8 @@ export default struct Setting {
                       .height(12)
                       .width(12)
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .stateStyles({
                     normal: {
                       .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -356,7 +356,7 @@ export default struct Setting {
                   .fontWeight(FontWeight.Medium)
                   .margin({
                     top: 6,
-                    left: $r('sys.float.ohos_id_corner_radius_default_m')
+                    left: 12
                   })
                   .onClick(() => {
                     openLink('https://docs.qq.com/doc/p/2fc9d7d60e5b79dcc09dec8251cb049fb29c7705')
@@ -377,7 +377,7 @@ export default struct Setting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -389,8 +389,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -408,8 +408,8 @@ export default struct Setting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('导入与导出')
@@ -420,8 +420,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -439,8 +439,8 @@ export default struct Setting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('备份与恢复')
@@ -451,8 +451,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -490,8 +490,8 @@ export default struct Setting {
                 .height(12)
                 .width(12)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -526,8 +526,8 @@ export default struct Setting {
                 .height(12)
                 .width(12)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -559,7 +559,7 @@ export default struct Setting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -571,8 +571,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -591,8 +591,8 @@ export default struct Setting {
               if (typeof (this.agreedPrivacyAgreement) === 'number') {
                 Divider()
                   .padding({
-                    left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                    right: $r('sys.float.ohos_id_corner_radius_default_m')
+                    left: 12,
+                    right: 12
                   })
               }
               if (this.agreedPrivacyAgreement === 0 || this.agreedPrivacyAgreement === 2) {
@@ -623,8 +623,8 @@ export default struct Setting {
                     .height(12)
                     .width(12)
                 }
-                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .borderRadius(12)
+                .padding(12)
                 .stateStyles({
                   normal: {
                     .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -650,8 +650,8 @@ export default struct Setting {
                     .height(12)
                     .width(12)
                 }
-                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .borderRadius(12)
+                .padding(12)
                 .stateStyles({
                   normal: {
                     .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -685,7 +685,7 @@ export default struct Setting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -697,8 +697,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -722,8 +722,8 @@ export default struct Setting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('第三方 SDK 列表')
@@ -734,8 +734,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -751,8 +751,8 @@ export default struct Setting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('已收集个人信息清单')
@@ -763,8 +763,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -782,8 +782,8 @@ export default struct Setting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('隐私声明摘要')
@@ -794,8 +794,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -827,7 +827,7 @@ export default struct Setting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -845,8 +845,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -864,8 +864,8 @@ export default struct Setting {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('其他')
@@ -876,8 +876,8 @@ export default struct Setting {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -923,8 +923,8 @@ export default struct Setting {
                 .height(12)
                 .width(12)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -942,8 +942,8 @@ export default struct Setting {
 
             Divider()
               .padding({
-                left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                right: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12,
+                right: 12
               })
             Row() {
               Text('服务协议与规则')
@@ -954,8 +954,8 @@ export default struct Setting {
                 .height(12)
                 .width(12)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

@@ -1,6 +1,6 @@
 import { getPasswordInfo, PasswordInfoItem, PasswordOut, PasswordTagItem } from '../common/Dataget'
-import { copy } from '../common/Pasteboard'
-import { getTotp } from '../common/Totp'
+import copy from '../common/Pasteboard'
+import getTotp from '../common/Totp'
 
 @ComponentV2
 export default struct Passwordinfo {
@@ -45,8 +45,8 @@ export default struct Passwordinfo {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -92,8 +92,8 @@ export default struct Passwordinfo {
                 })
                   .width(40)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -145,8 +145,8 @@ export default struct Passwordinfo {
               }
               .width('95%')
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

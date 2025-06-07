@@ -52,7 +52,7 @@ struct DataBackupRecovery {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -76,14 +76,14 @@ struct DataBackupRecovery {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('常用信息')
@@ -106,14 +106,14 @@ struct DataBackupRecovery {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('标签')
@@ -136,8 +136,8 @@ struct DataBackupRecovery {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -158,7 +158,7 @@ struct DataBackupRecovery {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -175,14 +175,14 @@ struct DataBackupRecovery {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('系统开启 (超级) 省电模式')
@@ -198,8 +198,8 @@ struct DataBackupRecovery {
                     this.getSetting()
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -220,7 +220,7 @@ struct DataBackupRecovery {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               Row() {
@@ -232,8 +232,8 @@ struct DataBackupRecovery {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -250,8 +250,8 @@ struct DataBackupRecovery {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('常用信息')
@@ -262,8 +262,8 @@ struct DataBackupRecovery {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -280,8 +280,8 @@ struct DataBackupRecovery {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('标签')
@@ -292,8 +292,8 @@ struct DataBackupRecovery {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -327,15 +327,15 @@ struct DataBackupRecovery {
                 .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
-                  left: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12
                 })
               Column() {
                 ForEach(this.isBackupTables, (item: string, index: number) => {
                   if (index !== 0) {
                     Divider()
                       .padding({
-                        left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                        right: $r('sys.float.ohos_id_corner_radius_default_m')
+                        left: 12,
+                        right: 12
                       })
                   }
                   Row() {
@@ -350,8 +350,8 @@ struct DataBackupRecovery {
                       .height(12)
                       .width(12)
                   }
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                  .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                  .borderRadius(12)
+                  .padding(12)
                   .stateStyles({
                     normal: {
                       .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

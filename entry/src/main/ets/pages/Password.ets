@@ -1,5 +1,6 @@
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import {
@@ -33,6 +34,7 @@ export default struct PasswordPage {
   @Local enableCloudBackup: boolean = false
   @Local orderColumnText: string = '修改时间'
   context = getContext(this)
+  preferType = 1
   shortcutDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'shortcut'
   })
@@ -82,7 +84,7 @@ export default struct PasswordPage {
             })
             .bindSheet($$this.isShowNewSheet, this.NewSheetBuilder(), {
               height: SheetSize.FIT_CONTENT,
-              preferType: SheetType.BOTTOM,
+              preferType: this.preferType,
               title: {
                 title: '新增密码'
               },
@@ -146,7 +148,7 @@ export default struct PasswordPage {
             })
             .bindSheet($$this.isShowFilterSheet, this.FilterSheetBuilder(), {
               height: SheetSize.FIT_CONTENT,
-              preferType: SheetType.BOTTOM,
+              preferType: this.preferType,
               title: {
                 title: '筛选密码'
               },
@@ -231,8 +233,8 @@ export default struct PasswordPage {
               .alignItems(HorizontalAlign.Start)
               .width('90%')
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -358,7 +360,7 @@ export default struct PasswordPage {
       ListItem()
         .bindSheet($$this.isShowInfoSheet, this.InfoSheetBuilder(this.passwordId), {
           height: SheetSize.FIT_CONTENT,
-          preferType: SheetType.BOTTOM,
+          preferType: this.preferType,
           title: {
             title: '密码详情'
           },
@@ -379,6 +381,9 @@ export default struct PasswordPage {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
+      if (deviceInfo.deviceType === 'phone') {
+        this.preferType = 0
+      }
       this.context.eventHub.on('refreshPassword', async () => {
         this.enableCloudBackup = false
         this.filterPasswordDataPreferences.clearSync()
@@ -426,7 +431,7 @@ export default struct PasswordPage {
     })
     .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.passwordId), {
       height: SheetSize.FIT_CONTENT,
-      preferType: SheetType.BOTTOM,
+      preferType: this.preferType,
       title: {
         title: '修改密码'
       },

@@ -53,15 +53,15 @@ struct Commonsetting {
                   this.commonSettingDataPreferences.flushSync()
                 })
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .width('100%')
 
             if (deviceInfo.deviceType === '2in1') {
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('记忆主窗口尺寸')
@@ -97,15 +97,15 @@ struct Commonsetting {
                     }
                   })
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .width('100%')
             }
 
             Divider()
               .padding({
-                left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                right: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12,
+                right: 12
               })
             Row() {
               Text('启动时检查更新')
@@ -123,14 +123,14 @@ struct Commonsetting {
                   this.commonSettingDataPreferences.flushSync()
                 })
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .width('100%')
 
             Divider()
               .padding({
-                left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                right: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12,
+                right: 12
               })
             Row() {
               Text('使用')
@@ -157,8 +157,8 @@ struct Commonsetting {
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
