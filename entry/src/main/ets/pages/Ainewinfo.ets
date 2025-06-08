@@ -141,7 +141,7 @@ export default struct Ainewinfo {
               callback: ((params: CallbackParam) => {
                 this.showCard = false
                 if (params.code === 200) {
-                  if (params.cardType === CardType.CARD_ID) {
+                  if (params.cardType === CardType.CARD_ID && params.cardInfo?.front) {
                     this.list.push({
                       type: '姓名',
                       value: String(params.cardInfo?.front.name)
@@ -163,13 +163,13 @@ export default struct Ainewinfo {
                       value: String(params.cardInfo?.main.name)
                     })
                   }
-                  if (params.cardType === CardType.CARD_DRIVER_LICENSE) {
+                  if (params.cardType === CardType.CARD_DRIVER_LICENSE && params.cardInfo?.front) {
                     this.list.push({
                       type: '姓名',
                       value: String(params.cardInfo?.front.name)
                     })
                   }
-                  if (params.cardType === CardType.CARD_VEHICLE_LICENSE) {
+                  if (params.cardType === CardType.CARD_VEHICLE_LICENSE && params.cardInfo?.front) {
                     this.list.push({
                       type: '姓名',
                       value: String(params.cardInfo?.front.owner)
