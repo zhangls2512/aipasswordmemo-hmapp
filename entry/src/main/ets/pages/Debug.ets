@@ -508,16 +508,16 @@ struct Debug {
     { name: 'Ipv4 掩码', value: decimalToDottedIP(wifiManager.getIpInfo().netmask) },
     { name: 'Ipv4 主 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().primaryDns) },
     { name: 'Ipv4 备 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().secondDns) },
-    { name: 'Ipv4 DHCP 服务端 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().serverIp) },
+    { name: 'Ipv4 DHCP 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().serverIp) },
     { name: 'Ipv4 IP 地址租用时长', value: String(wifiManager.getIpInfo().leaseDuration) + ' s' },
     { name: '链路 Ipv6 地址', value: wifiManager.getIpv6Info().linkIpv6Address },
     { name: '全局 Ipv6 地址', value: wifiManager.getIpv6Info().globalIpv6Address },
     { name: '唯一本地 Ipv6 地址', value: String(wifiManager.getIpv6Info().uniqueIpv6Address) },
     { name: '随机唯一本地 Ipv6 地址', value: String(wifiManager.getIpv6Info().randomUniqueIpv6Address) },
-    { name: '网关', value: wifiManager.getIpv6Info().gateway },
-    { name: '网络掩码', value: wifiManager.getIpv6Info().netmask },
-    { name: '主 DNS 服务器 Ipv6 地址', value: wifiManager.getIpv6Info().primaryDNS },
-    { name: '备 DNS 服务器 Ipv6 地址', value: wifiManager.getIpv6Info().secondDNS },
+    { name: 'Ipv6 网关', value: wifiManager.getIpv6Info().gateway },
+    { name: 'Ipv6 掩码', value: wifiManager.getIpv6Info().netmask },
+    { name: 'Ipv6 主 DNS 服务器 IP 地址', value: wifiManager.getIpv6Info().primaryDNS },
+    { name: 'Ipv6 备 DNS 服务器 IP 地址', value: wifiManager.getIpv6Info().secondDNS },
     { name: '国家码', value: wifiManager.getCountryCode() },
     { name: '热点是否已使能', value: wifiManager.isHotspotActive() ? '是' : '否' },
     { name: '蜂窝数据业务是否启用', value: data.isCellularDataEnabledSync() ? '是' : '否' }
@@ -528,9 +528,9 @@ struct Debug {
   ]
   processInfoArray: Item[] = [
     { name: '是否被隔离', value: process.isIsolatedProcess() ? '是' : '否' },
-    { name: '运行环境是否 64 位', value: process.is64Bit() ? '是' : '否' },
+    { name: '运行环境是否是 64 位', value: process.is64Bit() ? '是' : '否' },
     { name: '从系统启动到进程启动所经过的时间', value: String(process.getStartRealtime()) + ' ms' },
-    { name: '进程启动到当前时间的 CPU 时间', value: String(process.getPastCpuTime()) + ' ms' }
+    { name: '从进程启动到当前时间所经过的 CPU 时间', value: String(process.getPastCpuTime()) + ' ms' }
   ]
 
   getSetting() {
