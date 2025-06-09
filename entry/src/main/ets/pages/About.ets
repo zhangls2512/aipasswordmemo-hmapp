@@ -474,6 +474,45 @@ struct About {
               .onClick(() => {
                 openLink('https://pd.qq.com/s/cnx7f1zdm')
               })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Column() {
+                  Text('MeoW 频道')
+                    .fontWeight(FontWeight.Medium)
+                  Text('接收官方通知，包括但不限于公告、活动')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                }
+                .alignItems(HorizontalAlign.Start)
+
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.context.openLink('https://www.chuckfang.com/MeoW/appLinking?channelId=e734229e5e9141ba83682e72ecd9df41')
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
