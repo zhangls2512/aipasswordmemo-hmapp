@@ -3,7 +3,7 @@ import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { get } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
-import { copy } from '../common/Pasteboard'
+import copy from '../common/Pasteboard'
 import request from '../common/Request'
 
 interface VipItem {
@@ -206,7 +206,7 @@ struct Vip {
                 .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
-                  left: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12
                 })
               Column() {
                 Column() {
@@ -214,8 +214,8 @@ struct Vip {
                     if (index !== 0) {
                       Divider()
                         .padding({
-                          left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                          right: $r('sys.float.ohos_id_corner_radius_default_m')
+                          left: 12,
+                          right: 12
                         })
                     }
                     Row() {
@@ -233,8 +233,8 @@ struct Vip {
                         .height(12)
                         .width(12)
                     }
-                    .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                    .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                    .borderRadius(12)
+                    .padding(12)
                     .stateStyles({
                       normal: {
                         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -319,7 +319,7 @@ struct Vip {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12
               })
             Column() {
               if (this.iapStatus) {
@@ -332,8 +332,8 @@ struct Vip {
                     .height(12)
                     .width(12)
                 }
-                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .borderRadius(12)
+                .padding(12)
                 .stateStyles({
                   normal: {
                     .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -352,8 +352,8 @@ struct Vip {
 
                 Divider()
                   .padding({
-                    left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                    right: $r('sys.float.ohos_id_corner_radius_default_m')
+                    left: 12,
+                    right: 12
                   })
               }
               Row() {
@@ -365,8 +365,8 @@ struct Vip {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -384,8 +384,8 @@ struct Vip {
 
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('开通记录')
@@ -396,8 +396,8 @@ struct Vip {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

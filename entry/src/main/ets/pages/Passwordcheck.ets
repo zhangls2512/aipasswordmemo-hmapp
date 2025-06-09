@@ -1,4 +1,5 @@
 import { promptAction } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import { getRepeatPasswordList, ListItem, RepeatItem } from '../common/Passwordcheck'
 import UpdatePassword from './Updatepassword'
 
@@ -7,6 +8,7 @@ export default struct Passwordcheck {
   @Provider() isShowUpdateSheet: boolean = false
   @Local repeatArray: RepeatItem[] = []
   context = getContext(this)
+  preferType = 1
   passwordId = 0
 
   @Builder
@@ -44,16 +46,16 @@ export default struct Passwordcheck {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                right: $r('sys.float.ohos_id_corner_radius_default_m')
+                left: 12,
+                right: 12
               })
             Column() {
               ForEach(item.list, (item: ListItem, index) => {
                 if (index !== 0) {
                   Divider()
                     .padding({
-                      left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                      right: $r('sys.float.ohos_id_corner_radius_default_m')
+                      left: 12,
+                      right: 12
                     })
                 }
                 Row() {
@@ -65,8 +67,8 @@ export default struct Passwordcheck {
                     .height(12)
                     .width(12)
                 }
-                .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-                .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+                .borderRadius(12)
+                .padding(12)
                 .stateStyles({
                   normal: {
                     .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -99,11 +101,14 @@ export default struct Passwordcheck {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
+      if (deviceInfo.deviceType === 'phone') {
+        this.preferType = 0
+      }
       this.repeatArray = await getRepeatPasswordList()
     })
     .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.passwordId), {
       height: SheetSize.FIT_CONTENT,
-      preferType: SheetType.BOTTOM,
+      preferType: this.preferType,
       title: {
         title: '修改密码'
       },

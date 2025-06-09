@@ -1,4 +1,5 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { getTagList, Tag } from '../common/Dataget'
@@ -16,6 +17,7 @@ export default struct TagPage {
   @Local enableCloudBackup: boolean = false
   @Local orderColumnText: string = '修改时间'
   context = getContext(this)
+  preferType = 1
   orderColumn = 'updateTime'
   updateId = 0
 
@@ -47,7 +49,7 @@ export default struct TagPage {
             })
             .bindSheet($$this.isShowNewSheet, this.NewSheetBuilder(), {
               height: SheetSize.FIT_CONTENT,
-              preferType: SheetType.BOTTOM,
+              preferType: this.preferType,
               title: {
                 title: '新增标签'
               },
@@ -138,8 +140,8 @@ export default struct TagPage {
               }
               .width('90%')
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -259,6 +261,9 @@ export default struct TagPage {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
+      if (deviceInfo.deviceType === 'phone') {
+        this.preferType = 0
+      }
       this.context.eventHub.on('refreshTag', async () => {
         this.enableCloudBackup = false
         this.getList()
@@ -278,7 +283,7 @@ export default struct TagPage {
     })
     .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.updateId), {
       height: SheetSize.FIT_CONTENT,
-      preferType: SheetType.BOTTOM,
+      preferType: this.preferType,
       title: {
         title: '修改标签'
       },

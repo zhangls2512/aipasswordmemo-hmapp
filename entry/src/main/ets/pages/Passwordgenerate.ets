@@ -1,4 +1,4 @@
-import { copy } from '../common/Pasteboard'
+import copy from '../common/Pasteboard'
 
 @ComponentV2
 export default struct Passwordgenerate {
@@ -29,14 +29,14 @@ export default struct Passwordgenerate {
               this.length--
             })
           }
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-          .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+          .borderRadius(12)
+          .padding(12)
           .width('100%')
 
           Divider()
             .padding({
-              left: $r('sys.float.ohos_id_corner_radius_default_m'),
-              right: $r('sys.float.ohos_id_corner_radius_default_m')
+              left: 12,
+              right: 12
             })
           Row() {
             Text('数字')
@@ -47,14 +47,14 @@ export default struct Passwordgenerate {
               isOn: $$this.digit
             })
           }
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-          .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+          .borderRadius(12)
+          .padding(12)
           .width('100%')
 
           Divider()
             .padding({
-              left: $r('sys.float.ohos_id_corner_radius_default_m'),
-              right: $r('sys.float.ohos_id_corner_radius_default_m')
+              left: 12,
+              right: 12
             })
           Row() {
             Text('小写字母')
@@ -65,14 +65,14 @@ export default struct Passwordgenerate {
               isOn: $$this.lowercaseLetter
             })
           }
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-          .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+          .borderRadius(12)
+          .padding(12)
           .width('100%')
 
           Divider()
             .padding({
-              left: $r('sys.float.ohos_id_corner_radius_default_m'),
-              right: $r('sys.float.ohos_id_corner_radius_default_m')
+              left: 12,
+              right: 12
             })
           Row() {
             Text('大写字母')
@@ -83,14 +83,14 @@ export default struct Passwordgenerate {
               isOn: $$this.uppercaseLetter
             })
           }
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-          .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+          .borderRadius(12)
+          .padding(12)
           .width('100%')
 
           Divider()
             .padding({
-              left: $r('sys.float.ohos_id_corner_radius_default_m'),
-              right: $r('sys.float.ohos_id_corner_radius_default_m')
+              left: 12,
+              right: 12
             })
           Row() {
             Text('特殊符号')
@@ -101,8 +101,8 @@ export default struct Passwordgenerate {
               isOn: $$this.specialCharacter
             })
           }
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-          .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+          .borderRadius(12)
+          .padding(12)
           .width('100%')
         }
         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -164,8 +164,8 @@ export default struct Passwordgenerate {
             Row() {
               Text(this.password)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

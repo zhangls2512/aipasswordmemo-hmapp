@@ -43,6 +43,7 @@ export default struct Login {
               name: 'login'
             })
             loginDataPreferences.putSync('endDate', endDate)
+            loginDataPreferences.flushSync()
             promptAction.showToast({
               message: '登录成功'
             })
@@ -304,6 +305,7 @@ export default struct Login {
                   name: 'login'
                 })
                 loginDataPreferences.putSync('endDate', endDate)
+                loginDataPreferences.flushSync()
                 promptAction.showToast({
                   message: '登录成功'
                 })

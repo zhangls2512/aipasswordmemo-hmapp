@@ -1,6 +1,6 @@
 import { promptAction, window } from '@kit.ArkUI'
 import { getKey, removeKey, setRandomKey } from '../common/Crypto'
-import { copy } from '../common/Pasteboard'
+import copy from '../common/Pasteboard'
 
 @Builder
 export function KeyBuilder() {
@@ -31,8 +31,8 @@ struct Keypage {
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -65,8 +65,8 @@ struct Keypage {
                 .height(12)
                 .width(12)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -145,8 +145,8 @@ struct Keypage {
             if (this.keyValue) {
               Divider()
                 .padding({
-                  left: $r('sys.float.ohos_id_corner_radius_default_m'),
-                  right: $r('sys.float.ohos_id_corner_radius_default_m')
+                  left: 12,
+                  right: 12
                 })
               Row() {
                 Text('删除')
@@ -158,8 +158,8 @@ struct Keypage {
                   .height(12)
                   .width(12)
               }
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-              .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+              .borderRadius(12)
+              .padding(12)
               .stateStyles({
                 normal: {
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

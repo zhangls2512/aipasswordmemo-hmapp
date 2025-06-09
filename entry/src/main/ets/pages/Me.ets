@@ -1,5 +1,6 @@
 import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import { get, remove } from '../common/Accesstoken'
 import request from '../common/Request'
 import Login from './Login'
@@ -18,6 +19,7 @@ export default struct Me {
   @Local loading: boolean = false
   @Local email: string = ''
   context = getContext(this)
+  preferType = 1
 
   async getEmail() {
     const accessToken = get()
@@ -87,8 +89,8 @@ export default struct Me {
               }
             }
           }
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-          .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+          .borderRadius(12)
+          .padding(12)
           .stateStyles({
             normal: {
               .backgroundColor($r('sys.color.comp_background_primary'))
@@ -105,7 +107,7 @@ export default struct Me {
           })
           .bindSheet($$this.isShowLoginSheet, this.LoginSheetBuilder(), {
             height: SheetSize.FIT_CONTENT,
-            preferType: SheetType.BOTTOM,
+            preferType: this.preferType,
             title: {
               title: '登录'
             },
@@ -133,7 +135,7 @@ export default struct Me {
             .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
-              left: $r('sys.float.ohos_id_corner_radius_default_m')
+              left: 12
             })
           Column() {
             Row() {
@@ -151,8 +153,8 @@ export default struct Me {
                 .height(12)
                 .width(12)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.comp_background_primary'))
@@ -166,7 +168,7 @@ export default struct Me {
               this.isShowPasswordcheckSheet = !this.isShowPasswordcheckSheet
             })
             .bindSheet($$this.isShowPasswordcheckSheet, this.PasswordcheckSheetBuilder(), {
-              preferType: SheetType.BOTTOM,
+              preferType: this.preferType,
               title: {
                 title: '密码安全检查'
               },
@@ -183,7 +185,7 @@ export default struct Me {
             Divider()
               .padding({
                 left: 44,
-                right: $r('sys.float.ohos_id_corner_radius_default_m')
+                right: 12
               })
             Row() {
               Image($r('app.media.more'))
@@ -201,8 +203,8 @@ export default struct Me {
                 .height(12)
                 .width(12)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.comp_background_primary'))
@@ -216,7 +218,7 @@ export default struct Me {
               this.isShowPasswordgenerateSheet = !this.isShowPasswordgenerateSheet
             })
             .bindSheet($$this.isShowPasswordgenerateSheet, this.PasswordgenerateSheetBuilder(), {
-              preferType: SheetType.BOTTOM,
+              preferType: this.preferType,
               title: {
                 title: '密码随机生成'
               },
@@ -248,7 +250,7 @@ export default struct Me {
             .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
-              left: $r('sys.float.ohos_id_corner_radius_default_m')
+              left: 12
             })
           Column() {
             Row() {
@@ -266,8 +268,8 @@ export default struct Me {
                 .height(12)
                 .width(12)
             }
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-            .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+            .borderRadius(12)
+            .padding(12)
             .stateStyles({
               normal: {
                 .backgroundColor($r('sys.color.comp_background_primary'))
@@ -281,7 +283,7 @@ export default struct Me {
               this.isShowUrlcheckSheet = !this.isShowUrlcheckSheet
             })
             .bindSheet($$this.isShowUrlcheckSheet, this.UrlcheckSheetBuilder(), {
-              preferType: SheetType.BOTTOM,
+              preferType: this.preferType,
               title: {
                 title: '恶意 URL 检测'
               }
@@ -315,8 +317,8 @@ export default struct Me {
               .height(12)
               .width(12)
           }
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_m'))
-          .padding($r('sys.float.ohos_id_corner_radius_default_m'))
+          .borderRadius(12)
+          .padding(12)
           .stateStyles({
             normal: {
               .backgroundColor($r('sys.color.comp_background_primary'))
@@ -330,7 +332,7 @@ export default struct Me {
             this.isShowSettingSheet = !this.isShowSettingSheet
           })
           .bindSheet($$this.isShowSettingSheet, this.SettingSheetBuilder(), {
-            preferType: SheetType.BOTTOM
+            preferType: this.preferType
           })
         }
         .backgroundColor($r('sys.color.comp_background_primary'))
@@ -363,10 +365,9 @@ export default struct Me {
               })
               if (data.index === 1) {
                 remove()
-                const loginDataPreferences = preferences.getPreferencesSync(this.context, {
+                await preferences.deletePreferences(this.context, {
                   name: 'login'
                 })
-                loginDataPreferences.deleteSync('endDate')
                 this.email = ''
                 promptAction.showToast({
                   message: '退出成功'
@@ -387,6 +388,9 @@ export default struct Me {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(() => {
+      if (deviceInfo.deviceType === 'phone') {
+        this.preferType = 0
+      }
       this.context.eventHub.on('refreshMe', () => {
         this.getEmail()
       })
