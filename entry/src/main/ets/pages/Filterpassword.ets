@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getTagList, getTypeInfoList, PasswordInfoItem } from '../common/Dataget'
@@ -14,11 +15,11 @@ export default struct Filterpassword {
   @Local infoArray: string[] = []
   @Local passwordTagArray: string[] = []
   @Local tagArray: string[] = []
-  context = getContext(this)
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  specialTypes: string[] = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
   })
-  specialTypes: string[] = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   build() {
     List() {
@@ -53,7 +54,7 @@ export default struct Filterpassword {
           ])
             .selected($$this.infoTypeIndex)
             .value($$this.infoTypeValue)
-            .onSelect(async (index: number, value: string) => {
+            .onSelect(async (index, value) => {
               if (index === 9) {
                 this.infoType = ''
                 this.infoArray = []
@@ -71,7 +72,7 @@ export default struct Filterpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onChange(async (value: string) => {
+              .onChange(async (value) => {
                 if (this.specialTypes.includes(value)) {
                   this.infoTypeIndex = this.specialTypes.indexOf(value)
                   this.infoTypeValue = value
@@ -195,11 +196,11 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
               Blank()
-                .width('5%')
               Button('添加')
-                .width('20%')
+                .margin({
+                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
                 .onClick(() => {
                   if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
                     promptAction.showToast({
@@ -279,13 +280,13 @@ export default struct Filterpassword {
                   })
               }
               .alignItems(HorizontalAlign.Start)
-              .width('75%')
 
               Blank()
-                .width('5%')
               Button('删除')
+                .margin({
+                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
                 .role(ButtonRole.ERROR)
-                .width('20%')
                 .onClick(() => {
                   this.passwordInfoArray.splice(index, 1)
                 })
@@ -327,11 +328,11 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
               Blank()
-                .width('5%')
               Button('添加')
-                .width('20%')
+                .margin({
+                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
                 .onClick(() => {
                   if (this.passwordTagArray.some(tagItem => tagItem === item)) {
                     promptAction.showToast({
@@ -367,12 +368,12 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
               Blank()
-                .width('5%')
               Button('删除')
+                .margin({
+                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
                 .role(ButtonRole.ERROR)
-                .width('20%')
                 .onClick(() => {
                   this.passwordTagArray.splice(index, 1)
                 })

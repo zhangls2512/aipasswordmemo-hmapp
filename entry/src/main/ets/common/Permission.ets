@@ -33,23 +33,6 @@ export async function checkPermission(permission: Permissions): Promise<boolean>
   const resb = await atManager.requestPermissionOnSetting(context, [permission])
   const authResultb = resb[0]
   if (authResultb === 0) {
-    if (permission === 'ohos.permission.MICROPHONE') {
-      const resc = await atManager.requestGlobalSwitch(context, abilityAccessCtrl.SwitchType.MICROPHONE)
-      if (resc) {
-        return true
-      }
-      promptAction.showDialog({
-        title: '提示',
-        message: '请打开全局麦克风开关以使用此功能',
-        buttons: [
-          {
-            text: '确定',
-            color: $r('sys.color.font_emphasize')
-          }
-        ]
-      })
-      return false
-    }
     return true
   }
   promptAction.showDialog({

@@ -14,7 +14,7 @@ export function AboutBuilder() {
 struct About {
   @Local hasUpdate: number = -1
   @Local updateLoading: boolean = false
-  context = getContext(this) as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -29,7 +29,7 @@ struct About {
                 TapGesture({
                   count: 2
                 })
-                  .onAction((event: GestureEvent) => {
+                  .onAction((event) => {
                     if (event) {
                       this.pageInfos.pushPath({
                         name: 'Debug'
@@ -169,7 +169,49 @@ struct About {
             })
             .width('100%')
             .onClick(() => {
-              openLink('https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp')
+              this.pageInfos.pushPath({
+                name: 'Webview',
+                param: 'https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp'
+              })
+            })
+
+            Divider()
+              .padding({
+                left: 12,
+                right: 12
+              })
+            Row() {
+              Column() {
+                Text('使用教程')
+                  .fontWeight(FontWeight.Medium)
+                Text('https://docs.qq.com/doc/p/ad13731bb5a5562d7e7b11ee738928c6f1974b51')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+
+              Blank()
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
+            }
+            .borderRadius(12)
+            .padding(12)
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
+            .width('100%')
+            .onClick(() => {
+              openLink('https://docs.qq.com/doc/p/ad13731bb5a5562d7e7b11ee738928c6f1974b51')
             })
 
             Divider()
@@ -282,45 +324,6 @@ struct About {
             Column() {
               Row() {
                 Column() {
-                  Text('在线')
-                    .fontWeight(FontWeight.Medium)
-                  Text('https://chatbot.weixin.qq.com/webapp/5e2JglFAERGl06z0FkTK6eWL6D1Oa5?robotName=轩铭2512产品客服')
-                    .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                    .margin({
-                      top: $r('sys.float.ohos_id_text_margin_vertical')
-                    })
-                }
-                .alignItems(HorizontalAlign.Start)
-
-                Blank()
-                Image($r('app.media.right'))
-                  .fillColor($r('sys.color.icon_fourth'))
-                  .height(12)
-                  .width(12)
-              }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onClick(() => {
-                openLink('https://chatbot.weixin.qq.com/webapp/5e2JglFAERGl06z0FkTK6eWL6D1Oa5?robotName=轩铭2512产品客服')
-              })
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Column() {
                   Text('电话')
                     .fontWeight(FontWeight.Medium)
                   Text('18846496985')
@@ -390,7 +393,7 @@ struct About {
               .width('100%')
               .onClick(() => {
                 this.context.startAbilityByType('mail', {
-                  email: '2300990296@qq.com'
+                  email: ['2300990296@qq.com']
                 }, {
                   onError: () => {
                   }
@@ -443,9 +446,9 @@ struct About {
                 })
               Row() {
                 Column() {
-                  Text('腾讯频道')
+                  Text('QQ 群')
                     .fontWeight(FontWeight.Medium)
-                  Text('https://pd.qq.com/s/cnx7f1zdm')
+                  Text('https://qm.qq.com/q/8Ugei32784')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
@@ -472,7 +475,7 @@ struct About {
               })
               .width('100%')
               .onClick(() => {
-                openLink('https://pd.qq.com/s/cnx7f1zdm')
+                openLink('https://qm.qq.com/q/8Ugei32784')
               })
 
               Divider()
@@ -689,7 +692,7 @@ struct About {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('关于')
-    .onReady((context: NavDestinationContext) => {
+    .onReady((context) => {
       this.pageInfos = context.pathStack
     })
   }

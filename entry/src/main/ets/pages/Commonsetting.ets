@@ -1,6 +1,6 @@
-import { ConfigurationConstant } from '@kit.AbilityKit'
+import { common, ConfigurationConstant } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { promptAction } from '@kit.ArkUI'
+import { promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 
 @Builder
@@ -10,14 +10,24 @@ export function CommonsettingBuilder() {
 
 @ComponentV2
 struct Commonsetting {
+  @Local allowContinue: boolean = false
+  @Local allowRestore: boolean = false
+  @Local acceptCollaborate: boolean = false
+  @Local destroyWhenBackPressed: boolean = false
   @Local colorModeIndex: number = 0
   @Local colorModeValue: string = '跟随系统'
-  @Local isWindowRectAutoSave: boolean = false
+  @Local windowRectAutoSave: boolean = false
+  @Local keepScreenOn: boolean = false
+  @Local disallowScreenshot: boolean = true
+  @Local showPasswordInIndex: boolean = false
+  @Local mfaSecondsRemainingStyleIndex: number = 0
+  @Local mfaSecondsRemainingStyleValue: string = 'progress'
   @Local checkVersionUpdateIndex: number = 1
   @Local checkVersionUpdateValue: string = '仅 WLAN 下'
   @Local openLinkTypeIndex: number = 0
   @Local openLinkTypeValue: string = '系统默认'
-  context = getContext(this)
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  pageInfos = new NavPathStack()
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
@@ -27,52 +37,25 @@ struct Commonsetting {
       List() {
         ListItem() {
           Column() {
-            Row() {
-              Text('深色模式')
-                .fontWeight(FontWeight.Medium)
-              Blank()
-              Select([
-                { value: '跟随系统' },
-                { value: '浅色模式' },
-                { value: '深色模式' }
-              ])
-                .selected($$this.colorModeIndex)
-                .value($$this.colorModeValue)
-                .onSelect((index: number) => {
-                  const applicationContext = this.context.getApplicationContext()
-                  if (index === 0) {
-                    applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
-                  }
-                  if (index === 1) {
-                    applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
-                  }
-                  if (index === 2) {
-                    applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
-                  }
-                  this.commonSettingDataPreferences.putSync('colorMode', index)
-                  this.commonSettingDataPreferences.flushSync()
-                })
-            }
-            .borderRadius(12)
-            .padding(12)
-            .width('100%')
-
-            if (deviceInfo.deviceType === '2in1') {
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
+            Text('应用')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
               Row() {
-                Text('记忆主窗口尺寸')
+                Text('接续')
                   .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: this.isWindowRectAutoSave
+                  isOn: $$this.allowContinue
                 })
-                  .onChange(async (isOn: boolean) => {
-                    this.commonSettingDataPreferences.putSync('isWindowRectAutoSave', isOn)
+                  .onChange(async (isOn) => {
+                    this.commonSettingDataPreferences.putSync('allowContinue', isOn)
                     this.commonSettingDataPreferences.flushSync()
                     const data = await promptAction.showDialog({
                       title: '提示',
@@ -100,73 +83,373 @@ struct Commonsetting {
               .borderRadius(12)
               .padding(12)
               .width('100%')
-            }
 
-            Divider()
-              .padding({
-                left: 12,
-                right: 12
-              })
-            Row() {
-              Text('启动时检查更新')
-                .fontWeight(FontWeight.Medium)
-              Blank()
-              Select([
-                { value: '从不' },
-                { value: '仅 WLAN 下' },
-                { value: '始终' }
-              ])
-                .selected($$this.checkVersionUpdateIndex)
-                .value($$this.checkVersionUpdateValue)
-                .onSelect((index: number) => {
-                  this.commonSettingDataPreferences.putSync('checkVersionUpdate', index)
-                  this.commonSettingDataPreferences.flushSync()
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
                 })
-            }
-            .borderRadius(12)
-            .padding(12)
-            .width('100%')
+              Row() {
+                Text('备份恢复')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.allowRestore
+                })
+                  .onChange(async (isOn) => {
+                    this.commonSettingDataPreferences.putSync('allowRestore', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                    const data = await promptAction.showDialog({
+                      title: '提示',
+                      message: '设置成功，需重启应用生效，是否重启？',
+                      buttons: [
+                        {
+                          text: '取消',
+                          color: $r('sys.color.font_primary')
+                        },
+                        {
+                          text: '重启',
+                          color: $r('sys.color.font_emphasize')
+                        }
+                      ]
+                    })
+                    if (data.index === 1) {
+                      const applicationContext = this.context.getApplicationContext()
+                      applicationContext.restartApp({
+                        bundleName: 'com.zhangxm.aipasswordmemo',
+                        abilityName: 'EntryAbility'
+                      })
+                    }
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
 
-            Divider()
-              .padding({
-                left: 12,
-                right: 12
-              })
-            Row() {
-              Text('使用')
-                .fontWeight(FontWeight.Medium)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
                 })
-              Select([
-                { value: '系统默认' },
-                { value: '自行选择' }
-              ])
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              Row() {
+                Text('接受协同')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.acceptCollaborate
                 })
-                .selected($$this.openLinkTypeIndex)
-                .value($$this.openLinkTypeValue)
-                .onSelect((index: number) => {
-                  this.commonSettingDataPreferences.putSync('openLinkType', index)
-                  this.commonSettingDataPreferences.flushSync()
+                  .onChange(async (isOn) => {
+                    this.commonSettingDataPreferences.putSync('acceptCollaborate', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
                 })
-              Text('浏览器打开链接')
-                .fontWeight(FontWeight.Medium)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              Row() {
+                Text('侧滑返回时退出')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.destroyWhenBackPressed
                 })
+                  .onChange(async (isOn) => {
+                    this.commonSettingDataPreferences.putSync('destroyWhenBackPressed', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
             }
-            .borderRadius(12)
-            .padding(12)
-            .width('100%')
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
-          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-          .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          .alignItems(HorizontalAlign.Start)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
+
+        ListItem() {
+          Column() {
+            Text('界面')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Row() {
+                Text('深色模式')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Select([
+                  { value: '跟随系统' },
+                  { value: '浅色模式' },
+                  { value: '深色模式' }
+                ])
+                  .selected($$this.colorModeIndex)
+                  .value($$this.colorModeValue)
+                  .onSelect((index) => {
+                    const applicationContext = this.context.getApplicationContext()
+                    if (index === 0) {
+                      applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
+                    }
+                    if (index === 1) {
+                      applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
+                    }
+                    if (index === 2) {
+                      applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
+                    }
+                    this.commonSettingDataPreferences.putSync('colorMode', index)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              if (deviceInfo.deviceType === '2in1') {
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  Text('记忆主窗口尺寸')
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: $$this.windowRectAutoSave
+                  })
+                    .onChange(async (isOn) => {
+                      this.commonSettingDataPreferences.putSync('windowRectAutoSave', isOn)
+                      this.commonSettingDataPreferences.flushSync()
+                      const data = await promptAction.showDialog({
+                        title: '提示',
+                        message: '设置成功，需重启应用生效，是否重启？',
+                        buttons: [
+                          {
+                            text: '取消',
+                            color: $r('sys.color.font_primary')
+                          },
+                          {
+                            text: '重启',
+                            color: $r('sys.color.font_emphasize')
+                          }
+                        ]
+                      })
+                      if (data.index === 1) {
+                        const applicationContext = this.context.getApplicationContext()
+                        applicationContext.restartApp({
+                          bundleName: 'com.zhangxm.aipasswordmemo',
+                          abilityName: 'EntryAbility'
+                        })
+                      }
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+              }
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Column() {
+                  Text('屏幕常亮')
+                    .fontWeight(FontWeight.Medium)
+                  Text('仅在本次使用期间生效')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                }
+                .alignItems(HorizontalAlign.Start)
+
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.keepScreenOn
+                })
+                  .onChange(async (isOn) => {
+                    const lastWindow = await window.getLastWindow(this.context)
+                    lastWindow.setWindowKeepScreenOn(isOn)
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Column() {
+                  Text('敏感页面禁止截、录屏')
+                    .fontWeight(FontWeight.Medium)
+                  Text('强烈建议开启，降低敏感信息泄露风险')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                }
+                .alignItems(HorizontalAlign.Start)
+
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.disallowScreenshot
+                })
+                  .onChange((isOn) => {
+                    this.commonSettingDataPreferences.putSync('disallowScreenshot', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('首页显示密码')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.showPasswordInIndex
+                })
+                  .onChange((isOn) => {
+                    this.commonSettingDataPreferences.putSync('showPasswordInIndex', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('MFA 倒计时样式')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Select([
+                  { value: '进度条' },
+                  { value: '数字' }
+                ])
+                  .selected($$this.mfaSecondsRemainingStyleIndex)
+                  .value($$this.mfaSecondsRemainingStyleValue)
+                  .onSelect((index) => {
+                    this.commonSettingDataPreferences.putSync('mfaSecondsRemainingStyle', index)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('更多')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Row() {
+                Text('启动时检查更新')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Select([
+                  { value: '从不' },
+                  { value: '仅 WLAN 下' },
+                  { value: '始终' }
+                ])
+                  .selected($$this.checkVersionUpdateIndex)
+                  .value($$this.checkVersionUpdateValue)
+                  .onSelect((index) => {
+                    this.commonSettingDataPreferences.putSync('checkVersionUpdate', index)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('链接打开方式')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Select([
+                  { value: '系统默认' },
+                  { value: '自行选择' }
+                ])
+                  .selected($$this.openLinkTypeIndex)
+                  .value($$this.openLinkTypeValue)
+                  .onSelect((index) => {
+                    this.commonSettingDataPreferences.putSync('openLinkType', index)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
       }
       .padding({
@@ -177,7 +460,16 @@ struct Commonsetting {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('通用')
-    .onReady(() => {
+    .onReady(async (context) => {
+      this.pageInfos = context.pathStack
+      const allowContinue = this.commonSettingDataPreferences.getSync('allowContinue', true)
+      this.allowContinue = allowContinue as boolean
+      const allowRestore = this.commonSettingDataPreferences.getSync('allowRestore', true)
+      this.allowRestore = allowRestore as boolean
+      const acceptCollaborate = this.commonSettingDataPreferences.getSync('acceptCollaborate', true)
+      this.acceptCollaborate = acceptCollaborate as boolean
+      const destroyWhenBackPressed = this.commonSettingDataPreferences.getSync('destroyWhenBackPressed', false)
+      this.destroyWhenBackPressed = destroyWhenBackPressed as boolean
       const colorMode = this.commonSettingDataPreferences.getSync('colorMode', 0)
       this.colorModeIndex = colorMode as number
       if (colorMode === 0) {
@@ -189,8 +481,22 @@ struct Commonsetting {
       if (colorMode === 2) {
         this.colorModeValue = '深色模式'
       }
-      const isWindowRectAutoSave = this.commonSettingDataPreferences.getSync('isWindowRectAutoSave', false)
-      this.isWindowRectAutoSave = isWindowRectAutoSave as boolean
+      const windowRectAutoSave = this.commonSettingDataPreferences.getSync('windowRectAutoSave', false)
+      this.windowRectAutoSave = windowRectAutoSave as boolean
+      const lastWindow = await window.getLastWindow(this.context)
+      this.keepScreenOn = lastWindow.getWindowProperties().isKeepScreenOn
+      const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true)
+      this.disallowScreenshot = disallowScreenshot as boolean
+      const showPasswordInIndex = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false)
+      this.showPasswordInIndex = showPasswordInIndex as boolean
+      const mfaSecondsRemainingStyle = this.commonSettingDataPreferences.getSync('mfaSecondsRemainingStyle', 0)
+      this.mfaSecondsRemainingStyleIndex = mfaSecondsRemainingStyle as number
+      if (mfaSecondsRemainingStyle === 0) {
+        this.mfaSecondsRemainingStyleValue = '进度条'
+      }
+      if (mfaSecondsRemainingStyle === 1) {
+        this.mfaSecondsRemainingStyleValue = '数字'
+      }
       const checkVersionUpdate = this.commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
       this.checkVersionUpdateIndex = checkVersionUpdate as number
       if (checkVersionUpdate === 0) {

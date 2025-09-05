@@ -1,7 +1,9 @@
+import { common } from '@kit.AbilityKit'
+import { preferences } from '@kit.ArkData'
 import { window } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import Password from './Password'
 import Info from './Info'
-import Aihelper from './Aihelper'
 import Tag from './Tag'
 import Me from './Me'
 
@@ -10,7 +12,7 @@ import Me from './Me'
 struct Index {
   @Local index: number = 0
   @Local title: string = '密码'
-  context = getContext(this)
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   @Builder
   tabBuilder(index: number, image: Resource, title: string) {
@@ -30,13 +32,15 @@ struct Index {
 
   build() {
     Column() {
-      Text(this.title)
-        .fontSize(24)
-        .fontWeight(FontWeight.Bold)
-        .margin({
-          bottom: $r('sys.float.ohos_id_elements_margin_vertical_l'),
-          left: $r('sys.float.ohos_id_default_padding_start')
-        })
+      if (deviceInfo.deviceType === 'phone') {
+        Text(this.title)
+          .fontSize(24)
+          .fontWeight(FontWeight.Bold)
+          .margin({
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_l'),
+            left: $r('sys.float.ohos_id_default_padding_start')
+          })
+      }
       Tabs({
         barPosition: BarPosition.End,
         index: $$this.index
@@ -54,25 +58,21 @@ struct Index {
         .tabBar(this.tabBuilder(1, $r('app.media.info'), '常用信息'))
 
         TabContent() {
-          Aihelper()
-            .height('100%')
-        }
-        .tabBar(this.tabBuilder(2, $r('app.media.microphone'), 'AI 助手'))
-
-        TabContent() {
           Tag()
             .height('100%')
         }
-        .tabBar(this.tabBuilder(3, $r('app.media.tag'), '标签'))
+        .tabBar(this.tabBuilder(2, $r('app.media.tag'), '标签'))
 
         TabContent() {
           Me()
             .height('100%')
         }
-        .tabBar(this.tabBuilder(4, $r('app.media.me'), '我的'))
+        .tabBar(this.tabBuilder(3, $r('app.media.me'), '我的'))
       }
+      .barPosition(deviceInfo.deviceType === 'phone' ? BarPosition.End : BarPosition.Start)
       .scrollable(false)
-      .onAnimationStart(async (index: number, targetIndex: number) => {
+      .vertical(deviceInfo.deviceType === 'phone' ? false : true)
+      .onAnimationStart(async (index, targetIndex) => {
         if (targetIndex !== 1) {
           const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(false)
@@ -82,19 +82,22 @@ struct Index {
           this.context.eventHub.emit('refreshPassword')
         }
         if (targetIndex === 1) {
-          const lastWindow = await window.getLastWindow(this.context)
-          await lastWindow.setWindowPrivacyMode(true)
+          const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+            name: 'commonSetting'
+          })
+          const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+          if (disallowScreenshot) {
+            const lastWindow = await window.getLastWindow(this.context)
+            await lastWindow.setWindowPrivacyMode(true)
+          }
           this.title = '常用信息'
           this.context.eventHub.emit('refreshInfo')
         }
         if (targetIndex === 2) {
-          this.title = 'AI 助手'
-        }
-        if (targetIndex === 3) {
           this.title = '标签'
           this.context.eventHub.emit('refreshTag')
         }
-        if (targetIndex === 4) {
+        if (targetIndex === 3) {
           this.title = '我的'
           this.context.eventHub.emit('refreshMe')
         }

@@ -5,13 +5,13 @@
         "name": "release",
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "D:/harmonyproject/轩铭密码智能备忘录应用/keystore.p12",
-          "storePassword": "000000192EDCC60BA241782426D7688DFF0382C37DD0679F81616813571A47A0BB03E82AC11084AC6B",
+          "storeFile": "D:/harmonyproject/轩铭密码智能备忘录应用/内部文件/签名材料/keystore.p12",
+          "storePassword": "000000195C12DD78581766951C4A14A8EF547FA599ED4F3FADCD2A726A6754A39C4C94E2BE42310E9F",
           "keyAlias": "release",
-          "keyPassword": "0000001989BB7435476141E0B830F4084CC43A78BBA842728D310CCABFF88E27A95386685CDC6E40CB",
+          "keyPassword": "0000001984A06F2DD1122ECB427C9217BA8AB41E9F05DD1E930B56A57A794CDCDDE59C83C4D9B71366",
           "signAlg": "SHA256withECDSA",
-          "profile": "D:/harmonyproject/轩铭密码智能备忘录应用/release.p7b",
-          "certpath": "D:/harmonyproject/轩铭密码智能备忘录应用/release.cer"
+          "profile": "D:/harmonyproject/轩铭密码智能备忘录应用/内部文件/签名材料/release.p7b",
+          "certpath": "D:/harmonyproject/轩铭密码智能备忘录应用/内部文件/签名材料/release.cer"
         }
       },
       {
@@ -20,11 +20,11 @@
         "material": {
           "certpath": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B6A3358EB50B00242F7406DBF6D4C85D9F2628F98060FE1653F85969D684724B9EC3907C95E4049",
+          "keyPassword": "0000001B580512D17A32B9F25664587DE4FF77D2DBCF4CE369256DF5C2C0637BEF0BD1683412782E02526F",
           "profile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
-          "storePassword": "0000001B3FB35BDD5DAF0A0EA359F7AD3065208766D8521A3BD934583B6297ED3165FF436D4FA958BDCC0D"
+          "storePassword": "0000001B1D6FB8FBFA38C3F8F4CD9A4E1B076B4417C4A8409B1E92C4E59E8400F6E0A11338069935C436EC"
         }
       }
     ],

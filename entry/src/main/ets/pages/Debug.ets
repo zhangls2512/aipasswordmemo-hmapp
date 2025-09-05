@@ -28,8 +28,10 @@ export function DebugBuilder() {
 struct Debug {
   @Local globalErrorShowTypeIndex: number = 0
   @Local globalErrorShowTypeValue: string = 'Toast'
-  @Local autoUploadErrorLog: boolean = true
+  @Local saveErrorLog: boolean = false
+  @Local autoUploadErrorLog: boolean = false
   @Local showMemoryLevelChange: boolean = false
+  @Local processCache: boolean = false
   @Local lowBatteryCapacityLevelIndex: number = 3
   @Local lowBatteryCapacityLevelValue: string = '低'
   @Local showNetAvailableStatusChange: boolean = false
@@ -38,12 +40,12 @@ struct Debug {
   @Local showNetCapabilitiesChange: boolean = false
   @Local showNetQosChange: boolean = false
   @Local showNetSceneChange: boolean = false
-  @Local autoReportHighLatency: boolean = true
+  @Local autoReportHighLatency: boolean = false
   @Local highLatencyThreshold: string = '200'
-  @Local allService: boolean = true
+  @Local allService: boolean = false
   @Local windowInfoArray: Item[] = []
   @Local systemLoadValue: number = -1
-  context = getContext(this) as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'debugSetting'
@@ -174,6 +176,10 @@ struct Debug {
     {
       name: '是否是 Stage 模型',
       value: this.context.stageMode ? '是' : '否'
+    },
+    {
+      name: 'UIAbility 是否处于消亡中状态',
+      value: this.context.isTerminating() ? '是' : '否'
     },
     {
       name: '当前语言',
@@ -450,6 +456,29 @@ struct Debug {
     { name: '可用区域宽度', value: String(display.getDefaultDisplaySync().availableWidth) + ' px' },
     { name: '可用区域高度', value: String(display.getDefaultDisplaySync().availableHeight) + ' px' },
     { name: '设备是否可折叠', value: display.isFoldable() ? '是' : '否' },
+    {
+      name: '折叠状态',
+      value: display.getFoldStatus() === 0 ? '未知' :
+        display.getFoldStatus() === 1 ? '完全展开' :
+          display.getFoldStatus() === 2 ? '折叠' :
+            display.getFoldStatus() === 3 ? '半折叠' :
+              display.getFoldStatus() === 11 ? '折轴一完全展开，折轴二完全展开' :
+                display.getFoldStatus() === 21 ? '折轴一完全展开，折轴二半折叠' :
+                  display.getFoldStatus() === 12 ? '折轴一折叠，折轴二完全展开' :
+                    display.getFoldStatus() === 22 ? '折轴一折叠，折轴二半折叠' :
+                      display.getFoldStatus() === 13 ? '折轴一半折叠，折轴二完全展开' :
+                        display.getFoldStatus() === 23 ? '折轴一半折叠，折轴二半折叠' :
+                          'undefined'
+    },
+    {
+      name: '显示模式',
+      value: display.getFoldDisplayMode() === 0 ? '未知' :
+        display.getFoldDisplayMode() === 1 ? '全屏' :
+          display.getFoldDisplayMode() === 2 ? '主屏幕' :
+            display.getFoldDisplayMode() === 3 ? '子屏幕' :
+              display.getFoldDisplayMode() === 4 ? '双屏协同' :
+                'undefined'
+    },
     { name: '是否正在截屏、投屏、录屏', value: display.isCaptured() ? '是' : '否' }
   ]
   batteryInfoArray: Item[] = [
@@ -542,10 +571,14 @@ struct Debug {
     if (globalErrorShowType === 1) {
       this.globalErrorShowTypeValue = 'Dialog'
     }
+    const saveErrorLog = this.debugSettingDataPreferences.getSync('saveErrorLog', true)
+    this.saveErrorLog = saveErrorLog as boolean
     const autoUploadErrorLog = this.debugSettingDataPreferences.getSync('autoUploadErrorLog', true)
     this.autoUploadErrorLog = autoUploadErrorLog as boolean
     const showMemoryLevelChange = this.debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
     this.showMemoryLevelChange = showMemoryLevelChange as boolean
+    const processCache = this.debugSettingDataPreferences.getSync('processCache', true)
+    this.processCache = processCache as boolean
     const lowBatteryCapacityLevel = this.debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
     this.lowBatteryCapacityLevelIndex = (lowBatteryCapacityLevel as number) - 1
     if (lowBatteryCapacityLevel === 1) {
@@ -616,8 +649,31 @@ struct Debug {
                 ])
                   .selected($$this.globalErrorShowTypeIndex)
                   .value($$this.globalErrorShowTypeValue)
-                  .onSelect((index: number) => {
+                  .onSelect((index) => {
                     this.debugSettingDataPreferences.putSync('globalErrorShowType', index)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('保存故障日志')
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.saveErrorLog
+                })
+                  .enabled(this.allService)
+                  .onChange((isOn) => {
+                    this.debugSettingDataPreferences.putSync('saveErrorLog', isOn)
                     this.debugSettingDataPreferences.flushSync()
                   })
               }
@@ -639,7 +695,7 @@ struct Debug {
                   isOn: $$this.autoUploadErrorLog
                 })
                   .enabled(this.allService)
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('autoUploadErrorLog', isOn)
                     this.debugSettingDataPreferences.flushSync()
                   })
@@ -647,6 +703,37 @@ struct Debug {
               .borderRadius(12)
               .padding(12)
               .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('自动上传故障日志类型')
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Autouploaderrorlogtype'
+                })
+              })
 
               Divider()
                 .padding({
@@ -675,7 +762,7 @@ struct Debug {
               .width('100%')
               .onClick(() => {
                 this.pageInfos.pushPath({
-                  name: 'Faultlog'
+                  name: 'Errorlog'
                 })
               })
 
@@ -692,9 +779,52 @@ struct Debug {
                   type: ToggleType.Switch,
                   isOn: $$this.showMemoryLevelChange
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showMemoryLevelChange', isOn)
                     this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('进程缓存后快速启动')
+                  .fontWeight('medium')
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: $$this.processCache
+                })
+                  .onChange(async (isOn) => {
+                    this.debugSettingDataPreferences.putSync('processCache', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                    const data = await promptAction.showDialog({
+                      title: '提示',
+                      message: '设置成功，需重启应用生效，是否重启？',
+                      buttons: [
+                        {
+                          text: '取消',
+                          color: $r('sys.color.font_primary')
+                        },
+                        {
+                          text: '重启',
+                          color: $r('sys.color.font_emphasize')
+                        }
+                      ]
+                    })
+                    if (data.index === 1) {
+                      const applicationContext = this.context.getApplicationContext()
+                      applicationContext.restartApp({
+                        bundleName: 'com.zhangxm.aipasswordmemo',
+                        abilityName: 'EntryAbility'
+                      })
+                    }
                   })
               }
               .borderRadius(12)
@@ -721,7 +851,7 @@ struct Debug {
                 ])
                   .selected($$this.lowBatteryCapacityLevelIndex)
                   .value($$this.lowBatteryCapacityLevelValue)
-                  .onSelect((index: number) => {
+                  .onSelect((index) => {
                     this.debugSettingDataPreferences.putSync('lowBatteryCapacityLevel', index + 1)
                     this.debugSettingDataPreferences.flushSync()
                   })
@@ -738,6 +868,151 @@ struct Debug {
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
+
+        ListItem() {
+          Column() {
+            Text('应用')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Row() {
+                Text('沙箱文件删除工具')
+                  .fontColor($r('sys.color.warning'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Deletefile'
+                })
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('清除所有数据并退出')
+                  .fontColor($r('sys.color.warning'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(async () => {
+                const data = await promptAction.showDialog({
+                  title: '提示',
+                  message: '此操作将清除应用全部数据，同时撤销应用向用户申请的权限。确定清除？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '清除',
+                      color: $r('sys.color.warning')
+                    }
+                  ]
+                })
+                if (data.index === 1) {
+                  const applicationContext = this.context.getApplicationContext()
+                  applicationContext.clearUpApplicationData()
+                }
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('终止所有进程并退出')
+                  .fontColor($r('sys.color.warning'))
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(async () => {
+                const data = await promptAction.showActionMenu({
+                  title: '是否清除页面堆栈？',
+                  buttons: [
+                    {
+                      text: '是',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '否',
+                      color: $r('sys.color.font_primary')
+                    }
+                  ]
+                })
+                if (data.index === 0) {
+                  const applicationContext = this.context.getApplicationContext()
+                  applicationContext.killAllProcesses(true)
+                }
+                if (data.index === 1) {
+                  const applicationContext = this.context.getApplicationContext()
+                  applicationContext.killAllProcesses(false)
+                }
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
         ListItem() {
@@ -869,7 +1144,7 @@ struct Debug {
                   type: ToggleType.Switch,
                   isOn: $$this.showNetAvailableStatusChange
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetAvailableStatusChange', isOn)
                     this.debugSettingDataPreferences.flushSync()
                   })
@@ -891,7 +1166,7 @@ struct Debug {
                   type: ToggleType.Switch,
                   isOn: $$this.showNetBlockStatusChange
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetBlockStatusChange', isOn)
                     this.debugSettingDataPreferences.flushSync()
                   })
@@ -913,7 +1188,7 @@ struct Debug {
                   type: ToggleType.Switch,
                   isOn: $$this.showNetLost
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetLost', isOn)
                     this.debugSettingDataPreferences.flushSync()
                   })
@@ -935,7 +1210,7 @@ struct Debug {
                   type: ToggleType.Switch,
                   isOn: $$this.showNetCapabilitiesChange
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetCapabilitiesChange', isOn)
                     this.debugSettingDataPreferences.flushSync()
                   })
@@ -957,7 +1232,7 @@ struct Debug {
                   type: ToggleType.Switch,
                   isOn: $$this.showNetQosChange
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetQosChange', isOn)
                     this.debugSettingDataPreferences.flushSync()
                   })
@@ -979,7 +1254,7 @@ struct Debug {
                   type: ToggleType.Switch,
                   isOn: $$this.showNetSceneChange
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetSceneChange', isOn)
                     this.debugSettingDataPreferences.flushSync()
                   })
@@ -1001,7 +1276,7 @@ struct Debug {
                   type: ToggleType.Switch,
                   isOn: $$this.autoReportHighLatency
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('autoReportHighLatency', isOn)
                     this.debugSettingDataPreferences.flushSync()
                   })
@@ -1030,7 +1305,7 @@ struct Debug {
                   })
                   .maxLength(4)
                   .width('25%')
-                  .onSubmit((enterKey: EnterKeyType, event: SubmitEvent) => {
+                  .onSubmit((enterKey, event) => {
                     this.debugSettingDataPreferences.putSync('highLatencyThreshold', Number(event.text))
                     this.debugSettingDataPreferences.flushSync()
                     promptAction.showToast({
@@ -1120,119 +1395,6 @@ struct Debug {
         })
 
         ListItem() {
-          Column() {
-            Text('应用')
-              .fontColor($r('sys.color.font_secondary'))
-              .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .fontWeight('medium')
-              .margin({
-                bottom: 6,
-                left: 12
-              })
-            Column() {
-              Row() {
-                Text('清除所有数据并退出')
-                  .fontColor($r('sys.color.warning'))
-                  .fontWeight('medium')
-                Blank()
-                Image($r('app.media.right'))
-                  .fillColor($r('sys.color.icon_fourth'))
-                  .height(12)
-                  .width(12)
-              }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onClick(async () => {
-                const data = await promptAction.showDialog({
-                  title: '提示',
-                  message: '此操作将清除应用全部数据，同时撤销应用向用户申请的权限。确定清除？',
-                  buttons: [
-                    {
-                      text: '取消',
-                      color: $r('sys.color.font_primary')
-                    },
-                    {
-                      text: '清除',
-                      color: $r('sys.color.warning')
-                    }
-                  ]
-                })
-                if (data.index === 1) {
-                  const applicationContext = this.context.getApplicationContext()
-                  applicationContext.clearUpApplicationData()
-                }
-              })
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('终止所有进程并退出')
-                  .fontColor($r('sys.color.warning'))
-                  .fontWeight('medium')
-                Blank()
-                Image($r('app.media.right'))
-                  .fillColor($r('sys.color.icon_fourth'))
-                  .height(12)
-                  .width(12)
-              }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onClick(async () => {
-                const data = await promptAction.showActionMenu({
-                  title: '是否清除页面堆栈？',
-                  buttons: [
-                    {
-                      text: '是',
-                      color: $r('sys.color.font_primary')
-                    },
-                    {
-                      text: '否',
-                      color: $r('sys.color.font_primary')
-                    }
-                  ]
-                })
-                if (data.index === 0) {
-                  const applicationContext = this.context.getApplicationContext()
-                  applicationContext.killAllProcesses(true)
-                }
-                if (data.index === 1) {
-                  const applicationContext = this.context.getApplicationContext()
-                  applicationContext.killAllProcesses(false)
-                }
-              })
-            }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
-          }
-          .alignItems(HorizontalAlign.Start)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
           Button('恢复默认设置')
             .align(Alignment.Center)
             .onClick(async () => {
@@ -1276,7 +1438,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.applicationInfoArray, (item: Item, index: number) => {
+              ForEach(this.applicationInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1324,7 +1486,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.hapModuleInfoArray, (item: Item, index: number) => {
+              ForEach(this.hapModuleInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1372,7 +1534,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.abilityInfoArray, (item: Item, index: number) => {
+              ForEach(this.abilityInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1420,7 +1582,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.bundleInfoArray, (item: Item, index: number) => {
+              ForEach(this.bundleInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1468,7 +1630,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.deviceInfoArray, (item: Item, index: number) => {
+              ForEach(this.deviceInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1516,7 +1678,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.systemInfoArray, (item: Item, index: number) => {
+              ForEach(this.systemInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1564,7 +1726,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.displayInfoArray, (item: Item, index: number) => {
+              ForEach(this.displayInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1613,7 +1775,7 @@ struct Debug {
                   left: 12
                 })
               Column() {
-                ForEach(this.windowInfoArray, (item: Item, index: number) => {
+                ForEach(this.windowInfoArray, (item: Item, index) => {
                   if (item.value) {
                     if (index !== 0) {
                       Divider()
@@ -1662,7 +1824,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.batteryInfoArray, (item: Item, index: number) => {
+              ForEach(this.batteryInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1892,7 +2054,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.networkInfoArray, (item: Item, index: number) => {
+              ForEach(this.networkInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -1998,7 +2160,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.storageStatisticsInfoArray, (item: Item, index: number) => {
+              ForEach(this.storageStatisticsInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -2046,7 +2208,7 @@ struct Debug {
                 left: 12
               })
             Column() {
-              ForEach(this.processInfoArray, (item: Item, index: number) => {
+              ForEach(this.processInfoArray, (item: Item, index) => {
                 if (item.value) {
                   if (index !== 0) {
                     Divider()
@@ -2091,7 +2253,7 @@ struct Debug {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('调试')
-    .onReady(async (context: NavDestinationContext) => {
+    .onReady(async (context) => {
       this.getSetting()
       this.pageInfos = context.pathStack
       const isRunningInStabilityTest = await appManager.isRunningInStabilityTest()
@@ -2341,7 +2503,7 @@ struct Debug {
       if (deviceInfo.deviceType === '2in1') {
         this.windowInfoArray.push({
           name: '是否已经启用尺寸记忆',
-          value: this.commonSettingDataPreferences.getSync('isWindowRectAutoSave', false) ? '是' : '否'
+          value: this.commonSettingDataPreferences.getSync('windowRectAutoSave', false) ? '是' : '否'
         })
       }
       this.systemLoadValue = await systemLoad.getLevel()
@@ -2391,7 +2553,7 @@ struct Debug {
         })
       } catch (err) {
         promptAction.showToast({
-          message: 'js 运行异常，错误码：' + err.code + '，错误信息：' + err.message
+          message: '发生错误，错误码：' + err.code
         })
       }
       const wifiLinkedInfo = await wifiManager.getLinkedInfo()
@@ -2514,7 +2676,7 @@ struct Debug {
         })
       } catch (err) {
         promptAction.showToast({
-          message: 'js 运行异常，错误码：' + err.code + '，错误信息：' + err.message
+          message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
         })
       }
       const cellularDataFlowType = await data.getCellularDataFlowType()

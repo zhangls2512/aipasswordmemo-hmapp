@@ -1,4 +1,6 @@
-import { getPasswordInfo, PasswordInfoItem, PasswordOut, PasswordTagItem } from '../common/Dataget'
+import { preferences } from '@kit.ArkData'
+import { getPasswordInfo, PasswordInfoItem, Password, PasswordTagItem } from '../common/Dataget'
+import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
 import getTotp from '../common/Totp'
 
@@ -11,7 +13,10 @@ export default struct Passwordinfo {
   @Local mfaValue: string = ''
   @Local mfaStep: number = 30
   @Local mfaSecondsRemaining: number = 0
+  @Local mfaSecondsRemainingColor: Color = Color.Transparent
+  @Local mfaSecondsRemainingStyle: string = ''
   @Local passwordTag: PasswordTagItem[] = []
+  context = this.getUIContext().getHostContext()
 
   build() {
     List() {
@@ -30,7 +35,7 @@ export default struct Passwordinfo {
       })
 
       ForEach(this.passwordInfo, (item: PasswordInfoItem) => {
-        if (item.type !== 'MFA') {
+        if (item.type !== '图标' && item.type !== 'MFA' && item.type !== 'URL') {
           ListItem() {
             Column() {
               Row() {
@@ -44,6 +49,39 @@ export default struct Passwordinfo {
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
                   .width('50%')
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                copy(item.value)
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+        }
+        if (item.type === '图标') {
+          ListItem() {
+            Column() {
+              Row() {
+                Text(item.type)
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Image(item.value)
+                  .width('10%')
               }
               .borderRadius(12)
               .padding(12)
@@ -85,12 +123,19 @@ export default struct Passwordinfo {
                 .alignItems(HorizontalAlign.Start)
 
                 Blank()
-                Progress({
-                  value: this.mfaSecondsRemaining,
-                  total: this.mfaStep,
-                  type: ProgressType.Ring
-                })
-                  .width(40)
+                if (this.mfaSecondsRemainingStyle === 'progress') {
+                  Progress({
+                    value: this.mfaSecondsRemaining,
+                    total: this.mfaStep,
+                    type: ProgressType.Ring
+                  })
+                    .color(this.mfaSecondsRemainingColor)
+                    .width(40)
+                }
+                if (this.mfaSecondsRemainingStyle === 'number') {
+                  Text(String(this.mfaSecondsRemaining))
+                    .fontColor(this.mfaSecondsRemainingColor)
+                }
               }
               .borderRadius(12)
               .padding(12)
@@ -106,6 +151,55 @@ export default struct Passwordinfo {
               .onClick(() => {
                 copy(this.mfaValue)
               })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+        }
+        if (item.type === 'URL') {
+          ListItem() {
+            Column() {
+              Row() {
+                Text(item.type)
+                  .fontWeight(FontWeight.Medium)
+                  .width('45%')
+                Blank()
+                  .width('5%')
+                Text(item.value)
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .textAlign(TextAlign.End)
+                  .width('50%')
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .bindMenu([
+                {
+                  value: '打开',
+                  action: () => {
+                    openLink(item.value)
+                  }
+                },
+                {
+                  value: '复制',
+                  action: () => {
+                    copy(item.value)
+                  }
+                }
+              ])
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -164,7 +258,17 @@ export default struct Passwordinfo {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      const passwordInfo = await getPasswordInfo(this.passwordId) as PasswordOut
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const mfaSecondsRemainingStyleIndex = commonSettingDataPreferences.getSync('mfaSecondsRemainingStyle', 0)
+      if (mfaSecondsRemainingStyleIndex === 0) {
+        this.mfaSecondsRemainingStyle = 'progress'
+      }
+      if (mfaSecondsRemainingStyleIndex === 1) {
+        this.mfaSecondsRemainingStyle = 'number'
+      }
+      const passwordInfo = await getPasswordInfo(this.passwordId) as Password
       this.passwordName = passwordInfo.name
       this.passwordInfo = passwordInfo.info
       this.passwordTag = passwordInfo.tag
@@ -176,6 +280,19 @@ export default struct Passwordinfo {
           const res = getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
           this.mfaValue = res.value
           this.mfaSecondsRemaining = res.secondsRemaining
+          const mfaSecondsRemainingPercent = Number((this.mfaSecondsRemaining / this.mfaStep).toFixed(2))
+          if (mfaSecondsRemainingPercent >= 0.5) {
+            this.mfaSecondsRemainingColor = Color.Green
+          }
+          if (mfaSecondsRemainingPercent < 0.5 && mfaSecondsRemainingPercent >= 0.3) {
+            this.mfaSecondsRemainingColor = Color.Yellow
+          }
+          if (mfaSecondsRemainingPercent < 0.3 && mfaSecondsRemainingPercent >= 0.1) {
+            this.mfaSecondsRemainingColor = Color.Orange
+          }
+          if (mfaSecondsRemainingPercent <= 0.1) {
+            this.mfaSecondsRemainingColor = Color.Red
+          }
         }, 500)
       }
     })

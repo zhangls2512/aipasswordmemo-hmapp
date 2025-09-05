@@ -220,7 +220,7 @@ export default struct Updateinfo {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const abilityContext = getContext(this)
+          const abilityContext = this.getUIContext().getHostContext()
           const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(abilityContext, {
             name: 'cloudbackupSetting'
           })

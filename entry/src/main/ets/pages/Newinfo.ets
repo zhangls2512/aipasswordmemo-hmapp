@@ -34,7 +34,7 @@ export default struct Newinfo {
           ])
             .selected($$this.infoTypeIndex)
             .value($$this.infoTypeValue)
-            .onSelect((index: number, value: string) => {
+            .onSelect((index, value) => {
               if (index === 9) {
                 this.infoType = ''
               }
@@ -47,10 +47,11 @@ export default struct Newinfo {
               placeholder: '请输入类型',
               text: $$this.infoType
             })
+              .defaultFocus(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onChange((value: string) => {
+              .onChange((value) => {
                 if (this.specialTypes.includes(value)) {
                   this.infoTypeIndex = this.specialTypes.indexOf(value)
                   this.infoTypeValue = value
@@ -251,7 +252,7 @@ export default struct Newinfo {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const abilityContext = getContext(this)
+          const abilityContext = this.getUIContext().getHostContext()
           const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(abilityContext, {
             name: 'cloudbackupSetting'
           })

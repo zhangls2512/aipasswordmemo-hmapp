@@ -1,11 +1,10 @@
+import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { get } from '../common/Accesstoken'
-import openLink from '../common/Openlink'
 import request from '../common/Request'
 
-interface Account {
+export interface Account {
   platform: string,
   openid: string
 }
@@ -26,11 +25,11 @@ struct Huaweiaccount {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
-        response: loginComponentManager.HuaweiIDCredential) => {
+      .onClickLoginWithHuaweiIDButton(async (err, response) => {
         if (this.type === 'mfa' && this.mfa.length !== 6) {
           promptAction.showToast({
             message: '请输入正确的 MFA'
@@ -70,6 +69,7 @@ struct Huaweiaccount {
               message: '绑定成功'
             })
             this.pageInfos.pop()
+            this.context.eventHub.emit('refreshSetting')
           }
         }
         if (err) {
@@ -111,7 +111,7 @@ struct Huaweiaccount {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .onChange((isChecked: boolean) => {
+                    .onChange((isChecked) => {
                       if (isChecked) {
                         this.type = 'mfa'
                       }
@@ -128,7 +128,7 @@ struct Huaweiaccount {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .onChange((isChecked: boolean) => {
+                    .onChange((isChecked) => {
                       if (isChecked) {
                         this.type = 'emailcode'
                       }
@@ -278,6 +278,7 @@ struct Huaweiaccount {
                         message: '解绑成功'
                       })
                       this.pageInfos.pop()
+                      this.context.eventHub.emit('refreshSetting')
                     }
                   })
               }
@@ -288,7 +289,7 @@ struct Huaweiaccount {
                       type: ToggleType.Checkbox,
                       isOn: $$this.agree
                     })
-                      .onChange((isOn: boolean) => {
+                      .onChange((isOn) => {
                         this.controller.setEnabled(isOn)
                       })
                   }
@@ -302,12 +303,18 @@ struct Huaweiaccount {
                     Span('《华为账号用户认证协议》')
                       .fontColor($r('sys.color.font_emphasize'))
                       .onClick(() => {
-                        openLink('https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN')
+                        this.pageInfos.pushPath({
+                          name: 'Webview',
+                          param: 'https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN'
+                        })
                       })
                     Span('《关于华为账号与隐私的声明》')
                       .fontColor($r('sys.color.font_emphasize'))
                       .onClick(() => {
-                        openLink('https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN')
+                        this.pageInfos.pushPath({
+                          name: 'Webview',
+                          param: 'https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN'
+                        })
                       })
                     Span('。')
                   }
@@ -335,10 +342,10 @@ struct Huaweiaccount {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title(this.isBind ? '解绑华为账号' : '绑定华为账号')
-    .onReady(async (context: NavDestinationContext) => {
+    .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.controller.setEnabled(false)
-      const accessToken = get()
+      const accessToken = await get()
       if (accessToken) {
         this.loading = true
         const infores = await request('/account/getAccountInfo', {

@@ -19,6 +19,7 @@ export function ViplogBuilder() {
 struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
+  @Local accessToken: string = ''
   empty: boolean | undefined = undefined
 
   build() {
@@ -65,7 +66,9 @@ struct Viplog {
                   .width('5%')
                 Text(item.type === 'pay' ? '付费' :
                   item.type === 'vipcode' ? '兑换码' :
-                    'undefined')
+                    item.type === 'invitationcode' ? '邀请码' :
+                      item.type === 'invitenewuser' ? '邀请新用户' :
+                        'undefined')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
@@ -180,10 +183,10 @@ struct Viplog {
         right: $r('sys.float.ohos_id_max_padding_end')
       })
       .onReachEnd(async () => {
-        if (this.empty === false) {
+        if (this.accessToken && this.empty === false) {
           this.loading = true
           const res = await request('/product/getViplogList', {
-            accessToken: get(),
+            accessToken: this.accessToken,
             product: 'password',
             skip: this.viplogArray.length
           })
@@ -201,16 +204,19 @@ struct Viplog {
     .backgroundColor($r('app.color.sheet_background'))
     .title('会员开通记录')
     .onReady(async () => {
-      this.loading = true
-      const res = await request('/product/getViplogList', {
-        accessToken: get(),
-        product: 'password'
-      })
-      this.loading = false
-      if (res !== 'fail') {
-        const viplogs = JSON.parse(res).data as Item[]
-        this.viplogArray = viplogs
-        this.empty = false
+      this.accessToken = await get()
+      if (this.accessToken) {
+        this.loading = true
+        const res = await request('/product/getViplogList', {
+          accessToken: this.accessToken,
+          product: 'password'
+        })
+        this.loading = false
+        if (res !== 'fail') {
+          const viplogs = JSON.parse(res).data as Item[]
+          this.viplogArray = viplogs
+          this.empty = false
+        }
       }
     })
   }

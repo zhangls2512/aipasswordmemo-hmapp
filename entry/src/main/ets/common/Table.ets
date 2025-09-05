@@ -27,13 +27,13 @@ export async function syncTable(table: string, networkId: string, syncMode: rela
     const res = await rdbStore.sync(syncMode, predicates)
     if (res[0][1] === 0) {
       promptAction.showToast({
-        message: '同步成功，设备网络标识：' + networkId
+        message: '同步成功，设备网络标识：' + res[0][0]
       })
-      return
+    } else {
+      promptAction.showToast({
+        message: '同步失败，设备网络标识：' + res[0][0] + '，错误码：' + res[0][1]
+      })
     }
-    promptAction.showToast({
-      message: '同步失败，设备网络标识：' + networkId
-    })
   } catch (err) {
     promptAction.showToast({
       message: '发生错误，错误码：' + err.code

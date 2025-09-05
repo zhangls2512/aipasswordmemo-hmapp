@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -9,8 +10,8 @@ export function VipcodeBuilder() {
 
 @ComponentV2
 struct Vipcode {
-  @Local vipcode: string = ''
-  context = getContext(this)
+  @Local vipCode: string = ''
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -18,34 +19,38 @@ struct Vipcode {
       List() {
         ListItem() {
           Column() {
-            TextInput({
+            TextArea({
               placeholder: '请输入兑换码',
-              text: $$this.vipcode
+              text: $$this.vipCode
             })
               .maxLength(32)
+              .showCounter(true)
             Button('兑换')
-              .enabled(this.vipcode.length === 32 ? true : false)
+              .enabled(this.vipCode.length === 32 ? true : false)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
               .onClick(async () => {
-                const dialogControllerProgress = new CustomDialogController({
-                  builder: LoadingDialog({
-                    content: '验证中...'
+                const accessToken = await get()
+                if (accessToken) {
+                  const dialogControllerProgress = new CustomDialogController({
+                    builder: LoadingDialog({
+                      content: '验证中...'
+                    })
                   })
-                })
-                dialogControllerProgress.open()
-                const res = await request('/product/useVipcode', {
-                  accessToken: get(),
-                  vipcode: this.vipcode
-                })
-                dialogControllerProgress.close()
-                if (res !== 'fail') {
-                  promptAction.showToast({
-                    message: '兑换成功'
+                  dialogControllerProgress.open()
+                  const res = await request('/product/useVipcode', {
+                    accessToken: accessToken,
+                    vipcode: this.vipCode
                   })
-                  this.pageInfos.pop()
-                  this.context.eventHub.emit('refreshVip')
+                  dialogControllerProgress.close()
+                  if (res !== 'fail') {
+                    promptAction.showToast({
+                      message: '兑换成功'
+                    })
+                    this.pageInfos.pop()
+                    this.context.eventHub.emit('refreshVip')
+                  }
                 }
               })
           }
@@ -59,24 +64,46 @@ struct Vipcode {
             Text('如何获取兑换码？')
               .fontWeight(FontWeight.Bold)
             Text('· 应用市场评论')
+              .fontColor($r('sys.color.font_emphasize'))
               .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })
+              .onClick(() => {
+                this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+              })
             Text('· 提供有效反馈')
+              .fontColor($r('sys.color.font_emphasize'))
               .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+              })
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Feedback'
+                })
               })
             Text('· 关注官方活动')
+              .fontColor($r('sys.color.font_emphasize'))
               .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
               })
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'About'
+                })
+              })
             Text('· 加入官方团队')
+              .fontColor($r('sys.color.font_emphasize'))
               .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+              })
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'About'
+                })
               })
           }
           .alignItems(HorizontalAlign.Start)
@@ -93,7 +120,7 @@ struct Vipcode {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('兑换会员')
-    .onReady((context: NavDestinationContext) => {
+    .onReady((context) => {
       this.pageInfos = context.pathStack
     })
   }

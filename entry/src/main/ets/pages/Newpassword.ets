@@ -1,7 +1,17 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
+import { fileIo, fileUri } from '@kit.CoreFileKit'
+import { image } from '@kit.ImageKit'
+import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { scanBarcode, scanCore } from '@kit.ScanKit'
+import {
+  CollaborationServiceFilter,
+  CollaborationServiceStateDialog,
+  createCollaborationServiceMenuItems
+} from '@kit.ServiceCollaborationKit'
+import fs from '@ohos.file.fs'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { newPassword } from '../common/Datachange'
@@ -13,7 +23,7 @@ export default struct Newpassword {
   @Local passwordName: string = ''
   @Local passwordInfoArray: PasswordInfoItem[] = []
   @Local infoType: string = '密码'
-  @Local infoTypeIndex: number = 2
+  @Local infoTypeIndex: number = 3
   @Local infoTypeValue: string = '密码'
   @Local infoValue: string = ''
   @Local mfaStep: string = '30'
@@ -25,8 +35,61 @@ export default struct Newpassword {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  context = getContext(this)
-  specialTypes: string[] = ['昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  specialTypes: string[] =
+    ['图标', '昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
+
+  @Builder
+  ChooseImageMenu() {
+    Menu() {
+      MenuItem({ content: '本设备' })
+        .onClick(async () => {
+          const photoPicker = new photoAccessHelper.PhotoViewPicker()
+          const pickerres = await photoPicker.select({
+            MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+            maxSelectNumber: 1,
+            isPhotoTakingSupported: false
+          })
+          const fileSource = await fileIo.open(pickerres.photoUris[0])
+          const imageSource = image.createImageSource(fileSource.fd)
+          const imagePixelMap = await imageSource.createPixelMap()
+          const imageSize = imagePixelMap.getImageInfoSync().size
+          if (imageSize.width !== imageSize.height) {
+            promptAction.showToast({
+              message: '请选择宽高比为 1:1 的图片'
+            })
+            return
+          }
+          if (this.infoValue) {
+            fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+          }
+          const passwordIconDir = this.context.filesDir + '/media/passwordicon'
+          if (!fs.accessSync(passwordIconDir)) {
+            fs.mkdirSync(passwordIconDir, true)
+          }
+          const filePath = passwordIconDir + '/' + Date.now() + '.png'
+          const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
+          const imagePacker = image.createImagePacker()
+          await imagePacker.packToFile(imagePixelMap, file.fd, {
+            format: 'image/png',
+            quality: 100
+          })
+          fs.closeSync(file)
+          this.infoValue = fileUri.getUriFromPath(filePath)
+        })
+      MenuItem({
+        content: '其他设备',
+        builder: this.SubMenu()
+      })
+    }
+  }
+
+  @Builder
+  SubMenu() {
+    Menu() {
+      createCollaborationServiceMenuItems([CollaborationServiceFilter.IMAGE_PICKER], 1)
+    }
+  }
 
   build() {
     List() {
@@ -35,6 +98,7 @@ export default struct Newpassword {
           placeholder: '请输入名称',
           text: $$this.passwordName
         })
+          .defaultFocus(true)
       }
 
       ListItem() {
@@ -47,7 +111,49 @@ export default struct Newpassword {
 
       ListItem() {
         Column() {
+          CollaborationServiceStateDialog({
+            async onState(stateCode: number, bufferType: string, buffer: ArrayBuffer) {
+              if (stateCode !== 0) {
+                promptAction.showToast({
+                  message: '发生错误，错误码：' + stateCode
+                })
+                return
+              }
+              if (bufferType !== 'general.image') {
+                promptAction.showToast({
+                  message: '请选择图片'
+                })
+                return
+              }
+              const imageSource = image.createImageSource(buffer)
+              const imagePixelMap = await imageSource.createPixelMap()
+              const imageSize = imagePixelMap.getImageInfoSync().size
+              if (imageSize.width !== imageSize.height) {
+                promptAction.showToast({
+                  message: '请选择宽高比为 1:1 的图片'
+                })
+                return
+              }
+              if (this.infoValue) {
+                fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+              }
+              const passwordIconDir = this.context.filesDir + '/media/passwordicon'
+              if (!fs.accessSync(passwordIconDir)) {
+                fs.mkdirSync(passwordIconDir, true)
+              }
+              const filePath = passwordIconDir + '/' + Date.now() + '.png'
+              const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
+              const imagePacker = image.createImagePacker()
+              await imagePacker.packToFile(imagePixelMap, file.fd, {
+                format: 'image/png',
+                quality: 100
+              })
+              fs.closeSync(file)
+              this.infoValue = fileUri.getUriFromPath(filePath)
+            }
+          })
           Select([
+            { value: '图标' },
             { value: '昵称' },
             { value: '用户名' },
             { value: '密码' },
@@ -60,16 +166,17 @@ export default struct Newpassword {
             { value: 'URL' },
             { value: '自定义' }
           ])
+            .enabled((this.infoTypeIndex === 0 && this.infoValue === '') || this.infoTypeIndex !== 0)
             .selected($$this.infoTypeIndex)
             .value($$this.infoTypeValue)
-            .onSelect(async (index: number, value: string) => {
-              if (index === 10) {
-                this.infoType = ''
-                this.infoArray = []
-              }
-              if (index !== 10) {
+            .onSelect(async (index, value) => {
+              if (index !== 11) {
                 this.infoType = value
                 this.infoArray = await getTypeInfoList(value)
+              }
+              if (index === 11) {
+                this.infoType = ''
+                this.infoArray = []
               }
             })
           if (!this.specialTypes.includes(this.infoType)) {
@@ -80,12 +187,28 @@ export default struct Newpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onChange(async (value: string) => {
+              .onChange(async (value) => {
                 if (this.specialTypes.includes(value)) {
                   this.infoTypeIndex = this.specialTypes.indexOf(value)
                   this.infoTypeValue = value
                 }
                 this.infoArray = await getTypeInfoList(value)
+              })
+          }
+          if (this.infoType === '图标') {
+            Button('选择图片')
+              .buttonStyle(ButtonStyleMode.NORMAL)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .bindMenu(this.ChooseImageMenu)
+            TextInput({
+              placeholder: '请选择图片',
+              text: this.infoValue
+            })
+              .enabled(false)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
           }
           if (this.infoType === '昵称') {
@@ -131,7 +254,7 @@ export default struct Newpassword {
               })
               .type(InputType.Password)
             TextInput({
-              placeholder: '请输入步长（单位：秒）',
+              placeholder: '请输入步长 (单位：秒)',
               text: $$this.mfaStep
             })
               .margin({
@@ -282,7 +405,13 @@ export default struct Newpassword {
                   return
                 }
                 let value = this.infoValue
-                if (this.infoType !== 'MFA' && !value) {
+                if (this.infoType === '图标' && !value) {
+                  promptAction.showToast({
+                    message: '请选择图片'
+                  })
+                  return
+                }
+                if (this.infoType !== '图标' && this.infoType !== 'MFA' && !value) {
                   promptAction.showToast({
                     message: '请输入内容'
                   })
@@ -314,7 +443,7 @@ export default struct Newpassword {
                   value: value
                 })
                 this.infoType = '密码'
-                this.infoTypeIndex = 2
+                this.infoTypeIndex = 3
                 this.infoTypeValue = '密码'
                 this.infoValue = ''
                 this.infoArray = await getTypeInfoList('密码')
@@ -361,7 +490,7 @@ export default struct Newpassword {
                     value: uriSecret + '\0' + step + '\0' + digits
                   })
                   this.infoType = '密码'
-                  this.infoTypeIndex = 2
+                  this.infoTypeIndex = 3
                   this.infoTypeValue = '密码'
                   this.infoValue = ''
                   this.infoArray = await getTypeInfoList('密码')
@@ -398,6 +527,9 @@ export default struct Newpassword {
                 .role(ButtonRole.ERROR)
                 .width('20%')
                 .onClick(() => {
+                  if (item.type === '图标') {
+                    fileIo.unlinkSync(item.value.replace('file://com.zhangxm.aipasswordmemo', ''))
+                  }
                   this.passwordInfoArray.splice(index, 1)
                 })
             }

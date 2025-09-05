@@ -23,6 +23,7 @@ struct Feedback {
               placeholder: '请输入内容',
               text: $$this.content
             })
+              .defaultFocus(true)
               .maxLength(200)
               .showCounter(true)
             Text('联系方式 (可选)')
@@ -42,7 +43,7 @@ struct Feedback {
                 .selected($$this.contactTypeIndex)
                 .value($$this.contactType)
                 .width('30%')
-                .onSelect((index: number) => {
+                .onSelect((index) => {
                   if (index === 0) {
                     this.contactType = '邮箱'
                   }
@@ -93,7 +94,7 @@ struct Feedback {
         ListItem() {
           Column() {
             Button('提交')
-              .enabled(this.content ? true : false)
+              .enabled(this.content !== '')
               .onClick(async () => {
                 const dialogControllerProgress = new CustomDialogController({
                   builder: LoadingDialog({
@@ -142,7 +143,7 @@ struct Feedback {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('意见反馈')
-    .onReady((context: NavDestinationContext) => {
+    .onReady((context) => {
       this.pageInfos = context.pathStack
     })
   }

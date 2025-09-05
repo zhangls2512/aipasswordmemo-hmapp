@@ -1,3 +1,6 @@
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { get } from '../common/Accesstoken'
+import getDeviceToken from '../common/Devicetoken'
 import openLink from '../common/Openlink'
 
 @Builder
@@ -7,6 +10,7 @@ export function InfolistBuilder() {
 
 @ComponentV2
 struct Infolist {
+  @Local accessToken: string = ''
   pageInfos = new NavPathStack()
 
   build() {
@@ -22,6 +26,121 @@ struct Infolist {
           left: 12,
           right: 12,
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
+
+        ListItem() {
+          Column() {
+            Text('IP 地址及其归属地、运营商')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Column() {
+                Text('使用场景')
+                  .fontWeight(FontWeight.Medium)
+                Text('查询轩铭 2512 统一账号登录日志时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('使用目的')
+                  .fontWeight(FontWeight.Medium)
+                Text('生成、存储轩铭 2512 统一账号登录日志')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('收集时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('轩铭 2512 统一账号登录成功时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Column() {
+                  Text('信息内容')
+                    .fontWeight(FontWeight.Medium)
+                  Text('https://www.zhangls2512.cn/product/account/loginlog')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                }
+                .alignItems(HorizontalAlign.Start)
+
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                openLink('https://www.zhangls2512.cn/product/account/loginlog')
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
         ListItem() {
@@ -127,6 +246,239 @@ struct Infolist {
               .width('100%')
               .onClick(() => {
                 openLink('https://www.zhangls2512.cn/product/account/info')
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('订单号、商品 ID')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Column() {
+                Text('使用场景')
+                  .fontWeight(FontWeight.Medium)
+                Text('开通会员、查询会员开通记录时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('使用目的')
+                  .fontWeight(FontWeight.Medium)
+                Text('开通会员、生成并存储会员开通记录')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('收集时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('付费开通会员时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              if (this.accessToken) {
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  Text('信息内容')
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Image($r('app.media.right'))
+                    .fillColor($r('sys.color.icon_fourth'))
+                    .height(12)
+                    .width(12)
+                }
+                .borderRadius(12)
+                .padding(12)
+                .stateStyles({
+                  normal: {
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  pressed: {
+                    .backgroundColor($r('sys.color.interactive_pressed'))
+                  }
+                })
+                .width('100%')
+                .onClick(() => {
+                  this.pageInfos.pushPath({
+                    name: 'Viplog'
+                  })
+                })
+              }
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('DeviceToken')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Column() {
+                Text('使用场景')
+                  .fontWeight(FontWeight.Medium)
+                Text('服务器验证邀请码时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('使用目的')
+                  .fontWeight(FontWeight.Medium)
+                Text('让服务器知晓本设备是否使用过邀请码')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('收集时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('提交邀请码时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('信息内容')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(async () => {
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '加载中...'
+                  })
+                })
+                dialogControllerProgress.open()
+                const deviceToken = await getDeviceToken()
+                dialogControllerProgress.close()
+                if (deviceToken) {
+                  promptAction.showDialog({
+                    title: 'DeviceToken',
+                    message: deviceToken,
+                    buttons: [
+                      {
+                        text: '确定',
+                        color: $r('sys.color.font_emphasize')
+                      }
+                    ]
+                  })
+                }
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -328,7 +680,7 @@ struct Infolist {
               .width('100%')
               .onClick(() => {
                 this.pageInfos.pushPath({
-                  name: 'Faultlog'
+                  name: 'Errorlog'
                 })
               })
             }
@@ -416,7 +768,7 @@ struct Infolist {
               Column() {
                 Text('信息内容')
                   .fontWeight(FontWeight.Medium)
-                Text('内容、联系方式 (可选)')
+                Text('应用名称 (密码智能备忘录)、内容、联系方式 (可选)')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -446,8 +798,9 @@ struct Infolist {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('已收集个人信息清单')
-    .onReady((context: NavDestinationContext) => {
+    .onReady(async (context) => {
       this.pageInfos = context.pathStack
+      this.accessToken = await get()
     })
   }
 }

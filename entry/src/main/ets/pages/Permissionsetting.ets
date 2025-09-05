@@ -10,12 +10,11 @@ export function PermissionsettingBuilder() {
 @ComponentV2
 struct Permissionsetting {
   @Local writePasteBoard: boolean = false
-  context = getContext(this) as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  dataSync = getPermission('ohos.permission.DISTRIBUTED_DATASYNC')
   permissionSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'permissionSetting'
   })
-  dataSync = getPermission('ohos.permission.DISTRIBUTED_DATASYNC')
-  microphone = getPermission('ohos.permission.MICROPHONE')
 
   build() {
     NavDestination() {
@@ -79,61 +78,6 @@ struct Permissionsetting {
           Column() {
             Column() {
               Row() {
-                Text('麦克风')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: this.microphone
-                })
-                  .enabled(false)
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-            }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
-
-            Text() {
-              Span($r('app.string.MICROPHONE_reason'))
-                .fontColor($r('sys.color.font_secondary'))
-              Span('请前往')
-                .fontColor($r('sys.color.font_secondary'))
-              Span('系统设置')
-                .fontColor($r('sys.color.font_emphasize'))
-                .fontWeight(FontWeight.Medium)
-                .onClick(() => {
-                  this.context.startAbility({
-                    bundleName: 'com.huawei.hmos.settings',
-                    abilityName: 'com.huawei.hmos.settings.MainAbility',
-                    uri: 'application_info_entry',
-                    parameters: {
-                      pushParams: 'com.zhangxm.aipasswordmemo'
-                    }
-                  })
-                })
-              Span('管理此权限。')
-                .fontColor($r('sys.color.font_secondary'))
-            }
-            .fontSize($r('sys.float.ohos_id_text_size_body3'))
-            .margin({
-              top: 6,
-              left: 12,
-              right: 12
-            })
-          }
-          .alignItems(HorizontalAlign.Start)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
-          Column() {
-            Column() {
-              Row() {
                 Text('写入剪贴板')
                   .fontWeight(FontWeight.Medium)
                 Blank()
@@ -141,7 +85,7 @@ struct Permissionsetting {
                   type: ToggleType.Switch,
                   isOn: $$this.writePasteBoard
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.permissionSettingDataPreferences.putSync('writePasteBoard', isOn)
                     this.permissionSettingDataPreferences.flushSync()
                   })

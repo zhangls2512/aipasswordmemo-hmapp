@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -12,7 +13,8 @@ export function CloudserviceBuilder() {
 struct Cloudservice {
   @Local cloudService: boolean = false
   @Local loading: boolean = false
-  context = getContext(this)
+  @Local accessToken: string = ''
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -65,6 +67,7 @@ struct Cloudservice {
             Column() {
               if (!this.cloudService) {
                 Button('开通')
+                  .enabled(this.accessToken !== '')
                   .onClick(async () => {
                     const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
@@ -73,7 +76,7 @@ struct Cloudservice {
                     })
                     dialogControllerProgress.open()
                     const res = await request('/account/openService', {
-                      accessToken: get(),
+                      accessToken: this.accessToken,
                       service: 'password'
                     })
                     dialogControllerProgress.close()
@@ -89,6 +92,7 @@ struct Cloudservice {
               }
               if (this.cloudService) {
                 Button('取消开通')
+                  .enabled(this.accessToken !== '')
                   .role(ButtonRole.ERROR)
                   .onClick(async () => {
                     const dialogControllerProgress = new CustomDialogController({
@@ -98,7 +102,7 @@ struct Cloudservice {
                     })
                     dialogControllerProgress.open()
                     const res = await request('/account/closeService', {
-                      accessToken: get(),
+                      accessToken: this.accessToken,
                       service: 'password'
                     })
                     dialogControllerProgress.close()
@@ -129,8 +133,9 @@ struct Cloudservice {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title(this.cloudService ? '取消开通云服务' : '开通云服务')
-    .onReady(async (context: NavDestinationContext) => {
+    .onReady(async (context) => {
       this.pageInfos = context.pathStack
+      this.accessToken = await get()
       this.loading = true
       const cloudServiceStatus = await getCloudServiceStatus()
       this.loading = false

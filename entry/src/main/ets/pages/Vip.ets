@@ -1,9 +1,8 @@
 import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
-import { get } from '../common/Accesstoken'
+import { get, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
-import copy from '../common/Pasteboard'
 import request from '../common/Request'
 
 interface VipItem {
@@ -24,12 +23,13 @@ struct Vip {
   @Local vipStatusColor: string = 'red'
   @Local vipStatusLoading: boolean = false
   @Local vipEndDate: string = ''
-  @Local uid: string = ''
   @Local iapStatus: boolean = false
   @Local iapStatusLoading: boolean = false
   @Local agree: boolean = false
-  context = getContext(this) as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  accessToken = ''
+  uid = ''
   vipArray: VipItem[] = [
     {
       id: 'CG3_PfAJZa84niLQ',
@@ -78,7 +78,7 @@ struct Vip {
   async getVipStatus() {
     this.vipStatusLoading = true
     const userres = await request('/product/getUserInfo', {
-      accessToken: get(),
+      accessToken: this.accessToken,
       product: 'password'
     })
     this.vipStatusLoading = false
@@ -157,20 +157,6 @@ struct Vip {
                   .margin({
                     top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                   })
-              }
-              if (this.uid) {
-                Text() {
-                  Span('UID：')
-                  Span(this.uid)
-                    .fontColor($r('sys.color.font_emphasize'))
-                    .onClick(() => {
-                      copy(this.uid)
-                    })
-                }
-                .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                .margin({
-                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                })
               }
             }
             if (this.vipStatusLoading) {
@@ -357,7 +343,40 @@ struct Vip {
                   })
               }
               Row() {
+                Text('邀请新用户，免费得会员')
+                  .fontColor($r('sys.color.font_emphasize'))
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Invite'
+                })
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
                 Text('兑换码')
+                  .fontColor(Color.Red)
                   .fontWeight(FontWeight.Medium)
                 Blank()
                 Image($r('app.media.right'))
@@ -431,32 +450,31 @@ struct Vip {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('会员中心')
-    .onReady(async (context: NavDestinationContext) => {
+    .onReady(async (context) => {
       this.pageInfos = context.pathStack
-      await this.getVipStatus()
-      this.context.eventHub.on('refreshVip', () => {
-        this.getVipStatus()
-      })
-      this.iapStatusLoading = true
-      const res = await request('/account/getAccountInfo', {
-        accessToken: get()
-      })
-      if (res !== 'fail') {
-        this.uid = JSON.parse(res).data.uid as string
-      }
-      if (this.vipEndDate === '终身') {
-        this.iapStatusLoading = false
-      }
-      if (this.vipEndDate !== '终身') {
-        try {
-          await iap.queryEnvironmentStatus(this.context)
+      this.accessToken = await get()
+      if (this.accessToken) {
+        const accountInfo = await getAccountInfo()
+        this.uid = accountInfo.uid
+        await this.getVipStatus()
+        this.context.eventHub.on('refreshVip', () => {
+          this.getVipStatus()
+        })
+        this.iapStatusLoading = true
+        if (this.vipEndDate === '终身') {
           this.iapStatusLoading = false
-          this.iapStatus = true
-        } catch (err) {
-          this.iapStatusLoading = false
-          promptAction.showToast({
-            message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-          })
+        }
+        if (this.vipEndDate !== '终身') {
+          try {
+            await iap.queryEnvironmentStatus(this.context)
+            this.iapStatusLoading = false
+            this.iapStatus = true
+          } catch (err) {
+            this.iapStatusLoading = false
+            promptAction.showToast({
+              message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+            })
+          }
         }
       }
     })

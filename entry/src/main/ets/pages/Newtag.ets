@@ -14,15 +14,15 @@ export default struct Newtag {
   @Local alertText: string = ''
   colorArray: string[] = [
     '#000000',
-    '#0000ff',
-    '#a52a2a',
+    '#0000FF',
+    '#A52A2A',
     '#808080',
     '#008000',
-    '#ffa500',
-    '#ffc0cb',
-    '#ff0000',
-    '#ffffff',
-    '#ffff00',
+    '#FFA500',
+    '#FFC0CB',
+    '#FF0000',
+    '#FFFFFF',
+    '#FFFF00',
     'rgba(0,0,0,0)'
   ]
 
@@ -34,6 +34,7 @@ export default struct Newtag {
             placeholder: '请输入内容',
             text: $$this.tagValue
           })
+            .defaultFocus(true)
           Row() {
             ForEach(this.colorArray, (item: string) => {
               Circle({
@@ -72,7 +73,7 @@ export default struct Newtag {
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
 
-          Text('颜色示例：#ffffff、#ff000000、rgb(255, 100, 255)、rgba(255, 100, 255, 0.5)')
+          Text('颜色示例：#FFFFFF、#FF000000、rgb(255, 100, 255)、rgba(255, 100, 255, 0.5)')
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
@@ -166,7 +167,7 @@ export default struct Newtag {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const abilityContext = getContext(this)
+          const abilityContext = this.getUIContext().getHostContext()
           const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(abilityContext, {
             name: 'cloudbackupSetting'
           })

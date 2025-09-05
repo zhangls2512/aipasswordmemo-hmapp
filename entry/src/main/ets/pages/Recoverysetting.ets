@@ -27,11 +27,11 @@ struct Recoverysetting {
                   { value: '总是' },
                   { value: 'JS_CRASH' },
                   { value: 'APP_FREEZE' },
-                  { value: '总不' }
+                  { value: '从不' }
                 ])
                   .selected(2)
                   .value('APP_FREEZE')
-                  .onSelect((index: number) => {
+                  .onSelect((index) => {
                     if (index === 0) {
                       this.restart = appRecovery.RestartFlag.ALWAYS_RESTART
                     }
@@ -65,7 +65,7 @@ struct Recoverysetting {
                 ])
                   .selected(0)
                   .value('发生故障')
-                  .onSelect((index: number) => {
+                  .onSelect((index) => {
                     if (index === 0) {
                       this.saveOccasion = appRecovery.SaveOccasionFlag.SAVE_WHEN_ERROR
                     }
@@ -93,7 +93,7 @@ struct Recoverysetting {
                 ])
                   .selected(0)
                   .value('写入到本地文件缓存')
-                  .onSelect((index: number) => {
+                  .onSelect((index) => {
                     if (index === 0) {
                       this.saveMode = appRecovery.SaveModeFlag.SAVE_WITH_FILE
                     }
@@ -135,7 +135,7 @@ struct Recoverysetting {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('应用恢复设置')
-    .onReady((context: NavDestinationContext) => {
+    .onReady((context) => {
       this.pageInfos = context.pathStack
     })
   }

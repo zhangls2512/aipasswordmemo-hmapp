@@ -1,6 +1,11 @@
 import { preferences } from '@kit.ArkData'
 import { backupTable, recoveryTable } from '../common/Table'
 
+interface Type {
+  name: string,
+  value: string
+}
+
 @Builder
 export function DataBackupRecoveryBuilder() {
   DataBackupRecovery()
@@ -8,32 +13,34 @@ export function DataBackupRecoveryBuilder() {
 
 @ComponentV2
 struct DataBackupRecovery {
-  @Local isBackupPassword: boolean = false
-  @Local isBackupInfo: boolean = false
-  @Local isBackupTag: boolean = false
-  @Local autoBackupPassword: boolean = false
-  @Local autoBackupInfo: boolean = false
-  @Local autoBackupTag: boolean = false
+  @Local autoBackupTables: string[] = []
   @Local pauseAutoBackupWhenLowBatteryCapacityLevel: boolean = false
   @Local pauseAutoBackupWhenPowerSave: boolean = false
   @Local isBackupTables: string[] = []
-  context = getContext(this)
+  context = this.getUIContext().getHostContext()
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
-  autoBackupTables: string[] = []
+  typeArray: Type[] = [
+    {
+      name: '密码',
+      value: 'password'
+    },
+    {
+      name: '常用信息',
+      value: 'info'
+    },
+    {
+      name: '标签',
+      value: 'tag'
+    }
+  ]
 
   getSetting() {
     const isBackupTables = this.dataSettingDataPreferences.getSync('isBackupTables', [])
     this.isBackupTables = isBackupTables as string[]
-    this.isBackupPassword = this.isBackupTables.includes('password')
-    this.isBackupInfo = this.isBackupTables.includes('info')
-    this.isBackupTag = this.isBackupTables.includes('tag')
     const autoBackupTables = this.dataSettingDataPreferences.getSync('autoBackupTables', [])
     this.autoBackupTables = autoBackupTables as string[]
-    this.autoBackupPassword = this.autoBackupTables.includes('password')
-    this.autoBackupInfo = this.autoBackupTables.includes('info')
-    this.autoBackupTag = this.autoBackupTables.includes('tag')
     const pauseAutoBackupWhenLowBatteryCapacityLevel =
       this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false)
     this.pauseAutoBackupWhenLowBatteryCapacityLevel = pauseAutoBackupWhenLowBatteryCapacityLevel as boolean
@@ -55,90 +62,39 @@ struct DataBackupRecovery {
                 left: 12
               })
             Column() {
-              Row() {
-                Text('密码')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.autoBackupPassword
-                })
-                  .onChange((isOn: boolean) => {
-                    let autoBackupTables: string[] = []
-                    if (!isOn) {
-                      autoBackupTables = this.autoBackupTables.filter(item => item !== 'password')
-                    }
-                    if (isOn) {
-                      autoBackupTables = [...this.autoBackupTables, 'password']
-                    }
-                    this.dataSettingDataPreferences.putSync('autoBackupTables', autoBackupTables)
-                    this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
+              ForEach(this.typeArray, (item: Type, index) => {
+                if (index !== 0) {
+                  Divider()
+                    .padding({
+                      left: 12,
+                      right: 12
+                    })
+                }
+                Row() {
+                  Text(item.name)
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.autoBackupTables.includes(item.value)
                   })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('常用信息')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.autoBackupInfo
-                })
-                  .onChange((isOn: boolean) => {
-                    let autoBackupTables: string[] = []
-                    if (!isOn) {
-                      autoBackupTables = this.autoBackupTables.filter(item => item !== 'info')
-                    }
-                    if (isOn) {
-                      autoBackupTables = [...this.autoBackupTables, 'info']
-                    }
-                    this.dataSettingDataPreferences.putSync('autoBackupTables', autoBackupTables)
-                    this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
-                  })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('标签')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.autoBackupTag
-                })
-                  .onChange((isOn: boolean) => {
-                    let autoBackupTables: string[] = []
-                    if (!isOn) {
-                      autoBackupTables = this.autoBackupTables.filter(item => item !== 'tag')
-                    }
-                    if (isOn) {
-                      autoBackupTables = [...this.autoBackupTables, 'tag']
-                    }
-                    this.dataSettingDataPreferences.putSync('autoBackupTables', autoBackupTables)
-                    this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
-                  })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
+                    .onChange((isOn) => {
+                      let autoBackupTables: string[] = []
+                      if (!isOn) {
+                        autoBackupTables = this.autoBackupTables.filter(itema => itema !== item.value)
+                      }
+                      if (isOn) {
+                        autoBackupTables = [...this.autoBackupTables, item.value]
+                      }
+                      this.dataSettingDataPreferences.putSync('autoBackupTables', autoBackupTables)
+                      this.dataSettingDataPreferences.flushSync()
+                      this.getSetting()
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -169,10 +125,9 @@ struct DataBackupRecovery {
                   type: ToggleType.Switch,
                   isOn: $$this.pauseAutoBackupWhenLowBatteryCapacityLevel
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenLowBatteryCapacityLevel', isOn)
                     this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
                   })
               }
               .borderRadius(12)
@@ -192,10 +147,9 @@ struct DataBackupRecovery {
                   type: ToggleType.Switch,
                   isOn: $$this.pauseAutoBackupWhenPowerSave
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenPowerSave', isOn)
                     this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
                   })
               }
               .borderRadius(12)
@@ -330,7 +284,7 @@ struct DataBackupRecovery {
                   left: 12
                 })
               Column() {
-                ForEach(this.isBackupTables, (item: string, index: number) => {
+                ForEach(this.isBackupTables, (item: string, index) => {
                   if (index !== 0) {
                     Divider()
                       .padding({

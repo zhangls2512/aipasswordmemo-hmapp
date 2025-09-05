@@ -5,8 +5,7 @@
     "deviceTypes": [
       "phone",
       "tablet",
-      "2in1",
-      "tv"
+      "2in1"
     ],
     "deliveryWithInstall": true,
     "pages": "$profile:main_pages",
@@ -29,6 +28,7 @@
           }
         ],
         "exported": true,
+        "continuable": true,
         "skills": [
           {
             "entities": [
@@ -42,8 +42,34 @@
                 "scheme": "file",
                 "type": "general.plain-text",
                 "linkFeature": "FileOpen"
+              },
+              {
+                "scheme": "file",
+                "type": "general.comma-separated-values-text",
+                "linkFeature": "FileOpen"
+              },
+              {
+                "scheme": "storage",
+                "path": "clearcache",
+                "linkFeature": "AppStorageMgmt"
               }
             ]
+          },
+          {
+            "entities": [
+              "entity.system.browsable"
+            ],
+            "actions": [
+              "ohos.want.action.viewData"
+            ],
+            "uris": [
+              {
+                "scheme": "https",
+                "host": "www.zhangls2512.cn",
+                "path": "product/password"
+              }
+            ],
+            "domainVerify": true
           }
         ],
         "startWindowIcon": "$media:layered_image",
@@ -87,16 +113,6 @@
       {
         "name": "ohos.permission.DISTRIBUTED_DATASYNC",
         "reason": "$string:DISTRIBUTED_DATASYNC_reason",
-        "usedScene": {
-          "abilities": [
-            "EntryAbility"
-          ],
-          "when": "inuse"
-        }
-      },
-      {
-        "name": "ohos.permission.MICROPHONE",
-        "reason": "$string:MICROPHONE_reason",
         "usedScene": {
           "abilities": [
             "EntryAbility"

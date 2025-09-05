@@ -8,7 +8,7 @@ interface ErrorResponse {
   errFix: string
 }
 
-export default async function request(path: string, body: rcp.RequestContent) {
+export default async function request(path: string, body: rcp.RequestContent, hideDialog?: boolean) {
   const context = getContext()
   const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'commonSetting'
@@ -41,10 +41,10 @@ export default async function request(path: string, body: rcp.RequestContent) {
         return body
       }
       const res = JSON.parse(body) as ErrorResponse
-      if (res.errCode === 3061) {
+      if (res.errCode === 3061 && !hideDialog) {
         promptAction.showDialog({
           title: '提示',
-          message: '此华为账号未绑定轩铭 2512 统一账号。请您使用其他验证方式（密码、MFA、邮箱验证码）登录轩铭 2512 统一账号，依次进入“设置”>“绑定华为账号”，绑定华为账号后即可使用华为账号登录。',
+          message: '此华为账号未绑定轩铭 2512 统一账号。请您使用其他验证方式 (密码、MFA、邮箱验证码) 登录轩铭 2512 统一账号，依次进入“设置”>“绑定华为账号”，绑定华为账号后即可使用华为账号登录。',
           buttons: [
             {
               text: '确定',
@@ -67,7 +67,7 @@ export default async function request(path: string, body: rcp.RequestContent) {
       return 'fail'
     }
     promptAction.showToast({
-      message: '请求失败，错误码：' + response.statusCode + '，错误信息：' + response.reasonPhrase
+      message: '请求失败，错误码：' + response.statusCode
     })
     return 'fail'
   } catch (err) {

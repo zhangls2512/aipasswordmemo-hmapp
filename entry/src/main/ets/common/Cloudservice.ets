@@ -2,7 +2,7 @@ import { get } from './Accesstoken'
 import request from './Request'
 
 export default async function getCloudServiceStatus(): Promise<boolean> {
-  const accessToken = get()
+  const accessToken = await get()
   if (accessToken) {
     const infores = await request('/account/getAccountInfo', {
       accessToken: accessToken

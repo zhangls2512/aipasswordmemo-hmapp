@@ -1,8 +1,6 @@
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { privacyManager } from '@kit.AppGalleryKit'
-import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -18,11 +16,10 @@ export default struct Login {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  context = getContext(this)
+  context = this.getUIContext().getHostContext()
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
-        response: loginComponentManager.HuaweiIDCredential) => {
+      .onClickLoginWithHuaweiIDButton(async (err, response) => {
         if (response) {
           const dialogControllerProgress = new CustomDialogController({
             builder: LoadingDialog({
@@ -37,13 +34,14 @@ export default struct Login {
           dialogControllerProgress.close()
           if (res !== 'fail') {
             const accessToken = JSON.parse(res).accessToken as string
+            const uid = JSON.parse(res).uid as string
+            const email = JSON.parse(res).email as string
             const endDate = JSON.parse(res).endDate as number
-            set(accessToken)
-            const loginDataPreferences = preferences.getPreferencesSync(this.context, {
-              name: 'login'
+            set(accessToken, {
+              uid: uid,
+              email: email,
+              endDate: endDate
             })
-            loginDataPreferences.putSync('endDate', endDate)
-            loginDataPreferences.flushSync()
             promptAction.showToast({
               message: '登录成功'
             })
@@ -77,7 +75,7 @@ export default struct Login {
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                .onChange((isChecked: boolean) => {
+                .onChange((isChecked) => {
                   if (isChecked) {
                     this.type = 'password'
                   }
@@ -94,7 +92,7 @@ export default struct Login {
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                .onChange((isChecked: boolean) => {
+                .onChange((isChecked) => {
                   if (isChecked) {
                     this.type = 'mfa'
                   }
@@ -111,7 +109,7 @@ export default struct Login {
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                .onChange((isChecked: boolean) => {
+                .onChange((isChecked) => {
                   if (isChecked) {
                     this.type = 'emailcode'
                   }
@@ -299,13 +297,14 @@ export default struct Login {
               dialogControllerProgress.close()
               if (res !== 'fail') {
                 const accessToken = JSON.parse(res).accessToken as string
+                const uid = JSON.parse(res).uid as string
+                const email = JSON.parse(res).email as string
                 const endDate = JSON.parse(res).endDate as number
-                set(accessToken)
-                const loginDataPreferences = preferences.getPreferencesSync(this.context, {
-                  name: 'login'
+                set(accessToken, {
+                  uid: uid,
+                  email: email,
+                  endDate: endDate
                 })
-                loginDataPreferences.putSync('endDate', endDate)
-                loginDataPreferences.flushSync()
                 promptAction.showToast({
                   message: '登录成功'
                 })
@@ -343,7 +342,7 @@ export default struct Login {
                 type: ToggleType.Checkbox,
                 isOn: $$this.agree
               })
-                .onChange((isOn: boolean) => {
+                .onChange((isOn) => {
                   this.controller.setEnabled(isOn)
                 })
             }

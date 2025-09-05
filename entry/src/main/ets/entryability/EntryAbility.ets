@@ -1,20 +1,54 @@
 import { AbilityConstant, appRecovery, ConfigurationConstant, errorManager, UIAbility, Want } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { preferences, relationalStore } from '@kit.ArkData'
-import { util } from '@kit.ArkTS'
+import { uri, util } from '@kit.ArkTS'
 import { promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { wifiManager } from '@kit.ConnectivityKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
+import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
 import fs from '@ohos.file.fs'
-import { remove } from '../common/Accesstoken'
-import { importInfo, importPassword, importTag } from '../common/Dataimport'
+import { check, get, getAccountInfo } from '../common/Accesstoken'
+import { decrypt, getKey } from '../common/Crypto'
+import { getPasswordMaxId, PasswordInfoItem } from '../common/Dataget'
+import { importInfo, importPassword, importTag, InfoInItem, PasswordInItem, TagInItem } from '../common/Dataimport'
+import getDeviceToken from '../common/Devicetoken'
 import request from '../common/Request'
+import { InfoCloudBackup, Item, PasswordCloudBackup, TagCloudBackup } from '../pages/Cloudbackupimport'
+import { PasswordOutItem } from '../pages/DataInOut'
 
 export default class EntryAbility extends UIAbility {
-  async onCreate(want: Want) {
+  storage = new LocalStorage()
+
+  parseCsvLine(line: string) {
+    const result: string[] = []
+    let inQuotes = false
+    let currentField = ''
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i]
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          currentField += '"'
+          i++
+        } else {
+          inQuotes = !inQuotes
+        }
+      } else if (char === ',' && !inQuotes) {
+        result.push(currentField)
+        currentField = ''
+      } else {
+        currentField += char
+      }
+    }
+    result.push(currentField)
+    return result
+  }
+
+  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
+    const accessToken = await get()
+    const accountInfo = await getAccountInfo()
     const passwordRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'password',
       securityLevel: 4,
@@ -36,133 +70,25 @@ export default class EntryAbility extends UIAbility {
       allowRebuild: true
     })
     tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag (id INTEGER PRIMARY KEY AUTOINCREMENT, value, color, updateTime, cloudBackupTime)')
+    if (launchParam.launchReason === AbilityConstant.LaunchReason.CONTINUATION) {
+      this.context.restoreWindowStage(this.storage)
+    }
+    if (notificationManager.isNotificationEnabledSync()) {
+      notificationManager.setBadgeNumber(0)
+    }
     appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
-    if (want.parameters?.shortcutId) {
-      const shortcutDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'shortcut'
-      })
-      shortcutDataPreferences.putSync('shortcutId', want.parameters?.shortcutId)
-    }
-    if (want.parameters?.shortcutId === 'newPassword') {
-      this.context.eventHub.emit('newPassword')
-    }
-    if (want.parameters?.shortcutId === 'searchPassword') {
-      this.context.eventHub.emit('searchPassword')
-    }
-    let uri = ''
-    if (want.uri) {
-      uri = want.uri
-    }
-    if (want.parameters?.menuHandler === 'clickMenu') {
-      const uriList = want.parameters.uriList as string[]
-      uri = uriList[0] as string
-    }
-    if (uri) {
-      const file = fs.openSync(uri)
-      const size = fs.statSync(file.fd).size
-      const filebuffer = new ArrayBuffer(size)
-      fs.readSync(file.fd, filebuffer)
-      const decoder = util.TextDecoder.create()
-      const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-      fs.closeSync(file)
-      const data = await promptAction.showActionMenu({
-        title: '选择导入类型',
-        buttons: [
-          {
-            text: '密码',
-            color: $r('sys.color.font_primary')
-          },
-          {
-            text: '常用信息',
-            color: $r('sys.color.font_primary')
-          },
-          {
-            text: '标签',
-            color: $r('sys.color.font_primary')
-          }
-        ]
-      })
-      if (data.index === 0) {
-        await importPassword(filestring, 0)
-        this.context.eventHub.emit('refreshPassword')
-      }
-      if (data.index === 1) {
-        await importInfo(filestring, 0)
-        this.context.eventHub.emit('refreshInfo')
-      }
-      if (data.index === 2) {
-        await importTag(filestring, 0)
-        this.context.eventHub.emit('refreshTag')
-      }
-      promptAction.showToast({
-        message: '导入成功'
-      })
-    }
-  }
-
-  async onNewWant(want: Want) {
-    if (want.parameters?.shortcutId === 'newPassword') {
-      this.context.eventHub.emit('newPassword')
-    }
-    if (want.parameters?.shortcutId === 'searchPassword') {
-      this.context.eventHub.emit('searchPassword')
-    }
-    let uri = ''
-    if (want.uri) {
-      uri = want.uri
-    }
-    if (want.parameters?.menuHandler === 'clickMenu') {
-      const uriList = want.parameters.uriList as string[]
-      uri = uriList[0] as string
-    }
-    if (uri) {
-      const file = fs.openSync(uri)
-      const size = fs.statSync(file.fd).size
-      const filebuffer = new ArrayBuffer(size)
-      fs.readSync(file.fd, filebuffer)
-      const decoder = util.TextDecoder.create()
-      const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-      fs.closeSync(file)
-      const data = await promptAction.showActionMenu({
-        title: '选择导入类型',
-        buttons: [
-          {
-            text: '密码',
-            color: $r('sys.color.font_primary')
-          },
-          {
-            text: '常用信息',
-            color: $r('sys.color.font_primary')
-          },
-          {
-            text: '标签',
-            color: $r('sys.color.font_primary')
-          }
-        ]
-      })
-      if (data.index === 0) {
-        await importPassword(filestring, 0)
-        this.context.eventHub.emit('refreshPassword')
-      }
-      if (data.index === 1) {
-        await importInfo(filestring, 0)
-        this.context.eventHub.emit('refreshInfo')
-      }
-      if (data.index === 2) {
-        await importTag(filestring, 0)
-        this.context.eventHub.emit('refreshTag')
-      }
-      promptAction.showToast({
-        message: '导入成功'
-      })
-    }
-  }
-
-  async onWindowStageCreate(windowStage: window.WindowStage) {
-    windowStage.loadContent('pages/Index')
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
     })
+    const allowContinue = commonSettingDataPreferences.getSync('allowContinue', true)
+    if (!allowContinue) {
+      await this.context.setMissionContinueState(AbilityConstant.ContinueState.INACTIVE)
+    }
+    if (allowContinue) {
+      await this.context.setMissionContinueState(AbilityConstant.ContinueState.ACTIVE)
+    }
+    const allowRestore = commonSettingDataPreferences.getSync('allowRestore', true) as boolean
+    this.context.setRestoreEnabled(allowRestore)
     const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
     const applicationContext = this.context.getApplicationContext()
     if (colorMode === 0) {
@@ -174,29 +100,11 @@ export default class EntryAbility extends UIAbility {
     if (colorMode === 2) {
       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
     }
-    if (deviceInfo.deviceType === '2in1') {
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      const isWindowRectAutoSave = commonSettingDataPreferences.getSync('isWindowRectAutoSave', false) as boolean
-      await windowStage.setWindowRectAutoSave(isWindowRectAutoSave)
-    }
-    const loginDataPreferences = preferences.getPreferencesSync(this.context, {
-      name: 'login'
-    })
-    const loginEndDate = loginDataPreferences.getSync('endDate', 0)
-    if (loginEndDate !== 0 && loginEndDate < Date.now()) {
-      remove()
-      await preferences.deletePreferences(this.context, {
-        name: 'login'
-      })
-      promptAction.showToast({
-        message: '登录态过期，请重新登录'
-      })
-    }
     const debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'debugSetting'
     })
+    const processCache = debugSettingDataPreferences.getSync('processCache', true) as boolean
+    applicationContext.setSupportedProcessCache(processCache)
     const observer: errorManager.ErrorObserver = {
       onUnhandledException(errMsg) {
         if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 0) {
@@ -230,31 +138,56 @@ export default class EntryAbility extends UIAbility {
       appEventFilters: [
         {
           domain: hiAppEvent.domain.OS,
-          eventTypes: [1]
+          eventTypes: [hiAppEvent.EventType.FAULT]
         }
       ],
-      onReceive: async (domain: string, appEventGroups: hiAppEvent.AppEventGroup[]) => {
+      onReceive: async (domain, appEventGroups) => {
+        const autoUploadErrorLogType = debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
+          'APP_CRASH',
+          'APP_FREEZE',
+          'APP_KILLED',
+          'APP_LAUNCH',
+          'RESOURCE_OVERLIMIT',
+          'ADDRESS_SANITIZER',
+          'MAIN_THREAD_JANK',
+          'SCROLL_JANK',
+          'CPU_USAGE_HIGH',
+          'BATTERY_USAGE'
+        ]) as string[]
+        if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
+          const errorLogDir = this.context.filesDir + '/log/error'
+          if (!fs.accessSync(errorLogDir)) {
+            fs.mkdirSync(errorLogDir, true)
+          }
+          appEventGroups.forEach((item) => {
+            const file = fs.openSync(this.context.filesDir + '/log/error/' + Date.now() + '.txt',
+              fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE)
+            fs.writeSync(file.fd, JSON.stringify(item))
+            fs.closeSync(file)
+          })
+        }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
-          const promises = appEventGroups.map(async (item) => {
-            const res = await request('/debug/newErrorLog', {
-              key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
-              object: item
-            })
-            if (res !== 'fail') {
-              promptAction.showToast({
-                message: '故障日志自动上传成功，故障类型：' + item.name
+          appEventGroups.map(async (item) => {
+            if (autoUploadErrorLogType.includes(item.name)) {
+              const res = await request('/debug/newErrorLog', {
+                key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
+                object: item
               })
+              if (res !== 'fail') {
+                promptAction.showToast({
+                  message: '故障日志自动上传成功，故障类型：' + item.name
+                })
+              }
             }
           })
-          await Promise.all(promises)
         }
       }
     })
     const netConnection: connection.NetConnection = connection.createNetConnection()
     netConnection.register(() => {
     })
-    netConnection.on('netAvailable', (data: connection.NetHandle) => {
+    netConnection.on('netAvailable', (data) => {
       if (debugSettingDataPreferences.getSync('showNetAvailableStatusChange', false)) {
         promptAction.showToast({
           message: '网络可用，数据网络句柄：' + data.netId
@@ -268,7 +201,7 @@ export default class EntryAbility extends UIAbility {
         })
       }
     })
-    netConnection.on('netBlockStatusChange', (data: connection.NetBlockStatusInfo) => {
+    netConnection.on('netBlockStatusChange', (data) => {
       if (debugSettingDataPreferences.getSync('showNetBlockStatusChange', false)) {
         promptAction.showDialog({
           title: '网络阻塞状态变化',
@@ -282,14 +215,14 @@ export default class EntryAbility extends UIAbility {
         })
       }
     })
-    netConnection.on('netLost', (data: connection.NetHandle) => {
+    netConnection.on('netLost', (data) => {
       if (debugSettingDataPreferences.getSync('showNetLost', false)) {
         promptAction.showToast({
           message: '网络丢失，数据网络句柄：' + data.netId
         })
       }
     })
-    netConnection.on('netCapabilitiesChange', (data: connection.NetCapabilityInfo) => {
+    netConnection.on('netCapabilitiesChange', (data) => {
       if (debugSettingDataPreferences.getSync('showNetCapabilitiesChange', false)) {
         const netBearType = data.netCap.bearerTypes.includes(0) ? '蜂窝' :
           data.netCap.bearerTypes.includes(1) ? 'Wi-Fi' :
@@ -310,7 +243,7 @@ export default class EntryAbility extends UIAbility {
         })
       }
     })
-    netQuality.on('netQosChange', (list: netQuality.NetworkQos[]) => {
+    netQuality.on('netQosChange', (list) => {
       if (list.length > 0) {
         const data = list[0]
         if (debugSettingDataPreferences.getSync('showNetQosChange', false)) {
@@ -346,7 +279,7 @@ export default class EntryAbility extends UIAbility {
         }
       }
     })
-    netQuality.on('netSceneChange', (list: netQuality.NetworkScene[]) => {
+    netQuality.on('netSceneChange', (list) => {
       if (list.length > 0) {
         const data = list[0]
         if (debugSettingDataPreferences.getSync('showNetSceneChange', false)) {
@@ -384,6 +317,7 @@ export default class EntryAbility extends UIAbility {
         }
       }
     })
+    await check()
     const checkVersionUpdate = commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
     try {
       if (checkVersionUpdate === 1) {
@@ -404,6 +338,533 @@ export default class EntryAbility extends UIAbility {
       promptAction.showToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
+    }
+    if (accessToken && getKey()) {
+      const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'cloudbackupSetting'
+      })
+      const autoImportTables = cloudbackupSettingDataPreferences.getSync('autoImport', []) as string[]
+      if (autoImportTables.includes('password')) {
+        promptAction.showToast({
+          message: '导入密码云备份中'
+        })
+        const countres = await request('/password/getBackupCount', {
+          accessToken: accessToken
+        })
+        if (countres !== 'fail') {
+          const total = JSON.parse(countres).count.password as number
+          for (let i = 0; i < total; i += 50) {
+            const listres = await request('/password/getBackupList', {
+              accessToken: accessToken,
+              type: 'password',
+              skip: i,
+              count: 50
+            })
+            if (listres !== 'fail') {
+              const listarray = JSON.parse(listres).data as Item[]
+              const array: PasswordInItem[] = []
+              const promises = listarray.map(async (item) => {
+                const itemstring = await decrypt({
+                  content: item.content,
+                  iv: item.iv
+                })
+                if (itemstring !== 'fail') {
+                  const itemobject = JSON.parse(itemstring) as PasswordCloudBackup
+                  let cloudBackupTime = itemobject.cloudBackupTime
+                  if (typeof (cloudBackupTime) === 'number') {
+                    cloudBackupTime = JSON.stringify([{
+                      uid: accountInfo.uid,
+                      time: itemobject.cloudBackupTime
+                    }])
+                  }
+                  array.push({
+                    id: item.id,
+                    name: itemobject.name,
+                    info: itemobject.info,
+                    tag: itemobject.tag,
+                    updateTime: itemobject.updateTime,
+                    cloudBackupTime: cloudBackupTime
+                  })
+                }
+              })
+              await Promise.all(promises)
+              await importPassword(JSON.stringify(array), 0)
+            }
+          }
+          promptAction.showToast({
+            message: '导入密码云备份成功'
+          })
+        }
+      }
+      if (autoImportTables.includes('info')) {
+        promptAction.showToast({
+          message: '导入常用信息云备份中'
+        })
+        const countres = await request('/password/getBackupCount', {
+          accessToken: accessToken
+        })
+        if (countres !== 'fail') {
+          const total = JSON.parse(countres).count.info as number
+          for (let i = 0; i < total; i += 50) {
+            const listres = await request('/password/getBackupList', {
+              accessToken: accessToken,
+              type: 'info',
+              skip: i,
+              count: 50
+            })
+            if (listres !== 'fail') {
+              const listarray = JSON.parse(listres).data as Item[]
+              const array: InfoInItem[] = []
+              const promises = listarray.map(async (item) => {
+                const itemstring = await decrypt({
+                  content: item.content,
+                  iv: item.iv
+                })
+                if (itemstring !== 'fail') {
+                  const itemobject = JSON.parse(itemstring) as InfoCloudBackup
+                  let cloudBackupTime = itemobject.cloudBackupTime
+                  if (typeof (cloudBackupTime) === 'number') {
+                    cloudBackupTime = JSON.stringify([{
+                      uid: accountInfo.uid,
+                      time: itemobject.cloudBackupTime
+                    }])
+                  }
+                  array.push({
+                    id: item.id,
+                    type: itemobject.type,
+                    value: itemobject.value,
+                    updateTime: itemobject.updateTime,
+                    cloudBackupTime: cloudBackupTime
+                  })
+                }
+              })
+              await Promise.all(promises)
+              await importInfo(JSON.stringify(array), 0)
+            }
+          }
+          promptAction.showToast({
+            message: '导入常用信息云备份成功'
+          })
+        }
+      }
+      if (autoImportTables.includes('tag')) {
+        promptAction.showToast({
+          message: '导入标签云备份中'
+        })
+        const countres = await request('/password/getBackupCount', {
+          accessToken: accessToken
+        })
+        if (countres !== 'fail') {
+          const total = JSON.parse(countres).count.tag as number
+          for (let i = 0; i < total; i += 50) {
+            const listres = await request('/password/getBackupList', {
+              accessToken: accessToken,
+              type: 'tag',
+              skip: i,
+              count: 50
+            })
+            if (listres !== 'fail') {
+              const listarray = JSON.parse(listres).data as Item[]
+              const array: TagInItem[] = []
+              const promises = listarray.map(async (item) => {
+                const itemstring = await decrypt({
+                  content: item.content,
+                  iv: item.iv
+                })
+                if (itemstring !== 'fail') {
+                  const itemobject = JSON.parse(itemstring) as TagCloudBackup
+                  let cloudBackupTime = itemobject.cloudBackupTime
+                  if (typeof (cloudBackupTime) === 'number') {
+                    cloudBackupTime = JSON.stringify([{
+                      uid: accountInfo.uid,
+                      time: itemobject.cloudBackupTime
+                    }])
+                  }
+                  array.push({
+                    id: item.id,
+                    value: itemobject.value,
+                    color: itemobject.color,
+                    updateTime: itemobject.updateTime,
+                    cloudBackupTime: cloudBackupTime
+                  })
+                }
+              })
+              await Promise.all(promises)
+              await importInfo(JSON.stringify(array), 0)
+            }
+          }
+          promptAction.showToast({
+            message: '导入标签云备份成功'
+          })
+        }
+      }
+    }
+    if (want.parameters?.shortcutId) {
+      const shortcutDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'shortcut'
+      })
+      shortcutDataPreferences.putSync('shortcutId', want.parameters?.shortcutId)
+    }
+    if (want.parameters?.shortcutId === 'newPassword') {
+      this.context.eventHub.emit('newPassword')
+    }
+    if (want.parameters?.shortcutId === 'searchPassword') {
+      this.context.eventHub.emit('searchPassword')
+    }
+    if (want.parameters?.menuHandler === 'clickMenu') {
+      const uriList = want.parameters.uriList as string[]
+      const filePath = uriList[0] as string
+      const file = fs.openSync(filePath)
+      const size = fs.statSync(file.fd).size
+      const filebuffer = new ArrayBuffer(size)
+      fs.readSync(file.fd, filebuffer)
+      const decoder = util.TextDecoder.create()
+      const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
+      fs.closeSync(file)
+      if (filePath.endsWith('.txt')) {
+        const data = await promptAction.showActionMenu({
+          title: '选择导入类型',
+          buttons: [
+            {
+              text: '密码',
+              color: $r('sys.color.font_primary')
+            },
+            {
+              text: '常用信息',
+              color: $r('sys.color.font_primary')
+            },
+            {
+              text: '标签',
+              color: $r('sys.color.font_primary')
+            }
+          ]
+        })
+        if (data.index === 0) {
+          await importPassword(filestring, 0)
+          this.context.eventHub.emit('refreshPassword')
+        }
+        if (data.index === 1) {
+          await importInfo(filestring, 0)
+          this.context.eventHub.emit('refreshInfo')
+        }
+        if (data.index === 2) {
+          await importTag(filestring, 0)
+          this.context.eventHub.emit('refreshTag')
+        }
+      }
+      if (filePath.endsWith('.csv')) {
+        const lines = filestring.split('\n').filter(line => line.trim() !== '')
+        const result: PasswordOutItem[] = []
+        const maxId = await getPasswordMaxId()
+        let idCounter = maxId + 1
+        const firstLine = this.parseCsvLine(lines[0])
+        const columnCount = firstLine.length
+        const nameIndex = firstLine.findIndex(item => item === '名称')
+        if (nameIndex === -1) {
+          promptAction.showToast({
+            message: '导入失败，原因：无名称列'
+          })
+        } else {
+          const infoColumnsIndex: number[] = []
+          for (let i = 0; i < columnCount; i++) {
+            if (i !== nameIndex) {
+              infoColumnsIndex.push(i)
+            }
+          }
+          for (let i = 1; i < lines.length; i++) {
+            const line = lines[i]
+            const parsedLine = this.parseCsvLine(line)
+            const name = parsedLine[nameIndex]
+            const info: PasswordInfoItem[] = []
+            infoColumnsIndex.forEach(item => {
+              if (firstLine[item] && parsedLine[item] && firstLine[item] !== '图标' && firstLine[item] !== 'MFA') {
+                info.push({ type: firstLine[item], value: parsedLine[item] })
+              }
+            })
+            if (name && info.length > 0) {
+              result.push({
+                id: idCounter++,
+                name: name,
+                info,
+                tag: [],
+                updateTime: Date.now(),
+                cloudBackupTime: JSON.stringify([])
+              })
+            }
+          }
+          await importPassword(JSON.stringify(result), 0)
+          this.context.eventHub.emit('refreshPassword')
+        }
+      }
+      promptAction.showToast({
+        message: '导入成功'
+      })
+    }
+    if (want.uri) {
+      if (want.uri === 'storage:///clearcache') {
+        promptAction.showDialog({
+          title: '提示',
+          message: '请前往“我的”>“设置”>“其他”>“清理数据”清理数据。',
+          buttons: [
+            {
+              text: '确定',
+              color: $r('sys.color.font_emphasize')
+            }
+          ]
+        })
+      }
+      if (want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
+        const urires = new uri.URI(want.uri)
+        const invitationCode = urires.getQueryValue('invitationcode')
+        const vipCode = urires.getQueryValue('vipcode')
+        if (invitationCode) {
+          if (accessToken) {
+            const deviceToken = await getDeviceToken()
+            if (deviceToken) {
+              const res = await request('/product/useInvitationcode', {
+                accessToken: accessToken,
+                deviceToken: deviceToken,
+                product: 'password',
+                invitationcode: invitationCode
+              })
+              if (res !== 'fail') {
+                promptAction.showToast({
+                  message: '邀请码使用成功'
+                })
+              }
+            }
+          } else {
+            promptAction.showToast({
+              message: '邀请码使用失败，原因：未登录账号'
+            })
+          }
+        }
+        if (vipCode) {
+          if (accessToken) {
+            const res = await request('/product/useVipcode', {
+              accessToken: accessToken,
+              vipcode: vipCode
+            })
+            if (res !== 'fail') {
+              promptAction.showToast({
+                message: '兑换码使用成功'
+              })
+            }
+          } else {
+            promptAction.showToast({
+              message: '兑换码使用失败，原因：未登录账号'
+            })
+          }
+        }
+      }
+    }
+  }
+
+  async onWindowStageCreate(windowStage: window.WindowStage) {
+    if (deviceInfo.deviceType === '2in1') {
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const windowRectAutoSave = commonSettingDataPreferences.getSync('windowRectAutoSave', false) as boolean
+      await windowStage.setWindowRectAutoSave(windowRectAutoSave)
+    }
+    windowStage.loadContent('pages/Index')
+    if (!notificationManager.isNotificationEnabledSync()) {
+      notificationManager.requestEnableNotification(this.context)
+    }
+  }
+
+  onContinue(wantParam: Record<string, Object>) {
+    if (wantParam.version !== 14) {
+      return AbilityConstant.OnContinueResult.MISMATCH
+    }
+    return AbilityConstant.OnContinueResult.AGREE
+  }
+
+  async onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam) {
+    const accessToken = await get()
+    if (launchParam.launchReason === AbilityConstant.LaunchReason.CONTINUATION) {
+      this.context.restoreWindowStage(this.storage)
+    }
+    if (notificationManager.isNotificationEnabledSync()) {
+      notificationManager.setBadgeNumber(0)
+    }
+    if (want.parameters?.shortcutId === 'newPassword') {
+      this.context.eventHub.emit('newPassword')
+    }
+    if (want.parameters?.shortcutId === 'searchPassword') {
+      this.context.eventHub.emit('searchPassword')
+    }
+    if (want.parameters?.menuHandler === 'clickMenu') {
+      const uriList = want.parameters.uriList as string[]
+      const filePath = uriList[0] as string
+      const file = fs.openSync(filePath)
+      const size = fs.statSync(file.fd).size
+      const filebuffer = new ArrayBuffer(size)
+      fs.readSync(file.fd, filebuffer)
+      const decoder = util.TextDecoder.create()
+      const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
+      fs.closeSync(file)
+      if (filePath.endsWith('.txt')) {
+        const data = await promptAction.showActionMenu({
+          title: '选择导入类型',
+          buttons: [
+            {
+              text: '密码',
+              color: $r('sys.color.font_primary')
+            },
+            {
+              text: '常用信息',
+              color: $r('sys.color.font_primary')
+            },
+            {
+              text: '标签',
+              color: $r('sys.color.font_primary')
+            }
+          ]
+        })
+        if (data.index === 0) {
+          await importPassword(filestring, 0)
+          this.context.eventHub.emit('refreshPassword')
+        }
+        if (data.index === 1) {
+          await importInfo(filestring, 0)
+          this.context.eventHub.emit('refreshInfo')
+        }
+        if (data.index === 2) {
+          await importTag(filestring, 0)
+          this.context.eventHub.emit('refreshTag')
+        }
+      }
+      if (filePath.endsWith('.csv')) {
+        const lines = filestring.split('\n').filter(line => line.trim() !== '')
+        const result: PasswordOutItem[] = []
+        const maxId = await getPasswordMaxId()
+        let idCounter = maxId + 1
+        const firstLine = this.parseCsvLine(lines[0])
+        const columnCount = firstLine.length
+        const nameIndex = firstLine.findIndex(item => item === '名称')
+        if (nameIndex === -1) {
+          promptAction.showToast({
+            message: '导入失败，原因：无名称列'
+          })
+        } else {
+          const infoColumnsIndex: number[] = []
+          for (let i = 0; i < columnCount; i++) {
+            if (i !== nameIndex) {
+              infoColumnsIndex.push(i)
+            }
+          }
+          for (let i = 1; i < lines.length; i++) {
+            const line = lines[i]
+            const parsedLine = this.parseCsvLine(line)
+            const name = parsedLine[nameIndex]
+            const info: PasswordInfoItem[] = []
+            infoColumnsIndex.forEach(item => {
+              if (firstLine[item] && parsedLine[item] && firstLine[item] !== '图标' && firstLine[item] !== 'MFA') {
+                info.push({ type: firstLine[item], value: parsedLine[item] })
+              }
+            })
+            if (name && info.length > 0) {
+              result.push({
+                id: idCounter++,
+                name: name,
+                info,
+                tag: [],
+                updateTime: Date.now(),
+                cloudBackupTime: JSON.stringify([])
+              })
+            }
+          }
+          await importPassword(JSON.stringify(result), 0)
+          this.context.eventHub.emit('refreshPassword')
+        }
+      }
+      promptAction.showToast({
+        message: '导入成功'
+      })
+    }
+    if (want.uri) {
+      if (want.uri === 'storage:///clearcache') {
+        promptAction.showDialog({
+          title: '提示',
+          message: '请前往“我的”>“设置”>“其他”>“清理数据”清理数据。',
+          buttons: [
+            {
+              text: '确定',
+              color: $r('sys.color.font_emphasize')
+            }
+          ]
+        })
+      }
+      if (want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
+        const urires = new uri.URI(want.uri)
+        const invitationCode = urires.getQueryValue('invitationcode')
+        const vipCode = urires.getQueryValue('vipcode')
+        if (invitationCode) {
+          if (accessToken) {
+            const deviceToken = await getDeviceToken()
+            if (deviceToken) {
+              const res = await request('/product/useInvitationcode', {
+                accessToken: accessToken,
+                deviceToken: deviceToken,
+                product: 'password',
+                invitationcode: invitationCode
+              })
+              if (res !== 'fail') {
+                promptAction.showToast({
+                  message: '邀请码使用成功'
+                })
+              }
+            }
+          } else {
+            promptAction.showToast({
+              message: '邀请码使用失败，原因：未登录账号'
+            })
+          }
+        }
+        if (vipCode) {
+          if (accessToken) {
+            const res = await request('/product/useVipcode', {
+              accessToken: accessToken,
+              vipcode: vipCode
+            })
+            if (res !== 'fail') {
+              promptAction.showToast({
+                message: '兑换码使用成功'
+              })
+            }
+          } else {
+            promptAction.showToast({
+              message: '兑换码使用失败，原因：未登录账号'
+            })
+          }
+        }
+      }
+    }
+  }
+
+  onBackPressed() {
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    const destroyWhenBackPressed = commonSettingDataPreferences.getSync('destroyWhenBackPressed', false) as boolean
+    if (!destroyWhenBackPressed) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  onCollaborate() {
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    const acceptCollaborate = commonSettingDataPreferences.getSync('acceptCollaborate', true) as boolean
+    if (acceptCollaborate) {
+      return 0
+    } else {
+      return 1
     }
   }
 

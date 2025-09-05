@@ -14,6 +14,7 @@ export default struct Urlcheck {
           placeholder: '请输入 URL',
           text: $$this.url
         })
+          .defaultFocus(true)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')

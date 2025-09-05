@@ -1,30 +1,37 @@
 import { common } from '@kit.AbilityKit'
+import { appAccount } from '@kit.BasicServicesKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
+import { checkPermission } from '../common/Permission'
 import request from '../common/Request'
+import { Account } from './Huaweiaccount'
 
 @ComponentV2
 export default struct Setting {
-  @Local allService: boolean = true
+  @Local allService: boolean = false
   @Local agreedPrivacyAgreement: number | undefined = undefined
+  @Local isBindHuaweiAccount: boolean = false
   @Local cloudService: boolean = false
-  @Local cloudServiceLoading: boolean = false
+  @Local accountLoading: boolean = false
+  @Local accountDataSync: boolean = false
+  @Local accountDataSyncEnabled: boolean = false
+  @Local autoLoginByHuaweiAccount: boolean = false
   @Local vipStatus: string = '未开通'
   @Local vipStatusColor: string = 'red'
   @Local vipStatusLoading: boolean = false
-  context = getContext(this) as common.UIAbilityContext
+  @Local accessToken: string = ''
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'commonSetting'
-  })
-  accessToken = get()
 
   async getSetting() {
-    const allService = this.commonSettingDataPreferences.getSync('allService', true)
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    const allService = commonSettingDataPreferences.getSync('allService', true)
     this.allService = allService as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
@@ -34,30 +41,48 @@ export default struct Setting {
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
-    this.cloudServiceLoading = true
-    const cloudServiceStatus = await getCloudServiceStatus()
-    this.cloudServiceLoading = false
-    this.cloudService = cloudServiceStatus
-    if (cloudServiceStatus) {
-      this.vipStatusLoading = true
-      const userres = await request('/product/getUserInfo', {
-        accessToken: this.accessToken,
-        product: 'password'
+    this.accessToken = await get()
+    if (this.accessToken) {
+      this.accountLoading = true
+      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+      this.accountDataSyncEnabled = res
+      if (res) {
+        const appAccountManager = appAccount.createAppAccountManager()
+        this.accountDataSync = await appAccountManager.checkDataSyncEnabled('default')
+      }
+      const autoLoginByHuaweiAccount = commonSettingDataPreferences.getSync('autoLoginByHuaweiAccount', false)
+      this.autoLoginByHuaweiAccount = autoLoginByHuaweiAccount as boolean
+      const accountres = await request('/account/getExternalAccount', {
+        accessToken: this.accessToken
       })
-      this.vipStatusLoading = false
-      if (userres !== 'fail') {
-        const vipenddate = JSON.parse(userres).data.vipEndDate as number
-        if (vipenddate < 0) {
-          this.vipStatus = '未开通'
-          this.vipStatusColor = 'red'
-        }
-        if (vipenddate === 0 || vipenddate >= Date.now()) {
-          this.vipStatus = '已开通'
-          this.vipStatusColor = '#FFD700'
-        }
-        if (vipenddate > 0 && vipenddate < Date.now()) {
-          this.vipStatus = '已过期'
-          this.vipStatusColor = 'red'
+      if (accountres !== 'fail') {
+        const account = JSON.parse(accountres).data as Account[]
+        this.isBindHuaweiAccount = account.some(item => item.platform === 'huawei')
+      }
+      const cloudServiceStatus = await getCloudServiceStatus()
+      this.accountLoading = false
+      this.cloudService = cloudServiceStatus
+      if (cloudServiceStatus) {
+        this.vipStatusLoading = true
+        const userres = await request('/product/getUserInfo', {
+          accessToken: this.accessToken,
+          product: 'password'
+        })
+        this.vipStatusLoading = false
+        if (userres !== 'fail') {
+          const vipenddate = JSON.parse(userres).data.vipEndDate as number
+          if (vipenddate < 0) {
+            this.vipStatus = '未开通'
+            this.vipStatusColor = 'red'
+          }
+          if (vipenddate === 0 || vipenddate >= Date.now()) {
+            this.vipStatus = '已开通'
+            this.vipStatusColor = '#FFD700'
+          }
+          if (vipenddate > 0 && vipenddate < Date.now()) {
+            this.vipStatus = '已过期'
+            this.vipStatusColor = 'red'
+          }
         }
       }
     }
@@ -79,8 +104,46 @@ export default struct Setting {
                 })
               Column() {
                 Row() {
-                  Text('绑定华为账号')
+                  Text('设备间同步')
                     .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: $$this.accountDataSync
+                  })
+                    .enabled(this.accountDataSyncEnabled)
+                    .onChange(async (isOn) => {
+                      try {
+                        const appAccountManager = appAccount.createAppAccountManager()
+                        await appAccountManager.setDataSyncEnabled('default', isOn)
+                      } catch (err) {
+                        this.accountDataSync = false
+                        promptAction.showToast({
+                          message: '发生错误，错误码：' + err.code
+                        })
+                      }
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  if (!this.isBindHuaweiAccount) {
+                    Text('绑定华为账号')
+                      .fontColor($r('sys.color.font_emphasize'))
+                      .fontWeight(FontWeight.Medium)
+                  }
+                  if (this.isBindHuaweiAccount) {
+                    Text('解绑华为账号')
+                      .fontColor($r('sys.color.warning'))
+                      .fontWeight(FontWeight.Medium)
+                  }
                   Blank()
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
@@ -104,7 +167,42 @@ export default struct Setting {
                   })
                 })
 
-                if (!this.cloudServiceLoading) {
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  Column() {
+                    Text('华为账号静默登录')
+                      .fontWeight(FontWeight.Medium)
+                    Text('需绑定华为账号')
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .margin({
+                        top: $r('sys.float.ohos_id_text_margin_vertical')
+                      })
+                  }
+                  .alignItems(HorizontalAlign.Start)
+
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: $$this.autoLoginByHuaweiAccount
+                  })
+                    .onChange(async (isOn) => {
+                      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                        name: 'commonSetting'
+                      })
+                      commonSettingDataPreferences.putSync('autoLoginByHuaweiAccount', isOn)
+                      commonSettingDataPreferences.flushSync()
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+
+                if (!this.accountLoading) {
                   Divider()
                     .padding({
                       left: 12,
@@ -199,7 +297,7 @@ export default struct Setting {
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
               .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
-              if (this.cloudServiceLoading) {
+              if (this.accountLoading) {
                 LoadingProgress()
                   .height(20)
                   .margin({
@@ -215,7 +313,7 @@ export default struct Setting {
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
 
-          if (!this.cloudServiceLoading && this.cloudService) {
+          if (!this.accountLoading && this.cloudService) {
             ListItem() {
               Column() {
                 Text('云备份')
@@ -352,11 +450,12 @@ export default struct Setting {
 
                 Text('安全保障说明')
                   .fontColor($r('sys.color.font_emphasize'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body3'))
                   .fontWeight(FontWeight.Medium)
                   .margin({
                     top: 6,
-                    left: 12
+                    left: 12,
+                    right: 12
                   })
                   .onClick(() => {
                     openLink('https://docs.qq.com/doc/p/2fc9d7d60e5b79dcc09dec8251cb049fb29c7705')
@@ -476,7 +575,7 @@ export default struct Setting {
         }
         .margin({
           top: this.accessToken ? $r('sys.float.ohos_id_elements_margin_vertical_l') :
-          $r('sys.float.ohos_id_elements_margin_vertical_m')
+            $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
         ListItem() {
@@ -597,25 +696,10 @@ export default struct Setting {
               }
               if (this.agreedPrivacyAgreement === 0 || this.agreedPrivacyAgreement === 2) {
                 Row() {
-                  if (this.agreedPrivacyAgreement === 0) {
+                  if (this.agreedPrivacyAgreement === 0 || this.agreedPrivacyAgreement === 2) {
                     Text('阅读并签署隐私协议')
+                      .fontColor($r('sys.color.font_emphasize'))
                       .fontWeight(FontWeight.Medium)
-                  }
-                  if (this.agreedPrivacyAgreement === 2) {
-                    Badge({
-                      value: '',
-                      position: BadgePosition.Right,
-                      style: {
-                        badgeSize: 12,
-                        badgeColor: '#FA2A2D'
-                      }
-                    }) {
-                      Text('阅读并签署隐私协议')
-                        .fontWeight(FontWeight.Medium)
-                        .margin({
-                          right: 16
-                        })
-                    }
                   }
                   Blank()
                   Image($r('app.media.right'))
@@ -712,7 +796,10 @@ export default struct Setting {
                 try {
                   const appPrivacyLink =
                     privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
-                  openLink(appPrivacyLink?.url as string)
+                  this.pageInfos.pushPath({
+                    name: 'Webview',
+                    param: appPrivacyLink?.url
+                  })
                 } catch (err) {
                   promptAction.showToast({
                     message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
@@ -996,7 +1083,7 @@ export default struct Setting {
     })
     .title('设置')
     .titleMode(NavigationTitleMode.Mini)
-    .onAppear(() => {
+    .onAppear(async () => {
       this.getSetting()
       this.context.eventHub.on('refreshSetting', () => {
         this.getSetting()

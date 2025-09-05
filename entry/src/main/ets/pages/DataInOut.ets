@@ -1,16 +1,34 @@
+import { common } from '@kit.AbilityKit'
 import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
 import { fileIo as fs, picker } from '@kit.CoreFileKit'
-import { getInfoList, getPasswordList, getTagList, PasswordInfoItem } from '../common/Dataget'
+import { getInfoList, getPasswordList, getPasswordMaxId, getTagList, PasswordInfoItem } from '../common/Dataget'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
+import openLink from '../common/Openlink'
 
-interface PasswordOutItem {
+export interface PasswordOutItem {
   id: number,
   name: string,
   info: PasswordInfoItem[],
   tag: string[],
   updateTime: number,
-  cloudBackupTime: number
+  cloudBackupTime: string
+}
+
+export interface InfoOutItem {
+  id: number,
+  type: string,
+  value: string,
+  updateTime: number,
+  cloudBackupTime: string
+}
+
+export interface TagOutItem {
+  id: number,
+  value: string,
+  color: string,
+  updateTime: number,
+  cloudBackupTime: string
 }
 
 @Builder
@@ -22,7 +40,32 @@ export function DataInOutBuilder() {
 struct DataInOut {
   @Local index: number = 0
   @Local value: string = '保留'
-  context = getContext(this)
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  pageInfos = new NavPathStack()
+
+  parseCsvLine(line: string) {
+    const result: string[] = []
+    let inQuotes = false
+    let currentField = ''
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i]
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          currentField += '"'
+          i++
+        } else {
+          inQuotes = !inQuotes
+        }
+      } else if (char === ',' && !inQuotes) {
+        result.push(currentField)
+        currentField = ''
+      } else {
+        currentField += char
+      }
+    }
+    result.push(currentField)
+    return result
+  }
 
   build() {
     NavDestination() {
@@ -86,10 +129,11 @@ struct DataInOut {
               .onClick(async () => {
                 const documentSelectOptions = new picker.DocumentSelectOptions()
                 documentSelectOptions.maxSelectNumber = 1
-                documentSelectOptions.fileSuffixFilters = ['.txt']
+                documentSelectOptions.fileSuffixFilters = ['.txt', '.csv']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
                 const file = fs.openSync(uris[0])
+                const name = file.name
                 const size = fs.statSync(file.fd).size
                 const filebuffer = new ArrayBuffer(size)
                 fs.readSync(file.fd, filebuffer)
@@ -100,7 +144,53 @@ struct DataInOut {
                 if (this.index === 1) {
                   conflictResolution = 5
                 }
-                await importPassword(filestring, conflictResolution)
+                if (name.endsWith('.txt')) {
+                  await importPassword(filestring, conflictResolution)
+                }
+                if (name.endsWith('.csv')) {
+                  const lines = filestring.split('\n').filter(line => line.trim() !== '')
+                  const result: PasswordOutItem[] = []
+                  const maxId = await getPasswordMaxId()
+                  let idCounter = maxId + 1
+                  const firstLine = this.parseCsvLine(lines[0])
+                  const columnCount = firstLine.length
+                  const nameIndex = firstLine.findIndex(item => item === '名称')
+                  if (nameIndex === -1) {
+                    promptAction.showToast({
+                      message: '导入失败，原因：无名称列'
+                    })
+                    return
+                  }
+                  const infoColumnsIndex: number[] = []
+                  for (let i = 0; i < columnCount; i++) {
+                    if (i !== nameIndex) {
+                      infoColumnsIndex.push(i)
+                    }
+                  }
+                  for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i]
+                    const parsedLine = this.parseCsvLine(line)
+                    const name = parsedLine[nameIndex]
+                    const info: PasswordInfoItem[] = []
+                    infoColumnsIndex.forEach(item => {
+                      if (firstLine[item] && parsedLine[item] && firstLine[item] !== '图标' &&
+                        firstLine[item] !== 'MFA') {
+                        info.push({ type: firstLine[item], value: parsedLine[item] })
+                      }
+                    })
+                    if (name && info.length > 0) {
+                      result.push({
+                        id: idCounter++,
+                        name: name,
+                        info,
+                        tag: [],
+                        updateTime: Date.now(),
+                        cloudBackupTime: JSON.stringify([])
+                      })
+                    }
+                  }
+                  await importPassword(JSON.stringify(result), conflictResolution)
+                }
                 promptAction.showToast({
                   message: '导入成功'
                 })
@@ -205,6 +295,140 @@ struct DataInOut {
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text() {
+              Span('导入密码须知：txt 文件需为从本页面下方导出的、csv 文件需为')
+                .fontColor($r('sys.color.font_secondary'))
+              Span('此文档')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontWeight(FontWeight.Medium)
+                .onClick(() => {
+                  openLink('https://docs.qq.com/doc/p/a12dc0f6d9e9ab998d81ddd1ddc95b5445518209')
+                })
+              Span('中所述的标准格式')
+                .fontColor($r('sys.color.font_secondary'))
+            }
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
+            .margin({
+              top: 6,
+              left: 12,
+              right: 12
+            })
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('导入第三方密码')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Row() {
+                Text('Edge、Chrome')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(async () => {
+                const documentSelectOptions = new picker.DocumentSelectOptions()
+                documentSelectOptions.maxSelectNumber = 1
+                documentSelectOptions.fileSuffixFilters = ['.csv']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.select(documentSelectOptions)
+                const file = fs.openSync(uris[0])
+                const size = fs.statSync(file.fd).size
+                const filebuffer = new ArrayBuffer(size)
+                fs.readSync(file.fd, filebuffer)
+                const decoder = util.TextDecoder.create()
+                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
+                fs.closeSync(file)
+                let conflictResolution = 0
+                if (this.index === 1) {
+                  conflictResolution = 5
+                }
+                const lines = filestring.split('\n').filter(line => line.trim() !== '')
+                const result: PasswordOutItem[] = []
+                const maxId = await getPasswordMaxId()
+                let idCounter = maxId + 1
+                for (let i = 1; i < lines.length; i++) {
+                  const line = lines[i]
+                  const parsedFields = this.parseCsvLine(line)
+                  const name = parsedFields[0]
+                  const url = parsedFields[1]
+                  const username = parsedFields[2]
+                  const password = parsedFields[3]
+                  const info: PasswordInfoItem[] = []
+                  if (username) {
+                    info.push({ type: '用户名', value: username })
+                  }
+                  if (password) {
+                    info.push({ type: '密码', value: password })
+                  }
+                  if (url) {
+                    info.push({ type: 'URL', value: url })
+                  }
+                  result.push({
+                    id: idCounter++,
+                    name,
+                    info,
+                    tag: [],
+                    updateTime: Date.now(),
+                    cloudBackupTime: JSON.stringify([])
+                  })
+                }
+                await importPassword(JSON.stringify(result), conflictResolution)
+                promptAction.showToast({
+                  message: '导入成功'
+                })
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text() {
+              Span('联系')
+                .fontColor($r('sys.color.font_secondary'))
+              Span('客服')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontWeight(FontWeight.Medium)
+                .onClick(() => {
+                  this.pageInfos.pushPath({
+                    name: 'About'
+                  })
+                })
+              Span('申请适配更多第三方')
+                .fontColor($r('sys.color.font_secondary'))
+            }
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
+            .margin({
+              top: 6,
+              left: 12,
+              right: 12
+            })
           }
           .alignItems(HorizontalAlign.Start)
         }
@@ -251,14 +475,20 @@ struct DataInOut {
                 const uris = await documentViewPicker.save(documentSaveOptions)
                 const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
                 const array = await getPasswordList()
-                const arrayOut = array.map((item): PasswordOutItem => ({
-                  id: item.id,
-                  name: item.name,
-                  info: item.info,
-                  tag: item.tag.map(item => item.value),
-                  updateTime: item.updateTime,
-                  cloudBackupTime: item.cloudBackupTime
-                }))
+                const arrayOut = array.map((item): PasswordOutItem => {
+                  let cloudBackupTime = JSON.stringify([])
+                  if (typeof (item.cloudBackupTime) === 'string') {
+                    cloudBackupTime = item.cloudBackupTime
+                  }
+                  return {
+                    id: item.id,
+                    name: item.name,
+                    info: item.info,
+                    tag: item.tag.map(item => item.value),
+                    updateTime: item.updateTime,
+                    cloudBackupTime: cloudBackupTime
+                  }
+                })
                 fs.writeSync(file.fd, JSON.stringify(arrayOut))
                 fs.closeSync(file)
                 promptAction.showToast({
@@ -299,7 +529,20 @@ struct DataInOut {
                 const uris = await documentViewPicker.save(documentSaveOptions)
                 const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
                 const array = await getInfoList()
-                fs.writeSync(file.fd, JSON.stringify(array))
+                const arrayOut = array.map((item): InfoOutItem => {
+                  let cloudBackupTime = JSON.stringify([])
+                  if (typeof (item.cloudBackupTime) === 'string') {
+                    cloudBackupTime = item.cloudBackupTime
+                  }
+                  return {
+                    id: item.id,
+                    type: item.type,
+                    value: item.value,
+                    updateTime: item.updateTime,
+                    cloudBackupTime: cloudBackupTime
+                  }
+                })
+                fs.writeSync(file.fd, JSON.stringify(arrayOut))
                 fs.closeSync(file)
                 promptAction.showToast({
                   message: '导出成功'
@@ -339,7 +582,20 @@ struct DataInOut {
                 const uris = await documentViewPicker.save(documentSaveOptions)
                 const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
                 const array = await getTagList()
-                fs.writeSync(file.fd, JSON.stringify(array))
+                const arrayOut = array.map((item): TagOutItem => {
+                  let cloudBackupTime = JSON.stringify([])
+                  if (typeof (item.cloudBackupTime) === 'string') {
+                    cloudBackupTime = item.cloudBackupTime
+                  }
+                  return {
+                    id: item.id,
+                    value: item.value,
+                    color: item.color,
+                    updateTime: item.updateTime,
+                    cloudBackupTime: cloudBackupTime
+                  }
+                })
+                fs.writeSync(file.fd, JSON.stringify(arrayOut))
                 fs.closeSync(file)
                 promptAction.showToast({
                   message: '导出成功'
@@ -364,5 +620,8 @@ struct DataInOut {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('数据导入与导出')
+    .onReady((context) => {
+      this.pageInfos = context.pathStack
+    })
   }
 }
