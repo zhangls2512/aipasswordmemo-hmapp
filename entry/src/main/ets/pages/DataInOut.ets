@@ -15,7 +15,7 @@ export interface PasswordOutItem {
   cloudBackupTime: string
 }
 
-export interface InfoOutItem {
+interface InfoOutItem {
   id: number,
   type: string,
   value: string,
@@ -23,7 +23,7 @@ export interface InfoOutItem {
   cloudBackupTime: string
 }
 
-export interface TagOutItem {
+interface TagOutItem {
   id: number,
   value: string,
   color: string,

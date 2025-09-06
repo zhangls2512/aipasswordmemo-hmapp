@@ -148,12 +148,13 @@ export async function newInfo(data: InfoInput) {
   predicates.equalTo('value', data.value)
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
+    resultSet.close()
     promptAction.showToast({
       message: '新增失败：已存在'
     })
-    resultSet.close()
     throw new Error('fail')
   }
+  resultSet.close()
   const updateTime = Date.now()
   const id = rdbStore.insertSync('info', {
     type: data.type,
@@ -204,6 +205,7 @@ export async function updateInfo(id: number, data: InfoInput) {
     })
     throw new Error('fail')
   }
+  resultSeta.close()
   const predicatesb = new relationalStore.RdbPredicates('info')
   predicatesb.equalTo('id', id)
   const updateTime = Date.now()
@@ -264,12 +266,13 @@ export async function newTag(data: TagInput) {
   predicates.equalTo('value', data.value)
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
+    resultSet.close()
     promptAction.showToast({
       message: '新增失败：已存在'
     })
-    resultSet.close()
     throw new Error('fail')
   }
+  resultSet.close()
   const updateTime = Date.now()
   const id = rdbStore.insertSync('tag', {
     value: data.value,
@@ -320,6 +323,7 @@ export async function updateTag(id: number, data: TagInput) {
     })
     throw new Error('fail')
   }
+  resultSeta.close()
   const predicatesb = new relationalStore.RdbPredicates('tag')
   predicatesb.equalTo('id', id)
   const updateTime = Date.now()

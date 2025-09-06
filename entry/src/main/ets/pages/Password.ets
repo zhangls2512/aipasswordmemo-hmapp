@@ -8,8 +8,8 @@ import { getKey } from '../common/Crypto'
 import {
   CloudBackupTimeItem,
   getFilterPasswordList,
-  PasswordInfoItem,
   Password,
+  PasswordInfoItem,
   PasswordTagItem
 } from '../common/Dataget'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'

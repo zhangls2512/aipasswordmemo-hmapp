@@ -5,7 +5,7 @@ import { promptAction } from '@kit.ArkUI'
 import { appAccount } from '@kit.BasicServicesKit'
 import request from './Request'
 
-export interface AccountInfo {
+interface AccountInfo {
   uid: string,
   email: string,
   endDate: number

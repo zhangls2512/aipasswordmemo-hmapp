@@ -1,4 +1,5 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { pushService } from '@kit.PushKit'
 import { get } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
 import openLink from '../common/Openlink'
@@ -576,6 +577,127 @@ struct Infolist {
               .borderRadius(12)
               .padding(12)
               .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('PushToken')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Column() {
+                Text('使用场景')
+                  .fontWeight(FontWeight.Medium)
+                Text('服务器推送通知时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('使用目的')
+                  .fontWeight(FontWeight.Medium)
+                Text('让服务器知晓推送通知到哪个设备')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('收集时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('开启通知位时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('信息内容')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(async () => {
+                try {
+                  const pushToken = await pushService.getToken()
+                  promptAction.showDialog({
+                    title: 'PushToken',
+                    message: pushToken,
+                    buttons: [
+                      {
+                        text: '确定',
+                        color: $r('sys.color.font_emphasize')
+                      }
+                    ]
+                  })
+                } catch (err) {
+                  promptAction.showToast({
+                    message: '发生错误，错误码：' + err.code
+                  })
+                }
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))

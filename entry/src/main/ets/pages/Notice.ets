@@ -82,7 +82,7 @@ struct Notice {
               .width(20)
           }
         }
-        if (!this.loading) {
+        if (!this.loading && this.noticeArray.length > 0) {
           ListItem() {
             Column() {
               Text('通知位')

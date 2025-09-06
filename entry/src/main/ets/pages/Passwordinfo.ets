@@ -1,5 +1,5 @@
 import { preferences } from '@kit.ArkData'
-import { getPasswordInfo, PasswordInfoItem, Password, PasswordTagItem } from '../common/Dataget'
+import { getPasswordInfo, Password, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
 import getTotp from '../common/Totp'
