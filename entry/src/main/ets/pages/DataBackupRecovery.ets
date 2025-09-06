@@ -37,15 +37,12 @@ struct DataBackupRecovery {
   ]
 
   getSetting() {
-    const isBackupTables = this.dataSettingDataPreferences.getSync('isBackupTables', [])
-    this.isBackupTables = isBackupTables as string[]
-    const autoBackupTables = this.dataSettingDataPreferences.getSync('autoBackupTables', [])
-    this.autoBackupTables = autoBackupTables as string[]
-    const pauseAutoBackupWhenLowBatteryCapacityLevel =
-      this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false)
-    this.pauseAutoBackupWhenLowBatteryCapacityLevel = pauseAutoBackupWhenLowBatteryCapacityLevel as boolean
-    const pauseAutoBackupWhenPowerSave = this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false)
-    this.pauseAutoBackupWhenPowerSave = pauseAutoBackupWhenPowerSave as boolean
+    this.isBackupTables = this.dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
+    this.autoBackupTables = this.dataSettingDataPreferences.getSync('autoBackupTables', []) as string[]
+    this.pauseAutoBackupWhenLowBatteryCapacityLevel =
+      this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false) as boolean
+    this.pauseAutoBackupWhenPowerSave =
+      this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false) as boolean
   }
 
   build() {
@@ -123,7 +120,7 @@ struct DataBackupRecovery {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.pauseAutoBackupWhenLowBatteryCapacityLevel
+                  isOn: this.pauseAutoBackupWhenLowBatteryCapacityLevel!!
                 })
                   .onChange((isOn) => {
                     this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenLowBatteryCapacityLevel', isOn)
@@ -145,7 +142,7 @@ struct DataBackupRecovery {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.pauseAutoBackupWhenPowerSave
+                  isOn: this.pauseAutoBackupWhenPowerSave!!
                 })
                   .onChange((isOn) => {
                     this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenPowerSave', isOn)
@@ -339,7 +336,7 @@ struct DataBackupRecovery {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('数据备份与恢复')
-    .onReady(() => {
+    .onAppear(() => {
       this.getSetting()
     })
   }

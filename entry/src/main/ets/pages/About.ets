@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
-import { updateManager } from '@kit.AppGalleryKit'
+//import { FunctionComponent, FunctionController } from '@kit.AgentFrameworkKit'
+import { commentManager, updateManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
 import { call } from '@kit.TelephonyKit'
 import openLink from '../common/Openlink'
@@ -14,8 +15,11 @@ export function AboutBuilder() {
 struct About {
   @Local hasUpdate: number = -1
   @Local updateLoading: boolean = false
+  @Local isAgentSupport: boolean = false
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+
+  //controller: FunctionController = new FunctionController()
 
   build() {
     NavDestination() {
@@ -127,7 +131,7 @@ struct About {
               } catch (err) {
                 this.updateLoading = false
                 this.hasUpdate = -1
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
               }
@@ -269,7 +273,13 @@ struct About {
             })
             .width('100%')
             .onClick(() => {
-              this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+              try {
+                commentManager.showCommentDialog(this.context)
+              } catch (err) {
+                promptAction.openToast({
+                  message: JSON.stringify(err)
+                })
+              }
             })
 
             Divider()
@@ -311,9 +321,29 @@ struct About {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
+        /*if (this.isAgentSupport) {
+          ListItem() {
+            FunctionComponent({
+              agentId: 'agentdf468e04a1474579bbf0653f19c929ee',
+              options: {
+                title: '智能客服'
+              },
+              controller: this.controller,
+              onError: (err) => {
+                promptAction.openToast({
+                  message: JSON.stringify(err)
+                })
+              }
+            })
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
+        }*/
+
         ListItem() {
           Column() {
-            Text('客服')
+            Text('人工客服')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
@@ -446,8 +476,9 @@ struct About {
                 })
               Row() {
                 Column() {
-                  Text('QQ 群')
+                  Text('QQ群')
                     .fontWeight(FontWeight.Medium)
+                    .enableAutoSpacing(true)
                   Text('https://qm.qq.com/q/8Ugei32784')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -485,8 +516,9 @@ struct About {
                 })
               Row() {
                 Column() {
-                  Text('MeoW 频道')
+                  Text('MeoW频道')
                     .fontWeight(FontWeight.Medium)
+                    .enableAutoSpacing(true)
                   Text('接收官方通知，包括但不限于公告、活动')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -692,8 +724,16 @@ struct About {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('关于')
-    .onReady((context) => {
+    .onReady(async (context) => {
       this.pageInfos = context.pathStack
+      /*try {
+        this.isAgentSupport =
+          await this.controller.isAgentSupport(this.context, 'agentdf468e04a1474579bbf0653f19c929ee')
+      } catch (err) {
+        promptAction.openToast({
+          message: JSON.stringify(err)
+        })
+      }*/
     })
   }
 }

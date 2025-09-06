@@ -46,7 +46,7 @@ export default struct TagPage {
               .onClick(() => {
                 this.isShowNewSheet = !this.isShowNewSheet
               })
-              .bindSheet($$this.isShowNewSheet, this.NewSheetBuilder(), {
+              .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
                 height: SheetSize.FIT_CONTENT,
                 preferType: this.preferType,
                 title: {
@@ -95,7 +95,9 @@ export default struct TagPage {
                     this.loading = true
                   }
                 }
-              ])
+              ], {
+                hapticFeedbackMode: HapticFeedbackMode.AUTO
+              })
           }
           .width('100%')
         }
@@ -242,7 +244,9 @@ export default struct TagPage {
                     this.loading = true
                   }
                 }
-              ])
+              ], {
+                hapticFeedbackMode: HapticFeedbackMode.AUTO
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -280,7 +284,7 @@ export default struct TagPage {
       .onDisAppear(() => {
         this.context.eventHub.off('refreshTag')
       })
-      .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.updateId), {
+      .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
         height: SheetSize.FIT_CONTENT,
         preferType: this.preferType,
         title: {

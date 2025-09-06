@@ -108,7 +108,7 @@ export default class EntryAbility extends UIAbility {
     const observer: errorManager.ErrorObserver = {
       onUnhandledException(errMsg) {
         if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 0) {
-          promptAction.showToast({
+          promptAction.openToast({
             message: 'js 运行异常：' + errMsg
           })
         }
@@ -175,7 +175,7 @@ export default class EntryAbility extends UIAbility {
                 object: item
               })
               if (res !== 'fail') {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '故障日志自动上传成功，故障类型：' + item.name
                 })
               }
@@ -189,14 +189,14 @@ export default class EntryAbility extends UIAbility {
     })
     netConnection.on('netAvailable', (data) => {
       if (debugSettingDataPreferences.getSync('showNetAvailableStatusChange', false)) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '网络可用，数据网络句柄：' + data.netId
         })
       }
     })
     netConnection.on('netUnavailable', () => {
       if (debugSettingDataPreferences.getSync('showNetAvailableStatusChange', false)) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '网络不可用'
         })
       }
@@ -217,7 +217,7 @@ export default class EntryAbility extends UIAbility {
     })
     netConnection.on('netLost', (data) => {
       if (debugSettingDataPreferences.getSync('showNetLost', false)) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '网络丢失，数据网络句柄：' + data.netId
         })
       }
@@ -273,7 +273,7 @@ export default class EntryAbility extends UIAbility {
             serviceType: 'default',
             qoeType: 'highLatency'
           })
-          promptAction.showToast({
+          promptAction.openToast({
             message: '自动反馈网络高时延传输体验成功'
           })
         }
@@ -335,7 +335,7 @@ export default class EntryAbility extends UIAbility {
         }
       }
     } catch (err) {
-      promptAction.showToast({
+      promptAction.openToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
@@ -345,7 +345,7 @@ export default class EntryAbility extends UIAbility {
       })
       const autoImportTables = cloudbackupSettingDataPreferences.getSync('autoImport', []) as string[]
       if (autoImportTables.includes('password')) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '导入密码云备份中'
         })
         const countres = await request('/password/getBackupCount', {
@@ -391,13 +391,13 @@ export default class EntryAbility extends UIAbility {
               await importPassword(JSON.stringify(array), 0)
             }
           }
-          promptAction.showToast({
+          promptAction.openToast({
             message: '导入密码云备份成功'
           })
         }
       }
       if (autoImportTables.includes('info')) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '导入常用信息云备份中'
         })
         const countres = await request('/password/getBackupCount', {
@@ -442,13 +442,13 @@ export default class EntryAbility extends UIAbility {
               await importInfo(JSON.stringify(array), 0)
             }
           }
-          promptAction.showToast({
+          promptAction.openToast({
             message: '导入常用信息云备份成功'
           })
         }
       }
       if (autoImportTables.includes('tag')) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '导入标签云备份中'
         })
         const countres = await request('/password/getBackupCount', {
@@ -493,7 +493,7 @@ export default class EntryAbility extends UIAbility {
               await importInfo(JSON.stringify(array), 0)
             }
           }
-          promptAction.showToast({
+          promptAction.openToast({
             message: '导入标签云备份成功'
           })
         }
@@ -561,7 +561,7 @@ export default class EntryAbility extends UIAbility {
         const columnCount = firstLine.length
         const nameIndex = firstLine.findIndex(item => item === '名称')
         if (nameIndex === -1) {
-          promptAction.showToast({
+          promptAction.openToast({
             message: '导入失败，原因：无名称列'
           })
         } else {
@@ -596,7 +596,7 @@ export default class EntryAbility extends UIAbility {
           this.context.eventHub.emit('refreshPassword')
         }
       }
-      promptAction.showToast({
+      promptAction.openToast({
         message: '导入成功'
       })
     }
@@ -628,13 +628,13 @@ export default class EntryAbility extends UIAbility {
                 invitationcode: invitationCode
               })
               if (res !== 'fail') {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '邀请码使用成功'
                 })
               }
             }
           } else {
-            promptAction.showToast({
+            promptAction.openToast({
               message: '邀请码使用失败，原因：未登录账号'
             })
           }
@@ -646,12 +646,12 @@ export default class EntryAbility extends UIAbility {
               vipcode: vipCode
             })
             if (res !== 'fail') {
-              promptAction.showToast({
+              promptAction.openToast({
                 message: '兑换码使用成功'
               })
             }
           } else {
-            promptAction.showToast({
+            promptAction.openToast({
               message: '兑换码使用失败，原因：未登录账号'
             })
           }
@@ -745,7 +745,7 @@ export default class EntryAbility extends UIAbility {
         const columnCount = firstLine.length
         const nameIndex = firstLine.findIndex(item => item === '名称')
         if (nameIndex === -1) {
-          promptAction.showToast({
+          promptAction.openToast({
             message: '导入失败，原因：无名称列'
           })
         } else {
@@ -780,7 +780,7 @@ export default class EntryAbility extends UIAbility {
           this.context.eventHub.emit('refreshPassword')
         }
       }
-      promptAction.showToast({
+      promptAction.openToast({
         message: '导入成功'
       })
     }
@@ -812,13 +812,13 @@ export default class EntryAbility extends UIAbility {
                 invitationcode: invitationCode
               })
               if (res !== 'fail') {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '邀请码使用成功'
                 })
               }
             }
           } else {
-            promptAction.showToast({
+            promptAction.openToast({
               message: '邀请码使用失败，原因：未登录账号'
             })
           }
@@ -830,12 +830,12 @@ export default class EntryAbility extends UIAbility {
               vipcode: vipCode
             })
             if (res !== 'fail') {
-              promptAction.showToast({
+              promptAction.openToast({
                 message: '兑换码使用成功'
               })
             }
           } else {
-            promptAction.showToast({
+            promptAction.openToast({
               message: '兑换码使用失败，原因：未登录账号'
             })
           }
@@ -884,7 +884,7 @@ export default class EntryAbility extends UIAbility {
       if (level === 2) {
         memoryLevel = '高'
       }
-      promptAction.showToast({
+      promptAction.openToast({
         message: '当前内存占用' + memoryLevel
       })
     }

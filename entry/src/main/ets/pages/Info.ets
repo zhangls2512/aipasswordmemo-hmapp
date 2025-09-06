@@ -54,7 +54,7 @@ export default struct InfoPage {
               .onClick(() => {
                 this.isShowNewSheet = !this.isShowNewSheet
               })
-              .bindSheet($$this.isShowNewSheet, this.NewSheetBuilder(), {
+              .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
                 height: SheetSize.FIT_CONTENT,
                 preferType: this.preferType,
                 title: {
@@ -88,7 +88,7 @@ export default struct InfoPage {
               .onClick(() => {
                 this.isShowAinewSheet = !this.isShowAinewSheet
               })
-              .bindSheet($$this.isShowAinewSheet, this.AinewSheetBuilder(), {
+              .bindSheet(this.isShowAinewSheet!!, this.AinewSheetBuilder(), {
                 preferType: this.preferType,
                 title: {
                   title: 'AI 识别新增常用信息'
@@ -241,7 +241,9 @@ export default struct InfoPage {
                     this.loading = true
                   }
                 }
-              ])
+              ], {
+                hapticFeedbackMode: HapticFeedbackMode.AUTO
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -279,7 +281,7 @@ export default struct InfoPage {
       .onDisAppear(() => {
         this.context.eventHub.off('refreshInfo')
       })
-      .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.updateId), {
+      .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
         height: SheetSize.FIT_CONTENT,
         preferType: this.preferType,
         title: {

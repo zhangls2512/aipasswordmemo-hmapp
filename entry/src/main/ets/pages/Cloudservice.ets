@@ -81,7 +81,7 @@ struct Cloudservice {
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.showToast({
+                      promptAction.openToast({
                         message: '开通成功'
                       })
                       this.cloudService = true
@@ -107,7 +107,7 @@ struct Cloudservice {
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.showToast({
+                      promptAction.openToast({
                         message: '取消开通成功'
                       })
                       this.cloudService = false

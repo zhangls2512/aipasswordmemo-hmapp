@@ -42,6 +42,9 @@ struct Debug {
   @Local showNetSceneChange: boolean = false
   @Local autoReportHighLatency: boolean = false
   @Local highLatencyThreshold: string = '200'
+  @Local optimizeParserBudget: boolean = true
+  @Local destroyModeIndex: number = 0
+  @Local destroyModeValue: string = '普通'
   @Local allService: boolean = false
   @Local windowInfoArray: Item[] = []
   @Local systemLoadValue: number = -1
@@ -121,7 +124,7 @@ struct Debug {
       value: this.context.applicationInfo.installSource
     },
     {
-      name: '打包时使用的 SDK 的发布类型',
+      name: '打包时使用的SDK的发布类型',
       value: this.context.applicationInfo.releaseType
     },
     {
@@ -149,7 +152,7 @@ struct Debug {
       value: this.context.databaseDir
     },
     {
-      name: 'preferences 目录',
+      name: 'preferences目录',
       value: this.context.preferencesDir
     },
     {
@@ -174,11 +177,11 @@ struct Debug {
                 'undefined'
     },
     {
-      name: '是否是 Stage 模型',
+      name: '是否是Stage模型',
       value: this.context.stageMode ? '是' : '否'
     },
     {
-      name: 'UIAbility 是否处于消亡中状态',
+      name: 'UIAbility是否处于消亡中状态',
       value: this.context.isTerminating() ? '是' : '否'
     },
     {
@@ -211,7 +214,7 @@ struct Debug {
                     'undefined'
     },
     {
-      name: '所在物理屏幕 ID',
+      name: '所在物理屏幕ID',
       value: String(this.context.config.displayId)
     },
     {
@@ -258,11 +261,11 @@ struct Debug {
   ]
   abilityInfoArray: Item[] = [
     {
-      name: '应用 Bundle 名称',
+      name: '应用Bundle名称',
       value: this.context.abilityInfo.bundleName
     },
     {
-      name: '所属 HAP 名称',
+      name: '所属HAP名称',
       value: this.context.abilityInfo.moduleName
     },
     {
@@ -328,7 +331,7 @@ struct Debug {
       value: String(this.context.abilityInfo.windowSize.minWindowHeight) + ' vp'
     },
     {
-      name: '是否可以在 dock 区域隐藏图标',
+      name: '是否可以在dock区域隐藏图标',
       value: this.context.abilityInfo.excludeFromDock ? '是' : '否'
     }
   ]
@@ -343,29 +346,29 @@ struct Debug {
     { name: '认证型号别名', value: deviceInfo.productModelAlias },
     { name: '内部软件子型号', value: deviceInfo.softwareModel },
     { name: '硬件版本号', value: deviceInfo.hardwareModel },
-    { name: 'Bootloader 版本号', value: deviceInfo.bootloaderVersion },
+    { name: 'Bootloader版本号', value: deviceInfo.bootloaderVersion },
     { name: '应用二进制接口', value: deviceInfo.abiList },
     { name: '安全补丁级别', value: deviceInfo.securityPatchTag },
     { name: '产品版本', value: deviceInfo.displayVersion },
     { name: '差异版本号', value: deviceInfo.incrementalVersion },
     { name: '系统发布类型', value: deviceInfo.osReleaseType },
     { name: '系统版本', value: deviceInfo.osFullName },
-    { name: 'Major 版本号', value: String(deviceInfo.majorVersion) },
-    { name: 'Senior 版本号', value: String(deviceInfo.seniorVersion) },
-    { name: 'Feature 版本号', value: String(deviceInfo.featureVersion) },
-    { name: 'Build 版本号', value: String(deviceInfo.buildVersion) },
-    { name: '系统软件 API 版本', value: String(deviceInfo.sdkApiVersion) },
-    { name: '首个版本系统软件 API 版本', value: String(deviceInfo.firstApiVersion) },
-    { name: '版本 ID', value: deviceInfo.versionId },
+    { name: 'Major版本号', value: String(deviceInfo.majorVersion) },
+    { name: 'Senior版本号', value: String(deviceInfo.seniorVersion) },
+    { name: 'Feature版本号', value: String(deviceInfo.featureVersion) },
+    { name: 'Build版本号', value: String(deviceInfo.buildVersion) },
+    { name: '系统软件API版本', value: String(deviceInfo.sdkApiVersion) },
+    { name: '首个版本系统软件API版本', value: String(deviceInfo.firstApiVersion) },
+    { name: '版本ID', value: deviceInfo.versionId },
     { name: '构建类型', value: deviceInfo.buildType },
     { name: '构建用户', value: deviceInfo.buildUser },
     { name: '构建主机', value: deviceInfo.buildHost },
     { name: '构建时间', value: deviceInfo.buildTime },
-    { name: '构建版本 Hash', value: deviceInfo.buildRootHash },
+    { name: '构建版本Hash', value: deviceInfo.buildRootHash },
     { name: '发行版系统名称', value: deviceInfo.distributionOSName },
     { name: '发行版系统版本号', value: deviceInfo.distributionOSVersion },
-    { name: '发行版系统 API 版本', value: String(deviceInfo.distributionOSApiVersion) },
-    { name: '发行版系统 API 版本名称', value: deviceInfo.distributionOSApiName },
+    { name: '发行版系统API版本', value: String(deviceInfo.distributionOSApiVersion) },
+    { name: '发行版系统API版本名称', value: deviceInfo.distributionOSApiName },
     { name: '发行版系统类型', value: deviceInfo.distributionOSReleaseType },
     { name: '开发者匿名设备标识符', value: deviceInfo.ODID }
   ]
@@ -395,7 +398,7 @@ struct Debug {
     { name: '系统语言', value: String(atomicService.getSystemInfoSync(this.stateArray).language) },
     { name: '系统版本', value: String(atomicService.getSystemInfoSync(this.stateArray).osFullName) },
     { name: '显示设备逻辑像素密度', value: String(atomicService.getSystemInfoSync(this.stateArray).fontSizeSetting) },
-    { name: '系统软件 API 版本', value: String(atomicService.getSystemInfoSync(this.stateArray).sdkApiVersion) },
+    { name: '系统软件API版本', value: String(atomicService.getSystemInfoSync(this.stateArray).sdkApiVersion) },
     {
       name: '蓝牙系统开关',
       value: atomicService.getSystemInfoSync(this.stateArray).bluetoothEnabled ? '开启' : '关闭'
@@ -404,7 +407,7 @@ struct Debug {
       name: '地理位置系统开关',
       value: atomicService.getSystemInfoSync(this.stateArray).locationEnabled ? '开启' : '关闭'
     },
-    { name: 'Wi-Fi 系统开关', value: atomicService.getSystemInfoSync(this.stateArray).wifiEnabled ? '开启' : '关闭' },
+    { name: 'Wi-Fi系统开关', value: atomicService.getSystemInfoSync(this.stateArray).wifiEnabled ? '开启' : '关闭' },
     { name: '设备方向', value: String(atomicService.getSystemInfoSync(this.stateArray).deviceOrientation) },
     {
       name: '系统主题',
@@ -415,7 +418,7 @@ struct Debug {
     }
   ]
   displayInfoArray: Item[] = [
-    { name: 'id 号', value: String(display.getDefaultDisplaySync().id) },
+    { name: 'id号', value: String(display.getDefaultDisplaySync().id) },
     { name: '名称', value: display.getDefaultDisplaySync().name },
     { name: '是否启用', value: display.getDefaultDisplaySync().alive ? '是' : '否' },
     {
@@ -451,8 +454,8 @@ struct Debug {
     },
     { name: '逻辑像素密度', value: String(display.getDefaultDisplaySync().densityPixels) },
     { name: '显示字体缩放因子', value: String(display.getDefaultDisplaySync().scaledDensity) },
-    { name: 'x 方向中每英寸屏幕的确切物理像素值', value: String(display.getDefaultDisplaySync().xDPI) },
-    { name: 'y 方向中每英寸屏幕的确切物理像素值', value: String(display.getDefaultDisplaySync().yDPI) },
+    { name: 'x方向中每英寸屏幕的确切物理像素值', value: String(display.getDefaultDisplaySync().xDPI) },
+    { name: 'y方向中每英寸屏幕的确切物理像素值', value: String(display.getDefaultDisplaySync().yDPI) },
     { name: '可用区域宽度', value: String(display.getDefaultDisplaySync().availableWidth) + ' px' },
     { name: '可用区域高度', value: String(display.getDefaultDisplaySync().availableHeight) + ' px' },
     { name: '设备是否可折叠', value: display.isFoldable() ? '是' : '否' },
@@ -530,23 +533,23 @@ struct Debug {
     { name: '数据网络句柄', value: String(connection.getDefaultNetSync().netId) },
     { name: '当前网络上的数据流量使用是否被计量', value: connection.isDefaultNetMeteredSync() ? '是' : '否' },
     { name: '默认数据网络是否被激活', value: connection.hasDefaultNetSync() ? '是' : '否' },
-    { name: 'WLAN 开关是否已使能', value: wifiManager.isWifiActive() ? '是' : '否' },
-    { name: 'WLAN 是否已连接', value: wifiManager.isConnected() ? '是' : '否' },
-    { name: 'Ipv4 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().ipAddress) },
-    { name: 'Ipv4 网关', value: decimalToDottedIP(wifiManager.getIpInfo().gateway) },
-    { name: 'Ipv4 掩码', value: decimalToDottedIP(wifiManager.getIpInfo().netmask) },
-    { name: 'Ipv4 主 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().primaryDns) },
-    { name: 'Ipv4 备 DNS 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().secondDns) },
-    { name: 'Ipv4 DHCP 服务器 IP 地址', value: decimalToDottedIP(wifiManager.getIpInfo().serverIp) },
-    { name: 'Ipv4 IP 地址租用时长', value: String(wifiManager.getIpInfo().leaseDuration) + ' s' },
-    { name: '链路 Ipv6 地址', value: wifiManager.getIpv6Info().linkIpv6Address },
-    { name: '全局 Ipv6 地址', value: wifiManager.getIpv6Info().globalIpv6Address },
-    { name: '唯一本地 Ipv6 地址', value: String(wifiManager.getIpv6Info().uniqueIpv6Address) },
-    { name: '随机唯一本地 Ipv6 地址', value: String(wifiManager.getIpv6Info().randomUniqueIpv6Address) },
-    { name: 'Ipv6 网关', value: wifiManager.getIpv6Info().gateway },
-    { name: 'Ipv6 掩码', value: wifiManager.getIpv6Info().netmask },
-    { name: 'Ipv6 主 DNS 服务器 IP 地址', value: wifiManager.getIpv6Info().primaryDNS },
-    { name: 'Ipv6 备 DNS 服务器 IP 地址', value: wifiManager.getIpv6Info().secondDNS },
+    { name: 'WLAN开关是否已使能', value: wifiManager.isWifiActive() ? '是' : '否' },
+    { name: 'WLAN是否已连接', value: wifiManager.isConnected() ? '是' : '否' },
+    { name: 'Ipv4 IP地址', value: decimalToDottedIP(wifiManager.getIpInfo().ipAddress) },
+    { name: 'Ipv4网关', value: decimalToDottedIP(wifiManager.getIpInfo().gateway) },
+    { name: 'Ipv4掩码', value: decimalToDottedIP(wifiManager.getIpInfo().netmask) },
+    { name: 'Ipv4主DNS服务器IP地址', value: decimalToDottedIP(wifiManager.getIpInfo().primaryDns) },
+    { name: 'Ipv4备DNS服务器IP地址', value: decimalToDottedIP(wifiManager.getIpInfo().secondDns) },
+    { name: 'Ipv4 DHCP服务器IP地址', value: decimalToDottedIP(wifiManager.getIpInfo().serverIp) },
+    { name: 'Ipv4 IP地址租用时长', value: String(wifiManager.getIpInfo().leaseDuration) + ' s' },
+    { name: '链路Ipv6地址', value: wifiManager.getIpv6Info().linkIpv6Address },
+    { name: '全局Ipv6地址', value: wifiManager.getIpv6Info().globalIpv6Address },
+    { name: '唯一本地Ipv6地址', value: String(wifiManager.getIpv6Info().uniqueIpv6Address) },
+    { name: '随机唯一本地Ipv6地址', value: String(wifiManager.getIpv6Info().randomUniqueIpv6Address) },
+    { name: 'Ipv6网关', value: wifiManager.getIpv6Info().gateway },
+    { name: 'Ipv6掩码', value: wifiManager.getIpv6Info().netmask },
+    { name: 'Ipv6主DNS服务器IP地址', value: wifiManager.getIpv6Info().primaryDNS },
+    { name: 'Ipv6备DNS服务器IP地址', value: wifiManager.getIpv6Info().secondDNS },
     { name: '国家码', value: wifiManager.getCountryCode() },
     { name: '热点是否已使能', value: wifiManager.isHotspotActive() ? '是' : '否' },
     { name: '蜂窝数据业务是否启用', value: data.isCellularDataEnabledSync() ? '是' : '否' }
@@ -557,9 +560,9 @@ struct Debug {
   ]
   processInfoArray: Item[] = [
     { name: '是否被隔离', value: process.isIsolatedProcess() ? '是' : '否' },
-    { name: '运行环境是否是 64 位', value: process.is64Bit() ? '是' : '否' },
+    { name: '运行环境是否是64位', value: process.is64Bit() ? '是' : '否' },
     { name: '从系统启动到进程启动所经过的时间', value: String(process.getStartRealtime()) + ' ms' },
-    { name: '从进程启动到当前时间所经过的 CPU 时间', value: String(process.getPastCpuTime()) + ' ms' }
+    { name: '从进程启动到当前时间所经过的CPU时间', value: String(process.getPastCpuTime()) + ' ms' }
   ]
 
   getSetting() {
@@ -571,14 +574,10 @@ struct Debug {
     if (globalErrorShowType === 1) {
       this.globalErrorShowTypeValue = 'Dialog'
     }
-    const saveErrorLog = this.debugSettingDataPreferences.getSync('saveErrorLog', true)
-    this.saveErrorLog = saveErrorLog as boolean
-    const autoUploadErrorLog = this.debugSettingDataPreferences.getSync('autoUploadErrorLog', true)
-    this.autoUploadErrorLog = autoUploadErrorLog as boolean
-    const showMemoryLevelChange = this.debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
-    this.showMemoryLevelChange = showMemoryLevelChange as boolean
-    const processCache = this.debugSettingDataPreferences.getSync('processCache', true)
-    this.processCache = processCache as boolean
+    this.saveErrorLog = this.debugSettingDataPreferences.getSync('saveErrorLog', true) as boolean
+    this.autoUploadErrorLog = this.debugSettingDataPreferences.getSync('autoUploadErrorLog', true) as boolean
+    this.showMemoryLevelChange = this.debugSettingDataPreferences.getSync('showMemoryLevelChange', false) as boolean
+    this.processCache = this.debugSettingDataPreferences.getSync('processCache', true) as boolean
     const lowBatteryCapacityLevel = this.debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
     this.lowBatteryCapacityLevelIndex = (lowBatteryCapacityLevel as number) - 1
     if (lowBatteryCapacityLevel === 1) {
@@ -602,22 +601,26 @@ struct Debug {
     if (lowBatteryCapacityLevel === 7) {
       this.lowBatteryCapacityLevelValue = '关机'
     }
-    const autoReportHighLatency = this.debugSettingDataPreferences.getSync('autoReportHighLatency', true)
-    this.autoReportHighLatency = autoReportHighLatency as boolean
-    const showNetAvailableStatusChange = this.debugSettingDataPreferences.getSync('showNetAvailableStatusChange', false)
-    this.showNetAvailableStatusChange = showNetAvailableStatusChange as boolean
-    const showNetBlockStatusChange = this.debugSettingDataPreferences.getSync('showNetBlockStatusChange', false)
-    this.showNetBlockStatusChange = showNetBlockStatusChange as boolean
-    const showNetLost = this.debugSettingDataPreferences.getSync('showNetLost', false)
-    this.showNetLost = showNetLost as boolean
-    const showNetCapabilitiesChange = this.debugSettingDataPreferences.getSync('showNetCapabilitiesChange', false)
-    this.showNetCapabilitiesChange = showNetCapabilitiesChange as boolean
-    const showNetQosChange = this.debugSettingDataPreferences.getSync('showNetQosChange', false)
-    this.showNetQosChange = showNetQosChange as boolean
-    const showNetSceneChange = this.debugSettingDataPreferences.getSync('showNetSceneChange', false)
-    this.showNetSceneChange = showNetSceneChange as boolean
-    const highLatencyThreshold = this.debugSettingDataPreferences.getSync('highLatencyThreshold', 200)
-    this.highLatencyThreshold = String(highLatencyThreshold)
+    this.autoReportHighLatency = this.debugSettingDataPreferences.getSync('autoReportHighLatency', true) as boolean
+    this.showNetAvailableStatusChange =
+      this.debugSettingDataPreferences.getSync('showNetAvailableStatusChange', false) as boolean
+    this.showNetBlockStatusChange =
+      this.debugSettingDataPreferences.getSync('showNetBlockStatusChange', false) as boolean
+    this.showNetLost = this.debugSettingDataPreferences.getSync('showNetLost', false) as boolean
+    this.showNetCapabilitiesChange =
+      this.debugSettingDataPreferences.getSync('showNetCapabilitiesChange', false) as boolean
+    this.showNetQosChange = this.debugSettingDataPreferences.getSync('showNetQosChange', false) as boolean
+    this.showNetSceneChange = this.debugSettingDataPreferences.getSync('showNetSceneChange', false) as boolean
+    this.highLatencyThreshold = String(this.debugSettingDataPreferences.getSync('highLatencyThreshold', 200))
+    this.optimizeParserBudget = this.debugSettingDataPreferences.getSync('optimizeParserBudget', true) as boolean
+    const destroyMode = this.debugSettingDataPreferences.getSync('destroyMode', 0)
+    this.destroyModeIndex = destroyMode as number
+    if (destroyMode === 0) {
+      this.destroyModeValue = '普通'
+    }
+    if (destroyMode === 1) {
+      this.destroyModeValue = '快速'
+    }
     const allService = this.commonSettingDataPreferences.getSync('allService', true)
     this.allService = allService as boolean
     if (!allService) {
@@ -647,8 +650,8 @@ struct Debug {
                   { value: 'Toast' },
                   { value: 'Dialog' }
                 ])
-                  .selected($$this.globalErrorShowTypeIndex)
-                  .value($$this.globalErrorShowTypeValue)
+                  .selected(this.globalErrorShowTypeIndex!!)
+                  .value(this.globalErrorShowTypeValue!!)
                   .onSelect((index) => {
                     this.debugSettingDataPreferences.putSync('globalErrorShowType', index)
                     this.debugSettingDataPreferences.flushSync()
@@ -669,7 +672,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.saveErrorLog
+                  isOn: this.saveErrorLog!!
                 })
                   .enabled(this.allService)
                   .onChange((isOn) => {
@@ -692,7 +695,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.autoUploadErrorLog
+                  isOn: this.autoUploadErrorLog!!
                 })
                   .enabled(this.allService)
                   .onChange((isOn) => {
@@ -777,7 +780,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.showMemoryLevelChange
+                  isOn: this.showMemoryLevelChange!!
                 })
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showMemoryLevelChange', isOn)
@@ -799,7 +802,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.processCache
+                  isOn: this.processCache!!
                 })
                   .onChange(async (isOn) => {
                     this.debugSettingDataPreferences.putSync('processCache', isOn)
@@ -849,8 +852,8 @@ struct Debug {
                   { value: '极低' },
                   { value: '关机' }
                 ])
-                  .selected($$this.lowBatteryCapacityLevelIndex)
-                  .value($$this.lowBatteryCapacityLevelValue)
+                  .selected(this.lowBatteryCapacityLevelIndex!!)
+                  .value(this.lowBatteryCapacityLevelValue!!)
                   .onSelect((index) => {
                     this.debugSettingDataPreferences.putSync('lowBatteryCapacityLevel', index + 1)
                     this.debugSettingDataPreferences.flushSync()
@@ -1078,7 +1081,7 @@ struct Debug {
               .onClick(() => {
                 const res = appRecovery.saveAppState()
                 if (res) {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '保存成功'
                   })
                 }
@@ -1142,7 +1145,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.showNetAvailableStatusChange
+                  isOn: this.showNetAvailableStatusChange!!
                 })
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetAvailableStatusChange', isOn)
@@ -1164,7 +1167,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.showNetBlockStatusChange
+                  isOn: this.showNetBlockStatusChange!!
                 })
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetBlockStatusChange', isOn)
@@ -1186,7 +1189,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.showNetLost
+                  isOn: this.showNetLost!!
                 })
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetLost', isOn)
@@ -1208,7 +1211,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.showNetCapabilitiesChange
+                  isOn: this.showNetCapabilitiesChange!!
                 })
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetCapabilitiesChange', isOn)
@@ -1230,7 +1233,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.showNetQosChange
+                  isOn: this.showNetQosChange!!
                 })
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetQosChange', isOn)
@@ -1252,7 +1255,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.showNetSceneChange
+                  isOn: this.showNetSceneChange!!
                 })
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('showNetSceneChange', isOn)
@@ -1274,7 +1277,7 @@ struct Debug {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.autoReportHighLatency
+                  isOn: this.autoReportHighLatency!!
                 })
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('autoReportHighLatency', isOn)
@@ -1297,8 +1300,9 @@ struct Debug {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                 TextInput({
-                  text: $$this.highLatencyThreshold
+                  text: this.highLatencyThreshold!!
                 })
+                  .enableAutoSpacing(true)
                   .type(InputType.Number)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -1308,12 +1312,13 @@ struct Debug {
                   .onSubmit((enterKey, event) => {
                     this.debugSettingDataPreferences.putSync('highLatencyThreshold', Number(event.text))
                     this.debugSettingDataPreferences.flushSync()
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '设置成功'
                     })
                   })
-                Text('ms 时判定为高时延')
+                Text('ms时判定为高时延')
                   .fontWeight('medium')
+                  .enableAutoSpacing(true)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
@@ -1395,6 +1400,69 @@ struct Debug {
         })
 
         ListItem() {
+          Column() {
+            Text('Webview')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight('medium')
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Row() {
+                Text('分段解析HTML优化')
+                  .fontWeight('medium')
+                  .enableAutoSpacing(true)
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.optimizeParserBudget!!
+                })
+                  .onChange((isOn) => {
+                    this.debugSettingDataPreferences.putSync('optimizeParserBudget', isOn)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('销毁模式')
+                  .fontWeight('medium')
+                Blank()
+                Select([
+                  { value: '普通' },
+                  { value: '快速' }
+                ])
+                  .selected(this.destroyModeIndex!!)
+                  .value(this.destroyModeValue!!)
+                  .onSelect((index) => {
+                    this.debugSettingDataPreferences.putSync('destroyMode', index)
+                    this.debugSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
           Button('恢复默认设置')
             .align(Alignment.Center)
             .onClick(async () => {
@@ -1415,7 +1483,7 @@ struct Debug {
               if (data.index === 1) {
                 this.debugSettingDataPreferences.clearSync()
                 this.debugSettingDataPreferences.flushSync()
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '恢复成功'
                 })
                 this.getSetting()
@@ -1450,6 +1518,7 @@ struct Debug {
                   Row() {
                     Text(item.name)
                       .fontWeight('medium')
+                      .enableAutoSpacing(true)
                       .width('45%')
                     Blank()
                       .width('5%')
@@ -1477,10 +1546,11 @@ struct Debug {
 
         ListItem() {
           Column() {
-            Text('HAP 信息')
+            Text('HAP信息')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight('medium')
+              .enableAutoSpacing(true)
               .margin({
                 bottom: 6,
                 left: 12
@@ -1525,10 +1595,11 @@ struct Debug {
 
         ListItem() {
           Column() {
-            Text('Ability 信息')
+            Text('Ability信息')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight('medium')
+              .enableAutoSpacing(true)
               .margin({
                 bottom: 6,
                 left: 12
@@ -1546,6 +1617,7 @@ struct Debug {
                   Row() {
                     Text(item.name)
                       .fontWeight('medium')
+                      .enableAutoSpacing(true)
                       .width('45%')
                     Blank()
                       .width('5%')
@@ -1594,6 +1666,7 @@ struct Debug {
                   Row() {
                     Text(item.name)
                       .fontWeight('medium')
+                      .enableAutoSpacing(true)
                       .width('45%')
                     Blank()
                       .width('5%')
@@ -1642,6 +1715,7 @@ struct Debug {
                   Row() {
                     Text(item.name)
                       .fontWeight('medium')
+                      .enableAutoSpacing(true)
                       .width('45%')
                     Blank()
                       .width('5%')
@@ -1690,6 +1764,7 @@ struct Debug {
                   Row() {
                     Text(item.name)
                       .fontWeight('medium')
+                      .enableAutoSpacing(true)
                       .width('45%')
                     Blank()
                       .width('5%')
@@ -1738,6 +1813,7 @@ struct Debug {
                   Row() {
                     Text(item.name)
                       .fontWeight('medium')
+                      .enableAutoSpacing(true)
                       .width('45%')
                     Blank()
                       .width('5%')
@@ -1787,6 +1863,7 @@ struct Debug {
                     Row() {
                       Text(item.name)
                         .fontWeight('medium')
+                        .enableAutoSpacing(true)
                         .width('45%')
                       Blank()
                         .width('5%')
@@ -2066,12 +2143,14 @@ struct Debug {
                   Row() {
                     Text(item.name)
                       .fontWeight('medium')
+                      .enableAutoSpacing(true)
                       .width('45%')
                     Blank()
                       .width('5%')
                     Text(item.value)
                       .fontColor($r('sys.color.font_secondary'))
                       .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .enableAutoSpacing(true)
                       .textAlign(TextAlign.End)
                       .width('50%')
                   }
@@ -2220,6 +2299,7 @@ struct Debug {
                   Row() {
                     Text(item.name)
                       .fontWeight('medium')
+                      .enableAutoSpacing(true)
                       .width('45%')
                     Blank()
                       .width('5%')
@@ -2254,8 +2334,8 @@ struct Debug {
     .backgroundColor($r('app.color.sheet_background'))
     .title('调试')
     .onReady(async (context) => {
-      this.getSetting()
       this.pageInfos = context.pathStack
+      this.getSetting()
       const isRunningInStabilityTest = await appManager.isRunningInStabilityTest()
       this.applicationInfoArray.push({
         name: '当前是否处于稳定性测试场景',
@@ -2263,7 +2343,7 @@ struct Debug {
       })
       const isRamConstrainedDevice = await appManager.isRamConstrainedDevice()
       this.applicationInfoArray.push({
-        name: '是否为 ram 受限设备',
+        name: '是否为ram受限设备',
         value: isRamConstrainedDevice ? '是' : '否'
       })
       const memorySize = await appManager.getAppMemorySize()
@@ -2294,7 +2374,7 @@ struct Debug {
         value: String(bundleInfo.targetVersion)
       })
       this.bundleInfoArray.push({
-        name: '应用 appId',
+        name: '应用appId',
         value: bundleInfo.signatureInfo.appId
       })
       this.bundleInfoArray.push({
@@ -2360,7 +2440,7 @@ struct Debug {
         { name: '隐私模式', value: lastWindow.getWindowProperties().isPrivacyMode ? '开启' : '关闭' },
         { name: '是否透明', value: lastWindow.getWindowProperties().isTransparent ? '是' : '否' },
         { name: 'ID', value: String(lastWindow.getWindowProperties().id) },
-        { name: '所在屏幕 ID', value: String(lastWindow.getWindowProperties().displayId) },
+        { name: '所在屏幕ID', value: String(lastWindow.getWindowProperties().displayId) },
         {
           name: '所在屏幕的系统显示大小缩放系数',
           value: String(lastWindow.getWindowDensityInfo().systemDensity)
@@ -2371,11 +2451,11 @@ struct Debug {
         },
         { name: '自定义设置的显示大小缩放系数', value: String(lastWindow.getWindowDensityInfo().customDensity) },
         {
-          name: '在屏幕上的真实显示区域距离屏幕左上角的 x 坐标',
+          name: '在屏幕上的真实显示区域距离屏幕左上角的x坐标',
           value: String(lastWindow.getGlobalRect().left) + ' px'
         },
         {
-          name: '在屏幕上的真实显示区域距离屏幕左上角的 y 坐标',
+          name: '在屏幕上的真实显示区域距离屏幕左上角的y坐标',
           value: String(lastWindow.getGlobalRect().top) + ' px'
         },
         {
@@ -2552,17 +2632,17 @@ struct Debug {
                     'undefined'
         })
       } catch (err) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '发生错误，错误码：' + err.code
         })
       }
       const wifiLinkedInfo = await wifiManager.getLinkedInfo()
       this.networkInfoArray.push({
-        name: '热点 SSID',
+        name: '热点SSID',
         value: wifiLinkedInfo.ssid
       })
       this.networkInfoArray.push({
-        name: '热点 BSSID',
+        name: '热点BSSID',
         value: wifiLinkedInfo.bssid
       })
       this.networkInfoArray.push({
@@ -2570,21 +2650,21 @@ struct Debug {
         value: String(wifiLinkedInfo.rssi) + ' dBm'
       })
       this.networkInfoArray.push({
-        name: 'WLAN 接入点频段',
+        name: 'WLAN接入点频段',
         value: wifiLinkedInfo.band === 1 ? '2.4 GHz' :
           wifiLinkedInfo.band === 2 ? '5 Ghz' :
             'undefined'
       })
       this.networkInfoArray.push({
-        name: 'WLAN 信号强度',
+        name: 'WLAN信号强度',
         value: String(wifiManager.getSignalLevel(wifiLinkedInfo.rssi, wifiLinkedInfo.band))
       })
       this.networkInfoArray.push({
-        name: 'WLAN 接入点上行速度',
+        name: 'WLAN接入点上行速度',
         value: String(wifiLinkedInfo.linkSpeed) + ' Mbps/s'
       })
       this.networkInfoArray.push({
-        name: 'WLAN 接入点下行速度',
+        name: 'WLAN接入点下行速度',
         value: String(wifiLinkedInfo.rxLinkSpeed) + ' Mbps/s'
       })
       this.networkInfoArray.push({
@@ -2596,41 +2676,41 @@ struct Debug {
         value: String(wifiLinkedInfo.maxSupportedRxLinkSpeed) + ' Mbps/s'
       })
       this.networkInfoArray.push({
-        name: 'WLAN 接入点频率',
+        name: 'WLAN接入点频率',
         value: String(wifiLinkedInfo.frequency)
       })
       this.networkInfoArray.push({
-        name: 'WLAN 接入点是否是隐藏网络',
+        name: 'WLAN接入点是否是隐藏网络',
         value: wifiLinkedInfo.isHidden ? '是' : '否'
       })
       this.networkInfoArray.push({
-        name: 'WLAN 接入点是否限制数据量',
+        name: 'WLAN接入点是否限制数据量',
         value: wifiLinkedInfo.isRestricted ? '是' : '否'
       })
       this.networkInfoArray.push({
-        name: 'MAC 地址类型',
+        name: 'MAC地址类型',
         value: wifiLinkedInfo.macType === 0 ? '随机' :
           wifiLinkedInfo.macType === 1 ? '设备' :
             'undefined'
       })
       this.networkInfoArray.push({
-        name: 'MAC 地址',
+        name: 'MAC地址',
         value: wifiLinkedInfo.macAddress
       })
       this.networkInfoArray.push({
-        name: 'WLAN 连接的 IP 地址',
+        name: 'WLAN连接的IP地址',
         value: decimalToDottedIP(wifiLinkedInfo.ipAddress)
       })
       this.networkInfoArray.push({
-        name: 'WLAN 连接状态',
-        value: wifiLinkedInfo.connState === 0 ? '设备正在搜索可用的 AP' :
-          wifiLinkedInfo.connState === 1 ? '正在建立 WLAN 连接' :
-            wifiLinkedInfo.connState === 2 ? 'WLAN 连接正在认证中' :
-              wifiLinkedInfo.connState === 3 ? '正在获取 WLAN 连接的 IP 地址' :
-                wifiLinkedInfo.connState === 4 ? 'WLAN 连接已建立' :
-                  wifiLinkedInfo.connState === 5 ? 'WLAN 连接正在断开' :
-                    wifiLinkedInfo.connState === 6 ? 'WLAN 连接已断开' :
-                      wifiLinkedInfo.connState === 7 ? 'WLAN 连接建立失败' :
+        name: 'WLAN连接状态',
+        value: wifiLinkedInfo.connState === 0 ? '设备正在搜索可用的AP' :
+          wifiLinkedInfo.connState === 1 ? '正在建立WLAN连接' :
+            wifiLinkedInfo.connState === 2 ? 'WLAN连接正在认证中' :
+              wifiLinkedInfo.connState === 3 ? '正在获取WLAN连接的IP地址' :
+                wifiLinkedInfo.connState === 4 ? 'WLAN连接已建立' :
+                  wifiLinkedInfo.connState === 5 ? 'WLAN连接正在断开' :
+                    wifiLinkedInfo.connState === 6 ? 'WLAN连接已断开' :
+                      wifiLinkedInfo.connState === 7 ? 'WLAN连接建立失败' :
                         'undefined'
       })
       this.networkInfoArray.push({
@@ -2644,7 +2724,7 @@ struct Debug {
                     'undefined'
       })
       this.networkInfoArray.push({
-        name: '当前连接热点的 Wi-Fi 标准',
+        name: '当前连接热点的Wi-Fi标准',
         value: wifiLinkedInfo.wifiStandard === 0 ? '无效' :
           wifiLinkedInfo.wifiStandard === 1 ? '802.11a' :
             wifiLinkedInfo.wifiStandard === 2 ? '802.11b' :
@@ -2656,8 +2736,8 @@ struct Debug {
                         'undefined'
       })
       this.networkInfoArray.push({
-        name: '热点支持的最高 Wi-Fi 级别',
-        value: wifiLinkedInfo.supportedWifiCategory === 1 ? 'Wifi6 以下' :
+        name: '热点支持的最高Wi-Fi级别',
+        value: wifiLinkedInfo.supportedWifiCategory === 1 ? 'Wifi6以下' :
           wifiLinkedInfo.supportedWifiCategory === 2 ? 'Wifi6' :
             wifiLinkedInfo.supportedWifiCategory === 3 ? 'Wifi6+' :
               wifiLinkedInfo.supportedWifiCategory === 4 ? 'Wifi7' :
@@ -2665,17 +2745,17 @@ struct Debug {
                   'undefined'
       })
       this.networkInfoArray.push({
-        name: '热点是否支持 hilink',
+        name: '热点是否支持hilink',
         value: wifiLinkedInfo.isHiLinkNetwork ? '是' : '否'
       })
       try {
         const isMeteredHotspot = wifiManager.isMeteredHotspot()
         this.networkInfoArray.push({
-          name: '设备当前连接的 Wi-Fi 是否是手机热点',
+          name: '设备当前连接的Wi-Fi是否是手机热点',
           value: isMeteredHotspot ? '是' : '否'
         })
       } catch (err) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
         })
       }
@@ -2691,7 +2771,7 @@ struct Debug {
       })
       const cellularDataState = await data.getCellularDataState()
       this.networkInfoArray.push({
-        name: '分组交换域 (PS 域) 的连接状态',
+        name: '分组交换域 (PS域) 的连接状态',
         value: cellularDataState === -1 ? '未知' :
           cellularDataState === 0 ? '断开' :
             cellularDataState === 1 ? '正在连接' :

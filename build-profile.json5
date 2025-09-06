@@ -9,22 +9,22 @@
           "storePassword": "000000195C12DD78581766951C4A14A8EF547FA599ED4F3FADCD2A726A6754A39C4C94E2BE42310E9F",
           "keyAlias": "release",
           "keyPassword": "0000001984A06F2DD1122ECB427C9217BA8AB41E9F05DD1E930B56A57A794CDCDDE59C83C4D9B71366",
-          "signAlg": "SHA256withECDSA",
+          "certpath": "D:/harmonyproject/轩铭密码智能备忘录应用/内部文件/签名材料/release.cer",
           "profile": "D:/harmonyproject/轩铭密码智能备忘录应用/内部文件/签名材料/release.p7b",
-          "certpath": "D:/harmonyproject/轩铭密码智能备忘录应用/内部文件/签名材料/release.cer"
+          "signAlg": "SHA256withECDSA"
         }
       },
       {
         "name": "debug",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer",
+          "storeFile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
+          "storePassword": "0000001B1D6FB8FBFA38C3F8F4CD9A4E1B076B4417C4A8409B1E92C4E59E8400F6E0A11338069935C436EC",
           "keyAlias": "debugKey",
           "keyPassword": "0000001B580512D17A32B9F25664587DE4FF77D2DBCF4CE369256DF5C2C0637BEF0BD1683412782E02526F",
+          "certpath": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer",
           "profile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
-          "storePassword": "0000001B1D6FB8FBFA38C3F8F4CD9A4E1B076B4417C4A8409B1E92C4E59E8400F6E0A11338069935C436EC"
+          "signAlg": "SHA256withECDSA"
         }
       }
     ],
@@ -33,10 +33,16 @@
         "name": "default",
         "signingConfig": "debug",
         "buildOption": {
+          "resOptions": {
+            "resCompileThreads": 32
+          },
           "arkOptions": {
             "autoLazyImport": true,
             "reExportCheckMode": "strict",
-            "branchElimination": true
+            "branchElimination": true,
+            "expandImportPath": {
+              "enable": true
+            }
           },
           "strictMode": {
             "noExternalImportByPath": true,
@@ -46,7 +52,7 @@
           }
         },
         "runtimeOS": "HarmonyOS",
-        "compatibleSdkVersion": "5.0.5(17)"
+        "compatibleSdkVersion": "6.0.0(20)"
       }
     ]
   },

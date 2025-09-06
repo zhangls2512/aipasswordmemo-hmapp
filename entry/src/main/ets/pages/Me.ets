@@ -94,7 +94,7 @@ export default struct Me {
               this.isShowLoginSheet = !this.isShowLoginSheet
             }
           })
-          .bindSheet($$this.isShowLoginSheet, this.LoginSheetBuilder(), {
+          .bindSheet(this.isShowLoginSheet!!, this.LoginSheetBuilder(), {
             height: SheetSize.FIT_CONTENT,
             preferType: this.preferType,
             title: {
@@ -228,7 +228,7 @@ export default struct Me {
             .onClick(() => {
               this.isShowPasswordcheckSheet = !this.isShowPasswordcheckSheet
             })
-            .bindSheet($$this.isShowPasswordcheckSheet, this.PasswordcheckSheetBuilder(), {
+            .bindSheet(this.isShowPasswordcheckSheet!!, this.PasswordcheckSheetBuilder(), {
               preferType: this.preferType,
               title: {
                 title: '密码安全检查'
@@ -284,7 +284,7 @@ export default struct Me {
             .onClick(() => {
               this.isShowPasswordgenerateSheet = !this.isShowPasswordgenerateSheet
             })
-            .bindSheet($$this.isShowPasswordgenerateSheet, this.PasswordgenerateSheetBuilder(), {
+            .bindSheet(this.isShowPasswordgenerateSheet!!, this.PasswordgenerateSheetBuilder(), {
               preferType: this.preferType,
               title: {
                 title: '密码随机生成'
@@ -333,8 +333,9 @@ export default struct Me {
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
                 .width(24)
-              Text('恶意 URL 检测')
+              Text('恶意URL检测')
                 .fontWeight(FontWeight.Medium)
+                .enableAutoSpacing(true)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -355,7 +356,7 @@ export default struct Me {
             .onClick(() => {
               this.isShowUrlcheckSheet = !this.isShowUrlcheckSheet
             })
-            .bindSheet($$this.isShowUrlcheckSheet, this.UrlcheckSheetBuilder(), {
+            .bindSheet(this.isShowUrlcheckSheet!!, this.UrlcheckSheetBuilder(), {
               preferType: this.preferType,
               title: {
                 title: '恶意 URL 检测'
@@ -404,7 +405,7 @@ export default struct Me {
           .onClick(() => {
             this.isShowSettingSheet = !this.isShowSettingSheet
           })
-          .bindSheet($$this.isShowSettingSheet, this.SettingSheetBuilder(), {
+          .bindSheet(this.isShowSettingSheet!!, this.SettingSheetBuilder(), {
             preferType: this.preferType,
             onDisappear: (() => {
               this.get()
@@ -447,7 +448,7 @@ export default struct Me {
                 this.uid = ''
                 this.email = ''
                 this.endDate = ''
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '退出成功'
                 })
               }

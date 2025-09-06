@@ -39,7 +39,7 @@ struct Vip {
     },
     {
       id: 'QIX7fU1KM3.IMVyb',
-      name: '1 个月',
+      name: '1个月',
       type: iap.ProductType.NONRENEWABLE,
       price: '￥1.5'
     },
@@ -51,7 +51,7 @@ struct Vip {
     },
     {
       id: 'jYXNGP2VEuQOoXPA',
-      name: '1 季度',
+      name: '1季度',
       type: iap.ProductType.NONRENEWABLE,
       price: '￥4.5'
     },
@@ -63,7 +63,7 @@ struct Vip {
     },
     {
       id: 'Y3V08cwoFrvLTPR7',
-      name: '1 年',
+      name: '1年',
       type: iap.ProductType.NONRENEWABLE,
       price: '￥18'
     },
@@ -110,7 +110,7 @@ struct Vip {
 
   async buyVip(id: string, type: iap.ProductType) {
     if (!this.agree) {
-      promptAction.showToast({
+      promptAction.openToast({
         message: '请阅读并同意服务协议'
       })
       return
@@ -121,7 +121,7 @@ struct Vip {
         productType: type,
         developerPayload: this.uid
       })
-      promptAction.showToast({
+      promptAction.openToast({
         message: '服务器正在验证，大约需要 5-20 秒，请稍候'
       })
     } catch (err) {
@@ -130,12 +130,12 @@ struct Vip {
         return
       }
       if (errCode === 1001860051) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '已购买，无需重复购买'
         })
         return
       }
-      promptAction.showToast({
+      promptAction.openToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
@@ -207,6 +207,7 @@ struct Vip {
                     Row() {
                       Text(item.name)
                         .fontWeight(FontWeight.Medium)
+                        .enableAutoSpacing(true)
                       Blank()
                       Text(item.price)
                         .fontColor($r('sys.color.font_secondary'))
@@ -243,7 +244,7 @@ struct Vip {
                   Column() {
                     Toggle({
                       type: ToggleType.Checkbox,
-                      isOn: $$this.agree
+                      isOn: this.agree!!
                     })
                   }
                   .margin({
@@ -471,7 +472,7 @@ struct Vip {
             this.iapStatus = true
           } catch (err) {
             this.iapStatusLoading = false
-            promptAction.showToast({
+            promptAction.openToast({
               message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
             })
           }

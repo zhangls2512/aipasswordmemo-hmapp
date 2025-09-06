@@ -66,6 +66,7 @@ struct License {
                 openLink('https://beian.miit.gov.cn/#/Integrated/recordQuery')
               })
           }
+          .enableAutoSpacing(true)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -141,6 +142,7 @@ struct License {
                 openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512品备12号-HA')
               })
           }
+          .enableAutoSpacing(true)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -203,6 +205,7 @@ struct License {
               Column() {
                 Text('轩铭2512许12号-1M')
                   .fontColor($r('sys.color.font_emphasize'))
+                  .enableAutoSpacing(true)
                   .textAlign(TextAlign.Center)
                   .onClick(() => {
                     openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512许12号-1M')
@@ -306,6 +309,7 @@ struct License {
                 Column() {
                   Text(item.value)
                     .fontColor($r('sys.color.font_emphasize'))
+                    .enableAutoSpacing(true)
                     .textAlign(TextAlign.Center)
                     .onClick(() => {
                       openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=' + item.value)
@@ -379,7 +383,8 @@ struct License {
               .width('50%')
 
               Column() {
-                Text('有隐私相关功能，包括但不限于权限管理、业务与隐私的声明、第三方 SDK 列表、已收集个人信息清单、隐私声明摘要')
+                Text('有隐私相关功能，包括但不限于权限管理、业务与隐私的声明、第三方SDK列表、已收集个人信息清单、隐私声明摘要')
+                  .enableAutoSpacing(true)
                   .textAlign(TextAlign.Center)
               }
               .border({
@@ -396,6 +401,7 @@ struct License {
               Column() {
                 Text('轩铭2512私安备12号-1')
                   .fontColor($r('sys.color.font_emphasize'))
+                  .enableAutoSpacing(true)
                   .textAlign(TextAlign.Center)
                   .onClick(() => {
                     openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512私安备12号-1')

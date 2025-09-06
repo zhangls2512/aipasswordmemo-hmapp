@@ -43,9 +43,10 @@ struct Viplog {
                   .width('45%')
                 Blank()
                   .width('5%')
-                Text(item.duration === 0 ? '终身' : String(item.duration) + ' 天')
+                Text(item.duration === 0 ? '终身' : String(item.duration) + '天')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .enableAutoSpacing(true)
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
@@ -151,7 +152,7 @@ struct Viplog {
                   try {
                     iap.createRefundRequest(context, item.info)
                   } catch (err) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }
@@ -203,7 +204,7 @@ struct Viplog {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('会员开通记录')
-    .onReady(async () => {
+    .onAppear(async () => {
       this.accessToken = await get()
       if (this.accessToken) {
         this.loading = true

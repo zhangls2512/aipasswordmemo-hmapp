@@ -60,8 +60,9 @@ struct Invite {
           Column() {
             TextArea({
               placeholder: '请输入邀请码',
-              text: $$this.inputInvitationcode
+              text: this.inputInvitationcode!!
             })
+              .enableAutoSpacing(true)
               .maxLength(62)
               .showCounter(true)
             Button('提交')
@@ -84,7 +85,7 @@ struct Invite {
                 })
                 dialogControllerProgress.close()
                 if (res !== 'fail') {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '验证通过，已获得 30 天会员'
                   })
                   this.pageInfos.pop()
@@ -101,8 +102,9 @@ struct Invite {
           Column() {
             Text('活动说明')
               .fontWeight(FontWeight.Bold)
-            Text('1. 其他账号每使用本账号邀请码一次，本账号获得 7 天会员，其他账号获得 30 天会员。')
+            Text('1. 其他账号每使用本账号邀请码一次，本账号获得7天会员，其他账号获得30天会员。')
               .fontWeight(FontWeight.Medium)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })

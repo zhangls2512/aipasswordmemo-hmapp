@@ -69,7 +69,7 @@ struct Cloudbackupmanage {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .selectAll($$this.allSelected)
+                    .selectAll(this.allSelected!!)
                     .onChange((itemName) => {
                       this.types = itemName.name
                     })
@@ -98,7 +98,7 @@ struct Cloudbackupmanage {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .select($$this.passwordSelected)
+                    .select(this.passwordSelected!!)
                   Text('密码')
                     .fontWeight(FontWeight.Medium)
                   Blank()
@@ -124,7 +124,7 @@ struct Cloudbackupmanage {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .select($$this.infoSelected)
+                    .select(this.infoSelected!!)
                   Text('常用信息')
                     .fontWeight(FontWeight.Medium)
                   Blank()
@@ -150,7 +150,7 @@ struct Cloudbackupmanage {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .select($$this.tagSelected)
+                    .select(this.tagSelected!!)
                   Text('标签')
                     .fontWeight(FontWeight.Medium)
                   Blank()
@@ -200,7 +200,7 @@ struct Cloudbackupmanage {
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.showToast({
+                      promptAction.openToast({
                         message: '清理成功'
                       })
                       this.getCount()
@@ -224,7 +224,7 @@ struct Cloudbackupmanage {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('管理云备份')
-    .onReady(async () => {
+    .onAppear(async () => {
       this.accessToken = await get()
       this.getCount()
     })

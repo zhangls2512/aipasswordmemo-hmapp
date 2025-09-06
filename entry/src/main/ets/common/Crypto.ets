@@ -77,7 +77,7 @@ export async function setRandomKey() {
   query.set(asset.Tag.ALIAS, stringToArray('key'))
   query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
   asset.addSync(query)
-  promptAction.showToast({
+  promptAction.openToast({
     message: '导入成功'
   })
 }
@@ -105,7 +105,7 @@ export async function setCustomKey(key: string) {
   query.set(asset.Tag.ALIAS, stringToArray('key'))
   query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
   asset.addSync(query)
-  promptAction.showToast({
+  promptAction.openToast({
     message: '导入成功'
   })
 }
@@ -115,7 +115,7 @@ export async function removeKey() {
   const query: asset.AssetMap = new Map()
   query.set(asset.Tag.ALIAS, stringToArray('key'))
   asset.removeSync(query)
-  promptAction.showToast({
+  promptAction.openToast({
     message: '删除成功'
   })
 }
@@ -195,7 +195,7 @@ export async function decrypt(encryptData: EncryptData): Promise<string> {
     const res = await huks.finishSession(session.handle, options)
     return arrayToString(res.outData as Uint8Array)
   } catch (err) {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return 'fail'

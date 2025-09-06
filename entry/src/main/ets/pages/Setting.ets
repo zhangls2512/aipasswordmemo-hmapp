@@ -31,13 +31,12 @@ export default struct Setting {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
     })
-    const allService = commonSettingDataPreferences.getSync('allService', true)
-    this.allService = allService as boolean
+    this.allService = commonSettingDataPreferences.getSync('allService', true) as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
       this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
     } catch (err) {
-      promptAction.showToast({
+      promptAction.openToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
@@ -50,8 +49,7 @@ export default struct Setting {
         const appAccountManager = appAccount.createAppAccountManager()
         this.accountDataSync = await appAccountManager.checkDataSyncEnabled('default')
       }
-      const autoLoginByHuaweiAccount = commonSettingDataPreferences.getSync('autoLoginByHuaweiAccount', false)
-      this.autoLoginByHuaweiAccount = autoLoginByHuaweiAccount as boolean
+      this.autoLoginByHuaweiAccount = commonSettingDataPreferences.getSync('autoLoginByHuaweiAccount', false) as boolean
       const accountres = await request('/account/getExternalAccount', {
         accessToken: this.accessToken
       })
@@ -109,7 +107,7 @@ export default struct Setting {
                   Blank()
                   Toggle({
                     type: ToggleType.Switch,
-                    isOn: $$this.accountDataSync
+                    isOn: this.accountDataSync!!
                   })
                     .enabled(this.accountDataSyncEnabled)
                     .onChange(async (isOn) => {
@@ -118,7 +116,7 @@ export default struct Setting {
                         await appAccountManager.setDataSyncEnabled('default', isOn)
                       } catch (err) {
                         this.accountDataSync = false
-                        promptAction.showToast({
+                        promptAction.openToast({
                           message: '发生错误，错误码：' + err.code
                         })
                       }
@@ -188,7 +186,7 @@ export default struct Setting {
                   Blank()
                   Toggle({
                     type: ToggleType.Switch,
-                    isOn: $$this.autoLoginByHuaweiAccount
+                    isOn: this.autoLoginByHuaweiAccount!!
                   })
                     .onChange(async (isOn) => {
                       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
@@ -801,7 +799,7 @@ export default struct Setting {
                     param: appPrivacyLink?.url
                   })
                 } catch (err) {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                   })
                 }
@@ -813,8 +811,9 @@ export default struct Setting {
                   right: 12
                 })
               Row() {
-                Text('第三方 SDK 列表')
+                Text('第三方SDK列表')
                   .fontWeight(FontWeight.Medium)
+                  .enableAutoSpacing(true)
                 Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))

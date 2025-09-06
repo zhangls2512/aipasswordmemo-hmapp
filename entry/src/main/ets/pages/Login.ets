@@ -42,14 +42,14 @@ export default struct Login {
               email: email,
               endDate: endDate
             })
-            promptAction.showToast({
+            promptAction.openToast({
               message: '登录成功'
             })
             this.isShowLoginSheet = false
           }
         }
         if (err) {
-          promptAction.showToast({
+          promptAction.openToast({
             message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
           })
         }
@@ -127,10 +127,11 @@ export default struct Login {
               })
               .width('15%')
             TextInput({
-              text: $$this.email,
+              text: this.email!!,
               placeholder: '请输入邮箱'
             })
               .contentType(ContentType.EMAIL_ADDRESS)
+              .enableAutoSpacing(true)
               .type(InputType.Email)
               .width('80%')
           }
@@ -147,10 +148,11 @@ export default struct Login {
                 })
                 .width('15%')
               TextInput({
-                text: $$this.password,
+                text: this.password!!,
                 placeholder: '请输入密码'
               })
                 .contentType(ContentType.PASSWORD)
+                .enableAutoSpacing(true)
                 .maxLength(30)
                 .type(InputType.Password)
                 .width('80%')
@@ -168,11 +170,12 @@ export default struct Login {
                 })
                 .width('15%')
               TextInput({
-                text: $$this.mfa,
+                text: this.mfa!!,
                 placeholder: '请输入 MFA'
               })
+                .enableAutoSpacing(true)
                 .maxLength(6)
-                .type(InputType.Number)
+                .type(InputType.ONE_TIME_CODE)
                 .width('80%')
             }
             .margin({
@@ -188,11 +191,12 @@ export default struct Login {
                 })
                 .width('15%')
               TextInput({
-                text: $$this.emailcode,
+                text: this.emailcode!!,
                 placeholder: '请输入邮箱验证码'
               })
+                .enableAutoSpacing(true)
                 .maxLength(8)
-                .type(InputType.Number)
+                .type(InputType.ONE_TIME_CODE)
                 .width('80%')
             }
             .margin({
@@ -208,7 +212,7 @@ export default struct Login {
               .width('100%')
               .onClick(async () => {
                 if (!this.email) {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '请输入邮箱'
                   })
                   return
@@ -224,7 +228,7 @@ export default struct Login {
                 })
                 dialogControllerProgress.close()
                 if (res !== 'fail') {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '验证码已成功发送到邮箱：' + this.email
                   })
                   this.buttonEnabled = false
@@ -250,25 +254,25 @@ export default struct Login {
             .width('100%')
             .onClick(async () => {
               if (!this.email) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入邮箱'
                 })
                 return
               }
               if (this.type === 'password' && this.password.length < 8) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入正确的密码'
                 })
                 return
               }
               if (this.type === 'mfa' && this.mfa.length !== 6) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入正确的 MFA'
                 })
                 return
               }
               if (this.type === 'emailcode' && this.emailcode.length !== 8) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入正确的邮箱验证码'
                 })
                 return
@@ -305,7 +309,7 @@ export default struct Login {
                   email: email,
                   endDate: endDate
                 })
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '登录成功'
                 })
                 this.isShowLoginSheet = false
@@ -340,7 +344,7 @@ export default struct Login {
             Column() {
               Toggle({
                 type: ToggleType.Checkbox,
-                isOn: $$this.agree
+                isOn: this.agree!!
               })
                 .onChange((isOn) => {
                   this.controller.setEnabled(isOn)
@@ -361,7 +365,7 @@ export default struct Login {
                       privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 2)
                     openLink(appPrivacyLink?.url as string)
                   } catch (err) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }
@@ -374,7 +378,7 @@ export default struct Login {
                       privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
                     openLink(appPrivacyLink?.url as string)
                   } catch (err) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }

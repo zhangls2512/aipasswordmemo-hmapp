@@ -148,13 +148,13 @@ export default struct Ainewinfo {
           CollaborationServiceStateDialog({
             async onState(stateCode: number, bufferType: string, buffer: ArrayBuffer) {
               if (stateCode !== 0) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '发生错误，错误码：' + stateCode
                 })
                 return
               }
               if (bufferType !== 'general.image') {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请导入图片'
                 })
                 return
@@ -182,7 +182,9 @@ export default struct Ainewinfo {
           Row() {
             Button('图片识别')
               .width('48%')
-              .bindMenu(this.ChooseImageMenu)
+              .bindMenu(this.ChooseImageMenu, {
+                hapticFeedbackMode: HapticFeedbackMode.AUTO
+              })
             Blank()
               .width('4%')
             Button('卡证识别')
@@ -195,7 +197,7 @@ export default struct Ainewinfo {
           if (this.showCard) {
             CardRecognition({
               cardSide: CardSide.FRONT,
-              callback: ((res) => {
+              onResult: ((res) => {
                 this.showCard = false
                 if (res.code === 200) {
                   if (res.cardType === CardType.CARD_ID && res.cardInfo?.front) {
@@ -241,8 +243,9 @@ export default struct Ainewinfo {
           }
           TextArea({
             placeholder: '请输入待识别文本，AI 将自动识别、提取其中的邮箱、姓名、手机号、URL、身份证号',
-            text: $$this.text
+            text: this.text!!
           })
+            .enableAutoSpacing(true)
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
@@ -254,8 +257,9 @@ export default struct Ainewinfo {
       }
 
       ListItem() {
-        Text('AI 识别结果')
+        Text('AI识别结果')
           .fontWeight(FontWeight.Medium)
+          .enableAutoSpacing(true)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')

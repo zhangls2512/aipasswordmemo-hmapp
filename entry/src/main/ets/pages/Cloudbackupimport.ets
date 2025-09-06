@@ -76,8 +76,7 @@ struct Cloudbackupimport {
   ]
 
   getSetting() {
-    const autoImport = this.cloudbackupSettingDataPreferences.getSync('autoImport', [])
-    this.autoImport = autoImport as string[]
+    this.autoImport = this.cloudbackupSettingDataPreferences.getSync('autoImport', []) as string[]
   }
 
   build() {
@@ -93,8 +92,8 @@ struct Cloudbackupimport {
                 { value: '保留' },
                 { value: '覆盖' }
               ])
-                .selected($$this.index)
-                .value($$this.value)
+                .selected(this.index!!)
+                .value(this.value!!)
             }
             .borderRadius(12)
             .padding(12)
@@ -263,7 +262,7 @@ struct Cloudbackupimport {
                       }
                     }
                     this.dialogControllerProgress.close()
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '导入成功'
                     })
                   } else {
@@ -360,7 +359,7 @@ struct Cloudbackupimport {
                       }
                     }
                     this.dialogControllerProgress.close()
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '导入成功'
                     })
                   } else {
@@ -457,7 +456,7 @@ struct Cloudbackupimport {
                       }
                     }
                     this.dialogControllerProgress.close()
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '导入成功'
                     })
                   } else {
@@ -484,11 +483,11 @@ struct Cloudbackupimport {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('导入云备份')
-    .onReady(async () => {
+    .onAppear(async () => {
+      this.getSetting()
       this.accessToken = await get()
       const accountInfo = await getAccountInfo()
       this.uid = accountInfo.uid
-      this.getSetting()
     })
   }
 }

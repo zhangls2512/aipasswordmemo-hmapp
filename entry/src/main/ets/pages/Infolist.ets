@@ -31,10 +31,11 @@ struct Infolist {
 
         ListItem() {
           Column() {
-            Text('IP 地址及其归属地、运营商')
+            Text('IP地址及其归属地、运营商')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
+              .enableAutoSpacing(true)
               .margin({
                 bottom: 6,
                 left: 12
@@ -43,9 +44,10 @@ struct Infolist {
               Column() {
                 Text('使用场景')
                   .fontWeight(FontWeight.Medium)
-                Text('查询轩铭 2512 统一账号登录日志时')
+                Text('查询轩铭2512统一账号登录日志时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -63,9 +65,10 @@ struct Infolist {
               Column() {
                 Text('使用目的')
                   .fontWeight(FontWeight.Medium)
-                Text('生成、存储轩铭 2512 统一账号登录日志')
+                Text('生成、存储轩铭2512统一账号登录日志')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -83,9 +86,10 @@ struct Infolist {
               Column() {
                 Text('收集时机')
                   .fontWeight(FontWeight.Medium)
-                Text('轩铭 2512 统一账号登录成功时')
+                Text('轩铭2512统一账号登录成功时')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -146,10 +150,11 @@ struct Infolist {
 
         ListItem() {
           Column() {
-            Text('华为账号 UnionID')
+            Text('华为账号UnionID')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
+              .enableAutoSpacing(true)
               .margin({
                 bottom: 6,
                 left: 12
@@ -178,9 +183,10 @@ struct Infolist {
               Column() {
                 Text('使用目的')
                   .fontWeight(FontWeight.Medium)
-                Text('关联华为账号与轩铭 2512 统一账号')
+                Text('关联华为账号与轩铭2512统一账号')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -261,10 +267,11 @@ struct Infolist {
 
         ListItem() {
           Column() {
-            Text('订单号、商品 ID')
+            Text('订单号、商品ID')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
+              .enableAutoSpacing(true)
               .margin({
                 bottom: 6,
                 left: 12
@@ -566,9 +573,10 @@ struct Infolist {
               Column() {
                 Text('信息内容')
                   .fontWeight(FontWeight.Medium)
-                Text('数据类型、数据行 ID、数据密文、密钥初始向量')
+                Text('数据类型、数据行ID、数据密文、密钥初始向量')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -693,7 +701,7 @@ struct Infolist {
                     ]
                   })
                 } catch (err) {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
                 }

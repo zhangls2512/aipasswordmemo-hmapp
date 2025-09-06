@@ -88,7 +88,7 @@ export default struct PasswordPage {
               .onClick(() => {
                 this.isShowNewSheet = !this.isShowNewSheet
               })
-              .bindSheet($$this.isShowNewSheet, this.NewSheetBuilder(), {
+              .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
                 height: SheetSize.FIT_CONTENT,
                 preferType: this.preferType,
                 title: {
@@ -154,13 +154,15 @@ export default struct PasswordPage {
                     this.loading = true
                   }
                 }
-              ])
+              ], {
+                hapticFeedbackMode: HapticFeedbackMode.AUTO
+              })
             Button('筛选')
               .buttonStyle(ButtonStyleMode.NORMAL)
               .onClick(() => {
                 this.isShowFilterSheet = !this.isShowFilterSheet
               })
-              .bindSheet($$this.isShowFilterSheet, this.FilterSheetBuilder(), {
+              .bindSheet(this.isShowFilterSheet!!, this.FilterSheetBuilder(), {
                 height: SheetSize.FIT_CONTENT,
                 preferType: this.preferType,
                 title: {
@@ -393,7 +395,9 @@ export default struct PasswordPage {
                     this.loading = true
                   }
                 }
-              ])
+              ], {
+                hapticFeedbackMode: HapticFeedbackMode.AUTO
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -404,7 +408,7 @@ export default struct PasswordPage {
           })
         })
         ListItem()
-          .bindSheet($$this.isShowInfoSheet, this.InfoSheetBuilder(this.passwordId), {
+          .bindSheet(this.isShowInfoSheet!!, this.InfoSheetBuilder(this.passwordId), {
             height: SheetSize.FIT_CONTENT,
             preferType: this.preferType,
             title: {
@@ -503,7 +507,7 @@ export default struct PasswordPage {
         this.context.eventHub.off('refreshPassword')
         this.context.eventHub.off('refreshFilterPassword')
       })
-      .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.passwordId), {
+      .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
         height: SheetSize.FIT_CONTENT,
         preferType: this.preferType,
         title: {

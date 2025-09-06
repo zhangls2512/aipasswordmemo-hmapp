@@ -133,7 +133,7 @@ struct Notice {
                         })
                         dialogControllerProgress.close()
                         if (res !== 'fail') {
-                          promptAction.showToast({
+                          promptAction.openToast({
                             message: '设置成功'
                           })
                         }
@@ -167,7 +167,7 @@ struct Notice {
       try {
         this.pushToken = await pushService.getToken()
       } catch (err) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '发生错误，错误码：' + err.code
         })
       }

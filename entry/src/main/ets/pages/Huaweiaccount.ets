@@ -31,13 +31,13 @@ struct Huaweiaccount {
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err, response) => {
         if (this.type === 'mfa' && this.mfa.length !== 6) {
-          promptAction.showToast({
+          promptAction.openToast({
             message: '请输入正确的 MFA'
           })
           return
         }
         if (this.type === 'emailcode' && this.emailcode.length !== 8) {
-          promptAction.showToast({
+          promptAction.openToast({
             message: '请输入正确的邮箱验证码'
           })
           return
@@ -65,7 +65,7 @@ struct Huaweiaccount {
           })
           dialogControllerProgress.close()
           if (res !== 'fail') {
-            promptAction.showToast({
+            promptAction.openToast({
               message: '绑定成功'
             })
             this.pageInfos.pop()
@@ -73,7 +73,7 @@ struct Huaweiaccount {
           }
         }
         if (err) {
-          promptAction.showToast({
+          promptAction.openToast({
             message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
           })
         }
@@ -147,11 +147,12 @@ struct Huaweiaccount {
                     })
                     .width('15%')
                   TextInput({
-                    text: $$this.mfa,
+                    text: this.mfa!!,
                     placeholder: '请输入 MFA'
                   })
+                    .enableAutoSpacing(true)
                     .maxLength(6)
-                    .type(InputType.Number)
+                    .type(InputType.ONE_TIME_CODE)
                     .width('80%')
                 }
                 .margin({
@@ -167,11 +168,12 @@ struct Huaweiaccount {
                     })
                     .width('15%')
                   TextInput({
-                    text: $$this.emailcode,
+                    text: this.emailcode!!,
                     placeholder: '请输入邮箱验证码'
                   })
+                    .enableAutoSpacing(true)
                     .maxLength(8)
-                    .type(InputType.Number)
+                    .type(InputType.ONE_TIME_CODE)
                     .width('80%')
                 }
                 .margin({
@@ -197,7 +199,7 @@ struct Huaweiaccount {
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.showToast({
+                      promptAction.openToast({
                         message: '验证码已成功发送到邮箱：' + this.email
                       })
                       this.buttonEnabled = false
@@ -242,13 +244,13 @@ struct Huaweiaccount {
                   .width('100%')
                   .onClick(async () => {
                     if (this.type === 'mfa' && this.mfa.length !== 6) {
-                      promptAction.showToast({
+                      promptAction.openToast({
                         message: '请输入正确的 MFA'
                       })
                       return
                     }
                     if (this.type === 'emailcode' && this.emailcode.length !== 8) {
-                      promptAction.showToast({
+                      promptAction.openToast({
                         message: '请输入正确的邮箱验证码'
                       })
                       return
@@ -274,7 +276,7 @@ struct Huaweiaccount {
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.showToast({
+                      promptAction.openToast({
                         message: '解绑成功'
                       })
                       this.pageInfos.pop()
@@ -287,7 +289,7 @@ struct Huaweiaccount {
                   Column() {
                     Toggle({
                       type: ToggleType.Checkbox,
-                      isOn: $$this.agree
+                      isOn: this.agree!!
                     })
                       .onChange((isOn) => {
                         this.controller.setEnabled(isOn)

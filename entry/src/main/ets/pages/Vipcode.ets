@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit'
+import { commentManager } from '@kit.AppGalleryKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -21,8 +22,9 @@ struct Vipcode {
           Column() {
             TextArea({
               placeholder: '请输入兑换码',
-              text: $$this.vipCode
+              text: this.vipCode!!
             })
+              .enableAutoSpacing(true)
               .maxLength(32)
               .showCounter(true)
             Button('兑换')
@@ -45,7 +47,7 @@ struct Vipcode {
                   })
                   dialogControllerProgress.close()
                   if (res !== 'fail') {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '兑换成功'
                     })
                     this.pageInfos.pop()
@@ -70,7 +72,13 @@ struct Vipcode {
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })
               .onClick(() => {
-                this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+                try {
+                  commentManager.showCommentDialog(this.context)
+                } catch (err) {
+                  promptAction.openToast({
+                    message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                  })
+                }
               })
             Text('· 提供有效反馈')
               .fontColor($r('sys.color.font_emphasize'))

@@ -52,7 +52,7 @@ struct Commonsetting {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.allowContinue
+                  isOn: this.allowContinue!!
                 })
                   .onChange(async (isOn) => {
                     this.commonSettingDataPreferences.putSync('allowContinue', isOn)
@@ -95,7 +95,7 @@ struct Commonsetting {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.allowRestore
+                  isOn: this.allowRestore!!
                 })
                   .onChange(async (isOn) => {
                     this.commonSettingDataPreferences.putSync('allowRestore', isOn)
@@ -138,7 +138,7 @@ struct Commonsetting {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.acceptCollaborate
+                  isOn: this.acceptCollaborate!!
                 })
                   .onChange(async (isOn) => {
                     this.commonSettingDataPreferences.putSync('acceptCollaborate', isOn)
@@ -160,7 +160,7 @@ struct Commonsetting {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.destroyWhenBackPressed
+                  isOn: this.destroyWhenBackPressed!!
                 })
                   .onChange(async (isOn) => {
                     this.commonSettingDataPreferences.putSync('destroyWhenBackPressed', isOn)
@@ -201,8 +201,8 @@ struct Commonsetting {
                   { value: '浅色模式' },
                   { value: '深色模式' }
                 ])
-                  .selected($$this.colorModeIndex)
-                  .value($$this.colorModeValue)
+                  .selected(this.colorModeIndex!!)
+                  .value(this.colorModeValue!!)
                   .onSelect((index) => {
                     const applicationContext = this.context.getApplicationContext()
                     if (index === 0) {
@@ -234,7 +234,7 @@ struct Commonsetting {
                   Blank()
                   Toggle({
                     type: ToggleType.Switch,
-                    isOn: $$this.windowRectAutoSave
+                    isOn: this.windowRectAutoSave!!
                   })
                     .onChange(async (isOn) => {
                       this.commonSettingDataPreferences.putSync('windowRectAutoSave', isOn)
@@ -288,7 +288,7 @@ struct Commonsetting {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.keepScreenOn
+                  isOn: this.keepScreenOn!!
                 })
                   .onChange(async (isOn) => {
                     const lastWindow = await window.getLastWindow(this.context)
@@ -320,7 +320,7 @@ struct Commonsetting {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.disallowScreenshot
+                  isOn: this.disallowScreenshot!!
                 })
                   .onChange((isOn) => {
                     this.commonSettingDataPreferences.putSync('disallowScreenshot', isOn)
@@ -342,7 +342,7 @@ struct Commonsetting {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.showPasswordInIndex
+                  isOn: this.showPasswordInIndex!!
                 })
                   .onChange((isOn) => {
                     this.commonSettingDataPreferences.putSync('showPasswordInIndex', isOn)
@@ -359,15 +359,16 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
-                Text('MFA 倒计时样式')
+                Text('MFA倒计时样式')
                   .fontWeight(FontWeight.Medium)
+                  .enableAutoSpacing(true)
                 Blank()
                 Select([
                   { value: '进度条' },
                   { value: '数字' }
                 ])
-                  .selected($$this.mfaSecondsRemainingStyleIndex)
-                  .value($$this.mfaSecondsRemainingStyleValue)
+                  .selected(this.mfaSecondsRemainingStyleIndex!!)
+                  .value(this.mfaSecondsRemainingStyleValue!!)
                   .onSelect((index) => {
                     this.commonSettingDataPreferences.putSync('mfaSecondsRemainingStyle', index)
                     this.commonSettingDataPreferences.flushSync()
@@ -407,8 +408,8 @@ struct Commonsetting {
                   { value: '仅 WLAN 下' },
                   { value: '始终' }
                 ])
-                  .selected($$this.checkVersionUpdateIndex)
-                  .value($$this.checkVersionUpdateValue)
+                  .selected(this.checkVersionUpdateIndex!!)
+                  .value(this.checkVersionUpdateValue!!)
                   .onSelect((index) => {
                     this.commonSettingDataPreferences.putSync('checkVersionUpdate', index)
                     this.commonSettingDataPreferences.flushSync()
@@ -431,8 +432,8 @@ struct Commonsetting {
                   { value: '系统默认' },
                   { value: '自行选择' }
                 ])
-                  .selected($$this.openLinkTypeIndex)
-                  .value($$this.openLinkTypeValue)
+                  .selected(this.openLinkTypeIndex!!)
+                  .value(this.openLinkTypeValue!!)
                   .onSelect((index) => {
                     this.commonSettingDataPreferences.putSync('openLinkType', index)
                     this.commonSettingDataPreferences.flushSync()
@@ -462,14 +463,11 @@ struct Commonsetting {
     .title('通用')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
-      const allowContinue = this.commonSettingDataPreferences.getSync('allowContinue', true)
-      this.allowContinue = allowContinue as boolean
-      const allowRestore = this.commonSettingDataPreferences.getSync('allowRestore', true)
-      this.allowRestore = allowRestore as boolean
-      const acceptCollaborate = this.commonSettingDataPreferences.getSync('acceptCollaborate', true)
-      this.acceptCollaborate = acceptCollaborate as boolean
-      const destroyWhenBackPressed = this.commonSettingDataPreferences.getSync('destroyWhenBackPressed', false)
-      this.destroyWhenBackPressed = destroyWhenBackPressed as boolean
+      this.allowContinue = this.commonSettingDataPreferences.getSync('allowContinue', true) as boolean
+      this.allowRestore = this.commonSettingDataPreferences.getSync('allowRestore', true) as boolean
+      this.acceptCollaborate = this.commonSettingDataPreferences.getSync('acceptCollaborate', true) as boolean
+      this.destroyWhenBackPressed =
+        this.commonSettingDataPreferences.getSync('destroyWhenBackPressed', false) as boolean
       const colorMode = this.commonSettingDataPreferences.getSync('colorMode', 0)
       this.colorModeIndex = colorMode as number
       if (colorMode === 0) {
@@ -481,14 +479,11 @@ struct Commonsetting {
       if (colorMode === 2) {
         this.colorModeValue = '深色模式'
       }
-      const windowRectAutoSave = this.commonSettingDataPreferences.getSync('windowRectAutoSave', false)
-      this.windowRectAutoSave = windowRectAutoSave as boolean
+      this.windowRectAutoSave = this.commonSettingDataPreferences.getSync('windowRectAutoSave', false) as boolean
       const lastWindow = await window.getLastWindow(this.context)
       this.keepScreenOn = lastWindow.getWindowProperties().isKeepScreenOn
-      const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true)
-      this.disallowScreenshot = disallowScreenshot as boolean
-      const showPasswordInIndex = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false)
-      this.showPasswordInIndex = showPasswordInIndex as boolean
+      this.disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+      this.showPasswordInIndex = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
       const mfaSecondsRemainingStyle = this.commonSettingDataPreferences.getSync('mfaSecondsRemainingStyle', 0)
       this.mfaSecondsRemainingStyleIndex = mfaSecondsRemainingStyle as number
       if (mfaSecondsRemainingStyle === 0) {

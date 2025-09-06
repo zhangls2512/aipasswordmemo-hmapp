@@ -29,7 +29,7 @@ struct Servicemode {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.allService
+                  isOn: this.allService!!
                 })
                   .enabled(!this.allService)
                   .onChange((isOn) => {
@@ -61,7 +61,7 @@ struct Servicemode {
                       param: appPrivacyLink?.url
                     })
                   } catch (err) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }
@@ -133,8 +133,7 @@ struct Servicemode {
     .title('应用服务模式')
     .onReady((context) => {
       this.pageInfos = context.pathStack
-      const allService = this.commonSettingDataPreferences.getSync('allService', true)
-      this.allService = allService as boolean
+      this.allService = this.commonSettingDataPreferences.getSync('allService', true) as boolean
     })
     .onDisAppear(() => {
       this.context.eventHub.emit('refreshSetting')

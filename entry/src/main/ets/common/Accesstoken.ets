@@ -29,7 +29,7 @@ export async function get(): Promise<string> {
     const endDate = Number(appAccountManager.getCustomDataSync('default', 'endDate'))
     if (endDate < Date.now() && endDate !== 0) {
       await appAccountManager.removeAccount('default')
-      promptAction.showToast({
+      promptAction.openToast({
         message: '登录态过期，请重新登录'
       })
       return ''
@@ -47,7 +47,7 @@ export async function getAccountInfo(): Promise<AccountInfo> {
     const endDate = Number(appAccountManager.getCustomDataSync('default', 'endDate'))
     if (endDate < Date.now() && endDate !== 0) {
       await appAccountManager.removeAccount('default')
-      promptAction.showToast({
+      promptAction.openToast({
         message: '登录已到期，请重新登录'
       })
       return {
@@ -98,12 +98,12 @@ export async function check() {
             email: email,
             endDate: endDate
           })
-          promptAction.showToast({
+          promptAction.openToast({
             message: '华为账号静默登录成功'
           })
         }
       } catch (err) {
-        promptAction.showToast({
+        promptAction.openToast({
           message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
         })
       }

@@ -51,17 +51,17 @@ struct Autouploaderrorlogtype {
       value: 'SCROLL_JANK'
     },
     {
-      name: 'CPU 高负载',
+      name: 'CPU高负载',
       value: 'CPU_USAGE_HIGH'
     },
     {
-      name: '24h 功耗器件分解统计',
+      name: '24小时功耗器件分解统计',
       value: 'BATTERY_USAGE'
     }
   ]
 
   getSetting() {
-    const autoUploadErrorLogType = this.debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
+    this.autoUploadErrorLogType = this.debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
       'APP_CRASH',
       'APP_FREEZE',
       'APP_KILLED',
@@ -72,8 +72,7 @@ struct Autouploaderrorlogtype {
       'SCROLL_JANK',
       'CPU_USAGE_HIGH',
       'BATTERY_USAGE'
-    ])
-    this.autoUploadErrorLogType = autoUploadErrorLogType as string[]
+    ]) as string[]
   }
 
   build() {
@@ -92,6 +91,7 @@ struct Autouploaderrorlogtype {
               Row() {
                 Text(item.name)
                   .fontWeight(FontWeight.Medium)
+                  .enableAutoSpacing(true)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
@@ -131,7 +131,7 @@ struct Autouploaderrorlogtype {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('自动上传故障日志类型')
-    .onReady(() => {
+    .onAppear(() => {
       this.getSetting()
     })
   }

@@ -52,7 +52,7 @@ struct Errorlog {
         }
       })
     } catch (err) {
-      promptAction.showToast({
+      promptAction.openToast({
         message: '发生错误，错误码：' + err.code
       })
     }
@@ -88,7 +88,7 @@ struct Errorlog {
         }
       }).filter(item => item.type === type)
     } catch (err) {
-      promptAction.showToast({
+      promptAction.openToast({
         message: '发生错误，错误码：' + err.code
       })
     }
@@ -109,7 +109,7 @@ struct Errorlog {
             { value: '主线程超时' },
             { value: '滑动丢帧' },
             { value: 'CPU 高负载' },
-            { value: '24h 功耗器件分解统计' }
+            { value: '24 小时功耗器件分解统计' }
           ])
             .margin({
               bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -282,7 +282,7 @@ struct Errorlog {
                       copy(filestring)
                     }
                   } catch (err) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '发生错误，错误码：' + err.code
                     })
                   }
@@ -306,7 +306,7 @@ struct Errorlog {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('故障日志')
-    .onReady(() => {
+    .onAppear(() => {
       this.get()
     })
   }

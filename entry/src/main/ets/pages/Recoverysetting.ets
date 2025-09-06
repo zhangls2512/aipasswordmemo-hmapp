@@ -116,7 +116,7 @@ struct Recoverysetting {
               })
               .onClick(() => {
                 appRecovery.enableAppRecovery(this.restart, this.saveOccasion, this.saveMode)
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '保存成功'
                 })
                 this.pageInfos.pop()

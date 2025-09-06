@@ -56,7 +56,7 @@ export default struct Newpassword {
           const imagePixelMap = await imageSource.createPixelMap()
           const imageSize = imagePixelMap.getImageInfoSync().size
           if (imageSize.width !== imageSize.height) {
-            promptAction.showToast({
+            promptAction.openToast({
               message: '请选择宽高比为 1:1 的图片'
             })
             return
@@ -97,8 +97,9 @@ export default struct Newpassword {
       ListItem() {
         TextInput({
           placeholder: '请输入名称',
-          text: $$this.passwordName
+          text: this.passwordName!!
         })
+          .enableAutoSpacing(true)
       }
 
       ListItem() {
@@ -114,13 +115,13 @@ export default struct Newpassword {
           CollaborationServiceStateDialog({
             async onState(stateCode: number, bufferType: string, buffer: ArrayBuffer) {
               if (stateCode !== 0) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '发生错误，错误码：' + stateCode
                 })
                 return
               }
               if (bufferType !== 'general.image') {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请选择图片'
                 })
                 return
@@ -129,7 +130,7 @@ export default struct Newpassword {
               const imagePixelMap = await imageSource.createPixelMap()
               const imageSize = imagePixelMap.getImageInfoSync().size
               if (imageSize.width !== imageSize.height) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请选择宽高比为 1:1 的图片'
                 })
                 return
@@ -167,8 +168,8 @@ export default struct Newpassword {
             { value: '自定义' }
           ])
             .enabled((this.infoTypeIndex === 0 && this.infoValue === '') || this.infoTypeIndex !== 0)
-            .selected($$this.infoTypeIndex)
-            .value($$this.infoTypeValue)
+            .selected(this.infoTypeIndex!!)
+            .value(this.infoTypeValue!!)
             .onSelect(async (index, value) => {
               if (index !== 11) {
                 this.infoType = value
@@ -182,8 +183,9 @@ export default struct Newpassword {
           if (!this.specialTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入类型',
-              text: $$this.infoType
+              text: this.infoType!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -201,12 +203,15 @@ export default struct Newpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .bindMenu(this.ChooseImageMenu)
+              .bindMenu(this.ChooseImageMenu, {
+                hapticFeedbackMode: HapticFeedbackMode.AUTO
+              })
             TextInput({
               placeholder: '请选择图片',
               text: this.infoValue
             })
               .enabled(false)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -214,9 +219,10 @@ export default struct Newpassword {
           if (this.infoType === '昵称') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.NICKNAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -224,9 +230,10 @@ export default struct Newpassword {
           if (this.infoType === '用户名') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.USER_NAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -235,9 +242,10 @@ export default struct Newpassword {
           if (this.infoType === '密码') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .enableAutoFill(false)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -246,25 +254,28 @@ export default struct Newpassword {
           if (this.infoType === 'MFA') {
             TextInput({
               placeholder: '请输入密钥',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .enableAutoFill(false)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Password)
             TextInput({
               placeholder: '请输入步长 (单位：秒)',
-              text: $$this.mfaStep
+              text: this.mfaStep!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Number)
             TextInput({
               placeholder: '请输入位数',
-              text: $$this.mfaDigits
+              text: this.mfaDigits!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -273,9 +284,10 @@ export default struct Newpassword {
           if (this.infoType === '姓名') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.PERSON_FULL_NAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -283,9 +295,10 @@ export default struct Newpassword {
           if (this.infoType === '手机号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.PHONE_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -294,9 +307,10 @@ export default struct Newpassword {
           if (this.infoType === '邮箱') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.EMAIL_ADDRESS)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -305,9 +319,10 @@ export default struct Newpassword {
           if (this.infoType === '银行卡号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.BANK_CARD_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -316,9 +331,10 @@ export default struct Newpassword {
           if (this.infoType === '身份证号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.ID_CARD_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -326,8 +342,9 @@ export default struct Newpassword {
           if (this.infoType === 'URL') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -336,8 +353,9 @@ export default struct Newpassword {
           if (!this.specialTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -361,7 +379,7 @@ export default struct Newpassword {
                 .width('20%')
                 .onClick(() => {
                   if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '已添加此类型信息'
                     })
                     return
@@ -393,45 +411,45 @@ export default struct Newpassword {
               })
               .onClick(async () => {
                 if (!this.infoType) {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '请输入类型'
                   })
                   return
                 }
                 if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '已添加此类型信息'
                   })
                   return
                 }
                 let value = this.infoValue
                 if (this.infoType === '图标' && !value) {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '请选择图片'
                   })
                   return
                 }
                 if (this.infoType !== '图标' && this.infoType !== 'MFA' && !value) {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '请输入内容'
                   })
                   return
                 }
                 if (this.infoType === 'MFA') {
                   if (!value) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '请输入密钥'
                     })
                     return
                   }
                   if (!this.mfaStep) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '请输入步长'
                     })
                     return
                   }
                   if (!this.mfaDigits) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '请输入位数'
                     })
                     return
@@ -453,7 +471,7 @@ export default struct Newpassword {
                 .buttonStyle(ButtonStyleMode.NORMAL)
                 .onClick(async () => {
                   if (this.passwordInfoArray.some(item => item.type === 'MFA')) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '已添加此类型信息'
                     })
                     return
@@ -463,14 +481,14 @@ export default struct Newpassword {
                   })
                   const uriInstance = new uri.URI(res.originalValue)
                   if (uriInstance.scheme !== 'otpauth') {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '请扫描有效的 MFA 添加二维码'
                     })
                     return
                   }
                   const uriSecret = uriInstance.getQueryValue('secret')
                   if (!uriSecret) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '请扫描有效的 MFA 添加二维码'
                     })
                     return
@@ -556,8 +574,9 @@ export default struct Newpassword {
       ListItem() {
         TextInput({
           placeholder: '请输入内容',
-          text: $$this.passwordTag
+          text: this.passwordTag!!
         })
+          .enableAutoSpacing(true)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -575,7 +594,7 @@ export default struct Newpassword {
                 .width('20%')
                 .onClick(() => {
                   if (this.passwordTagArray.some(tagItem => tagItem === item)) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '已添加此标签'
                     })
                     return
@@ -600,13 +619,13 @@ export default struct Newpassword {
           Button('添加')
             .onClick(() => {
               if (!this.passwordTag) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入内容'
                 })
                 return
               }
               if (this.passwordTagArray.some(item => item === this.passwordTag)) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '已添加此标签'
                 })
                 return
@@ -657,7 +676,7 @@ export default struct Newpassword {
               Blank()
               Toggle({
                 type: ToggleType.Switch,
-                isOn: $$this.cloudBackup
+                isOn: this.cloudBackup!!
               })
                 .enabled(this.allowCloudBackup)
             }
@@ -691,13 +710,13 @@ export default struct Newpassword {
           Button('修改')
             .onClick(async () => {
               if (!this.passwordName) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入名称'
                 })
                 return
               }
               if (this.passwordInfoArray.length === 0) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请添加信息'
                 })
                 return

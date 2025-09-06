@@ -103,7 +103,7 @@ export default struct Passwordcheck {
       }
       this.repeatArray = await getRepeatPasswordList()
     })
-    .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.passwordId), {
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
       height: SheetSize.FIT_CONTENT,
       preferType: this.preferType,
       title: {

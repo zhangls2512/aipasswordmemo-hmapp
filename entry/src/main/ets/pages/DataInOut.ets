@@ -80,8 +80,8 @@ struct DataInOut {
                 { value: '保留' },
                 { value: '覆盖' }
               ])
-                .selected($$this.index)
-                .value($$this.value)
+                .selected(this.index!!)
+                .value(this.value!!)
             }
             .borderRadius(12)
             .padding(12)
@@ -156,7 +156,7 @@ struct DataInOut {
                   const columnCount = firstLine.length
                   const nameIndex = firstLine.findIndex(item => item === '名称')
                   if (nameIndex === -1) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '导入失败，原因：无名称列'
                     })
                     return
@@ -191,7 +191,7 @@ struct DataInOut {
                   }
                   await importPassword(JSON.stringify(result), conflictResolution)
                 }
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '导入成功'
                 })
               })
@@ -239,7 +239,7 @@ struct DataInOut {
                   conflictResolution = 5
                 }
                 await importInfo(filestring, conflictResolution)
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '导入成功'
                 })
               })
@@ -287,7 +287,7 @@ struct DataInOut {
                   conflictResolution = 5
                 }
                 await importTag(filestring, conflictResolution)
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '导入成功'
                 })
               })
@@ -297,7 +297,7 @@ struct DataInOut {
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
             Text() {
-              Span('导入密码须知：txt 文件需为从本页面下方导出的、csv 文件需为')
+              Span('导入密码须知：txt文件需为从本页面下方导出的、csv文件需为')
                 .fontColor($r('sys.color.font_secondary'))
               Span('此文档')
                 .fontColor($r('sys.color.font_emphasize'))
@@ -309,6 +309,7 @@ struct DataInOut {
                 .fontColor($r('sys.color.font_secondary'))
             }
             .fontSize($r('sys.float.ohos_id_text_size_body3'))
+            .enableAutoSpacing(true)
             .margin({
               top: 6,
               left: 12,
@@ -400,7 +401,7 @@ struct DataInOut {
                   })
                 }
                 await importPassword(JSON.stringify(result), conflictResolution)
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '导入成功'
                 })
               })
@@ -491,7 +492,7 @@ struct DataInOut {
                 })
                 fs.writeSync(file.fd, JSON.stringify(arrayOut))
                 fs.closeSync(file)
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '导出成功'
                 })
               })
@@ -544,7 +545,7 @@ struct DataInOut {
                 })
                 fs.writeSync(file.fd, JSON.stringify(arrayOut))
                 fs.closeSync(file)
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '导出成功'
                 })
               })
@@ -597,7 +598,7 @@ struct DataInOut {
                 })
                 fs.writeSync(file.fd, JSON.stringify(arrayOut))
                 fs.closeSync(file)
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '导出成功'
                 })
               })

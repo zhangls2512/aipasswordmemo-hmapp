@@ -21,8 +21,9 @@ struct Importkey {
           Column() {
             TextArea({
               placeholder: '请输入 Base64 编码、长度 44 的 AES256 密钥',
-              text: $$this.keyValue
+              text: this.keyValue!!
             })
+              .enableAutoSpacing(true)
               .maxLength(44)
               .showCounter(true)
             Button('导入')

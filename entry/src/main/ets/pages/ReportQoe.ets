@@ -114,7 +114,7 @@ struct ReportQoe {
                   serviceType: this.serviceType,
                   qoeType: this.qoeType
                 })
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '反馈成功'
                 })
                 this.pageInfos.pop()

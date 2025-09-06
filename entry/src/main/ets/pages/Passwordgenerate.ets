@@ -44,7 +44,7 @@ export default struct Passwordgenerate {
             Blank()
             Toggle({
               type: ToggleType.Switch,
-              isOn: $$this.digit
+              isOn: this.digit!!
             })
           }
           .borderRadius(12)
@@ -62,7 +62,7 @@ export default struct Passwordgenerate {
             Blank()
             Toggle({
               type: ToggleType.Switch,
-              isOn: $$this.lowercaseLetter
+              isOn: this.lowercaseLetter!!
             })
           }
           .borderRadius(12)
@@ -80,7 +80,7 @@ export default struct Passwordgenerate {
             Blank()
             Toggle({
               type: ToggleType.Switch,
-              isOn: $$this.uppercaseLetter
+              isOn: this.uppercaseLetter!!
             })
           }
           .borderRadius(12)
@@ -98,7 +98,7 @@ export default struct Passwordgenerate {
             Blank()
             Toggle({
               type: ToggleType.Switch,
-              isOn: $$this.specialCharacter
+              isOn: this.specialCharacter!!
             })
           }
           .borderRadius(12)

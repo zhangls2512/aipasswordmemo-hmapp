@@ -158,7 +158,7 @@ export async function getPasswordList(orderColumn: string = 'updateTime'): Promi
     resultSet.close()
     return array
   } catch {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误'
     })
     return []
@@ -240,7 +240,7 @@ export async function getFilterPasswordList(nameKeyword: string, info: PasswordI
     resultSet.close()
     return array
   } catch {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误'
     })
     return []
@@ -357,7 +357,7 @@ export async function getInfoList(): Promise<Info[]> {
     resultSet.close()
     return array
   } catch {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误'
     })
     return []
@@ -384,7 +384,7 @@ export async function getTypeInfoList(type: string): Promise<string[]> {
     resultSet.close()
     return array
   } catch {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误'
     })
     return []
@@ -507,7 +507,7 @@ export async function getTagList(orderColumn: string = 'updateTime'): Promise<Ta
     resultSet.close()
     return array
   } catch {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误'
     })
     return []

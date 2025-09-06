@@ -55,7 +55,7 @@ export async function importPassword(data: string, conflict: relationalStore.Con
     autoSyncTable('password')
     autoBackupTable('password')
   } catch {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误'
     })
   }
@@ -87,7 +87,7 @@ export async function importInfo(data: string, conflict: relationalStore.Conflic
     autoSyncTable('info')
     autoBackupTable('info')
   } catch {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误'
     })
   }
@@ -119,7 +119,7 @@ export async function importTag(data: string, conflict: relationalStore.Conflict
     autoSyncTable('tag')
     autoBackupTable('tag')
   } catch {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误'
     })
   }

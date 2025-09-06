@@ -52,7 +52,7 @@ export async function newPassword(data: PasswordInput) {
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
-  promptAction.showToast({
+  promptAction.openToast({
     message: '新增成功'
   })
   autoSyncTable('password')
@@ -104,7 +104,7 @@ export async function updatePassword(id: number, data: PasswordInput) {
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
   }, predicates)
-  promptAction.showToast({
+  promptAction.openToast({
     message: '修改成功'
   })
   autoSyncTable('password')
@@ -149,7 +149,7 @@ export async function newInfo(data: InfoInput) {
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
     resultSet.close()
-    promptAction.showToast({
+    promptAction.openToast({
       message: '新增失败：已存在'
     })
     throw new Error('fail')
@@ -162,7 +162,7 @@ export async function newInfo(data: InfoInput) {
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
-  promptAction.showToast({
+  promptAction.openToast({
     message: '新增成功'
   })
   autoSyncTable('info')
@@ -200,7 +200,7 @@ export async function updateInfo(id: number, data: InfoInput) {
   const resultSeta = await rdbStore.query(predicatesa)
   if (resultSeta.goToNextRow()) {
     resultSeta.close()
-    promptAction.showToast({
+    promptAction.openToast({
       message: '修改失败：已存在'
     })
     throw new Error('fail')
@@ -224,7 +224,7 @@ export async function updateInfo(id: number, data: InfoInput) {
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
   }, predicatesb)
-  promptAction.showToast({
+  promptAction.openToast({
     message: '修改成功'
   })
   autoSyncTable('info')
@@ -267,7 +267,7 @@ export async function newTag(data: TagInput) {
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
     resultSet.close()
-    promptAction.showToast({
+    promptAction.openToast({
       message: '新增失败：已存在'
     })
     throw new Error('fail')
@@ -280,7 +280,7 @@ export async function newTag(data: TagInput) {
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
-  promptAction.showToast({
+  promptAction.openToast({
     message: '新增成功'
   })
   autoSyncTable('tag')
@@ -318,7 +318,7 @@ export async function updateTag(id: number, data: TagInput) {
   const colorIndex = resultSeta.getColumnIndex('color')
   if (resultSeta.goToNextRow() && resultSeta.getValue(colorIndex) as string === data.color) {
     resultSeta.close()
-    promptAction.showToast({
+    promptAction.openToast({
       message: '修改失败：已存在'
     })
     throw new Error('fail')
@@ -342,7 +342,7 @@ export async function updateTag(id: number, data: TagInput) {
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
   }, predicatesb)
-  promptAction.showToast({
+  promptAction.openToast({
     message: '修改成功'
   })
   autoSyncTable('tag')
@@ -387,7 +387,7 @@ export async function deleteData(type: string, id: number) {
   const predicates = new relationalStore.RdbPredicates(type)
   predicates.equalTo('id', id)
   rdbStore.deleteSync(predicates)
-  promptAction.showToast({
+  promptAction.openToast({
     message: '删除成功'
   })
   autoSyncTable(type)
@@ -449,7 +449,7 @@ export async function setCloudBackup(data: CloudBackupItem) {
       rdbStore.updateSync({
         cloudBackupTime: JSON.stringify(cloudBackupTime)
       }, predicates)
-      promptAction.showToast({
+      promptAction.openToast({
         message: '云备份成功'
       })
     }
@@ -496,7 +496,7 @@ export async function deleteCloudBackup(data: CloudBackupItem) {
       rdbStore.updateSync({
         cloudBackupTime: JSON.stringify(cloudBackupTime)
       }, predicates)
-      promptAction.showToast({
+      promptAction.openToast({
         message: '删除云备份成功'
       })
     }

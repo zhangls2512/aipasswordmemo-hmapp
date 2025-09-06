@@ -30,7 +30,6 @@ struct Cleardata {
   @Local allLog: boolean = false
   @Local errorLog: boolean = false
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  controller: webview.WebviewController = new webview.WebviewController()
 
   stringToArray(str: string): Uint8Array {
     const textEncoder = new util.TextEncoder()
@@ -59,7 +58,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .selectAll($$this.allSetting)
+                  .selectAll(this.allSetting!!)
                   .onChange((itemName) => {
                     this.setting = itemName.name
                   })
@@ -84,10 +83,11 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.speakSetting)
+                  .select(this.speakSetting!!)
                 Column() {
-                  Text('AI 助手 (不再使用，可放心清理)')
+                  Text('AI助手 (不再使用，可放心清理)')
                     .fontWeight(FontWeight.Medium)
+                    .enableAutoSpacing(true)
                   Text('语音播报、连续对话')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -116,7 +116,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.oldaccount)
+                  .select(this.oldaccount!!)
                 Column() {
                   Text('旧账号 (不再使用，可放心清理)')
                     .fontWeight(FontWeight.Medium)
@@ -148,7 +148,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.cloudbackupSetting)
+                  .select(this.cloudbackupSetting!!)
                 Column() {
                   Text('云备份')
                     .fontWeight(FontWeight.Medium)
@@ -180,7 +180,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.dataSetting)
+                  .select(this.dataSetting!!)
                 Column() {
                   Text('数据')
                     .fontWeight(FontWeight.Medium)
@@ -212,7 +212,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.commonSetting)
+                  .select(this.commonSetting!!)
                 Column() {
                   Text('通用')
                     .fontWeight(FontWeight.Medium)
@@ -244,7 +244,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.permissionSetting)
+                  .select(this.permissionSetting!!)
                 Column() {
                   Text('权限')
                     .fontWeight(FontWeight.Medium)
@@ -276,7 +276,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.debugSetting)
+                  .select(this.debugSetting!!)
                 Column() {
                   Text('调试')
                     .fontWeight(FontWeight.Medium)
@@ -355,7 +355,7 @@ struct Cleardata {
                   }
                   preferences.deletePreferences(this.context, item)
                 })
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '清理成功'
                 })
               }
@@ -385,7 +385,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .selectAll($$this.allCache)
+                  .selectAll(this.allCache!!)
                   .onChange((itemName) => {
                     this.cache = itemName.name
                   })
@@ -410,7 +410,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.appCache)
+                  .select(this.appCache!!)
                 Column() {
                   Text('应用')
                     .fontWeight(FontWeight.Medium)
@@ -442,13 +442,14 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.webviewCache)
+                  .select(this.webviewCache!!)
                 Column() {
                   Text('Webview')
                     .fontWeight(FontWeight.Medium)
-                  Text('Webview 缓存')
+                  Text('Webview缓存')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .enableAutoSpacing(true)
                     .margin({
                       top: $r('sys.float.ohos_id_text_margin_vertical')
                     })
@@ -528,10 +529,10 @@ struct Cleardata {
                       }
                     }
                     if (item === 'webviewCache') {
-                      this.controller.removeCache(true)
+                      webview.WebviewController.removeAllCache(true)
                     }
                   })
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '清理成功'
                   })
                 }
@@ -562,7 +563,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .selectAll($$this.allLog)
+                  .selectAll(this.allLog!!)
                   .onChange((itemName) => {
                     this.log = itemName.name
                   })
@@ -587,7 +588,7 @@ struct Cleardata {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .select($$this.errorLog)
+                  .select(this.errorLog!!)
                 Column() {
                   Text('故障')
                     .fontWeight(FontWeight.Medium)
@@ -645,7 +646,7 @@ struct Cleardata {
                       }
                     }
                   })
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '清理成功'
                   })
                 }

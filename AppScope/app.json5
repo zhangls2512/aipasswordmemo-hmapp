@@ -9,6 +9,7 @@
       "multiAppModeType": "appClone",
       "maxCount": 5
     },
-    "configuration": "$profile:configuration"
+    "configuration": "$profile:configuration",
+    "appPreloadPhase": "windowStageCreated"
   }
 }

@@ -50,17 +50,13 @@ struct Tablesync {
   ]
 
   getSetting() {
-    const onTables = this.dataSettingDataPreferences.getSync('onTables', [])
-    this.onTables = onTables as string[]
-    const autoSyncTables = this.dataSettingDataPreferences.getSync('autoSyncTables', [])
-    this.autoSyncTables = autoSyncTables as string[]
-    const autoSyncDevices = this.dataSettingDataPreferences.getSync('autoSyncDevices', [])
-    this.autoSyncDevices = autoSyncDevices as Item[]
-    const pauseAutoSyncWhenLowBatteryCapacityLevel =
-      this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-    this.pauseAutoSyncWhenLowBatteryCapacityLevel = pauseAutoSyncWhenLowBatteryCapacityLevel as boolean
-    const pauseAutoSyncWhenPowerSave = this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
-    this.pauseAutoSyncWhenPowerSave = pauseAutoSyncWhenPowerSave as boolean
+    this.onTables = this.dataSettingDataPreferences.getSync('onTables', []) as string[]
+    this.autoSyncTables = this.dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
+    this.autoSyncDevices = this.dataSettingDataPreferences.getSync('autoSyncDevices', []) as Item[]
+    this.pauseAutoSyncWhenLowBatteryCapacityLevel =
+      this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false) as boolean
+    this.pauseAutoSyncWhenPowerSave =
+      this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false) as boolean
   }
 
   build() {
@@ -313,7 +309,7 @@ struct Tablesync {
                 const autoSyncDevices = this.autoSyncDevices.filter(device => device.deviceId !== item.deviceId)
                 this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
                 this.dataSettingDataPreferences.flushSync()
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '已关闭'
                 })
                 this.getSetting()
@@ -353,7 +349,7 @@ struct Tablesync {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.pauseAutoSyncWhenLowBatteryCapacityLevel
+                  isOn: this.pauseAutoSyncWhenLowBatteryCapacityLevel!!
                 })
                   .onChange((isOn) => {
                     this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenLowBatteryCapacityLevel', isOn)
@@ -375,7 +371,7 @@ struct Tablesync {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.pauseAutoSyncWhenPowerSave
+                  isOn: this.pauseAutoSyncWhenPowerSave!!
                 })
                   .onChange((isOn) => {
                     this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenPowerSave', isOn)
@@ -407,7 +403,7 @@ struct Tablesync {
               .onClick(() => {
                 this.availableDeviceArray = distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo')
                   .getAvailableDeviceListSync() as Item[]
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '刷新成功'
                 })
               })
@@ -533,7 +529,7 @@ struct Tablesync {
                   const autoSyncDevices = [...this.autoSyncDevices, item]
                   this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
                   this.dataSettingDataPreferences.flushSync()
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '已开启'
                   })
                   this.getSetting()
@@ -673,7 +669,7 @@ struct Tablesync {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('设备间数据同步')
-    .onReady(async () => {
+    .onAppear(async () => {
       this.getSetting()
       const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
       if (res) {

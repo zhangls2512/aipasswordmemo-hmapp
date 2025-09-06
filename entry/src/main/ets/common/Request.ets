@@ -66,13 +66,13 @@ export default async function request(path: string, body: rcp.RequestContent, hi
       })
       return 'fail'
     }
-    promptAction.showToast({
+    promptAction.openToast({
       message: '请求失败，错误码：' + response.statusCode
     })
     return 'fail'
   } catch (err) {
     session.close()
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return 'fail'

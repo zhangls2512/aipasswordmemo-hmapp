@@ -83,7 +83,7 @@ struct Permissionsetting {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.writePasteBoard
+                  isOn: this.writePasteBoard!!
                 })
                   .onChange((isOn) => {
                     this.permissionSettingDataPreferences.putSync('writePasteBoard', isOn)
@@ -121,9 +121,8 @@ struct Permissionsetting {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('权限管理')
-    .onReady(() => {
-      const writePasteBoard = this.permissionSettingDataPreferences.getSync('writePasteBoard', false)
-      this.writePasteBoard = writePasteBoard as boolean
+    .onAppear(() => {
+      this.writePasteBoard = this.permissionSettingDataPreferences.getSync('writePasteBoard', false) as boolean
     })
   }
 }

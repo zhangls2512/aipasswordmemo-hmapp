@@ -26,16 +26,16 @@ export async function syncTable(table: string, networkId: string, syncMode: rela
   try {
     const res = await rdbStore.sync(syncMode, predicates)
     if (res[0][1] === 0) {
-      promptAction.showToast({
+      promptAction.openToast({
         message: '同步成功，设备网络标识：' + res[0][0]
       })
     } else {
-      promptAction.showToast({
+      promptAction.openToast({
         message: '同步失败，设备网络标识：' + res[0][0] + '，错误码：' + res[0][1]
       })
     }
   } catch (err) {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
   }
@@ -54,7 +54,7 @@ export async function autoSyncTable(table: string) {
   const pauseAutoSyncWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false) as boolean
   const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4) as number
   if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '电池电量低，自动暂停同步'
     })
     return
@@ -64,7 +64,7 @@ export async function autoSyncTable(table: string) {
     if (power.getPowerMode() === 603) {
       text = '超级'
     }
-    promptAction.showToast({
+    promptAction.openToast({
       message: '系统开启' + text + '省电模式，暂停自动同步'
     })
     return
@@ -98,7 +98,7 @@ export async function backupTable(table: string) {
   const isBackupTables: string[] = dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
   dataSettingDataPreferences.putSync('isBackupTables', Array.from(new Set([...isBackupTables, table])))
   dataSettingDataPreferences.flushSync()
-  promptAction.showToast({
+  promptAction.openToast({
     message: '备份成功'
   })
 }
@@ -117,7 +117,7 @@ export async function autoBackupTable(table: string) {
     dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false) as boolean
   const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4) as number
   if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '电池电量低，自动暂停同步'
     })
     return
@@ -127,7 +127,7 @@ export async function autoBackupTable(table: string) {
     if (power.getPowerMode() === 603) {
       text = '超级'
     }
-    promptAction.showToast({
+    promptAction.openToast({
       message: '系统开启' + text + '省电模式，暂停自动备份'
     })
     return
@@ -151,7 +151,7 @@ export async function recoveryTable(table: string) {
     allowRebuild: true
   })
   await rdbStore.restore(table + 'Backup.db')
-  promptAction.showToast({
+  promptAction.openToast({
     message: '恢复成功'
   })
 }

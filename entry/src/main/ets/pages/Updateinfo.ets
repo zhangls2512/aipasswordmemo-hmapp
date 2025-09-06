@@ -22,14 +22,16 @@ export default struct Updateinfo {
         Column() {
           TextInput({
             placeholder: '请输入类型',
-            text: $$this.infoType
+            text: this.infoType!!
           })
+            .enableAutoSpacing(true)
           if (this.infoType === '昵称') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.NICKNAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -37,9 +39,10 @@ export default struct Updateinfo {
           if (this.infoType === '用户名') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.USER_NAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -48,9 +51,10 @@ export default struct Updateinfo {
           if (this.infoType === '密码') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .enableAutoFill(false)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -59,9 +63,10 @@ export default struct Updateinfo {
           if (this.infoType === '姓名') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.PERSON_FULL_NAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -69,9 +74,10 @@ export default struct Updateinfo {
           if (this.infoType === '手机号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.PHONE_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -80,9 +86,10 @@ export default struct Updateinfo {
           if (this.infoType === '邮箱') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.EMAIL_ADDRESS)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -91,9 +98,10 @@ export default struct Updateinfo {
           if (this.infoType === '银行卡号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.BANK_CARD_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -102,9 +110,10 @@ export default struct Updateinfo {
           if (this.infoType === '身份证号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.ID_CARD_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -112,8 +121,9 @@ export default struct Updateinfo {
           if (this.infoType === 'URL') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -122,8 +132,9 @@ export default struct Updateinfo {
           if (!this.specialTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -140,7 +151,7 @@ export default struct Updateinfo {
               Blank()
               Toggle({
                 type: ToggleType.Switch,
-                isOn: $$this.cloudBackup
+                isOn: this.cloudBackup!!
               })
                 .enabled(this.allowCloudBackup)
             }
@@ -174,13 +185,13 @@ export default struct Updateinfo {
           Button('修改')
             .onClick(async () => {
               if (!this.infoType) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入类型'
                 })
                 return
               }
               if (!this.infoValue) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入内容'
                 })
                 return

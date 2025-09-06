@@ -33,8 +33,7 @@ struct Autocloudbackupsetting {
   ]
 
   getSetting() {
-    const autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', [])
-    this.autoOn = autoOn as string[]
+    this.autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
   }
 
   build() {
@@ -92,7 +91,7 @@ struct Autocloudbackupsetting {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('云备份自动开启设置')
-    .onReady(() => {
+    .onAppear(() => {
       this.getSetting()
     })
   }

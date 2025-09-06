@@ -32,9 +32,10 @@ export default struct Newtag {
         Column() {
           TextInput({
             placeholder: '请输入内容',
-            text: $$this.tagValue
+            text: this.tagValue!!
           })
             .defaultFocus(true)
+            .enableAutoSpacing(true)
           Row() {
             ForEach(this.colorArray, (item: string) => {
               Circle({
@@ -65,8 +66,9 @@ export default struct Newtag {
               })
             TextInput({
               placeholder: '请输入颜色',
-              text: $$this.tagColor
+              text: this.tagColor!!
             })
+              .enableAutoSpacing(true)
               .width('90%')
           }
           .margin({
@@ -90,7 +92,7 @@ export default struct Newtag {
               Blank()
               Toggle({
                 type: ToggleType.Switch,
-                isOn: $$this.cloudBackup
+                isOn: this.cloudBackup!!
               })
                 .enabled(this.allowCloudBackup)
             }
@@ -124,13 +126,13 @@ export default struct Newtag {
           Button('新增')
             .onClick(async () => {
               if (!this.tagValue) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入内容'
                 })
                 return
               }
               if (!this.tagColor) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入颜色'
                 })
                 return

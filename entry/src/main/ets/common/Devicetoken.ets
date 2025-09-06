@@ -6,7 +6,7 @@ export default async function get(): Promise<string> {
     const deviceToken = await deviceCertificate.getDeviceToken()
     return deviceToken
   } catch (err) {
-    promptAction.showToast({
+    promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return ''
