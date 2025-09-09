@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
+import { netBoost } from '@kit.NetworkBoostKit';
 import { get, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -115,16 +116,28 @@ struct Vip {
       })
       return
     }
+    netBoost.setSceneDesc({
+      scene: 'transaction',
+      sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
+    })
     try {
       await iap.createPurchase(this.context, {
         productId: id,
         productType: type,
         developerPayload: this.uid
       })
+      netBoost.setSceneDesc({
+        scene: 'transaction',
+        sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
+      })
       promptAction.openToast({
         message: '服务器正在验证，大约需要 5-20 秒，请稍候'
       })
     } catch (err) {
+      netBoost.setSceneDesc({
+        scene: 'transaction',
+        sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
+      })
       const errCode = err.code as number
       if (errCode === 1001860000) {
         return

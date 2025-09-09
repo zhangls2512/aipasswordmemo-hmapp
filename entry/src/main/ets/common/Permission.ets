@@ -1,7 +1,7 @@
 import { abilityAccessCtrl, Permissions } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 
-export function getPermission(permission: Permissions): boolean {
+export function getPermission(permission: Permissions) {
   const atManager = abilityAccessCtrl.createAtManager()
   const status = atManager.getSelfPermissionStatus(permission)
   if (status === 0) {
@@ -10,7 +10,7 @@ export function getPermission(permission: Permissions): boolean {
   return false
 }
 
-export async function checkPermission(permission: Permissions): Promise<boolean> {
+export async function checkPermission(permission: Permissions) {
   const atManager = abilityAccessCtrl.createAtManager()
   const status = atManager.getSelfPermissionStatus(permission)
   if (status === 0) {

@@ -1,8 +1,8 @@
 import { common } from '@kit.AbilityKit'
-import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
+import { fileIo } from '@kit.CoreFileKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
-import fs from '@ohos.file.fs'
+import { read } from '../common/File'
 import copy from '../common/Pasteboard'
 
 interface Item {
@@ -24,16 +24,10 @@ struct Errorlog {
 
   get() {
     try {
-      const errorLogFileName = fs.listFileSync(this.context.filesDir + '/log/error/')
+      const errorLogFileName = fileIo.listFileSync(this.context.filesDir + '/log/error/')
       const errorLogFilePath = errorLogFileName.map(item => this.context.filesDir + '/log/error/' + item)
       this.errorLogArray = errorLogFilePath.map((item): Item => {
-        const file = fs.openSync(item)
-        const size = fs.statSync(file.fd).size
-        const filebuffer = new ArrayBuffer(size)
-        fs.readSync(file.fd, filebuffer)
-        const decoder = util.TextDecoder.create()
-        const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-        fs.closeSync(file)
+        const filestring = read(item)
         const errorLog = JSON.parse(filestring) as hiAppEvent.AppEventGroup
         const externalLog: string[] = []
         errorLog.appEventInfos.forEach((item) => {
@@ -60,16 +54,10 @@ struct Errorlog {
 
   filter(type: string) {
     try {
-      const errorLogFileName = fs.listFileSync(this.context.filesDir + '/log/error')
+      const errorLogFileName = fileIo.listFileSync(this.context.filesDir + '/log/error')
       const errorLogFilePath = errorLogFileName.map(item => this.context.filesDir + '/log/error/' + item)
       this.errorLogArray = errorLogFilePath.map((item): Item => {
-        const file = fs.openSync(item)
-        const size = fs.statSync(file.fd).size
-        const filebuffer = new ArrayBuffer(size)
-        fs.readSync(file.fd, filebuffer)
-        const decoder = util.TextDecoder.create()
-        const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-        fs.closeSync(file)
+        const filestring = read(item)
         const errorLog = JSON.parse(filestring) as hiAppEvent.AppEventGroup
         const externalLog: string[] = []
         errorLog.appEventInfos.forEach((item) => {
@@ -257,13 +245,7 @@ struct Errorlog {
                 .width('100%')
                 .onClick(async () => {
                   try {
-                    const file = fs.openSync(externalLogItem)
-                    const size = fs.statSync(file.fd).size
-                    const filebuffer = new ArrayBuffer(size)
-                    fs.readSync(file.fd, filebuffer)
-                    const decoder = util.TextDecoder.create()
-                    const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                    fs.closeSync(file)
+                    const filestring = read(externalLogItem)
                     const data = await promptAction.showDialog({
                       title: externalLogItem,
                       message: filestring,

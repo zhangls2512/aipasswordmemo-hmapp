@@ -111,6 +111,9 @@
         "name": "ohos.permission.VIBRATE"
       },
       {
+        "name": "ohos.permission.WINDOW_TOPMOST"
+      },
+      {
         "name": "ohos.permission.DISTRIBUTED_DATASYNC",
         "reason": "$string:DISTRIBUTED_DATASYNC_reason",
         "usedScene": {

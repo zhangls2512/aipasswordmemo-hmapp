@@ -4,8 +4,8 @@ import { deviceInfo } from '@kit.BasicServicesKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
-import { CloudBackupTimeItem, getInfoList, Info } from '../common/Dataget'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
+import { CloudBackupTimeItem, getInfoList, Info } from '../common/Dataget'
 import AinewInfo from './Ainewinfo'
 import NewInfo from './Newinfo'
 import UpdateInfo from './Updateinfo'
@@ -52,7 +52,7 @@ export default struct InfoPage {
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
               .onClick(() => {
-                this.isShowNewSheet = !this.isShowNewSheet
+                this.isShowNewSheet = true
               })
               .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
                 height: SheetSize.FIT_CONTENT,
@@ -86,7 +86,7 @@ export default struct InfoPage {
             Button('AI 识别新增')
               .buttonStyle(ButtonStyleMode.NORMAL)
               .onClick(() => {
-                this.isShowAinewSheet = !this.isShowAinewSheet
+                this.isShowAinewSheet = true
               })
               .bindSheet(this.isShowAinewSheet!!, this.AinewSheetBuilder(), {
                 preferType: this.preferType,
@@ -155,7 +155,7 @@ export default struct InfoPage {
                   icon: $r('app.media.edit'),
                   action: () => {
                     this.updateId = item.id
-                    this.isShowUpdateSheet = !this.isShowUpdateSheet
+                    this.isShowUpdateSheet = true
                   }
                 },
                 {

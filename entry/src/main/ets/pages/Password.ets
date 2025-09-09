@@ -86,10 +86,9 @@ export default struct PasswordPage {
           Row() {
             Button('新增')
               .onClick(() => {
-                this.isShowNewSheet = !this.isShowNewSheet
+                this.isShowNewSheet = true
               })
               .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
-                height: SheetSize.FIT_CONTENT,
                 preferType: this.preferType,
                 title: {
                   title: '新增密码'
@@ -160,10 +159,9 @@ export default struct PasswordPage {
             Button('筛选')
               .buttonStyle(ButtonStyleMode.NORMAL)
               .onClick(() => {
-                this.isShowFilterSheet = !this.isShowFilterSheet
+                this.isShowFilterSheet = true
               })
               .bindSheet(this.isShowFilterSheet!!, this.FilterSheetBuilder(), {
-                height: SheetSize.FIT_CONTENT,
                 preferType: this.preferType,
                 title: {
                   title: '筛选密码'
@@ -298,7 +296,7 @@ export default struct PasswordPage {
                   icon: $r('app.media.info'),
                   action: () => {
                     this.passwordId = item.id
-                    this.isShowInfoSheet = !this.isShowInfoSheet
+                    this.isShowInfoSheet = true
                   }
                 },
                 {
@@ -306,7 +304,7 @@ export default struct PasswordPage {
                   icon: $r('app.media.edit'),
                   action: () => {
                     this.passwordId = item.id
-                    this.isShowUpdateSheet = !this.isShowUpdateSheet
+                    this.isShowUpdateSheet = true
                   }
                 },
                 {
@@ -454,18 +452,18 @@ export default struct PasswordPage {
         }
         const shortcutId = this.shortcutDataPreferences.getSync('shortcutId', '') as string
         if (shortcutId === 'newPassword') {
-          this.isShowNewSheet = !this.isShowNewSheet
+          this.isShowNewSheet = true
           this.shortcutDataPreferences.deleteSync('shortcutId')
         }
         if (shortcutId === 'searchPassword') {
-          this.isShowFilterSheet = !this.isShowFilterSheet
+          this.isShowFilterSheet = true
           this.shortcutDataPreferences.deleteSync('shortcutId')
         }
         this.context.eventHub.on('newPassword', async () => {
-          this.isShowNewSheet = !this.isShowNewSheet
+          this.isShowNewSheet = true
         })
         this.context.eventHub.on('searchPassword', async () => {
-          this.isShowFilterSheet = !this.isShowFilterSheet
+          this.isShowFilterSheet = true
         })
         this.context.eventHub.on('refreshPassword', async () => {
           this.enableCloudBackup = false
@@ -508,7 +506,6 @@ export default struct PasswordPage {
         this.context.eventHub.off('refreshFilterPassword')
       })
       .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
-        height: SheetSize.FIT_CONTENT,
         preferType: this.preferType,
         title: {
           title: '修改密码'

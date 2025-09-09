@@ -17,6 +17,7 @@ struct Commonsetting {
   @Local colorModeIndex: number = 0
   @Local colorModeValue: string = '跟随系统'
   @Local windowRectAutoSave: boolean = false
+  @Local windowTopmost: boolean = false
   @Local keepScreenOn: boolean = false
   @Local disallowScreenshot: boolean = true
   @Local showPasswordInIndex: boolean = false
@@ -266,6 +267,29 @@ struct Commonsetting {
                 .padding(12)
                 .width('100%')
               }
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('窗口置顶')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.windowTopmost!!
+                })
+                  .onChange(async (isOn) => {
+                    const lastWindow = await window.getLastWindow(this.context)
+                    await lastWindow.setWindowTopmost(isOn)
+                    this.commonSettingDataPreferences.putSync('windowTopmost', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
 
               Divider()
                 .padding({
@@ -480,6 +504,7 @@ struct Commonsetting {
         this.colorModeValue = '深色模式'
       }
       this.windowRectAutoSave = this.commonSettingDataPreferences.getSync('windowRectAutoSave', false) as boolean
+      this.windowTopmost = this.commonSettingDataPreferences.getSync('windowTopmost', false) as boolean
       const lastWindow = await window.getLastWindow(this.context)
       this.keepScreenOn = lastWindow.getWindowProperties().isKeepScreenOn
       this.disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean

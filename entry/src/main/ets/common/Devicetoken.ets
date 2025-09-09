@@ -1,7 +1,7 @@
 import { promptAction } from '@kit.ArkUI'
 import { deviceCertificate } from '@kit.DeviceSecurityKit'
 
-export default async function get(): Promise<string> {
+export default async function get() {
   try {
     const deviceToken = await deviceCertificate.getDeviceToken()
     return deviceToken

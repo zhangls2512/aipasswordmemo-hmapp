@@ -77,7 +77,7 @@ export default struct Passwordcheck {
                 .width('100%')
                 .onClick(() => {
                   this.passwordId = item.id
-                  this.isShowUpdateSheet = !this.isShowUpdateSheet
+                  this.isShowUpdateSheet = true
                 })
               })
             }
@@ -104,7 +104,6 @@ export default struct Passwordcheck {
       this.repeatArray = await getRepeatPasswordList()
     })
     .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
-      height: SheetSize.FIT_CONTENT,
       preferType: this.preferType,
       title: {
         title: '修改密码'

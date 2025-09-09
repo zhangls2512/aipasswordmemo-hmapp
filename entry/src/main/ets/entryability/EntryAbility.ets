@@ -1,54 +1,156 @@
 import { AbilityConstant, appRecovery, ConfigurationConstant, errorManager, UIAbility, Want } from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { preferences, relationalStore } from '@kit.ArkData'
-import { uri, util } from '@kit.ArkTS'
+import { uri } from '@kit.ArkTS'
 import { promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { wifiManager } from '@kit.ConnectivityKit'
+import { fileIo } from '@kit.CoreFileKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
-import fs from '@ohos.file.fs'
-import { check, get, getAccountInfo } from '../common/Accesstoken'
-import { decrypt, getKey } from '../common/Crypto'
-import { getPasswordMaxId, PasswordInfoItem } from '../common/Dataget'
-import { importInfo, importPassword, importTag, InfoInItem, PasswordInItem, TagInItem } from '../common/Dataimport'
+import { check, get } from '../common/Accesstoken'
+import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackimport'
+import { importCsvPassword } from '../common/Csv'
+import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import getDeviceToken from '../common/Devicetoken'
+import { read } from '../common/File'
 import request from '../common/Request'
-import { InfoCloudBackup, Item, PasswordCloudBackup, TagCloudBackup } from '../pages/Cloudbackupimport'
-import { PasswordOutItem } from '../pages/DataInOut'
 
 export default class EntryAbility extends UIAbility {
-  storage = new LocalStorage()
-
-  parseCsvLine(line: string) {
-    const result: string[] = []
-    let inQuotes = false
-    let currentField = ''
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i]
-      if (char === '"') {
-        if (inQuotes && line[i + 1] === '"') {
-          currentField += '"'
-          i++
-        } else {
-          inQuotes = !inQuotes
+  async appInit(want: Want) {
+    const accessToken = await get()
+    if (notificationManager.isNotificationEnabledSync()) {
+      notificationManager.setBadgeNumber(0)
+    }
+    if (want.parameters?.shortcutId === 'newPassword') {
+      this.context.eventHub.emit('newPassword')
+    }
+    if (want.parameters?.shortcutId === 'searchPassword') {
+      this.context.eventHub.emit('searchPassword')
+    }
+    if (want.parameters?.menuHandler === 'clickMenu') {
+      const uriList = want.parameters.uriList as string[]
+      const filePath = uriList[0] as string
+      const filestring = read(filePath)
+      if (filePath.endsWith('.txt')) {
+        const data = await promptAction.showActionMenu({
+          title: '选择导入类型',
+          buttons: [
+            {
+              text: '密码',
+              color: $r('sys.color.font_primary')
+            },
+            {
+              text: '常用信息',
+              color: $r('sys.color.font_primary')
+            },
+            {
+              text: '标签',
+              color: $r('sys.color.font_primary')
+            }
+          ]
+        })
+        if (data.index === 0) {
+          await importPassword(filestring, 0)
+          this.context.eventHub.emit('refreshPassword')
         }
-      } else if (char === ',' && !inQuotes) {
-        result.push(currentField)
-        currentField = ''
-      } else {
-        currentField += char
+        if (data.index === 1) {
+          await importInfo(filestring, 0)
+          this.context.eventHub.emit('refreshInfo')
+        }
+        if (data.index === 2) {
+          await importTag(filestring, 0)
+          this.context.eventHub.emit('refreshTag')
+        }
+        promptAction.openToast({
+          message: '导入成功'
+        })
+      }
+      if (filePath.endsWith('.csv')) {
+        await importCsvPassword(filestring)
+        this.context.eventHub.emit('refreshPassword')
       }
     }
-    result.push(currentField)
-    return result
+    if (want.uri) {
+      if (want.uri === 'storage:///clearcache') {
+        promptAction.showDialog({
+          title: '提示',
+          message: '请前往“我的”>“设置”>“其他”>“清理数据”清理数据。',
+          buttons: [
+            {
+              text: '确定',
+              color: $r('sys.color.font_emphasize')
+            }
+          ]
+        })
+      }
+      if (want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
+        const urires = new uri.URI(want.uri)
+        const invitationCode = urires.getQueryValue('invitationcode')
+        const vipCode = urires.getQueryValue('vipcode')
+        if (invitationCode) {
+          if (accessToken) {
+            const deviceToken = await getDeviceToken()
+            if (deviceToken) {
+              const res = await request('/product/useInvitationcode', {
+                accessToken: accessToken,
+                deviceToken: deviceToken,
+                product: 'password',
+                invitationcode: invitationCode
+              })
+              if (res !== 'fail') {
+                promptAction.openToast({
+                  message: '邀请码使用成功'
+                })
+              }
+            }
+          } else {
+            promptAction.openToast({
+              message: '邀请码使用失败，原因：未登录账号'
+            })
+          }
+        }
+        if (vipCode) {
+          if (accessToken) {
+            const res = await request('/product/useVipcode', {
+              accessToken: accessToken,
+              vipcode: vipCode
+            })
+            if (res !== 'fail') {
+              promptAction.openToast({
+                message: '兑换码使用成功'
+              })
+            }
+          } else {
+            promptAction.openToast({
+              message: '兑换码使用失败，原因：未登录账号'
+            })
+          }
+        }
+      }
+    }
   }
 
-  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
-    const accessToken = await get()
-    const accountInfo = await getAccountInfo()
+  async windowInit(windowStage: window.WindowStage) {
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    if (deviceInfo.deviceType === '2in1') {
+      const windowRectAutoSave = commonSettingDataPreferences.getSync('windowRectAutoSave', false) as boolean
+      await windowStage.setWindowRectAutoSave(windowRectAutoSave)
+    }
+    await windowStage.loadContent('pages/Index')
+    const lastWindow = await window.getLastWindow(this.context)
+    const windowTopmost = commonSettingDataPreferences.getSync('windowTopmost', false) as boolean
+    await lastWindow.setWindowTopmost(windowTopmost)
+    if (!notificationManager.isNotificationEnabledSync()) {
+      notificationManager.requestEnableNotification(this.context)
+    }
+  }
+
+  async onCreate(want: Want) {
     const passwordRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'password',
       securityLevel: 4,
@@ -70,12 +172,6 @@ export default class EntryAbility extends UIAbility {
       allowRebuild: true
     })
     tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag (id INTEGER PRIMARY KEY AUTOINCREMENT, value, color, updateTime, cloudBackupTime)')
-    if (launchParam.launchReason === AbilityConstant.LaunchReason.CONTINUATION) {
-      this.context.restoreWindowStage(this.storage)
-    }
-    if (notificationManager.isNotificationEnabledSync()) {
-      notificationManager.setBadgeNumber(0)
-    }
     appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
@@ -105,19 +201,20 @@ export default class EntryAbility extends UIAbility {
     })
     const processCache = debugSettingDataPreferences.getSync('processCache', true) as boolean
     applicationContext.setSupportedProcessCache(processCache)
-    const observer: errorManager.ErrorObserver = {
+    const globalErrorShowType = debugSettingDataPreferences.getSync('globalErrorShowType', 0)
+    errorManager.on('error', {
       onUnhandledException(errMsg) {
-        if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 0) {
+        if (globalErrorShowType === 0) {
           promptAction.openToast({
             message: 'js 运行异常：' + errMsg
           })
         }
       },
       onException(err) {
-        if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 1) {
-          let message = '名称：' + err.name + '\n消息：' + err.message
+        if (globalErrorShowType === 1) {
+          let message = '名称：' + err.name + '\n信息：' + err.message
           if (typeof (err.stack) === 'string') {
-            message = message + '\n错误堆栈信息：' + err.stack
+            message = message + '\n堆栈：' + err.stack
           }
           promptAction.showDialog({
             title: 'js 运行异常',
@@ -131,8 +228,30 @@ export default class EntryAbility extends UIAbility {
           })
         }
       }
-    }
-    errorManager.on('error', observer)
+    })
+    errorManager.on('unhandledRejection', (err: Error) => {
+      if (globalErrorShowType === 0) {
+        promptAction.openToast({
+          message: 'js 运行异常，错误名称：' + err.name + '，错误信息：' + err.message + '，错误堆栈：' + err.stack
+        })
+      }
+      if (globalErrorShowType === 1) {
+        let message = '名称：' + err.name + '\n信息：' + err.message
+        if (typeof (err.stack) === 'string') {
+          message = message + '\n堆栈：' + err.stack
+        }
+        promptAction.showDialog({
+          title: 'js 运行异常',
+          message: message,
+          buttons: [
+            {
+              text: '确定',
+              color: $r('sys.color.font_emphasize')
+            }
+          ]
+        })
+      }
+    })
     hiAppEvent.addWatcher({
       name: 'watcher',
       appEventFilters: [
@@ -156,14 +275,14 @@ export default class EntryAbility extends UIAbility {
         ]) as string[]
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
           const errorLogDir = this.context.filesDir + '/log/error'
-          if (!fs.accessSync(errorLogDir)) {
-            fs.mkdirSync(errorLogDir, true)
+          if (!fileIo.accessSync(errorLogDir)) {
+            fileIo.mkdirSync(errorLogDir, true)
           }
           appEventGroups.forEach((item) => {
-            const file = fs.openSync(this.context.filesDir + '/log/error/' + Date.now() + '.txt',
-              fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE)
-            fs.writeSync(file.fd, JSON.stringify(item))
-            fs.closeSync(file)
+            const file = fileIo.openSync(this.context.filesDir + '/log/error/' + Date.now() + '.txt',
+              fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE)
+            fileIo.writeSync(file.fd, JSON.stringify(item))
+            fileIo.closeSync(file)
           })
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
@@ -339,509 +458,44 @@ export default class EntryAbility extends UIAbility {
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
-    if (accessToken && getKey()) {
-      const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'cloudbackupSetting'
-      })
-      const autoImportTables = cloudbackupSettingDataPreferences.getSync('autoImport', []) as string[]
-      if (autoImportTables.includes('password')) {
-        promptAction.openToast({
-          message: '导入密码云备份中'
-        })
-        const countres = await request('/password/getBackupCount', {
-          accessToken: accessToken
-        })
-        if (countres !== 'fail') {
-          const total = JSON.parse(countres).count.password as number
-          for (let i = 0; i < total; i += 50) {
-            const listres = await request('/password/getBackupList', {
-              accessToken: accessToken,
-              type: 'password',
-              skip: i,
-              count: 50
-            })
-            if (listres !== 'fail') {
-              const listarray = JSON.parse(listres).data as Item[]
-              const array: PasswordInItem[] = []
-              const promises = listarray.map(async (item) => {
-                const itemstring = await decrypt({
-                  content: item.content,
-                  iv: item.iv
-                })
-                if (itemstring !== 'fail') {
-                  const itemobject = JSON.parse(itemstring) as PasswordCloudBackup
-                  let cloudBackupTime = itemobject.cloudBackupTime
-                  if (typeof (cloudBackupTime) === 'number') {
-                    cloudBackupTime = JSON.stringify([{
-                      uid: accountInfo.uid,
-                      time: itemobject.cloudBackupTime
-                    }])
-                  }
-                  array.push({
-                    id: item.id,
-                    name: itemobject.name,
-                    info: itemobject.info,
-                    tag: itemobject.tag,
-                    updateTime: itemobject.updateTime,
-                    cloudBackupTime: cloudBackupTime
-                  })
-                }
-              })
-              await Promise.all(promises)
-              await importPassword(JSON.stringify(array), 0)
-            }
-          }
-          promptAction.openToast({
-            message: '导入密码云备份成功'
-          })
-        }
-      }
-      if (autoImportTables.includes('info')) {
-        promptAction.openToast({
-          message: '导入常用信息云备份中'
-        })
-        const countres = await request('/password/getBackupCount', {
-          accessToken: accessToken
-        })
-        if (countres !== 'fail') {
-          const total = JSON.parse(countres).count.info as number
-          for (let i = 0; i < total; i += 50) {
-            const listres = await request('/password/getBackupList', {
-              accessToken: accessToken,
-              type: 'info',
-              skip: i,
-              count: 50
-            })
-            if (listres !== 'fail') {
-              const listarray = JSON.parse(listres).data as Item[]
-              const array: InfoInItem[] = []
-              const promises = listarray.map(async (item) => {
-                const itemstring = await decrypt({
-                  content: item.content,
-                  iv: item.iv
-                })
-                if (itemstring !== 'fail') {
-                  const itemobject = JSON.parse(itemstring) as InfoCloudBackup
-                  let cloudBackupTime = itemobject.cloudBackupTime
-                  if (typeof (cloudBackupTime) === 'number') {
-                    cloudBackupTime = JSON.stringify([{
-                      uid: accountInfo.uid,
-                      time: itemobject.cloudBackupTime
-                    }])
-                  }
-                  array.push({
-                    id: item.id,
-                    type: itemobject.type,
-                    value: itemobject.value,
-                    updateTime: itemobject.updateTime,
-                    cloudBackupTime: cloudBackupTime
-                  })
-                }
-              })
-              await Promise.all(promises)
-              await importInfo(JSON.stringify(array), 0)
-            }
-          }
-          promptAction.openToast({
-            message: '导入常用信息云备份成功'
-          })
-        }
-      }
-      if (autoImportTables.includes('tag')) {
-        promptAction.openToast({
-          message: '导入标签云备份中'
-        })
-        const countres = await request('/password/getBackupCount', {
-          accessToken: accessToken
-        })
-        if (countres !== 'fail') {
-          const total = JSON.parse(countres).count.tag as number
-          for (let i = 0; i < total; i += 50) {
-            const listres = await request('/password/getBackupList', {
-              accessToken: accessToken,
-              type: 'tag',
-              skip: i,
-              count: 50
-            })
-            if (listres !== 'fail') {
-              const listarray = JSON.parse(listres).data as Item[]
-              const array: TagInItem[] = []
-              const promises = listarray.map(async (item) => {
-                const itemstring = await decrypt({
-                  content: item.content,
-                  iv: item.iv
-                })
-                if (itemstring !== 'fail') {
-                  const itemobject = JSON.parse(itemstring) as TagCloudBackup
-                  let cloudBackupTime = itemobject.cloudBackupTime
-                  if (typeof (cloudBackupTime) === 'number') {
-                    cloudBackupTime = JSON.stringify([{
-                      uid: accountInfo.uid,
-                      time: itemobject.cloudBackupTime
-                    }])
-                  }
-                  array.push({
-                    id: item.id,
-                    value: itemobject.value,
-                    color: itemobject.color,
-                    updateTime: itemobject.updateTime,
-                    cloudBackupTime: cloudBackupTime
-                  })
-                }
-              })
-              await Promise.all(promises)
-              await importInfo(JSON.stringify(array), 0)
-            }
-          }
-          promptAction.openToast({
-            message: '导入标签云备份成功'
-          })
-        }
-      }
-    }
-    if (want.parameters?.shortcutId) {
-      const shortcutDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'shortcut'
-      })
-      shortcutDataPreferences.putSync('shortcutId', want.parameters?.shortcutId)
-    }
-    if (want.parameters?.shortcutId === 'newPassword') {
-      this.context.eventHub.emit('newPassword')
-    }
-    if (want.parameters?.shortcutId === 'searchPassword') {
-      this.context.eventHub.emit('searchPassword')
-    }
-    if (want.parameters?.menuHandler === 'clickMenu') {
-      const uriList = want.parameters.uriList as string[]
-      const filePath = uriList[0] as string
-      const file = fs.openSync(filePath)
-      const size = fs.statSync(file.fd).size
-      const filebuffer = new ArrayBuffer(size)
-      fs.readSync(file.fd, filebuffer)
-      const decoder = util.TextDecoder.create()
-      const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-      fs.closeSync(file)
-      if (filePath.endsWith('.txt')) {
-        const data = await promptAction.showActionMenu({
-          title: '选择导入类型',
-          buttons: [
-            {
-              text: '密码',
-              color: $r('sys.color.font_primary')
-            },
-            {
-              text: '常用信息',
-              color: $r('sys.color.font_primary')
-            },
-            {
-              text: '标签',
-              color: $r('sys.color.font_primary')
-            }
-          ]
-        })
-        if (data.index === 0) {
-          await importPassword(filestring, 0)
-          this.context.eventHub.emit('refreshPassword')
-        }
-        if (data.index === 1) {
-          await importInfo(filestring, 0)
-          this.context.eventHub.emit('refreshInfo')
-        }
-        if (data.index === 2) {
-          await importTag(filestring, 0)
-          this.context.eventHub.emit('refreshTag')
-        }
-      }
-      if (filePath.endsWith('.csv')) {
-        const lines = filestring.split('\n').filter(line => line.trim() !== '')
-        const result: PasswordOutItem[] = []
-        const maxId = await getPasswordMaxId()
-        let idCounter = maxId + 1
-        const firstLine = this.parseCsvLine(lines[0])
-        const columnCount = firstLine.length
-        const nameIndex = firstLine.findIndex(item => item === '名称')
-        if (nameIndex === -1) {
-          promptAction.openToast({
-            message: '导入失败，原因：无名称列'
-          })
-        } else {
-          const infoColumnsIndex: number[] = []
-          for (let i = 0; i < columnCount; i++) {
-            if (i !== nameIndex) {
-              infoColumnsIndex.push(i)
-            }
-          }
-          for (let i = 1; i < lines.length; i++) {
-            const line = lines[i]
-            const parsedLine = this.parseCsvLine(line)
-            const name = parsedLine[nameIndex]
-            const info: PasswordInfoItem[] = []
-            infoColumnsIndex.forEach(item => {
-              if (firstLine[item] && parsedLine[item] && firstLine[item] !== '图标' && firstLine[item] !== 'MFA') {
-                info.push({ type: firstLine[item], value: parsedLine[item] })
-              }
-            })
-            if (name && info.length > 0) {
-              result.push({
-                id: idCounter++,
-                name: name,
-                info,
-                tag: [],
-                updateTime: Date.now(),
-                cloudBackupTime: JSON.stringify([])
-              })
-            }
-          }
-          await importPassword(JSON.stringify(result), 0)
-          this.context.eventHub.emit('refreshPassword')
-        }
-      }
+    const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'cloudbackupSetting'
+    })
+    const autoImportTables = cloudbackupSettingDataPreferences.getSync('autoImport', []) as string[]
+    if (autoImportTables.includes('password')) {
+      await importCloudBackupPassword()
+      this.context.eventHub.emit('refreshPassword')
       promptAction.openToast({
-        message: '导入成功'
+        message: '自动导入密码云备份成功'
       })
     }
-    if (want.uri) {
-      if (want.uri === 'storage:///clearcache') {
-        promptAction.showDialog({
-          title: '提示',
-          message: '请前往“我的”>“设置”>“其他”>“清理数据”清理数据。',
-          buttons: [
-            {
-              text: '确定',
-              color: $r('sys.color.font_emphasize')
-            }
-          ]
-        })
-      }
-      if (want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
-        const urires = new uri.URI(want.uri)
-        const invitationCode = urires.getQueryValue('invitationcode')
-        const vipCode = urires.getQueryValue('vipcode')
-        if (invitationCode) {
-          if (accessToken) {
-            const deviceToken = await getDeviceToken()
-            if (deviceToken) {
-              const res = await request('/product/useInvitationcode', {
-                accessToken: accessToken,
-                deviceToken: deviceToken,
-                product: 'password',
-                invitationcode: invitationCode
-              })
-              if (res !== 'fail') {
-                promptAction.openToast({
-                  message: '邀请码使用成功'
-                })
-              }
-            }
-          } else {
-            promptAction.openToast({
-              message: '邀请码使用失败，原因：未登录账号'
-            })
-          }
-        }
-        if (vipCode) {
-          if (accessToken) {
-            const res = await request('/product/useVipcode', {
-              accessToken: accessToken,
-              vipcode: vipCode
-            })
-            if (res !== 'fail') {
-              promptAction.openToast({
-                message: '兑换码使用成功'
-              })
-            }
-          } else {
-            promptAction.openToast({
-              message: '兑换码使用失败，原因：未登录账号'
-            })
-          }
-        }
-      }
-    }
-  }
-
-  async onWindowStageCreate(windowStage: window.WindowStage) {
-    if (deviceInfo.deviceType === '2in1') {
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      const windowRectAutoSave = commonSettingDataPreferences.getSync('windowRectAutoSave', false) as boolean
-      await windowStage.setWindowRectAutoSave(windowRectAutoSave)
-    }
-    windowStage.loadContent('pages/Index')
-    if (!notificationManager.isNotificationEnabledSync()) {
-      notificationManager.requestEnableNotification(this.context)
-    }
-  }
-
-  onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 14) {
-      return AbilityConstant.OnContinueResult.MISMATCH
-    }
-    return AbilityConstant.OnContinueResult.AGREE
-  }
-
-  async onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam) {
-    const accessToken = await get()
-    if (launchParam.launchReason === AbilityConstant.LaunchReason.CONTINUATION) {
-      this.context.restoreWindowStage(this.storage)
-    }
-    if (notificationManager.isNotificationEnabledSync()) {
-      notificationManager.setBadgeNumber(0)
-    }
-    if (want.parameters?.shortcutId === 'newPassword') {
-      this.context.eventHub.emit('newPassword')
-    }
-    if (want.parameters?.shortcutId === 'searchPassword') {
-      this.context.eventHub.emit('searchPassword')
-    }
-    if (want.parameters?.menuHandler === 'clickMenu') {
-      const uriList = want.parameters.uriList as string[]
-      const filePath = uriList[0] as string
-      const file = fs.openSync(filePath)
-      const size = fs.statSync(file.fd).size
-      const filebuffer = new ArrayBuffer(size)
-      fs.readSync(file.fd, filebuffer)
-      const decoder = util.TextDecoder.create()
-      const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-      fs.closeSync(file)
-      if (filePath.endsWith('.txt')) {
-        const data = await promptAction.showActionMenu({
-          title: '选择导入类型',
-          buttons: [
-            {
-              text: '密码',
-              color: $r('sys.color.font_primary')
-            },
-            {
-              text: '常用信息',
-              color: $r('sys.color.font_primary')
-            },
-            {
-              text: '标签',
-              color: $r('sys.color.font_primary')
-            }
-          ]
-        })
-        if (data.index === 0) {
-          await importPassword(filestring, 0)
-          this.context.eventHub.emit('refreshPassword')
-        }
-        if (data.index === 1) {
-          await importInfo(filestring, 0)
-          this.context.eventHub.emit('refreshInfo')
-        }
-        if (data.index === 2) {
-          await importTag(filestring, 0)
-          this.context.eventHub.emit('refreshTag')
-        }
-      }
-      if (filePath.endsWith('.csv')) {
-        const lines = filestring.split('\n').filter(line => line.trim() !== '')
-        const result: PasswordOutItem[] = []
-        const maxId = await getPasswordMaxId()
-        let idCounter = maxId + 1
-        const firstLine = this.parseCsvLine(lines[0])
-        const columnCount = firstLine.length
-        const nameIndex = firstLine.findIndex(item => item === '名称')
-        if (nameIndex === -1) {
-          promptAction.openToast({
-            message: '导入失败，原因：无名称列'
-          })
-        } else {
-          const infoColumnsIndex: number[] = []
-          for (let i = 0; i < columnCount; i++) {
-            if (i !== nameIndex) {
-              infoColumnsIndex.push(i)
-            }
-          }
-          for (let i = 1; i < lines.length; i++) {
-            const line = lines[i]
-            const parsedLine = this.parseCsvLine(line)
-            const name = parsedLine[nameIndex]
-            const info: PasswordInfoItem[] = []
-            infoColumnsIndex.forEach(item => {
-              if (firstLine[item] && parsedLine[item] && firstLine[item] !== '图标' && firstLine[item] !== 'MFA') {
-                info.push({ type: firstLine[item], value: parsedLine[item] })
-              }
-            })
-            if (name && info.length > 0) {
-              result.push({
-                id: idCounter++,
-                name: name,
-                info,
-                tag: [],
-                updateTime: Date.now(),
-                cloudBackupTime: JSON.stringify([])
-              })
-            }
-          }
-          await importPassword(JSON.stringify(result), 0)
-          this.context.eventHub.emit('refreshPassword')
-        }
-      }
+    if (autoImportTables.includes('info')) {
+      await importCloudBackupInfo()
+      this.context.eventHub.emit('refreshInfo')
       promptAction.openToast({
-        message: '导入成功'
+        message: '自动导入常用信息云备份成功'
       })
     }
-    if (want.uri) {
-      if (want.uri === 'storage:///clearcache') {
-        promptAction.showDialog({
-          title: '提示',
-          message: '请前往“我的”>“设置”>“其他”>“清理数据”清理数据。',
-          buttons: [
-            {
-              text: '确定',
-              color: $r('sys.color.font_emphasize')
-            }
-          ]
-        })
-      }
-      if (want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
-        const urires = new uri.URI(want.uri)
-        const invitationCode = urires.getQueryValue('invitationcode')
-        const vipCode = urires.getQueryValue('vipcode')
-        if (invitationCode) {
-          if (accessToken) {
-            const deviceToken = await getDeviceToken()
-            if (deviceToken) {
-              const res = await request('/product/useInvitationcode', {
-                accessToken: accessToken,
-                deviceToken: deviceToken,
-                product: 'password',
-                invitationcode: invitationCode
-              })
-              if (res !== 'fail') {
-                promptAction.openToast({
-                  message: '邀请码使用成功'
-                })
-              }
-            }
-          } else {
-            promptAction.openToast({
-              message: '邀请码使用失败，原因：未登录账号'
-            })
-          }
-        }
-        if (vipCode) {
-          if (accessToken) {
-            const res = await request('/product/useVipcode', {
-              accessToken: accessToken,
-              vipcode: vipCode
-            })
-            if (res !== 'fail') {
-              promptAction.openToast({
-                message: '兑换码使用成功'
-              })
-            }
-          } else {
-            promptAction.openToast({
-              message: '兑换码使用失败，原因：未登录账号'
-            })
-          }
-        }
-      }
+    if (autoImportTables.includes('tag')) {
+      await importCloudBackupTag()
+      this.context.eventHub.emit('refreshTag')
+      promptAction.openToast({
+        message: '自动导入标签云备份成功'
+      })
     }
+    this.appInit(want)
+  }
+
+  onNewWant(want: Want) {
+    this.appInit(want)
+  }
+
+  onWindowStageCreate(windowStage: window.WindowStage) {
+    this.windowInit(windowStage)
+  }
+
+  onWindowStageRestore(windowStage: window.WindowStage) {
+    this.windowInit(windowStage)
   }
 
   onBackPressed() {
@@ -854,6 +508,16 @@ export default class EntryAbility extends UIAbility {
     } else {
       return false
     }
+  }
+
+  onContinue(wantParam: Record<string, Object>) {
+    if (wantParam.version !== 14) {
+      promptAction.openToast({
+        message: '接续失败，原因：目标端应用版本号与发起端不匹配'
+      })
+      return AbilityConstant.OnContinueResult.MISMATCH
+    }
+    return AbilityConstant.OnContinueResult.AGREE
   }
 
   onCollaborate() {

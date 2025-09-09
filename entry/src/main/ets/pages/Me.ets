@@ -91,7 +91,7 @@ export default struct Me {
           .width('100%')
           .onClick(() => {
             if (!this.uid) {
-              this.isShowLoginSheet = !this.isShowLoginSheet
+              this.isShowLoginSheet = true
             }
           })
           .bindSheet(this.isShowLoginSheet!!, this.LoginSheetBuilder(), {
@@ -226,7 +226,7 @@ export default struct Me {
             })
             .width('100%')
             .onClick(() => {
-              this.isShowPasswordcheckSheet = !this.isShowPasswordcheckSheet
+              this.isShowPasswordcheckSheet = true
             })
             .bindSheet(this.isShowPasswordcheckSheet!!, this.PasswordcheckSheetBuilder(), {
               preferType: this.preferType,
@@ -282,7 +282,7 @@ export default struct Me {
             })
             .width('100%')
             .onClick(() => {
-              this.isShowPasswordgenerateSheet = !this.isShowPasswordgenerateSheet
+              this.isShowPasswordgenerateSheet = true
             })
             .bindSheet(this.isShowPasswordgenerateSheet!!, this.PasswordgenerateSheetBuilder(), {
               preferType: this.preferType,
@@ -354,7 +354,7 @@ export default struct Me {
             })
             .width('100%')
             .onClick(() => {
-              this.isShowUrlcheckSheet = !this.isShowUrlcheckSheet
+              this.isShowUrlcheckSheet = true
             })
             .bindSheet(this.isShowUrlcheckSheet!!, this.UrlcheckSheetBuilder(), {
               preferType: this.preferType,
@@ -403,7 +403,7 @@ export default struct Me {
           })
           .width('100%')
           .onClick(() => {
-            this.isShowSettingSheet = !this.isShowSettingSheet
+            this.isShowSettingSheet = true
           })
           .bindSheet(this.isShowSettingSheet!!, this.SettingSheetBuilder(), {
             preferType: this.preferType,

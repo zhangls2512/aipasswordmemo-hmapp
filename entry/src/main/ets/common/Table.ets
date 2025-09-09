@@ -59,7 +59,9 @@ export async function autoSyncTable(table: string) {
     })
     return
   }
-  if (pauseAutoSyncWhenPowerSave && (power.getPowerMode() === 600 || power.getPowerMode() === 603)) {
+  const currentPowerMode = power.getPowerMode()
+  if (pauseAutoSyncWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
+    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
     let text = ''
     if (power.getPowerMode() === 603) {
       text = '超级'
@@ -122,7 +124,9 @@ export async function autoBackupTable(table: string) {
     })
     return
   }
-  if (pauseAutoBackupWhenPowerSave && (power.getPowerMode() === 600 || power.getPowerMode() === 603)) {
+  const currentPowerMode = power.getPowerMode()
+  if (pauseAutoBackupWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
+    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
     let text = ''
     if (power.getPowerMode() === 603) {
       text = '超级'

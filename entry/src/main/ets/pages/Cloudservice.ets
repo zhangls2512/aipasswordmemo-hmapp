@@ -1,8 +1,8 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
-import request from '../common/Request'
 import getCloudServiceStatus from '../common/Cloudservice'
+import request from '../common/Request'
 
 @Builder
 export function CloudserviceBuilder() {

@@ -33,11 +33,31 @@ struct About {
                 TapGesture({
                   count: 2
                 })
-                  .onAction((event) => {
+                  .onAction(async (event) => {
                     if (event) {
-                      this.pageInfos.pushPath({
-                        name: 'Debug'
+                      const data = await promptAction.showActionMenu({
+                        title: '调试',
+                        buttons: [
+                          {
+                            text: '设置',
+                            color: $r('sys.color.font_primary')
+                          },
+                          {
+                            text: '信息',
+                            color: $r('sys.color.font_primary')
+                          }
+                        ]
                       })
+                      if (data.index === 0) {
+                        this.pageInfos.pushPath({
+                          name: 'Debugsetting'
+                        })
+                      }
+                      if (data.index === 1) {
+                        this.pageInfos.pushPath({
+                          name: 'Debuginfo'
+                        })
+                      }
                     }
                   })
               )

@@ -1,4 +1,7 @@
 import { preferences } from '@kit.ArkData'
+import { promptAction } from '@kit.ArkUI'
+import { fileIo } from '@kit.CoreFileKit'
+import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { getPasswordInfo, Password, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
@@ -94,8 +97,26 @@ export default struct Passwordinfo {
                 }
               })
               .width('100%')
-              .onClick(() => {
-                copy(item.value)
+              .onClick(async () => {
+                const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
+                try {
+                  const uris = await phAccessHelper.showAssetsCreationDialog([item.value], [{
+                    fileNameExtension: 'png',
+                    photoType: photoAccessHelper.PhotoType.IMAGE
+                  }])
+                  const srcFile = fileIo.openSync(item.value)
+                  const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
+                  fileIo.copyFileSync(srcFile.fd, destFile.fd);
+                  fileIo.closeSync(srcFile)
+                  fileIo.closeSync(destFile)
+                  promptAction.openToast({
+                    message: '保存成功'
+                  })
+                } catch (err) {
+                  promptAction.openToast({
+                    message: '发生错误，错误码：' + err.code
+                  })
+                }
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

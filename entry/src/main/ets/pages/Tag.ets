@@ -4,8 +4,8 @@ import { deviceInfo } from '@kit.BasicServicesKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
-import { CloudBackupTimeItem, getTagList, Tag } from '../common/Dataget'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
+import { CloudBackupTimeItem, getTagList, Tag } from '../common/Dataget'
 import NewTag from './Newtag'
 import UpdateTag from './Updatetag'
 
@@ -44,7 +44,7 @@ export default struct TagPage {
           Row() {
             Button('新增')
               .onClick(() => {
-                this.isShowNewSheet = !this.isShowNewSheet
+                this.isShowNewSheet = true
               })
               .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
                 height: SheetSize.FIT_CONTENT,
@@ -158,7 +158,7 @@ export default struct TagPage {
                   icon: $r('app.media.edit'),
                   action: () => {
                     this.updateId = item.id
-                    this.isShowUpdateSheet = !this.isShowUpdateSheet
+                    this.isShowUpdateSheet = true
                   }
                 },
                 {

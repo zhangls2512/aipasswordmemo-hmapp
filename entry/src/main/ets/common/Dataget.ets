@@ -45,7 +45,7 @@ export interface Tag {
   isCloudBackup: boolean
 }
 
-export async function getPasswordInfo(id: number): Promise<Password | string> {
+export async function getPasswordInfo(id: number) {
   const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
@@ -99,7 +99,7 @@ export async function getPasswordInfo(id: number): Promise<Password | string> {
   return 'fail'
 }
 
-export async function getPasswordList(orderColumn: string = 'updateTime'): Promise<Password[]> {
+export async function getPasswordList(orderColumn: string = 'updateTime') {
   try {
     const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
@@ -157,16 +157,16 @@ export async function getPasswordList(orderColumn: string = 'updateTime'): Promi
     }
     resultSet.close()
     return array
-  } catch {
+  } catch (err) {
     promptAction.openToast({
-      message: '发生错误'
+      message: '发生错误，错误码：' + err.code
     })
     return []
   }
 }
 
 export async function getFilterPasswordList(nameKeyword: string, info: PasswordInfoItem[], tag: string[],
-  orderColumn: string = 'updateTime'): Promise<Password[]> {
+  orderColumn: string = 'updateTime') {
   try {
     const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
@@ -239,15 +239,15 @@ export async function getFilterPasswordList(nameKeyword: string, info: PasswordI
     }
     resultSet.close()
     return array
-  } catch {
+  } catch (err) {
     promptAction.openToast({
-      message: '发生错误'
+      message: '发生错误，错误码：' + err.code
     })
     return []
   }
 }
 
-export async function getPasswordMaxId(): Promise<number> {
+export async function getPasswordMaxId() {
   const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
@@ -267,7 +267,7 @@ export async function getPasswordMaxId(): Promise<number> {
   return maxId
 }
 
-export async function getInfoInfo(id: number): Promise<Info | string> {
+export async function getInfoInfo(id: number) {
   const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
@@ -312,7 +312,7 @@ export async function getInfoInfo(id: number): Promise<Info | string> {
   return 'fail'
 }
 
-export async function getInfoList(): Promise<Info[]> {
+export async function getInfoList() {
   try {
     const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
@@ -356,15 +356,15 @@ export async function getInfoList(): Promise<Info[]> {
     }
     resultSet.close()
     return array
-  } catch {
+  } catch (err) {
     promptAction.openToast({
-      message: '发生错误'
+      message: '发生错误，错误码：' + err.code
     })
     return []
   }
 }
 
-export async function getTypeInfoList(type: string): Promise<string[]> {
+export async function getTypeInfoList(type: string) {
   try {
     const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
@@ -383,15 +383,15 @@ export async function getTypeInfoList(type: string): Promise<string[]> {
     }
     resultSet.close()
     return array
-  } catch {
+  } catch (err) {
     promptAction.openToast({
-      message: '发生错误'
+      message: '发生错误，错误码：' + err.code
     })
     return []
   }
 }
 
-async function getTagColor(value: string): Promise<string> {
+async function getTagColor(value: string) {
   const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
@@ -412,7 +412,7 @@ async function getTagColor(value: string): Promise<string> {
   return 'rgba(0,0,0,0)'
 }
 
-export async function getTagInfo(id: number): Promise<Tag | string> {
+export async function getTagInfo(id: number) {
   const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
@@ -457,7 +457,7 @@ export async function getTagInfo(id: number): Promise<Tag | string> {
   return 'fail'
 }
 
-export async function getTagList(orderColumn: string = 'updateTime'): Promise<Tag[]> {
+export async function getTagList(orderColumn: string = 'updateTime') {
   try {
     const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
@@ -506,9 +506,9 @@ export async function getTagList(orderColumn: string = 'updateTime'): Promise<Ta
     }
     resultSet.close()
     return array
-  } catch {
+  } catch (err) {
     promptAction.openToast({
-      message: '发生错误'
+      message: '发生错误，错误码：' + err.code
     })
     return []
   }

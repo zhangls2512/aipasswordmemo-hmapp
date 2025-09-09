@@ -23,7 +23,7 @@ export async function set(accessToken: string, accountInfo: AccountInfo) {
   await appAccountManager.setCredential('default', 'accessToken', accessToken)
 }
 
-export async function get(): Promise<string> {
+export async function get() {
   const appAccountManager = appAccount.createAppAccountManager()
   try {
     const endDate = Number(appAccountManager.getCustomDataSync('default', 'endDate'))

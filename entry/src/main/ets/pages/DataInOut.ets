@@ -1,9 +1,10 @@
 import { common } from '@kit.AbilityKit'
-import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
-import { fileIo as fs, picker } from '@kit.CoreFileKit'
+import { fileIo, picker } from '@kit.CoreFileKit'
+import { importCsvPassword, parseCsvLine } from '../common/Csv'
 import { getInfoList, getPasswordList, getPasswordMaxId, getTagList, PasswordInfoItem } from '../common/Dataget'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
+import { read } from '../common/File'
 import openLink from '../common/Openlink'
 
 export interface PasswordOutItem {
@@ -42,30 +43,6 @@ struct DataInOut {
   @Local value: string = '保留'
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-
-  parseCsvLine(line: string) {
-    const result: string[] = []
-    let inQuotes = false
-    let currentField = ''
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i]
-      if (char === '"') {
-        if (inQuotes && line[i + 1] === '"') {
-          currentField += '"'
-          i++
-        } else {
-          inQuotes = !inQuotes
-        }
-      } else if (char === ',' && !inQuotes) {
-        result.push(currentField)
-        currentField = ''
-      } else {
-        currentField += char
-      }
-    }
-    result.push(currentField)
-    return result
-  }
 
   build() {
     NavDestination() {
@@ -132,68 +109,21 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.txt', '.csv']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const file = fs.openSync(uris[0])
-                const name = file.name
-                const size = fs.statSync(file.fd).size
-                const filebuffer = new ArrayBuffer(size)
-                fs.readSync(file.fd, filebuffer)
-                const decoder = util.TextDecoder.create()
-                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                fs.closeSync(file)
+                const filePath = uris[0]
+                const filestring = read(filePath)
                 let conflictResolution = 0
                 if (this.index === 1) {
                   conflictResolution = 5
                 }
-                if (name.endsWith('.txt')) {
+                if (filePath.endsWith('.txt')) {
                   await importPassword(filestring, conflictResolution)
+                  promptAction.openToast({
+                    message: '导入成功'
+                  })
                 }
-                if (name.endsWith('.csv')) {
-                  const lines = filestring.split('\n').filter(line => line.trim() !== '')
-                  const result: PasswordOutItem[] = []
-                  const maxId = await getPasswordMaxId()
-                  let idCounter = maxId + 1
-                  const firstLine = this.parseCsvLine(lines[0])
-                  const columnCount = firstLine.length
-                  const nameIndex = firstLine.findIndex(item => item === '名称')
-                  if (nameIndex === -1) {
-                    promptAction.openToast({
-                      message: '导入失败，原因：无名称列'
-                    })
-                    return
-                  }
-                  const infoColumnsIndex: number[] = []
-                  for (let i = 0; i < columnCount; i++) {
-                    if (i !== nameIndex) {
-                      infoColumnsIndex.push(i)
-                    }
-                  }
-                  for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i]
-                    const parsedLine = this.parseCsvLine(line)
-                    const name = parsedLine[nameIndex]
-                    const info: PasswordInfoItem[] = []
-                    infoColumnsIndex.forEach(item => {
-                      if (firstLine[item] && parsedLine[item] && firstLine[item] !== '图标' &&
-                        firstLine[item] !== 'MFA') {
-                        info.push({ type: firstLine[item], value: parsedLine[item] })
-                      }
-                    })
-                    if (name && info.length > 0) {
-                      result.push({
-                        id: idCounter++,
-                        name: name,
-                        info,
-                        tag: [],
-                        updateTime: Date.now(),
-                        cloudBackupTime: JSON.stringify([])
-                      })
-                    }
-                  }
-                  await importPassword(JSON.stringify(result), conflictResolution)
+                if (filePath.endsWith('.csv')) {
+                  importCsvPassword(filestring)
                 }
-                promptAction.openToast({
-                  message: '导入成功'
-                })
               })
 
               Divider()
@@ -227,13 +157,8 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const file = fs.openSync(uris[0])
-                const size = fs.statSync(file.fd).size
-                const filebuffer = new ArrayBuffer(size)
-                fs.readSync(file.fd, filebuffer)
-                const decoder = util.TextDecoder.create()
-                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                fs.closeSync(file)
+                const filePath = uris[0]
+                const filestring = read(filePath)
                 let conflictResolution = 0
                 if (this.index === 1) {
                   conflictResolution = 5
@@ -275,13 +200,8 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const file = fs.openSync(uris[0])
-                const size = fs.statSync(file.fd).size
-                const filebuffer = new ArrayBuffer(size)
-                fs.readSync(file.fd, filebuffer)
-                const decoder = util.TextDecoder.create()
-                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                fs.closeSync(file)
+                const filePath = uris[0]
+                const filestring = read(filePath)
                 let conflictResolution = 0
                 if (this.index === 1) {
                   conflictResolution = 5
@@ -359,13 +279,8 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.csv']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const file = fs.openSync(uris[0])
-                const size = fs.statSync(file.fd).size
-                const filebuffer = new ArrayBuffer(size)
-                fs.readSync(file.fd, filebuffer)
-                const decoder = util.TextDecoder.create()
-                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                fs.closeSync(file)
+                const filePath = uris[0]
+                const filestring = read(filePath)
                 let conflictResolution = 0
                 if (this.index === 1) {
                   conflictResolution = 5
@@ -376,7 +291,7 @@ struct DataInOut {
                 let idCounter = maxId + 1
                 for (let i = 1; i < lines.length; i++) {
                   const line = lines[i]
-                  const parsedFields = this.parseCsvLine(line)
+                  const parsedFields = parseCsvLine(line)
                   const name = parsedFields[0]
                   const url = parsedFields[1]
                   const username = parsedFields[2]
@@ -474,7 +389,8 @@ struct DataInOut {
                 documentSaveOptions.fileSuffixChoices = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.save(documentSaveOptions)
-                const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
+                const filePath = uris[0]
+                const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
                 const array = await getPasswordList()
                 const arrayOut = array.map((item): PasswordOutItem => {
                   let cloudBackupTime = JSON.stringify([])
@@ -490,8 +406,8 @@ struct DataInOut {
                     cloudBackupTime: cloudBackupTime
                   }
                 })
-                fs.writeSync(file.fd, JSON.stringify(arrayOut))
-                fs.closeSync(file)
+                fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                fileIo.closeSync(file)
                 promptAction.openToast({
                   message: '导出成功'
                 })
@@ -528,7 +444,8 @@ struct DataInOut {
                 documentSaveOptions.fileSuffixChoices = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.save(documentSaveOptions)
-                const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
+                const filePath = uris[0]
+                const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
                 const array = await getInfoList()
                 const arrayOut = array.map((item): InfoOutItem => {
                   let cloudBackupTime = JSON.stringify([])
@@ -543,8 +460,8 @@ struct DataInOut {
                     cloudBackupTime: cloudBackupTime
                   }
                 })
-                fs.writeSync(file.fd, JSON.stringify(arrayOut))
-                fs.closeSync(file)
+                fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                fileIo.closeSync(file)
                 promptAction.openToast({
                   message: '导出成功'
                 })
@@ -581,7 +498,8 @@ struct DataInOut {
                 documentSaveOptions.fileSuffixChoices = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.save(documentSaveOptions)
-                const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
+                const filePath = uris[0]
+                const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
                 const array = await getTagList()
                 const arrayOut = array.map((item): TagOutItem => {
                   let cloudBackupTime = JSON.stringify([])
@@ -596,8 +514,8 @@ struct DataInOut {
                     cloudBackupTime: cloudBackupTime
                   }
                 })
-                fs.writeSync(file.fd, JSON.stringify(arrayOut))
-                fs.closeSync(file)
+                fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                fileIo.closeSync(file)
                 promptAction.openToast({
                   message: '导出成功'
                 })

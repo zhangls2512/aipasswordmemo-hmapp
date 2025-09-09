@@ -16,9 +16,14 @@
       "buildFunction": "LicenseBuilder"
     },
     {
-      "name": "Debug",
-      "pageSourceFile": "src/main/ets/pages/Debug.ets",
-      "buildFunction": "DebugBuilder"
+      "name": "Debugsetting",
+      "pageSourceFile": "src/main/ets/pages/Debugsetting.ets",
+      "buildFunction": "DebugsettingBuilder"
+    },
+    {
+      "name": "Debuginfo",
+      "pageSourceFile": "src/main/ets/pages/Debuginfo.ets",
+      "buildFunction": "DebuginfoBuilder"
     },
     {
       "name": "ReportQoe",
@@ -164,6 +169,11 @@
       "name": "Deletefile",
       "pageSourceFile": "src/main/ets/pages/Deletefile.ets",
       "buildFunction": "DeletefileBuilder"
+    },
+    {
+      "name": "Resourcelimit",
+      "pageSourceFile": "src/main/ets/pages/Resourcelimit.ets",
+      "buildFunction": "ResourcelimitBuilder"
     }
   ]
 }

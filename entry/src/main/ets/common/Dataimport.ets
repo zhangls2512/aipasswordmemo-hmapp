@@ -1,7 +1,7 @@
 import { relationalStore } from '@kit.ArkData'
+import { promptAction } from '@kit.ArkUI'
 import { PasswordInfoItem } from './Dataget'
 import { autoBackupTable, autoSyncTable } from './Table'
-import promptAction from '@ohos.promptAction'
 
 export interface PasswordInItem {
   id: number,
@@ -54,9 +54,9 @@ export async function importPassword(data: string, conflict: relationalStore.Con
     })
     autoSyncTable('password')
     autoBackupTable('password')
-  } catch {
+  } catch (err) {
     promptAction.openToast({
-      message: '发生错误'
+      message: '发生错误，错误码：' + err.code
     })
   }
 }
@@ -86,9 +86,9 @@ export async function importInfo(data: string, conflict: relationalStore.Conflic
     })
     autoSyncTable('info')
     autoBackupTable('info')
-  } catch {
+  } catch (err) {
     promptAction.openToast({
-      message: '发生错误'
+      message: '发生错误，错误码：' + err.code
     })
   }
 }
@@ -118,9 +118,9 @@ export async function importTag(data: string, conflict: relationalStore.Conflict
     })
     autoSyncTable('tag')
     autoBackupTable('tag')
-  } catch {
+  } catch (err) {
     promptAction.openToast({
-      message: '发生错误'
+      message: '发生错误，错误码：' + err.code
     })
   }
 }

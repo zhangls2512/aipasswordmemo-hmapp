@@ -1,10 +1,10 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
 import { webview } from '@kit.ArkWeb'
 import { asset } from '@kit.AssetStoreKit'
 import { fileIo } from '@kit.CoreFileKit'
+import { stringToArray } from '../common/Crypto'
 
 @Builder
 export function CleardataBuilder() {
@@ -30,11 +30,6 @@ struct Cleardata {
   @Local allLog: boolean = false
   @Local errorLog: boolean = false
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-
-  stringToArray(str: string): Uint8Array {
-    const textEncoder = new util.TextEncoder()
-    return textEncoder.encodeInto(str)
-  }
 
   build() {
     NavDestination() {
@@ -327,7 +322,7 @@ struct Cleardata {
                 this.setting.forEach(async (item) => {
                   if (item === 'oldaccount') {
                     const query: asset.AssetMap = new Map()
-                    query.set(asset.Tag.ALIAS, this.stringToArray('accessToken'))
+                    query.set(asset.Tag.ALIAS, stringToArray('accessToken'))
                     asset.removeSync(query)
                     await preferences.deletePreferences(this.context, {
                       name: 'login'

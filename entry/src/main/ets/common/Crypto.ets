@@ -9,12 +9,12 @@ interface EncryptData {
   iv: string
 }
 
-function stringToArray(str: string): Uint8Array {
+export function stringToArray(str: string) {
   const textEncoder = new util.TextEncoder()
   return textEncoder.encodeInto(str)
 }
 
-function arrayToString(arr: Uint8Array): string {
+function arrayToString(arr: Uint8Array) {
   const textDecoder = util.TextDecoder.create('utf-8', {
     ignoreBOM: true
   })
@@ -23,17 +23,17 @@ function arrayToString(arr: Uint8Array): string {
   })
 }
 
-function encodeBase64(arr: Uint8Array): Uint8Array {
+function encodeBase64(arr: Uint8Array) {
   const base64 = new util.Base64Helper()
   return base64.encodeSync(arr)
 }
 
-function encodeBase64ToString(arr: Uint8Array): string {
+function encodeBase64ToString(arr: Uint8Array) {
   const base64 = new util.Base64Helper()
   return base64.encodeToStringSync(arr)
 }
 
-function decodeBase64(arr: Uint8Array | string): Uint8Array {
+function decodeBase64(arr: Uint8Array | string) {
   const base64 = new util.Base64Helper()
   return base64.decodeSync(arr)
 }

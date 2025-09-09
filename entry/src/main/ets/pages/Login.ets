@@ -1,6 +1,7 @@
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { netBoost } from '@kit.NetworkBoostKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -27,9 +28,17 @@ export default struct Login {
             })
           })
           dialogControllerProgress.open()
+          netBoost.setSceneDesc({
+            scene: 'login',
+            sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
+          })
           const res = await request('/account/getAccessToken', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode
+          })
+          netBoost.setSceneDesc({
+            scene: 'login',
+            sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
           })
           dialogControllerProgress.close()
           if (res !== 'fail') {
@@ -293,10 +302,18 @@ export default struct Login {
                 })
               })
               dialogControllerProgress.open()
+              netBoost.setSceneDesc({
+                scene: 'login',
+                sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
+              })
               const res = await request('/account/getAccessToken', {
                 verifyType: this.type,
                 verifyCode: code,
                 email: this.email
+              })
+              netBoost.setSceneDesc({
+                scene: 'login',
+                sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
               })
               dialogControllerProgress.close()
               if (res !== 'fail') {

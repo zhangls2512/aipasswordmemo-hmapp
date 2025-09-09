@@ -11,7 +11,6 @@ import {
   CollaborationServiceStateDialog,
   createCollaborationServiceMenuItems
 } from '@kit.ServiceCollaborationKit'
-import fs from '@ohos.file.fs'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { newPassword } from '../common/Datachange'
@@ -64,17 +63,17 @@ export default struct Newpassword {
             fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
           }
           const passwordIconDir = this.context.filesDir + '/media/passwordicon'
-          if (!fs.accessSync(passwordIconDir)) {
-            fs.mkdirSync(passwordIconDir, true)
+          if (!fileIo.accessSync(passwordIconDir)) {
+            fileIo.mkdirSync(passwordIconDir, true)
           }
           const filePath = passwordIconDir + '/' + Date.now() + '.png'
-          const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
+          const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
           const imagePacker = image.createImagePacker()
           await imagePacker.packToFile(imagePixelMap, file.fd, {
             format: 'image/png',
             quality: 100
           })
-          fs.closeSync(file)
+          fileIo.closeSync(file)
           this.infoValue = fileUri.getUriFromPath(filePath)
         })
       MenuItem({
@@ -139,17 +138,17 @@ export default struct Newpassword {
                 fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
               }
               const passwordIconDir = this.context.filesDir + '/media/passwordicon'
-              if (!fs.accessSync(passwordIconDir)) {
-                fs.mkdirSync(passwordIconDir, true)
+              if (!fileIo.accessSync(passwordIconDir)) {
+                fileIo.mkdirSync(passwordIconDir, true)
               }
               const filePath = passwordIconDir + '/' + Date.now() + '.png'
-              const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
+              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
               const imagePacker = image.createImagePacker()
               await imagePacker.packToFile(imagePixelMap, file.fd, {
                 format: 'image/png',
                 quality: 100
               })
-              fs.closeSync(file)
+              fileIo.closeSync(file)
               this.infoValue = fileUri.getUriFromPath(filePath)
             }
           })
@@ -167,7 +166,7 @@ export default struct Newpassword {
             { value: 'URL' },
             { value: '自定义' }
           ])
-            .enabled((this.infoTypeIndex === 0 && this.infoValue === '') || this.infoTypeIndex !== 0)
+            .enabled((this.infoType === '图标' && this.infoValue === '') || this.infoType !== '图标')
             .selected(this.infoTypeIndex!!)
             .value(this.infoTypeValue!!)
             .onSelect(async (index, value) => {
@@ -546,7 +545,13 @@ export default struct Newpassword {
                 .width('20%')
                 .onClick(() => {
                   if (item.type === '图标') {
-                    fileIo.unlinkSync(item.value.replace('file://com.zhangxm.aipasswordmemo', ''))
+                    try {
+                      fileIo.unlinkSync(item.value.replace('file://com.zhangxm.aipasswordmemo', ''))
+                    } catch (err) {
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.code
+                      })
+                    }
                   }
                   this.passwordInfoArray.splice(index, 1)
                 })

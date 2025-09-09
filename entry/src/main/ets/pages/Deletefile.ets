@@ -30,17 +30,33 @@ struct Deletefile {
             Button('删除')
               .enabled(this.fileUri !== '')
               .role(ButtonRole.ERROR)
-              .onClick(() => {
-                try {
-                  fileIo.unlinkSync(this.fileUri.replace('file://com.zhangxm.aipasswordmemo', ''))
-                  promptAction.openToast({
-                    message: '删除成功'
-                  })
-                  this.fileUri = ''
-                } catch (err) {
-                  promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
+              .onClick(async () => {
+                const data = await promptAction.showDialog({
+                  title: '提示',
+                  message: '删除成功后无法恢复，确定删除？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '删除',
+                      color: $r('sys.color.warning')
+                    }
+                  ]
+                })
+                if (data.index === 1) {
+                  try {
+                    fileIo.unlinkSync(this.fileUri.replace('file://com.zhangxm.aipasswordmemo', ''))
+                    promptAction.openToast({
+                      message: '删除成功'
+                    })
+                    this.fileUri = ''
+                  } catch (err) {
+                    promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code
+                    })
+                  }
                 }
               })
           }
