@@ -515,11 +515,11 @@ struct Cleardata {
                       const cacheDir = this.context.cacheDir
                       const filenames = await fileIo.listFile(cacheDir)
                       for (let i = 0; i < filenames.length; i++) {
-                        const dirPath = cacheDir + '/' + filenames[i]
-                        if (fileIo.statSync(dirPath).isDirectory()) {
-                          fileIo.rmdirSync(dirPath)
+                        const path = cacheDir + '/' + filenames[i]
+                        if (fileIo.statSync(path).isDirectory()) {
+                          fileIo.rmdirSync(path)
                         } else {
-                          fileIo.unlinkSync(dirPath)
+                          fileIo.unlinkSync(path)
                         }
                       }
                     }

@@ -290,9 +290,9 @@ struct Debuginfo {
       this.pushPrimitiveType('窗口信息', '在屏幕上的真实显示区域', lastWindow.getGlobalRect())
       try {
         this.pushPrimitiveType('窗口信息', '是否可以获取到避让区', lastWindow.isSystemAvoidAreaEnabled())
-      } catch (err) {
+      } catch {
         promptAction.openToast({
-          message: '发生错误，错误码：' + err.code
+          message: '发生错误'
         })
       }
       this.pushPrimitiveType('窗口信息', '避让区 (系统默认)',
@@ -320,9 +320,9 @@ struct Debuginfo {
         this.pushPrimitiveType('窗口信息', '标题栏高度', lastWindow.getWindowDecorHeight())
         try {
           this.pushPrimitiveType('窗口信息', '子窗或悬浮窗的圆角半径值', lastWindow.getWindowCornerRadius())
-        } catch (err) {
+        } catch {
           promptAction.openToast({
-            message: '发生错误，错误码：' + err.code
+            message: '发生错误'
           })
         }
       }
@@ -331,9 +331,9 @@ struct Debuginfo {
       this.pushPrimitiveType('窗口信息', '是否已获焦', lastWindow.isFocused())
       try {
         this.pushPrimitiveType('窗口信息', '是否启用返回手势功能', lastWindow.isGestureBackEnabled())
-      } catch (err) {
+      } catch {
         promptAction.openToast({
-          message: '发生错误，错误码：' + err.code
+          message: '发生错误'
         })
       }
       this.pushPrimitiveType('窗口信息', '是否为激活态', lastWindow.isWindowHighlighted())
@@ -346,9 +346,9 @@ struct Debuginfo {
       this.pushPrimitiveType('屏幕信息', '显示模式', display.getFoldDisplayMode())
       try {
         this.pushObject('屏幕信息', display.getCurrentFoldCreaseRegion())
-      } catch (err) {
+      } catch {
         promptAction.openToast({
-          message: '发生错误，错误码：' + err.code
+          message: '发生错误'
         })
       }
       this.pushPrimitiveType('屏幕信息', '设备是否正在截屏、投屏、录屏', display.isCaptured())
@@ -357,7 +357,8 @@ struct Debuginfo {
         this.pushPrimitiveType('环境目录信息', '当前用户预授权桌面目录的沙箱路径', Environment.getUserDesktopDir())
         this.pushPrimitiveType('环境目录信息', '当前用户预授权文档目录的沙箱路径', Environment.getUserDocumentDir())
       }
-      this.pushObject('应用空间信息', storageStatistics.getCurrentBundleStats())
+      const currentBundleStats = await storageStatistics.getCurrentBundleStats()
+      this.pushObject('应用空间信息', currentBundleStats)
       this.pushPrimitiveType('内置存储空间信息', '总', storageStatistics.getTotalSizeSync())
       this.pushPrimitiveType('内置存储空间信息', '可用', storageStatistics.getFreeSizeSync())
     })

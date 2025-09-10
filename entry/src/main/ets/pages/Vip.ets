@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
-import { netBoost } from '@kit.NetworkBoostKit';
+import { netBoost } from '@kit.NetworkBoostKit'
 import { get, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'

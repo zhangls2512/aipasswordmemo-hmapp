@@ -1,4 +1,12 @@
-import { AbilityConstant, appRecovery, ConfigurationConstant, errorManager, UIAbility, Want } from '@kit.AbilityKit'
+import {
+  AbilityConstant,
+  appRecovery,
+  ConfigurationConstant,
+  errorManager,
+  UIAbility,
+  Want,
+  wantConstant
+} from '@kit.AbilityKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
@@ -280,7 +288,7 @@ export default class EntryAbility extends UIAbility {
           }
           appEventGroups.forEach((item) => {
             const file = fileIo.openSync(this.context.filesDir + '/log/error/' + Date.now() + '.txt',
-              fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE)
+              fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
             fileIo.writeSync(file.fd, JSON.stringify(item))
             fileIo.closeSync(file)
           })
@@ -294,8 +302,16 @@ export default class EntryAbility extends UIAbility {
                 object: item
               })
               if (res !== 'fail') {
-                promptAction.openToast({
-                  message: '故障日志自动上传成功，故障类型：' + item.name
+                promptAction.showDialog({
+                  title: '提示',
+                  message: '故障日志自动上传成功，故障类型：' + item.name +
+                    '。建议您依次进入“我的”>“设置”>“关于”，附带联系方式提交意见反馈或联系人工客服，便于开发者排查、处理问题。',
+                  buttons: [
+                    {
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
                 })
               }
             }
@@ -517,6 +533,11 @@ export default class EntryAbility extends UIAbility {
       })
       return AbilityConstant.OnContinueResult.MISMATCH
     }
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    const exitAfterContinue = commonSettingDataPreferences.getSync('exitAfterContinue', true) as boolean
+    wantParam[wantConstant.Params.SUPPORT_CONTINUE_SOURCE_EXIT_KEY] = exitAfterContinue
     return AbilityConstant.OnContinueResult.AGREE
   }
 

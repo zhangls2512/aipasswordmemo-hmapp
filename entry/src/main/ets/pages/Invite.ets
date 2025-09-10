@@ -1,5 +1,11 @@
 import { common } from '@kit.AbilityKit'
+import { uniformTypeDescriptor } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { fileIo, fileUri } from '@kit.CoreFileKit'
+import { image } from '@kit.ImageKit'
+import { photoAccessHelper } from '@kit.MediaLibraryKit'
+import { generateBarcode, scanCore } from '@kit.ScanKit'
+import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { get } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
 import copy from '../common/Pasteboard'
@@ -20,6 +26,13 @@ struct Invite {
   @Local accessToken: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  shareData = new systemShare.SharedData({
+    utd: uniformTypeDescriptor.UniformDataType.HYPERLINK,
+    title: '邀请您使用轩铭密码智能备忘录',
+    description: '邀请您使用轩铭密码智能备忘录，方便、智能地记录、管理密码。',
+    thumbnail: this.context.resourceManager.getMediaByNameSync('icon'),
+    content: 'https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode
+  })
 
   build() {
     NavDestination() {
@@ -27,7 +40,7 @@ struct Invite {
         ListItem() {
           Column() {
             if (!this.loading && this.invitationcode && this.inviteusercount !== -1) {
-              Text('本账号邀请码')
+              Text('邀请码')
                 .fontWeight(FontWeight.Bold)
               Text(this.invitationcode)
                 .fontColor($r('sys.color.font_emphasize'))
@@ -38,11 +51,131 @@ struct Invite {
                 .onClick(() => {
                   copy(this.invitationcode)
                 })
-              Text('已邀请新用户数：' + String(this.inviteusercount))
+              Text('邀请链接')
                 .fontWeight(FontWeight.Bold)
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                })
+              Text('https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode)
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontWeight(FontWeight.Medium)
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                 })
+                .onClick(() => {
+                  const shareController = new systemShare.ShareController(this.shareData)
+                  shareController.show(this.context, {})
+                })
+              Row() {
+                Text('邀请二维码')
+                  .fontWeight(FontWeight.Medium)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Button('分享')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                  .onClick(async () => {
+                    const qrcodeDir = this.context.filesDir + '/media/invitationqrcode'
+                    const qrcodePath = qrcodeDir + '/' + this.invitationcode + '.png'
+                    if (!fileIo.accessSync(qrcodePath)) {
+                      const qrcodePixelMap =
+                        await generateBarcode.createBarcode('https://www.zhangls2512.cn/product/password?invitationcode=' +
+                        this.invitationcode, {
+                          scanType: scanCore.ScanType.QR_CODE,
+                          width: 200,
+                          height: 200
+                        })
+                      if (!fileIo.accessSync(qrcodeDir)) {
+                        fileIo.mkdirSync(qrcodeDir, true)
+                      }
+                      const qrcodeFile =
+                        fileIo.openSync(qrcodePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+                      const imagePacker = image.createImagePacker()
+                      await imagePacker.packToFile(qrcodePixelMap, qrcodeFile.fd, {
+                        format: 'image/png',
+                        quality: 100
+                      })
+                      fileIo.closeSync(qrcodeFile)
+                    }
+                    const qrcodeUri = fileUri.getUriFromPath(qrcodePath)
+                    const shareData = new systemShare.SharedData({
+                      utd: uniformTypeDescriptor.UniformDataType.IMAGE,
+                      title: '邀请您使用轩铭密码智能备忘录',
+                      description: '邀请您使用轩铭密码智能备忘录，方便、智能地记录、管理密码。',
+                      thumbnailUri: qrcodeUri,
+                      uri: qrcodeUri
+                    })
+                    const shareController = new systemShare.ShareController(shareData)
+                    await shareController.show(this.context, {})
+                  })
+                Button('保存')
+                  .buttonStyle(ButtonStyleMode.NORMAL)
+                  .onClick(async () => {
+                    const qrcodeDir = this.context.filesDir + '/media/invitationqrcode'
+                    const qrcodePath = qrcodeDir + '/' + this.invitationcode + '.png'
+                    if (!fileIo.accessSync(qrcodePath)) {
+                      const qrcodePixelMap =
+                        await generateBarcode.createBarcode('https://www.zhangls2512.cn/product/password?invitationcode=' +
+                        this.invitationcode, {
+                          scanType: scanCore.ScanType.QR_CODE,
+                          width: 200,
+                          height: 200
+                        })
+                      if (!fileIo.accessSync(qrcodeDir)) {
+                        fileIo.mkdirSync(qrcodeDir, true)
+                      }
+                      const qrcodeFile =
+                        fileIo.openSync(qrcodePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+                      const imagePacker = image.createImagePacker()
+                      await imagePacker.packToFile(qrcodePixelMap, qrcodeFile.fd, {
+                        format: 'image/png',
+                        quality: 100
+                      })
+                      fileIo.closeSync(qrcodeFile)
+                    }
+                    const qrcodeUri = fileUri.getUriFromPath(qrcodePath)
+                    const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
+                    try {
+                      const uris = await phAccessHelper.showAssetsCreationDialog([qrcodeUri], [{
+                        fileNameExtension: 'png',
+                        photoType: photoAccessHelper.PhotoType.IMAGE
+                      }])
+                      const srcFile = fileIo.openSync(qrcodeUri)
+                      const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
+                      fileIo.copyFileSync(srcFile.fd, destFile.fd)
+                      fileIo.closeSync(srcFile)
+                      fileIo.closeSync(destFile)
+                      promptAction.openToast({
+                        message: '保存成功'
+                      })
+                    } catch (err) {
+                      if (err.code === 13900020) {
+                        return
+                      }
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.code
+                      })
+                    }
+                  })
+              }
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
+
+              Row() {
+                Text('已邀请新用户数')
+                  .fontWeight(FontWeight.Bold)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Text(String(this.inviteusercount))
+                  .fontWeight(FontWeight.Medium)
+              }
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
             }
             if (this.loading) {
               LoadingProgress()
@@ -100,6 +233,47 @@ struct Invite {
 
         ListItem() {
           Column() {
+            Text('参与活动')
+              .fontWeight(FontWeight.Bold)
+            Text('1. 点击复制蓝色的邀请码，发送给新用户，让其进入本页面输入邀请码并提交。')
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                top: $r('sys.float.ohos_id_text_paragraph_margin_m')
+              })
+            Text() {
+              Span('2. 点击分享蓝色的邀请链接给新用户，让其')
+                .fontWeight(FontWeight.Medium)
+              Span('登录轩铭2512统一账号后')
+                .fontWeight(FontWeight.Bold)
+              Span('访问邀请链接进入本应用。')
+                .fontWeight(FontWeight.Medium)
+            }
+            .enableAutoSpacing(true)
+            .margin({
+              top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+            })
+
+            Text() {
+              Span('3. 本设备停留在本页面，让新用户')
+                .fontWeight(FontWeight.Medium)
+              Span('登录轩铭2512统一账号后')
+                .fontWeight(FontWeight.Bold)
+              Span('与本设备碰一碰/隔空传送进入本应用。')
+                .fontWeight(FontWeight.Medium)
+            }
+            .enableAutoSpacing(true)
+            .margin({
+              top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+            })
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
             Text('活动说明')
               .fontWeight(FontWeight.Bold)
             Text('1. 其他账号每使用本账号邀请码一次，本账号获得7天会员，其他账号获得30天会员。')
@@ -150,6 +324,12 @@ struct Invite {
         })
         if (userres !== 'fail') {
           this.invitationcode = JSON.parse(userres).data.invitationCode as string
+          harmonyShare.on('knockShare', (sharableTarget) => {
+            sharableTarget.share(this.shareData)
+          })
+          harmonyShare.on('gesturesShare', (sharableTarget) => {
+            sharableTarget.share(this.shareData)
+          })
         }
         const countres = await request('/product/getInviteUserCount', {
           accessToken: this.accessToken,
@@ -160,6 +340,10 @@ struct Invite {
           this.inviteusercount = JSON.parse(countres).count as number
         }
       }
+    })
+    .onDisAppear(() => {
+      harmonyShare.off('knockShare')
+      harmonyShare.off('gesturesShare')
     })
   }
 }

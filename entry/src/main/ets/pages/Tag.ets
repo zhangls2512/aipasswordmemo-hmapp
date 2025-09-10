@@ -24,6 +24,96 @@ export default struct TagPage {
   updateId = 0
 
   @Builder
+  MenuBuilder(item: Tag) {
+    Menu() {
+      MenuItem({
+        startIcon: $r('app.media.delete'),
+        content: '删除'
+      })
+        .onClick(async () => {
+          const promptAction = this.getUIContext().getPromptAction()
+          const data = await promptAction.showDialog({
+            title: '提示',
+            message: '删除成功后无法恢复，确定删除？',
+            buttons: [
+              {
+                text: '取消',
+                color: $r('sys.color.font_primary')
+              },
+              {
+                text: '删除',
+                color: $r('sys.color.warning')
+              }
+            ]
+          })
+          if (data.index === 1) {
+            await deleteData('tag', item.id)
+            this.loading = true
+          }
+        })
+      MenuItem({
+        startIcon: $r('app.media.cloud'),
+        content: '云备份'
+      })
+        .enabled(this.enableCloudBackup && !item.isCloudBackup)
+        .onClick(async () => {
+          let cloudBackupTime = JSON.stringify([])
+          if (typeof (item.cloudBackupTime) === 'string') {
+            cloudBackupTime = item.cloudBackupTime
+          }
+          const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
+          const accountInfo = await getAccountInfo()
+          const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
+          if (cloudBackupTimeIndex !== -1) {
+            cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
+          } else {
+            cloudBackupTimeArray.push({
+              uid: accountInfo.uid,
+              time: Date.now()
+            })
+          }
+          const dialogControllerProgress = new CustomDialogController({
+            builder: LoadingDialog({
+              content: '云备份中...'
+            })
+          })
+          dialogControllerProgress.open()
+          await setCloudBackup({
+            type: 'tag',
+            id: item.id,
+            content: JSON.stringify({
+              value: item.value,
+              color: item.color,
+              updateTime: item.updateTime,
+              cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
+            })
+          })
+          dialogControllerProgress.close()
+          this.loading = true
+        })
+      MenuItem({
+        startIcon: $r('app.media.clouddelete'),
+        content: '删除云备份'
+      })
+        .enabled(this.enableCloudBackup && item.isCloudBackup)
+        .onClick(async () => {
+          const dialogControllerProgress = new CustomDialogController({
+            builder: LoadingDialog({
+              content: '删除云备份中...'
+            })
+          })
+          dialogControllerProgress.open()
+          await deleteCloudBackup({
+            type: 'tag',
+            id: item.id
+          })
+          dialogControllerProgress.close()
+          this.loading = true
+        })
+    }
+  }
+
+  @Builder
   NewSheetBuilder() {
     NewTag()
   }
@@ -152,99 +242,11 @@ export default struct TagPage {
                 }
               })
               .width('100%')
-              .bindMenu([
-                {
-                  value: '修改',
-                  icon: $r('app.media.edit'),
-                  action: () => {
-                    this.updateId = item.id
-                    this.isShowUpdateSheet = true
-                  }
-                },
-                {
-                  value: '删除',
-                  icon: $r('app.media.delete'),
-                  action: async () => {
-                    const data = await promptAction.showDialog({
-                      title: '提示',
-                      message: '删除成功后无法恢复，确定删除？',
-                      buttons: [
-                        {
-                          text: '取消',
-                          color: $r('sys.color.font_primary')
-                        },
-                        {
-                          text: '删除',
-                          color: $r('sys.color.warning')
-                        }
-                      ]
-                    })
-                    if (data.index === 1) {
-                      await deleteData('tag', item.id)
-                      this.loading = true
-                    }
-                  }
-                },
-                {
-                  value: '云备份',
-                  icon: $r('app.media.cloud'),
-                  enabled: this.enableCloudBackup && !item.isCloudBackup,
-                  action: async () => {
-                    let cloudBackupTime = JSON.stringify([])
-                    if (typeof (item.cloudBackupTime) === 'string') {
-                      cloudBackupTime = item.cloudBackupTime
-                    }
-                    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-                    const accountInfo = await getAccountInfo()
-                    const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
-                    if (cloudBackupTimeIndex !== -1) {
-                      cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-                    } else {
-                      cloudBackupTimeArray.push({
-                        uid: accountInfo.uid,
-                        time: Date.now()
-                      })
-                    }
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '云备份中...'
-                      })
-                    })
-                    dialogControllerProgress.open()
-                    await setCloudBackup({
-                      type: 'tag',
-                      id: item.id,
-                      content: JSON.stringify({
-                        value: item.value,
-                        color: item.color,
-                        updateTime: item.updateTime,
-                        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-                      })
-                    })
-                    dialogControllerProgress.close()
-                    this.loading = true
-                  }
-                },
-                {
-                  value: '删除云备份',
-                  icon: $r('app.media.clouddelete'),
-                  enabled: this.enableCloudBackup && item.isCloudBackup,
-                  action: async () => {
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '删除云备份中...'
-                      })
-                    })
-                    dialogControllerProgress.open()
-                    await deleteCloudBackup({
-                      type: 'tag',
-                      id: item.id
-                    })
-                    dialogControllerProgress.close()
-                    this.loading = true
-                  }
-                }
-              ], {
+              .onClick(() => {
+                this.updateId = item.id
+                this.isShowUpdateSheet = true
+              })
+              .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress | ResponseType.RightClick, {
                 hapticFeedbackMode: HapticFeedbackMode.AUTO
               })
             }

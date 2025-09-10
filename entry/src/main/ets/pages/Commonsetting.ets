@@ -11,6 +11,7 @@ export function CommonsettingBuilder() {
 @ComponentV2
 struct Commonsetting {
   @Local allowContinue: boolean = false
+  @Local exitAfterContinue: boolean = false
   @Local allowRestore: boolean = false
   @Local acceptCollaborate: boolean = false
   @Local destroyWhenBackPressed: boolean = false
@@ -91,6 +92,28 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
+                Text('接续成功后退出')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.exitAfterContinue!!
+                })
+                  .onChange((isOn) => {
+                    this.commonSettingDataPreferences.putSync('exitAfterContinue', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
                 Text('备份恢复')
                   .fontWeight(FontWeight.Medium)
                 Blank()
@@ -141,7 +164,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.acceptCollaborate!!
                 })
-                  .onChange(async (isOn) => {
+                  .onChange((isOn) => {
                     this.commonSettingDataPreferences.putSync('acceptCollaborate', isOn)
                     this.commonSettingDataPreferences.flushSync()
                   })
@@ -163,7 +186,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.destroyWhenBackPressed!!
                 })
-                  .onChange(async (isOn) => {
+                  .onChange((isOn) => {
                     this.commonSettingDataPreferences.putSync('destroyWhenBackPressed', isOn)
                     this.commonSettingDataPreferences.flushSync()
                   })
@@ -488,6 +511,7 @@ struct Commonsetting {
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.allowContinue = this.commonSettingDataPreferences.getSync('allowContinue', true) as boolean
+      this.exitAfterContinue = this.commonSettingDataPreferences.getSync('exitAfterContinue', true) as boolean
       this.allowRestore = this.commonSettingDataPreferences.getSync('allowRestore', true) as boolean
       this.acceptCollaborate = this.commonSettingDataPreferences.getSync('acceptCollaborate', true) as boolean
       this.destroyWhenBackPressed =

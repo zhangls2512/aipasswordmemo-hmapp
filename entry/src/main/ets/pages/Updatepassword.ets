@@ -44,38 +44,47 @@ export default struct Newpassword {
     Menu() {
       MenuItem({ content: '本设备' })
         .onClick(async () => {
-          const photoPicker = new photoAccessHelper.PhotoViewPicker()
-          const pickerres = await photoPicker.select({
-            MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
-            maxSelectNumber: 1,
-            isPhotoTakingSupported: false
-          })
-          const fileSource = await fileIo.open(pickerres.photoUris[0])
-          const imageSource = image.createImageSource(fileSource.fd)
-          const imagePixelMap = await imageSource.createPixelMap()
-          const imageSize = imagePixelMap.getImageInfoSync().size
-          if (imageSize.width !== imageSize.height) {
-            promptAction.openToast({
-              message: '请选择宽高比为 1:1 的图片'
+          try {
+            const photoPicker = new photoAccessHelper.PhotoViewPicker()
+            const pickerres = await photoPicker.select({
+              MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+              maxSelectNumber: 1,
+              isPhotoTakingSupported: false
             })
-            return
+            const fileSource = await fileIo.open(pickerres.photoUris[0])
+            const imageSource = image.createImageSource(fileSource.fd)
+            const imagePixelMap = await imageSource.createPixelMap()
+            const imageSize = imagePixelMap.getImageInfoSync().size
+            if (imageSize.width !== imageSize.height) {
+              promptAction.openToast({
+                message: '请选择宽高比为 1:1 的图片'
+              })
+              return
+            }
+            if (this.infoValue) {
+              fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+            }
+            const passwordIconDir = this.context.filesDir + '/media/passwordicon'
+            if (!fileIo.accessSync(passwordIconDir)) {
+              fileIo.mkdirSync(passwordIconDir, true)
+            }
+            const filePath = passwordIconDir + '/' + Date.now() + '.png'
+            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+            const imagePacker = image.createImagePacker()
+            await imagePacker.packToFile(imagePixelMap, file.fd, {
+              format: 'image/png',
+              quality: 100
+            })
+            fileIo.closeSync(file)
+            this.infoValue = fileUri.getUriFromPath(filePath)
+          } catch (err) {
+            if (err.code === 13900020) {
+              return
+            }
+            promptAction.openToast({
+              message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+            })
           }
-          if (this.infoValue) {
-            fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-          }
-          const passwordIconDir = this.context.filesDir + '/media/passwordicon'
-          if (!fileIo.accessSync(passwordIconDir)) {
-            fileIo.mkdirSync(passwordIconDir, true)
-          }
-          const filePath = passwordIconDir + '/' + Date.now() + '.png'
-          const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-          const imagePacker = image.createImagePacker()
-          await imagePacker.packToFile(imagePixelMap, file.fd, {
-            format: 'image/png',
-            quality: 100
-          })
-          fileIo.closeSync(file)
-          this.infoValue = fileUri.getUriFromPath(filePath)
         })
       MenuItem({
         content: '其他设备',

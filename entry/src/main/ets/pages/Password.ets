@@ -54,6 +54,107 @@ export default struct PasswordPage {
   })
 
   @Builder
+  MenuBuilder(item: Password) {
+    Menu() {
+      MenuItem({
+        startIcon: $r('app.media.edit'),
+        content: '修改'
+      })
+        .onClick(() => {
+          this.passwordId = item.id
+          this.isShowUpdateSheet = true
+        })
+      MenuItem({
+        startIcon: $r('app.media.delete'),
+        content: '删除'
+      })
+        .enabled(!item.info.some(itema => itema.type === '图标'))
+        .onClick(async () => {
+          const promptAction = this.getUIContext().getPromptAction()
+          const data = await promptAction.showDialog({
+            title: '提示',
+            message: '删除成功后无法恢复，确定删除？',
+            buttons: [
+              {
+                text: '取消',
+                color: $r('sys.color.font_primary')
+              },
+              {
+                text: '删除',
+                color: $r('sys.color.warning')
+              }
+            ]
+          })
+          if (data.index === 1) {
+            await deleteData('password', item.id)
+            this.loading = true
+          }
+        })
+      MenuItem({
+        startIcon: $r('app.media.cloud'),
+        content: '云备份'
+      })
+        .enabled(this.enableCloudBackup && !item.isCloudBackup)
+        .onClick(async () => {
+          let cloudBackupTime = JSON.stringify([])
+          if (typeof (item.cloudBackupTime) === 'string') {
+            cloudBackupTime = item.cloudBackupTime
+          }
+          const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
+          const accountInfo = await getAccountInfo()
+          const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
+          if (cloudBackupTimeIndex !== -1) {
+            cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
+          } else {
+            cloudBackupTimeArray.push({
+              uid: accountInfo.uid,
+              time: Date.now()
+            })
+          }
+          const dialogControllerProgress = new CustomDialogController({
+            builder: LoadingDialog({
+              content: '云备份中...'
+            })
+          })
+          dialogControllerProgress.open()
+          await setCloudBackup({
+            type: 'password',
+            id: item.id,
+            content: JSON.stringify({
+              id: item.id,
+              name: item.name,
+              info: item.info,
+              tag: item.tag.map(item => item.value),
+              updateTime: item.updateTime,
+              cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
+            })
+          })
+          dialogControllerProgress.close()
+          this.loading = true
+        })
+      MenuItem({
+        startIcon: $r('app.media.clouddelete'),
+        content: '删除云备份'
+      })
+        .enabled(this.enableCloudBackup && item.isCloudBackup)
+        .onClick(async () => {
+          const dialogControllerProgress = new CustomDialogController({
+            builder: LoadingDialog({
+              content: '删除云备份中...'
+            })
+          })
+          dialogControllerProgress.open()
+          await deleteCloudBackup({
+            type: 'password',
+            id: item.id
+          })
+          dialogControllerProgress.close()
+          this.loading = true
+        })
+    }
+  }
+
+  @Builder
   NewSheetBuilder() {
     NewPassword()
   }
@@ -290,110 +391,11 @@ export default struct PasswordPage {
                 }
               })
               .width('100%')
-              .bindMenu([
-                {
-                  value: '详情',
-                  icon: $r('app.media.info'),
-                  action: () => {
-                    this.passwordId = item.id
-                    this.isShowInfoSheet = true
-                  }
-                },
-                {
-                  value: '修改',
-                  icon: $r('app.media.edit'),
-                  action: () => {
-                    this.passwordId = item.id
-                    this.isShowUpdateSheet = true
-                  }
-                },
-                {
-                  value: '删除',
-                  icon: $r('app.media.delete'),
-                  enabled: !item.info.some(itema => itema.type === '图标'),
-                  action: async () => {
-                    const data = await promptAction.showDialog({
-                      title: '提示',
-                      message: '删除成功后无法恢复，确定删除？',
-                      buttons: [
-                        {
-                          text: '取消',
-                          color: $r('sys.color.font_primary')
-                        },
-                        {
-                          text: '删除',
-                          color: $r('sys.color.warning')
-                        }
-                      ]
-                    })
-                    if (data.index === 1) {
-                      await deleteData('password', item.id)
-                      this.loading = true
-                    }
-                  }
-                },
-                {
-                  value: '云备份',
-                  icon: $r('app.media.cloud'),
-                  enabled: this.enableCloudBackup && !item.isCloudBackup,
-                  action: async () => {
-                    let cloudBackupTime = JSON.stringify([])
-                    if (typeof (item.cloudBackupTime) === 'string') {
-                      cloudBackupTime = item.cloudBackupTime
-                    }
-                    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-                    const accountInfo = await getAccountInfo()
-                    const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
-                    if (cloudBackupTimeIndex !== -1) {
-                      cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-                    } else {
-                      cloudBackupTimeArray.push({
-                        uid: accountInfo.uid,
-                        time: Date.now()
-                      })
-                    }
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '云备份中...'
-                      })
-                    })
-                    dialogControllerProgress.open()
-                    await setCloudBackup({
-                      type: 'password',
-                      id: item.id,
-                      content: JSON.stringify({
-                        id: item.id,
-                        name: item.name,
-                        info: item.info,
-                        tag: item.tag.map(item => item.value),
-                        updateTime: item.updateTime,
-                        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-                      })
-                    })
-                    dialogControllerProgress.close()
-                    this.loading = true
-                  }
-                },
-                {
-                  value: '删除云备份',
-                  icon: $r('app.media.clouddelete'),
-                  enabled: this.enableCloudBackup && item.isCloudBackup,
-                  action: async () => {
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '删除云备份中...'
-                      })
-                    })
-                    dialogControllerProgress.open()
-                    await deleteCloudBackup({
-                      type: 'password',
-                      id: item.id
-                    })
-                    dialogControllerProgress.close()
-                    this.loading = true
-                  }
-                }
-              ], {
+              .onClick(() => {
+                this.passwordId = item.id
+                this.isShowInfoSheet = true
+              })
+              .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress | ResponseType.RightClick, {
                 hapticFeedbackMode: HapticFeedbackMode.AUTO
               })
             }

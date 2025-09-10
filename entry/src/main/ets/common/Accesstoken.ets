@@ -48,7 +48,7 @@ export async function getAccountInfo(): Promise<AccountInfo> {
     if (endDate < Date.now() && endDate !== 0) {
       await appAccountManager.removeAccount('default')
       promptAction.openToast({
-        message: '登录已到期，请重新登录'
+        message: '登录态过期，请重新登录'
       })
       return {
         uid: '',
@@ -93,7 +93,7 @@ export async function check() {
           const uid = JSON.parse(res).uid as string
           const email = JSON.parse(res).email as string
           const endDate = JSON.parse(res).endDate as number
-          set(accessToken, {
+          await set(accessToken, {
             uid: uid,
             email: email,
             endDate: endDate

@@ -188,7 +188,7 @@ export default struct Setting {
                     type: ToggleType.Switch,
                     isOn: this.autoLoginByHuaweiAccount!!
                   })
-                    .onChange(async (isOn) => {
+                    .onChange((isOn) => {
                       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
                         name: 'commonSetting'
                       })
@@ -1082,7 +1082,7 @@ export default struct Setting {
     })
     .title('设置')
     .titleMode(NavigationTitleMode.Mini)
-    .onAppear(async () => {
+    .onAppear(() => {
       this.getSetting()
       this.context.eventHub.on('refreshSetting', () => {
         this.getSetting()

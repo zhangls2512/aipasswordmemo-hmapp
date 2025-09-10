@@ -106,13 +106,16 @@ export default struct Passwordinfo {
                   }])
                   const srcFile = fileIo.openSync(item.value)
                   const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
-                  fileIo.copyFileSync(srcFile.fd, destFile.fd);
+                  fileIo.copyFileSync(srcFile.fd, destFile.fd)
                   fileIo.closeSync(srcFile)
                   fileIo.closeSync(destFile)
                   promptAction.openToast({
                     message: '保存成功'
                   })
                 } catch (err) {
+                  if (err.code === 13900020) {
+                    return
+                  }
                   promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
