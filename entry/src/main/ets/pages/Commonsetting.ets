@@ -355,7 +355,7 @@ struct Commonsetting {
                 Column() {
                   Text('敏感页面禁止截、录屏')
                     .fontWeight(FontWeight.Medium)
-                  Text('强烈建议开启，降低敏感信息泄露风险')
+                  Text('建议开启，降低敏感信息泄露风险')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({

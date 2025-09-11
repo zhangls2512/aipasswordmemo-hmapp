@@ -297,7 +297,7 @@ struct About {
                 commentManager.showCommentDialog(this.context)
               } catch (err) {
                 promptAction.openToast({
-                  message: JSON.stringify(err)
+                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
               }
             })

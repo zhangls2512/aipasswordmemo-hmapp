@@ -84,7 +84,13 @@ export default struct Passwordinfo {
                   .fontWeight(FontWeight.Medium)
                 Blank()
                 Image(item.value)
+                  .copyOption(CopyOptions.LocalDevice)
                   .width('10%')
+                  .onError((err) => {
+                    promptAction.openToast({
+                      message: '发生错误，错误码：' + err.error?.code + '，错误信息：' + err.error?.message
+                    })
+                  })
               }
               .borderRadius(12)
               .padding(12)

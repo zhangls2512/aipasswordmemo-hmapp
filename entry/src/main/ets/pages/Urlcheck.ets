@@ -58,12 +58,11 @@ export default struct Urlcheck {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
+                .width('87%')
               Blank()
                 .width('5%')
-              Button('删除')
-                .role(ButtonRole.ERROR)
-                .width('20%')
+              Image($r('app.media.delete'))
+                .width('8%')
                 .onClick(() => {
                   this.urlArray.splice(index, 1)
                 })

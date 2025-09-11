@@ -208,11 +208,11 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
+                .width('87%')
               Blank()
-              Button('添加')
-                .margin({
-                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
+                .width('5%')
+              Image($r('app.media.add'))
+                .width('8%')
                 .onClick(() => {
                   if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
                     promptAction.openToast({
@@ -292,13 +292,12 @@ export default struct Filterpassword {
                   })
               }
               .alignItems(HorizontalAlign.Start)
+              .width('87%')
 
               Blank()
-              Button('删除')
-                .margin({
-                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .role(ButtonRole.ERROR)
+                .width('5%')
+              Image($r('app.media.delete'))
+                .width('8%')
                 .onClick(() => {
                   this.passwordInfoArray.splice(index, 1)
                 })
@@ -340,11 +339,11 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
+                .width('87%')
               Blank()
-              Button('添加')
-                .margin({
-                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
+                .width('5%')
+              Image($r('app.media.add'))
+                .width('8%')
                 .onClick(() => {
                   if (this.passwordTagArray.some(tagItem => tagItem === item)) {
                     promptAction.openToast({
@@ -380,12 +379,11 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
+                .width('87%')
               Blank()
-              Button('删除')
-                .margin({
-                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .role(ButtonRole.ERROR)
+                .width('5%')
+              Image($r('app.media.delete'))
+                .width('8%')
                 .onClick(() => {
                   this.passwordTagArray.splice(index, 1)
                 })

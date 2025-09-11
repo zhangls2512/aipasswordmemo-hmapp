@@ -17,7 +17,7 @@ import { updatePassword } from '../common/Datachange'
 import { getPasswordInfo, getTagList, getTypeInfoList, Password, PasswordInfoItem } from '../common/Dataget'
 
 @ComponentV2
-export default struct Newpassword {
+export default struct Updatepassword {
   @Consumer() isShowUpdateSheet: boolean = false
   @Param passwordId: number = 0
   @Local passwordName: string = ''
@@ -62,7 +62,13 @@ export default struct Newpassword {
               return
             }
             if (this.infoValue) {
-              fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+              try {
+                fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+              } catch (err) {
+                promptAction.openToast({
+                  message: '发生错误，错误码：' + err.code
+                })
+              }
             }
             const passwordIconDir = this.context.filesDir + '/media/passwordicon'
             if (!fileIo.accessSync(passwordIconDir)) {
@@ -380,11 +386,11 @@ export default struct Newpassword {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
+                .width('87%')
               Blank()
                 .width('5%')
-              Button('添加')
-                .width('20%')
+              Image($r('app.media.add'))
+                .width('8%')
                 .onClick(() => {
                   if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
                     promptAction.openToast({
@@ -545,13 +551,42 @@ export default struct Newpassword {
                   })
               }
               .alignItems(HorizontalAlign.Start)
-              .width('75%')
+              .width('65%')
 
               Blank()
                 .width('5%')
-              Button('删除')
-                .role(ButtonRole.ERROR)
-                .width('20%')
+              if (index === 0) {
+                Blank()
+                  .width('11%')
+              }
+              if (index === this.passwordInfoArray.length - 1) {
+                Blank()
+                  .width('11%')
+              }
+              if (index !== 0) {
+                Image($r('app.media.up'))
+                  .width('8%')
+                  .onClick(() => {
+                    const temp = this.passwordInfoArray[index]
+                    this.passwordInfoArray[index] = this.passwordInfoArray[index - 1]
+                    this.passwordInfoArray[index - 1] = temp
+                  })
+                Blank()
+                  .width('3%')
+              }
+              if (index !== this.passwordInfoArray.length - 1) {
+                Image($r('app.media.down'))
+                  .width('8%')
+                  .onClick(() => {
+                    const temp = this.passwordInfoArray[index]
+                    this.passwordInfoArray[index] = this.passwordInfoArray[index + 1]
+                    this.passwordInfoArray[index + 1] = temp
+                  })
+                Blank()
+                  .width('3%')
+              }
+              Image($r('app.media.delete'))
+                .width('8%')
                 .onClick(() => {
                   if (item.type === '图标') {
                     try {
@@ -601,11 +636,11 @@ export default struct Newpassword {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
+                .width('87%')
               Blank()
                 .width('5%')
-              Button('添加')
-                .width('20%')
+              Image($r('app.media.add'))
+                .width('8%')
                 .onClick(() => {
                   if (this.passwordTagArray.some(tagItem => tagItem === item)) {
                     promptAction.openToast({
@@ -659,12 +694,41 @@ export default struct Newpassword {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
+                .width('65%')
               Blank()
                 .width('5%')
-              Button('删除')
-                .role(ButtonRole.ERROR)
-                .width('20%')
+              if (index === 0) {
+                Blank()
+                  .width('11%')
+              }
+              if (index === this.passwordTagArray.length - 1) {
+                Blank()
+                  .width('11%')
+              }
+              if (index !== 0) {
+                Image($r('app.media.up'))
+                  .width('8%')
+                  .onClick(() => {
+                    const temp = this.passwordTagArray[index]
+                    this.passwordTagArray[index] = this.passwordTagArray[index - 1]
+                    this.passwordTagArray[index - 1] = temp
+                  })
+                Blank()
+                  .width('3%')
+              }
+              if (index !== this.passwordTagArray.length - 1) {
+                Image($r('app.media.down'))
+                  .width('8%')
+                  .onClick(() => {
+                    const temp = this.passwordTagArray[index]
+                    this.passwordTagArray[index] = this.passwordTagArray[index + 1]
+                    this.passwordTagArray[index + 1] = temp
+                  })
+                Blank()
+                  .width('3%')
+              }
+              Image($r('app.media.delete'))
+                .width('8%')
                 .onClick(() => {
                   this.passwordTagArray.splice(index, 1)
                 })

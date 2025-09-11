@@ -338,10 +338,16 @@ export default struct PasswordPage {
                 }
                 if (item.info.some(itema => itema.type === '图标')) {
                   Image(item.info[item.info.findIndex(itema => itema.type === '图标')].value)
+                    .copyOption(CopyOptions.LocalDevice)
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
                     .width('10%')
+                    .onError((err) => {
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.error?.code + '，错误信息：' + err.error?.message
+                      })
+                    })
                 }
                 Column() {
                   Text(item.name)

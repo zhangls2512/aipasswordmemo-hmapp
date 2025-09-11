@@ -225,7 +225,7 @@ struct DataInOut {
                 .onClick(() => {
                   openLink('https://docs.qq.com/doc/p/a12dc0f6d9e9ab998d81ddd1ddc95b5445518209')
                 })
-              Span('中所述的标准格式')
+              Span('中所述的标准格式。\n因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导入。')
                 .fontColor($r('sys.color.font_secondary'))
             }
             .fontSize($r('sys.float.ohos_id_text_size_body3'))
@@ -400,7 +400,7 @@ struct DataInOut {
                   return {
                     id: item.id,
                     name: item.name,
-                    info: item.info,
+                    info: item.info.filter(itema => itema.type !== '图标'),
                     tag: item.tag.map(item => item.value),
                     updateTime: item.updateTime,
                     cloudBackupTime: cloudBackupTime
@@ -524,6 +524,14 @@ struct DataInOut {
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text('因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导出。')
+              .fontSize($r('sys.float.ohos_id_text_size_body3'))
+              .margin({
+                top: 6,
+                left: 12,
+                right: 12
+              })
           }
           .alignItems(HorizontalAlign.Start)
         }

@@ -46,7 +46,7 @@ export async function importPassword(data: string, conflict: relationalStore.Con
       rdbStore.insertSync('password', {
         id: item.id,
         name: item.name,
-        info: JSON.stringify(item.info),
+        info: JSON.stringify(item.info.filter(itema => itema.type !== '图标')),
         tag: JSON.stringify(item.tag),
         updateTime: item.updateTime,
         cloudBackupTime: cloudBackupTime
