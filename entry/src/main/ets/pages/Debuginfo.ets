@@ -11,6 +11,10 @@ import { process } from '@kit.ArkTS'
 import { display, floatingBall, PiPWindow, promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { Environment, storageStatistics } from '@kit.CoreFileKit'
+import { cryptoFramework } from '@kit.CryptoArchitectureKit'
+import { businessRiskIntelligentDetection, safetyDetect } from '@kit.DeviceSecurityKit'
+import { i18n } from '@kit.LocalizationKit'
+import { fido2, ifaa, soter } from '@kit.OnlineAuthenticationKit'
 
 interface RootItem {
   type: string,
@@ -361,6 +365,55 @@ struct Debuginfo {
       this.pushObject('应用空间信息', currentBundleStats)
       this.pushPrimitiveType('内置存储空间信息', '总', storageStatistics.getTotalSizeSync())
       this.pushPrimitiveType('内置存储空间信息', '可用', storageStatistics.getFreeSizeSync())
+      this.pushPrimitiveType('国际化信息', '系统支持的语言列表', i18n.System.getSystemLanguages())
+      this.pushPrimitiveType('国际化信息', '系统当前设置的语言', i18n.System.getSystemLanguage())
+      this.pushPrimitiveType('国际化信息', '系统当前设置的国家地区', i18n.System.getSystemRegion())
+      this.pushPrimitiveType('国际化信息', '系统当前设置的区域对象', i18n.System.getSystemLocaleInstance())
+      this.pushPrimitiveType('国际化信息', '系统时制是否为24小时制', i18n.System.is24HourClock())
+      this.pushPrimitiveType('国际化信息', '系统偏好语言列表', i18n.System.getPreferredLanguageList())
+      this.pushPrimitiveType('国际化信息', '系统偏好语言列表中的第一个语言', i18n.System.getFirstPreferredLanguage())
+      this.pushPrimitiveType('国际化信息', '应用偏好语言', i18n.System.getAppPreferredLanguage())
+      this.pushPrimitiveType('国际化信息', '系统是否使用本地数字', i18n.System.getUsingLocalDigit())
+      this.pushPrimitiveType('国际化信息', '系统设置的温度单位', i18n.System.getTemperatureType())
+      this.pushPrimitiveType('国际化信息', '系统设置的周起始日', i18n.System.getFirstDayOfWeek())
+      try {
+        const sysIntegrityOnLocal = await safetyDetect.checkSysIntegrityOnLocal()
+        this.pushPrimitiveType('设备安全信息', '系统完整性的本地检测结果', sysIntegrityOnLocal)
+      } catch {
+        promptAction.openToast({
+          message: '发生错误'
+        })
+      }
+      const random = cryptoFramework.createRandom()
+      try {
+        const fraudRisk = await businessRiskIntelligentDetection.detectFraudRisk({
+          nonce: random.generateRandomSync(24).data,
+          algorithm: businessRiskIntelligentDetection.SigningAlgorithm.ES256,
+          version: 2
+        })
+        this.pushPrimitiveType('设备安全信息', '涉诈行为风险', fraudRisk)
+        const simulatedClickRisk = await businessRiskIntelligentDetection.detectSimulatedClickRisk({})
+        this.pushPrimitiveType('设备安全信息', '自动化点击、设备墙等作弊行为检测结果', simulatedClickRisk)
+      } catch {
+        promptAction.openToast({
+          message: '发生错误'
+        })
+      }
+      try {
+        this.pushPrimitiveType('在线认证服务信息', 'IFAA免密认证接口的版本号', ifaa.getVersionSync())
+        this.pushPrimitiveType('在线认证服务信息', 'IFAA免密认证的协议版本号', ifaa.getProtocolVersionSync())
+        this.pushPrimitiveType('在线认证服务信息', 'IFAA免密认证支持的证书格式', ifaa.getSupportedCertTypesSync())
+        this.pushPrimitiveType('在线认证服务信息', 'SOTER免密认证API接口的版本号', soter.getVersionSync())
+        const fido2ClientCapabilities = await fido2.getClientCapabilities(uiContext.getHostContext())
+        this.pushPrimitiveType('在线认证服务信息', '当前设备/版本支持的认证能力列表', fido2ClientCapabilities)
+        const fido2PlatformAuthenticators = await fido2.getPlatformAuthenticators(uiContext.getHostContext())
+        this.pushPrimitiveType('在线认证服务信息', '当前支持的平台认证器能力列表（人脸、指纹、PIN码）',
+          fido2PlatformAuthenticators)
+      } catch {
+        promptAction.openToast({
+          message: '发生错误'
+        })
+      }
     })
   }
 }

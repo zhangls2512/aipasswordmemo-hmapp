@@ -4,7 +4,7 @@ import { safetyDetect } from '@kit.DeviceSecurityKit'
 @ComponentV2
 export default struct Urlcheck {
   @Local url: string = ''
-  @Local urlArray: Array<string> = []
+  @Local urlArray: string[] = []
   @Local resultArray: safetyDetect.UrlCheckResult[] = []
 
   build() {

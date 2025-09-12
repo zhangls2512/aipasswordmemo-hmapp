@@ -1,6 +1,7 @@
 import { common, ConfigurationConstant } from '@kit.AbilityKit'
+import { appInfoManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
-import { promptAction, window } from '@kit.ArkUI'
+import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 
 @Builder
@@ -10,6 +11,8 @@ export function CommonsettingBuilder() {
 
 @ComponentV2
 struct Commonsetting {
+  @Local iconModeIndex: number = 1
+  @Local iconModeValue: string = '浅色'
   @Local allowContinue: boolean = false
   @Local exitAfterContinue: boolean = false
   @Local allowRestore: boolean = false
@@ -48,6 +51,60 @@ struct Commonsetting {
                 left: 12
               })
             Column() {
+              Row() {
+                Text('图标模式')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Select([
+                  { value: '自动' },
+                  { value: '浅色' },
+                  { value: '深色' }
+                ])
+                  .selected(this.iconModeIndex!!)
+                  .value(this.iconModeValue!!)
+                  .onSelect(async (index) => {
+                    try {
+                      if (index === 0) {
+                        if (this.colorModeIndex === 0) {
+                          const systemColorMode = uiAppearance.getDarkMode()
+                          if (systemColorMode === 0) {
+                            await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+                          }
+                          if (systemColorMode === 1) {
+                            await appInfoManager.disableDynamicIcon()
+                          }
+                        }
+                        if (this.colorModeIndex === 1) {
+                          await appInfoManager.disableDynamicIcon()
+                        }
+                        if (this.colorModeIndex === 2) {
+                          await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+                        }
+                      }
+                      if (index === 1) {
+                        await appInfoManager.disableDynamicIcon()
+                      }
+                      if (index === 2) {
+                        await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+                      }
+                    } catch (err) {
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                      })
+                    }
+                    this.commonSettingDataPreferences.putSync('iconMode', index)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
               Row() {
                 Text('接续')
                   .fontWeight(FontWeight.Medium)
@@ -510,6 +567,17 @@ struct Commonsetting {
     .title('通用')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
+      const iconMode = this.commonSettingDataPreferences.getSync('iconMode', 1)
+      this.iconModeIndex = iconMode as number
+      if (iconMode === 0) {
+        this.iconModeValue = '自动'
+      }
+      if (iconMode === 1) {
+        this.iconModeValue = '浅色'
+      }
+      if (iconMode === 2) {
+        this.iconModeValue = '深色'
+      }
       this.allowContinue = this.commonSettingDataPreferences.getSync('allowContinue', true) as boolean
       this.exitAfterContinue = this.commonSettingDataPreferences.getSync('exitAfterContinue', true) as boolean
       this.allowRestore = this.commonSettingDataPreferences.getSync('allowRestore', true) as boolean

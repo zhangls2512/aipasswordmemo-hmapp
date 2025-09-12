@@ -7,10 +7,10 @@ import {
   Want,
   wantConstant
 } from '@kit.AbilityKit'
-import { updateManager } from '@kit.AppGalleryKit'
+import { appInfoManager, updateManager } from '@kit.AppGalleryKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
-import { promptAction, window } from '@kit.ArkUI'
+import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { wifiManager } from '@kit.ConnectivityKit'
 import { fileIo } from '@kit.CoreFileKit'
@@ -184,6 +184,31 @@ export default class EntryAbility extends UIAbility {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
     })
+    const iconMode = commonSettingDataPreferences.getSync('iconMode', 1)
+    const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
+    if (iconMode === 0) {
+      if (colorMode === 0) {
+        const systemColorMode = uiAppearance.getDarkMode()
+        if (systemColorMode === 0) {
+          await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+        }
+        if (systemColorMode === 1) {
+          await appInfoManager.disableDynamicIcon()
+        }
+      }
+      if (colorMode === 1) {
+        await appInfoManager.disableDynamicIcon()
+      }
+      if (colorMode === 2) {
+        await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+      }
+    }
+    if (iconMode === 1) {
+      await appInfoManager.disableDynamicIcon()
+    }
+    if (iconMode === 2) {
+      await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+    }
     const allowContinue = commonSettingDataPreferences.getSync('allowContinue', true)
     if (!allowContinue) {
       await this.context.setMissionContinueState(AbilityConstant.ContinueState.INACTIVE)
@@ -193,7 +218,6 @@ export default class EntryAbility extends UIAbility {
     }
     const allowRestore = commonSettingDataPreferences.getSync('allowRestore', true) as boolean
     this.context.setRestoreEnabled(allowRestore)
-    const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
     const applicationContext = this.context.getApplicationContext()
     if (colorMode === 0) {
       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
@@ -518,7 +542,7 @@ export default class EntryAbility extends UIAbility {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
     })
-    const destroyWhenBackPressed = commonSettingDataPreferences.getSync('destroyWhenBackPressed', false) as boolean
+    const destroyWhenBackPressed = commonSettingDataPreferences.getSync('destroyWhenBackPressed', false)
     if (!destroyWhenBackPressed) {
       return true
     } else {
@@ -536,7 +560,7 @@ export default class EntryAbility extends UIAbility {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
     })
-    const exitAfterContinue = commonSettingDataPreferences.getSync('exitAfterContinue', true) as boolean
+    const exitAfterContinue = commonSettingDataPreferences.getSync('exitAfterContinue', true)
     wantParam[wantConstant.Params.SUPPORT_CONTINUE_SOURCE_EXIT_KEY] = exitAfterContinue
     return AbilityConstant.OnContinueResult.AGREE
   }
@@ -545,7 +569,7 @@ export default class EntryAbility extends UIAbility {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
     })
-    const acceptCollaborate = commonSettingDataPreferences.getSync('acceptCollaborate', true) as boolean
+    const acceptCollaborate = commonSettingDataPreferences.getSync('acceptCollaborate', true)
     if (acceptCollaborate) {
       return 0
     } else {

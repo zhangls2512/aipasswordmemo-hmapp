@@ -50,9 +50,9 @@ export async function autoSyncTable(table: string) {
     name: 'debugSetting'
   })
   const pauseAutoSyncWhenLowBatteryCapacityLevel =
-    dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false) as boolean
-  const pauseAutoSyncWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false) as boolean
-  const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4) as number
+    dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false)
+  const pauseAutoSyncWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
+  const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
   if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
     promptAction.openToast({
       message: '电池电量低，自动暂停同步'
@@ -114,10 +114,9 @@ export async function autoBackupTable(table: string) {
     name: 'debugSetting'
   })
   const pauseAutoBackupWhenLowBatteryCapacityLevel =
-    dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false) as boolean
-  const pauseAutoBackupWhenPowerSave =
-    dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false) as boolean
-  const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4) as number
+    dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false)
+  const pauseAutoBackupWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false)
+  const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
   if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
     promptAction.openToast({
       message: '电池电量低，自动暂停同步'

@@ -19,9 +19,9 @@
         "type": "HarmonyOS",
         "material": {
           "storeFile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
-          "storePassword": "0000001B1D6FB8FBFA38C3F8F4CD9A4E1B076B4417C4A8409B1E92C4E59E8400F6E0A11338069935C436EC",
+          "storePassword": "0000001B33014B925957FCB6C07BE40FE428B2730EC2AE942DC2816298D18F08914C05D937B6D8763BB90E",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B580512D17A32B9F25664587DE4FF77D2DBCF4CE369256DF5C2C0637BEF0BD1683412782E02526F",
+          "keyPassword": "0000001B7808848AFBBCE9003182EC582F728A1FFC270F6D74912EAB804400EEFA599F8A74FFD5133841C7",
           "certpath": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer",
           "profile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p7b",
           "signAlg": "SHA256withECDSA"
