@@ -21,11 +21,6 @@
       "buildFunction": "DebugsettingBuilder"
     },
     {
-      "name": "Debuginfo",
-      "pageSourceFile": "src/main/ets/pages/Debuginfo.ets",
-      "buildFunction": "DebuginfoBuilder"
-    },
-    {
       "name": "ReportQoe",
       "pageSourceFile": "src/main/ets/pages/ReportQoe.ets",
       "buildFunction": "ReportQoeBuilder"

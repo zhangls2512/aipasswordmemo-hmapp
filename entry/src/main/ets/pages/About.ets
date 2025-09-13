@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-//import { FunctionComponent, FunctionController } from '@kit.AgentFrameworkKit'
+import { FunctionComponent, FunctionController } from '@kit.AgentFrameworkKit'
 import { commentManager, updateManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
 import { call } from '@kit.TelephonyKit'
@@ -18,8 +18,7 @@ struct About {
   @Local isAgentSupport: boolean = false
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-
-  //controller: FunctionController = new FunctionController()
+  controller: FunctionController = new FunctionController()
 
   build() {
     NavDestination() {
@@ -54,8 +53,8 @@ struct About {
                         })
                       }
                       if (data.index === 1) {
-                        this.pageInfos.pushPath({
-                          name: 'Debuginfo'
+                        promptAction.openToast({
+                          message: '暂未上线，敬请期待'
                         })
                       }
                     }
@@ -341,7 +340,7 @@ struct About {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
-        /*if (this.isAgentSupport) {
+        if (this.isAgentSupport) {
           ListItem() {
             FunctionComponent({
               agentId: 'agentdf468e04a1474579bbf0653f19c929ee',
@@ -351,7 +350,7 @@ struct About {
               controller: this.controller,
               onError: (err) => {
                 promptAction.openToast({
-                  message: JSON.stringify(err)
+                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
               }
             })
@@ -359,7 +358,7 @@ struct About {
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
-        }*/
+        }
 
         ListItem() {
           Column() {
@@ -746,14 +745,14 @@ struct About {
     .title('关于')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
-      /*try {
+      try {
         this.isAgentSupport =
           await this.controller.isAgentSupport(this.context, 'agentdf468e04a1474579bbf0653f19c929ee')
       } catch (err) {
         promptAction.openToast({
-          message: JSON.stringify(err)
+          message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
         })
-      }*/
+      }
     })
   }
 }
