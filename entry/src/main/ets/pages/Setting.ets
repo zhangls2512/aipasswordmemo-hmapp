@@ -3,6 +3,7 @@ import { appAccount } from '@kit.BasicServicesKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
+import { formProvider } from '@kit.FormKit'
 import { get } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
@@ -578,35 +579,77 @@ export default struct Setting {
 
         ListItem() {
           Column() {
-            Row() {
-              Text('通用')
-                .fontWeight(FontWeight.Medium)
-              Blank()
-              Image($r('app.media.right'))
-                .fillColor($r('sys.color.icon_fourth'))
-                .height(12)
-                .width(12)
-            }
-            .borderRadius(12)
-            .padding(12)
-            .stateStyles({
-              normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-              },
-              pressed: {
-                .backgroundColor($r('sys.color.interactive_pressed'))
-              }
-            })
-            .width('100%')
-            .onClick(() => {
-              this.pageInfos.pushPath({
-                name: 'Commonsetting'
+            Text('通用')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
               })
-            })
+            Column() {
+              Row() {
+                Text('通用')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Commonsetting'
+                })
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('卡片')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                formProvider.openFormManager({
+                  bundleName: 'com.zhangxm.aipasswordmemo'
+                })
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
-          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-          .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          .alignItems(HorizontalAlign.Start)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')

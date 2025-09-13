@@ -274,8 +274,18 @@ struct Commonsetting {
               })
             Column() {
               Row() {
-                Text('深色模式')
-                  .fontWeight(FontWeight.Medium)
+                Column() {
+                  Text('深色模式')
+                    .fontWeight(FontWeight.Medium)
+                  Text('不对卡片生效')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                }
+                .alignItems(HorizontalAlign.Start)
+
                 Blank()
                 Select([
                   { value: '跟随系统' },
@@ -409,18 +419,8 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
-                Column() {
-                  Text('敏感页面禁止截、录屏')
-                    .fontWeight(FontWeight.Medium)
-                  Text('建议开启，降低敏感信息泄露风险')
-                    .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                    .margin({
-                      top: $r('sys.float.ohos_id_text_margin_vertical')
-                    })
-                }
-                .alignItems(HorizontalAlign.Start)
-
+                Text('敏感页面禁止截、录屏')
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,

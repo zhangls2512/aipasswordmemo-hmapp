@@ -526,6 +526,7 @@ struct DataInOut {
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
             Text('因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导出。')
+              .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body3'))
               .margin({
                 top: 6,

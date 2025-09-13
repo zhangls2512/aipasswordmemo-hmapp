@@ -43,14 +43,8 @@ export default struct PasswordPage {
   preferType = 1
   orderColumn = 'updateTime'
   passwordId = 0
-  shortcutDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'shortcut'
-  })
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
-  })
-  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'commonSetting'
   })
 
   @Builder
@@ -458,20 +452,15 @@ export default struct PasswordPage {
         if (disallowScreenshot) {
           await lastWindow.setWindowPrivacyMode(this.showPassword)
         }
-        const shortcutId = this.shortcutDataPreferences.getSync('shortcutId', '') as string
-        if (shortcutId === 'newPassword') {
-          this.isShowNewSheet = true
-          this.shortcutDataPreferences.deleteSync('shortcutId')
-        }
-        if (shortcutId === 'searchPassword') {
-          this.isShowFilterSheet = true
-          this.shortcutDataPreferences.deleteSync('shortcutId')
-        }
-        this.context.eventHub.on('newPassword', async () => {
-          this.isShowNewSheet = true
+        this.context.eventHub.on('newPassword', () => {
+          if (!this.isShowNewSheet && !this.isShowInfoSheet && !this.isShowUpdateSheet && !this.isShowFilterSheet) {
+            this.isShowNewSheet = true
+          }
         })
-        this.context.eventHub.on('searchPassword', async () => {
-          this.isShowFilterSheet = true
+        this.context.eventHub.on('searchPassword', () => {
+          if (!this.isShowNewSheet && !this.isShowInfoSheet && !this.isShowUpdateSheet && !this.isShowFilterSheet) {
+            this.isShowFilterSheet = true
+          }
         })
         this.context.eventHub.on('refreshPassword', async () => {
           this.enableCloudBackup = false
