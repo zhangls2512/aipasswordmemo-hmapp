@@ -1,4 +1,9 @@
 {
+  "network-security-config": {
+    "base-config": {
+      "cleartextTrafficPermitted": true
+    }
+  },
   "trust-global-user-ca": false,
   "trust-current-user-ca": false
 }

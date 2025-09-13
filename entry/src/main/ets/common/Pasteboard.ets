@@ -6,7 +6,7 @@ async function writePasteBoard(text: string) {
   const pasteData: pasteboard.PasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text)
   const systemPasteboard = pasteboard.getSystemPasteboard()
   await systemPasteboard.setData(pasteData)
-  promptAction.showToast({
+  promptAction.openToast({
     message: '内容已复制到剪贴板'
   })
 }

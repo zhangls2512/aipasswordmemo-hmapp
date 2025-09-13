@@ -7,7 +7,7 @@ import UpdatePassword from './Updatepassword'
 export default struct Passwordcheck {
   @Provider() isShowUpdateSheet: boolean = false
   @Local repeatArray: RepeatItem[] = []
-  context = getContext(this)
+  context = this.getUIContext().getHostContext()
   preferType = 1
   passwordId = 0
 
@@ -24,16 +24,13 @@ export default struct Passwordcheck {
         Text('重复')
           .fontWeight(FontWeight.Bold)
       }
-      .margin({
-        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
-      })
 
       if (this.repeatArray.length === 0) {
         ListItem() {
           Text('无数据')
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
         .width('100%')
       }
@@ -80,7 +77,7 @@ export default struct Passwordcheck {
                 .width('100%')
                 .onClick(() => {
                   this.passwordId = item.id
-                  this.isShowUpdateSheet = !this.isShowUpdateSheet
+                  this.isShowUpdateSheet = true
                 })
               })
             }
@@ -91,7 +88,7 @@ export default struct Passwordcheck {
           .alignItems(HorizontalAlign.Start)
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
       })
     }
@@ -106,13 +103,12 @@ export default struct Passwordcheck {
       }
       this.repeatArray = await getRepeatPasswordList()
     })
-    .bindSheet($$this.isShowUpdateSheet, this.UpdateSheetBuilder(this.passwordId), {
-      height: SheetSize.FIT_CONTENT,
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
       preferType: this.preferType,
       title: {
         title: '修改密码'
       },
-      onWillDismiss: (async (DismissSheetAction: DismissSheetAction) => {
+      onWillDismiss: (async (DismissSheetAction) => {
         const data = await promptAction.showDialog({
           title: '提示',
           message: '数据尚未保存，确定退出？',

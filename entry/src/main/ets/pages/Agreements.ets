@@ -39,7 +39,7 @@ struct Agreements {
                 const appPrivacyLink = privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 2)
                 openLink(appPrivacyLink?.url as string)
               } catch (err) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
               }

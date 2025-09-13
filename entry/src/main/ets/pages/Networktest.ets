@@ -64,18 +64,18 @@ struct Networktest {
                     this.startTransferTimeMs = Number(response.timeInfo?.startTransferTimeMs)
                     this.totalTimeMs = Number(response.timeInfo?.totalTimeMs)
                     this.redirectTimeMs = Number(response.timeInfo?.redirectTimeMs)
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '测试完成'
                     })
                   } else {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '请求失败，错误码：' + response.statusCode + '，错误信息：' + response.reasonPhrase
                     })
                   }
                 } catch (err) {
                   session.close()
                   dialogControllerProgress.close()
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
                 }
@@ -124,8 +124,9 @@ struct Networktest {
                   right: 12
                 })
               Row() {
-                Text('请求 IP')
+                Text('请求IP')
                   .fontWeight(FontWeight.Medium)
+                  .enableAutoSpacing(true)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -166,8 +167,9 @@ struct Networktest {
                   right: 12
                 })
               Row() {
-                Text('HTTP 版本')
+                Text('HTTP版本')
                   .fontWeight(FontWeight.Medium)
+                  .enableAutoSpacing(true)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -187,8 +189,9 @@ struct Networktest {
                   right: 12
                 })
               Row() {
-                Text('DNS 解析所需的时间')
+                Text('DNS解析所需的时间')
                   .fontWeight(FontWeight.Medium)
+                  .enableAutoSpacing(true)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -231,6 +234,7 @@ struct Networktest {
               Row() {
                 Text('从开始到远程主机 (或代理) 的 TLS 握手完成的时间')
                   .fontWeight(FontWeight.Medium)
+                  .enableAutoSpacing(true)
                   .width('45%')
                 Blank()
                   .width('5%')

@@ -1,0 +1,17 @@
+{
+  "forms": [
+    {
+      "name": "passwordentrance",
+      "displayName": "新增、搜索密码快捷入口",
+      "src": "./ets/widget/pages/PasswordentranceCard.ets",
+      "uiSyntax": "arkts",
+      "isDefault": true,
+      "supportDimensions": [
+        "1*2"
+      ],
+      "defaultDimension": "1*2",
+      "updateEnabled": false,
+      "renderingMode": "autoColor"
+    }
+  ]
+}

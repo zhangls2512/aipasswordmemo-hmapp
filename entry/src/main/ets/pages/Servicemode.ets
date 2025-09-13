@@ -1,7 +1,7 @@
+import { common } from '@kit.AbilityKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import openLink from '../common/Openlink'
 
 @Builder
 export function ServicemodeBuilder() {
@@ -10,8 +10,9 @@ export function ServicemodeBuilder() {
 
 @ComponentV2
 struct Servicemode {
-  @Local allService: boolean = true
-  context = getContext(this)
+  @Local allService: boolean = false
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  pageInfos = new NavPathStack()
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
@@ -28,10 +29,10 @@ struct Servicemode {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: this.allService
+                  isOn: this.allService!!
                 })
                   .enabled(!this.allService)
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.allService = isOn
                     this.commonSettingDataPreferences.putSync('allService', isOn)
                     this.commonSettingDataPreferences.flushSync()
@@ -55,9 +56,12 @@ struct Servicemode {
                   try {
                     const appPrivacyLink =
                       privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
-                    openLink(appPrivacyLink?.url as string)
+                    this.pageInfos.pushPath({
+                      name: 'Webview',
+                      param: appPrivacyLink?.url
+                    })
                   } catch (err) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }
@@ -90,7 +94,7 @@ struct Servicemode {
                   isOn: !this.allService
                 })
                   .enabled(this.allService)
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.allService = !isOn
                     this.commonSettingDataPreferences.putSync('allService', !isOn)
                     this.commonSettingDataPreferences.flushSync()
@@ -127,9 +131,9 @@ struct Servicemode {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('应用服务模式')
-    .onReady(() => {
-      const allService = this.commonSettingDataPreferences.getSync('allService', true)
-      this.allService = allService as boolean
+    .onReady((context) => {
+      this.pageInfos = context.pathStack
+      this.allService = this.commonSettingDataPreferences.getSync('allService', true) as boolean
     })
     .onDisAppear(() => {
       this.context.eventHub.emit('refreshSetting')

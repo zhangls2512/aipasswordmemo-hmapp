@@ -4,7 +4,7 @@ import { safetyDetect } from '@kit.DeviceSecurityKit'
 @ComponentV2
 export default struct Urlcheck {
   @Local url: string = ''
-  @Local urlArray: Array<string> = []
+  @Local urlArray: string[] = []
   @Local resultArray: safetyDetect.UrlCheckResult[] = []
 
   build() {
@@ -12,8 +12,10 @@ export default struct Urlcheck {
       ListItem() {
         TextInput({
           placeholder: '请输入 URL',
-          text: $$this.url
+          text: this.url!!
         })
+          .defaultFocus(true)
+          .enableAutoSpacing(true)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -24,19 +26,19 @@ export default struct Urlcheck {
           Button('添加')
             .onClick(() => {
               if (this.urlArray.length >= 10) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '数量达到上限'
                 })
                 return
               }
               if (!this.url) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入 URL'
                 })
                 return
               }
               if (this.urlArray.includes(this.url)) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '已添加此 URL'
                 })
                 return
@@ -56,12 +58,11 @@ export default struct Urlcheck {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
+                .width('87%')
               Blank()
                 .width('5%')
-              Button('删除')
-                .role(ButtonRole.ERROR)
-                .width('20%')
+              Image($r('app.media.delete'))
+                .width('8%')
                 .onClick(() => {
                   this.urlArray.splice(index, 1)
                 })
@@ -83,7 +84,7 @@ export default struct Urlcheck {
           Button('检测')
             .onClick(async () => {
               if (this.urlArray.length === 0) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请添加 URL'
                 })
                 return
@@ -102,7 +103,7 @@ export default struct Urlcheck {
                 this.resultArray = res.results
               } catch (err) {
                 dialogControllerProgress.close()
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
               }

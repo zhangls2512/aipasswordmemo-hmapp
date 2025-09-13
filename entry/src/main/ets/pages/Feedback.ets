@@ -21,8 +21,10 @@ struct Feedback {
           Column() {
             TextArea({
               placeholder: '请输入内容',
-              text: $$this.content
+              text: this.content!!
             })
+              .defaultFocus(true)
+              .enableAutoSpacing(true)
               .maxLength(200)
               .showCounter(true)
             Text('联系方式 (可选)')
@@ -39,10 +41,10 @@ struct Feedback {
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                .selected($$this.contactTypeIndex)
-                .value($$this.contactType)
+                .selected(this.contactTypeIndex!!)
+                .value(this.contactType!!)
                 .width('30%')
-                .onSelect((index: number) => {
+                .onSelect((index) => {
                   if (index === 0) {
                     this.contactType = '邮箱'
                   }
@@ -56,25 +58,28 @@ struct Feedback {
               if (this.contactType === '邮箱') {
                 TextInput({
                   placeholder: '请输入邮箱',
-                  text: $$this.contactValue
+                  text: this.contactValue!!
                 })
                   .contentType(ContentType.EMAIL_ADDRESS)
+                  .enableAutoSpacing(true)
                   .type(InputType.Email)
                   .width('65%')
               }
               if (this.contactType === '微信') {
                 TextInput({
                   placeholder: '请输入微信号',
-                  text: $$this.contactValue
+                  text: this.contactValue!!
                 })
+                  .enableAutoSpacing(true)
                   .maxLength(30)
                   .width('65%')
               }
               if (this.contactType === 'QQ') {
                 TextInput({
                   placeholder: '请输入 QQ 号',
-                  text: $$this.contactValue
+                  text: this.contactValue!!
                 })
+                  .enableAutoSpacing(true)
                   .maxLength(20)
                   .type(InputType.Number)
                   .width('65%')
@@ -93,7 +98,7 @@ struct Feedback {
         ListItem() {
           Column() {
             Button('提交')
-              .enabled(this.content ? true : false)
+              .enabled(this.content !== '')
               .onClick(async () => {
                 const dialogControllerProgress = new CustomDialogController({
                   builder: LoadingDialog({
@@ -110,7 +115,7 @@ struct Feedback {
                 })
                 dialogControllerProgress.close()
                 if (res !== 'fail') {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '提交成功'
                   })
                   this.pageInfos.pop()
@@ -142,7 +147,7 @@ struct Feedback {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('意见反馈')
-    .onReady((context: NavDestinationContext) => {
+    .onReady((context) => {
       this.pageInfos = context.pathStack
     })
   }

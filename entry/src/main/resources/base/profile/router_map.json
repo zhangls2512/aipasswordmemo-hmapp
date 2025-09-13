@@ -16,14 +16,9 @@
       "buildFunction": "LicenseBuilder"
     },
     {
-      "name": "Debug",
-      "pageSourceFile": "src/main/ets/pages/Debug.ets",
-      "buildFunction": "DebugBuilder"
-    },
-    {
-      "name": "Faultlog",
-      "pageSourceFile": "src/main/ets/pages/Faultlog.ets",
-      "buildFunction": "FaultlogBuilder"
+      "name": "Debugsetting",
+      "pageSourceFile": "src/main/ets/pages/Debugsetting.ets",
+      "buildFunction": "DebugsettingBuilder"
     },
     {
       "name": "ReportQoe",
@@ -126,9 +121,9 @@
       "buildFunction": "AutocloudbackupsettingBuilder"
     },
     {
-      "name": "Clearsettings",
-      "pageSourceFile": "src/main/ets/pages/Clearsettings.ets",
-      "buildFunction": "ClearsettingsBuilder"
+      "name": "Cleardata",
+      "pageSourceFile": "src/main/ets/pages/Cleardata.ets",
+      "buildFunction": "CleardataBuilder"
     },
     {
       "name": "DataInOut",
@@ -144,6 +139,36 @@
       "name": "Infolist",
       "pageSourceFile": "src/main/ets/pages/Infolist.ets",
       "buildFunction": "InfolistBuilder"
+    },
+    {
+      "name": "Invite",
+      "pageSourceFile": "src/main/ets/pages/Invite.ets",
+      "buildFunction": "InviteBuilder"
+    },
+    {
+      "name": "Webview",
+      "pageSourceFile": "src/main/ets/pages/Webview.ets",
+      "buildFunction": "WebviewBuilder"
+    },
+    {
+      "name": "Autouploaderrorlogtype",
+      "pageSourceFile": "src/main/ets/pages/Autouploaderrorlogtype.ets",
+      "buildFunction": "AutouploaderrorlogtypeBuilder"
+    },
+    {
+      "name": "Errorlog",
+      "pageSourceFile": "src/main/ets/pages/Errorlog.ets",
+      "buildFunction": "ErrorlogBuilder"
+    },
+    {
+      "name": "Deletefile",
+      "pageSourceFile": "src/main/ets/pages/Deletefile.ets",
+      "buildFunction": "DeletefileBuilder"
+    },
+    {
+      "name": "Resourcelimit",
+      "pageSourceFile": "src/main/ets/pages/Resourcelimit.ets",
+      "buildFunction": "ResourcelimitBuilder"
     }
   ]
 }

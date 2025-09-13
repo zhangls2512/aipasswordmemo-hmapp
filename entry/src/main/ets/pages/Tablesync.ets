@@ -1,8 +1,14 @@
+import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { checkPermission } from '../common/Permission'
 import { syncTable } from '../common/Table'
+
+interface Type {
+  name: string,
+  value: string
+}
 
 interface Item {
   deviceId: string,
@@ -18,41 +24,39 @@ export function TablesyncBuilder() {
 
 @ComponentV2
 struct Tablesync {
-  @Local onPassword: boolean = false
-  @Local onInfo: boolean = false
-  @Local onTag: boolean = false
-  @Local autoSyncPassword: boolean = false
-  @Local autoSyncInfo: boolean = false
-  @Local autoSyncTag: boolean = false
+  @Local onTables: string[] = []
+  @Local autoSyncTables: string[] = []
   @Local pauseAutoSyncWhenLowBatteryCapacityLevel: boolean = false
   @Local pauseAutoSyncWhenPowerSave: boolean = false
   @Local autoSyncDevices: Item[] = []
   @Local availableDeviceArray: Item[] = []
-  context = getContext(this)
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
-  onTables: string[] = []
-  autoSyncTables: string[] = []
+  typeArray: Type[] = [
+    {
+      name: '密码',
+      value: 'password'
+    },
+    {
+      name: '常用信息',
+      value: 'info'
+    },
+    {
+      name: '标签',
+      value: 'tag'
+    }
+  ]
 
   getSetting() {
-    const onTables = this.dataSettingDataPreferences.getSync('onTables', [])
-    this.onTables = onTables as string[]
-    this.onPassword = this.onTables.includes('password')
-    this.onInfo = this.onTables.includes('info')
-    this.onTag = this.onTables.includes('tag')
-    const autoSyncTables = this.dataSettingDataPreferences.getSync('autoSyncTables', [])
-    this.autoSyncTables = autoSyncTables as string[]
-    this.autoSyncPassword = this.autoSyncTables.includes('password')
-    this.autoSyncInfo = this.autoSyncTables.includes('info')
-    this.autoSyncTag = this.autoSyncTables.includes('tag')
-    const autoSyncDevices = this.dataSettingDataPreferences.getSync('autoSyncDevices', [])
-    this.autoSyncDevices = autoSyncDevices as Item[]
-    const pauseAutoSyncWhenLowBatteryCapacityLevel =
-      this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-    this.pauseAutoSyncWhenLowBatteryCapacityLevel = pauseAutoSyncWhenLowBatteryCapacityLevel as boolean
-    const pauseAutoSyncWhenPowerSave = this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
-    this.pauseAutoSyncWhenPowerSave = pauseAutoSyncWhenPowerSave as boolean
+    this.onTables = this.dataSettingDataPreferences.getSync('onTables', []) as string[]
+    this.autoSyncTables = this.dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
+    this.autoSyncDevices = this.dataSettingDataPreferences.getSync('autoSyncDevices', []) as Item[]
+    this.pauseAutoSyncWhenLowBatteryCapacityLevel =
+      this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false) as boolean
+    this.pauseAutoSyncWhenPowerSave =
+      this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false) as boolean
   }
 
   build() {
@@ -69,120 +73,53 @@ struct Tablesync {
                 left: 12
               })
             Column() {
-              Row() {
-                Text('密码')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.onPassword
-                })
-                  .enabled(!this.onPassword)
-                  .onChange(async (isOn: boolean) => {
-                    if (isOn) {
-                      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
-                      if (!res) {
-                        this.onPassword = false
-                      }
-                      if (res) {
-                        const rdbStore = await relationalStore.getRdbStore(this.context, {
-                          name: 'password',
-                          securityLevel: 4,
-                          encrypt: true,
-                          allowRebuild: true
-                        })
-                        await rdbStore.setDistributedTables(['password'])
-                        const onTables = [...this.onTables, 'password']
-                        this.dataSettingDataPreferences.putSync('onTables', onTables)
-                        this.dataSettingDataPreferences.flushSync()
+              ForEach(this.typeArray, (item: Type, index) => {
+                if (index !== 0) {
+                  Divider()
+                    .padding({
+                      left: 12,
+                      right: 12
+                    })
+                }
+                Row() {
+                  Text(item.name)
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.onTables.includes(item.value)
+                  })
+                    .enabled(!this.onTables.includes(item.value))
+                    .onChange(async (isOn) => {
+                      if (isOn) {
+                        const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+                        if (!res) {
+                          this.onTables = this.onTables.filter(itema => itema !== item.value)
+                        }
+                        if (res) {
+                          let securityLevel = 4
+                          if (item.value === 'tag') {
+                            securityLevel = 1
+                          }
+                          const rdbStore = await relationalStore.getRdbStore(this.context, {
+                            name: item.value,
+                            securityLevel: securityLevel,
+                            encrypt: true,
+                            allowRebuild: true
+                          })
+                          await rdbStore.setDistributedTables([item.value])
+                          const onTables = [...this.onTables, item.value]
+                          this.dataSettingDataPreferences.putSync('onTables', onTables)
+                          this.dataSettingDataPreferences.flushSync()
+                        }
                         this.getSetting()
                       }
-                    }
-                  })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('常用信息')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.onInfo
-                })
-                  .enabled(!this.onInfo)
-                  .onChange(async (isOn: boolean) => {
-                    if (isOn) {
-                      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
-                      if (!res) {
-                        this.onInfo = false
-                      }
-                      if (res) {
-                        const rdbStore = await relationalStore.getRdbStore(this.context, {
-                          name: 'info',
-                          securityLevel: 4,
-                          encrypt: true,
-                          allowRebuild: true
-                        })
-                        await rdbStore.setDistributedTables(['info'])
-                        const onTables = [...this.onTables, 'info']
-                        this.dataSettingDataPreferences.putSync('onTables', onTables)
-                        this.dataSettingDataPreferences.flushSync()
-                        this.getSetting()
-                      }
-                    }
-                  })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('标签')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.onTag
-                })
-                  .enabled(!this.onTag)
-                  .onChange(async (isOn: boolean) => {
-                    if (isOn) {
-                      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
-                      if (!res) {
-                        this.onTag = false
-                      }
-                      if (res) {
-                        const rdbStore = await relationalStore.getRdbStore(this.context, {
-                          name: 'tag',
-                          securityLevel: 1,
-                          encrypt: true,
-                          allowRebuild: true
-                        })
-                        await rdbStore.setDistributedTables(['tag'])
-                        const onTables = [...this.onTables, 'tag']
-                        this.dataSettingDataPreferences.putSync('onTables', onTables)
-                        this.dataSettingDataPreferences.flushSync()
-                        this.getSetting()
-                      }
-                    }
-                  })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -205,93 +142,39 @@ struct Tablesync {
                 left: 12
               })
             Column() {
-              Row() {
-                Text('密码')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.autoSyncPassword
-                })
-                  .enabled(this.onPassword)
-                  .onChange((isOn: boolean) => {
-                    let autoSyncTables: string[] = []
-                    if (!isOn) {
-                      autoSyncTables = this.autoSyncTables.filter(item => item !== 'password')
-                    }
-                    if (isOn) {
-                      autoSyncTables = [...this.autoSyncTables, 'password']
-                    }
-                    this.dataSettingDataPreferences.putSync('autoSyncTables', autoSyncTables)
-                    this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
+              ForEach(this.typeArray, (item: Type, index) => {
+                if (index !== 0) {
+                  Divider()
+                    .padding({
+                      left: 12,
+                      right: 12
+                    })
+                }
+                Row() {
+                  Text(item.name)
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.autoSyncTables.includes(item.value)
                   })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('常用信息')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.autoSyncInfo
-                })
-                  .enabled(this.onInfo)
-                  .onChange((isOn: boolean) => {
-                    let autoSyncTables: string[] = []
-                    if (!isOn) {
-                      autoSyncTables = this.autoSyncTables.filter(item => item !== 'info')
-                    }
-                    if (isOn) {
-                      autoSyncTables = [...this.autoSyncTables, 'info']
-                    }
-                    this.dataSettingDataPreferences.putSync('autoSyncTables', autoSyncTables)
-                    this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
-                  })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('标签')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: $$this.autoSyncTag
-                })
-                  .enabled(this.onTag)
-                  .onChange((isOn: boolean) => {
-                    let autoSyncTables: string[] = []
-                    if (!isOn) {
-                      autoSyncTables = this.autoSyncTables.filter(item => item !== 'tag')
-                    }
-                    if (isOn) {
-                      autoSyncTables = [...this.autoSyncTables, 'tag']
-                    }
-                    this.dataSettingDataPreferences.putSync('autoSyncTables', autoSyncTables)
-                    this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
-                  })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
+                    .onChange((isOn) => {
+                      let autoSyncTables: string[] = []
+                      if (!isOn) {
+                        autoSyncTables = this.autoSyncTables.filter(itema => itema !== item.value)
+                      }
+                      if (isOn) {
+                        autoSyncTables = [...this.autoSyncTables, item.value]
+                      }
+                      this.dataSettingDataPreferences.putSync('autoSyncTables', autoSyncTables)
+                      this.dataSettingDataPreferences.flushSync()
+                      this.getSetting()
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -362,7 +245,10 @@ struct Tablesync {
                   .width('45%')
                 Blank()
                   .width('5%')
-                Text(item.deviceType)
+                Text(item.deviceType === 'phone' ? '手机' :
+                  item.deviceType === 'tablet' ? '平板' :
+                    item.deviceType === '2in1' ? '电脑' :
+                      'undefined')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
@@ -423,7 +309,7 @@ struct Tablesync {
                 const autoSyncDevices = this.autoSyncDevices.filter(device => device.deviceId !== item.deviceId)
                 this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
                 this.dataSettingDataPreferences.flushSync()
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '已关闭'
                 })
                 this.getSetting()
@@ -463,12 +349,11 @@ struct Tablesync {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.pauseAutoSyncWhenLowBatteryCapacityLevel
+                  isOn: this.pauseAutoSyncWhenLowBatteryCapacityLevel!!
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenLowBatteryCapacityLevel', isOn)
                     this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
                   })
               }
               .borderRadius(12)
@@ -486,12 +371,11 @@ struct Tablesync {
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,
-                  isOn: $$this.pauseAutoSyncWhenPowerSave
+                  isOn: this.pauseAutoSyncWhenPowerSave!!
                 })
-                  .onChange((isOn: boolean) => {
+                  .onChange((isOn) => {
                     this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenPowerSave', isOn)
                     this.dataSettingDataPreferences.flushSync()
-                    this.getSetting()
                   })
               }
               .borderRadius(12)
@@ -509,8 +393,21 @@ struct Tablesync {
         })
 
         ListItem() {
-          Text('可信设备')
-            .fontWeight(FontWeight.Medium)
+          Row() {
+            Text('可信设备')
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
+            Button('刷新')
+              .onClick(() => {
+                this.availableDeviceArray = distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo')
+                  .getAvailableDeviceListSync() as Item[]
+                promptAction.openToast({
+                  message: '刷新成功'
+                })
+              })
+          }
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -567,7 +464,10 @@ struct Tablesync {
                   .width('45%')
                 Blank()
                   .width('5%')
-                Text(item.deviceType)
+                Text(item.deviceType === 'phone' ? '手机' :
+                  item.deviceType === 'tablet' ? '平板' :
+                    item.deviceType === '2in1' ? '电脑' :
+                      'undefined')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
@@ -629,7 +529,7 @@ struct Tablesync {
                   const autoSyncDevices = [...this.autoSyncDevices, item]
                   this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
                   this.dataSettingDataPreferences.flushSync()
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '已开启'
                   })
                   this.getSetting()
@@ -769,7 +669,7 @@ struct Tablesync {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('设备间数据同步')
-    .onReady(async () => {
+    .onAppear(async () => {
       this.getSetting()
       const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
       if (res) {

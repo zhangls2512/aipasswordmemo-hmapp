@@ -1,8 +1,10 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
-import { get, remove } from '../common/Accesstoken'
-import request from '../common/Request'
+import { getAccountInfo, remove } from '../common/Accesstoken'
+import openLink from '../common/Openlink'
+import copy from '../common/Pasteboard'
 import Login from './Login'
 import Passwordcheck from './Passwordcheck'
 import Passwordgenerate from './Passwordgenerate'
@@ -16,23 +18,17 @@ export default struct Me {
   @Local isShowPasswordgenerateSheet: boolean = false
   @Local isShowUrlcheckSheet: boolean = false
   @Local isShowSettingSheet: boolean = false
-  @Local loading: boolean = false
+  @Local uid: string = ''
   @Local email: string = ''
-  context = getContext(this)
+  @Local endDate: string = ''
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   preferType = 1
 
-  async getEmail() {
-    const accessToken = get()
-    if (accessToken) {
-      this.loading = true
-      const res = await request('/account/getAccountInfo', {
-        accessToken: accessToken
-      })
-      this.loading = false
-      if (res !== 'fail') {
-        this.email = JSON.parse(res).data.email as string
-      }
-    }
+  async get() {
+    const accountInfo = await getAccountInfo()
+    this.uid = accountInfo.uid
+    this.email = accountInfo.email
+    this.endDate = String(new Date(accountInfo.endDate))
   }
 
   @Builder
@@ -71,22 +67,15 @@ export default struct Me {
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
               .width(40)
-            if (this.loading) {
-              LoadingProgress()
-                .height(40)
-                .width(40)
+            if (!this.uid) {
+              Text('登录')
+                .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+                .fontWeight(FontWeight.Bold)
             }
-            if (!this.loading) {
-              if (!this.email) {
-                Text('登录')
-                  .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-                  .fontWeight(FontWeight.Bold)
-              }
-              if (this.email) {
-                Text(this.email)
-                  .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-                  .fontWeight(FontWeight.Bold)
-              }
+            if (this.uid) {
+              Text(this.email)
+                .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+                .fontWeight(FontWeight.Bold)
             }
           }
           .borderRadius(12)
@@ -101,26 +90,98 @@ export default struct Me {
           })
           .width('100%')
           .onClick(() => {
-            if (!this.email && !this.loading) {
-              this.isShowLoginSheet = !this.isShowLoginSheet
+            if (!this.uid) {
+              this.isShowLoginSheet = true
             }
           })
-          .bindSheet($$this.isShowLoginSheet, this.LoginSheetBuilder(), {
+          .bindSheet(this.isShowLoginSheet!!, this.LoginSheetBuilder(), {
             height: SheetSize.FIT_CONTENT,
             preferType: this.preferType,
             title: {
               title: '登录'
             },
             onAppear: (async () => {
-              const lastWindow = await window.getLastWindow(this.context)
-              await lastWindow.setWindowPrivacyMode(true)
+              const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                name: 'commonSetting'
+              })
+              const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+              if (disallowScreenshot) {
+                const lastWindow = await window.getLastWindow(this.context)
+                lastWindow.setWindowPrivacyMode(true)
+              }
             }),
             onDisappear: (async () => {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(false)
-              this.getEmail()
+              this.get()
             })
           })
+
+          if (this.email) {
+            Divider()
+              .padding({
+                left: 12,
+                right: 12
+              })
+            Row() {
+              Text('UID')
+                .fontWeight(FontWeight.Medium)
+              Blank()
+              Text(this.uid)
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+            }
+            .borderRadius(12)
+            .padding(12)
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
+            .width('100%')
+            .onClick(() => {
+              copy(this.uid)
+            })
+
+            Divider()
+              .padding({
+                left: 12,
+                right: 12
+              })
+            Row() {
+              Text('登录到期时间：' + this.endDate)
+                .fontWeight(FontWeight.Medium)
+                .width('75%')
+              Blank()
+              Text('去修改')
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
+            }
+            .borderRadius(12)
+            .padding(12)
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
+            .width('100%')
+            .onClick(() => {
+              openLink('https://www.zhangls2512.cn/product/account/info')
+            })
+          }
         }
         .backgroundColor($r('sys.color.comp_background_primary'))
         .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -165,20 +226,26 @@ export default struct Me {
             })
             .width('100%')
             .onClick(() => {
-              this.isShowPasswordcheckSheet = !this.isShowPasswordcheckSheet
+              this.isShowPasswordcheckSheet = true
             })
-            .bindSheet($$this.isShowPasswordcheckSheet, this.PasswordcheckSheetBuilder(), {
+            .bindSheet(this.isShowPasswordcheckSheet!!, this.PasswordcheckSheetBuilder(), {
               preferType: this.preferType,
               title: {
                 title: '密码安全检查'
               },
               onAppear: (async () => {
-                const lastWindow = await window.getLastWindow(this.context)
-                await lastWindow.setWindowPrivacyMode(true)
+                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: 'commonSetting'
+                })
+                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                if (disallowScreenshot) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  lastWindow.setWindowPrivacyMode(true)
+                }
               }),
               onDisappear: (async () => {
                 const lastWindow = await window.getLastWindow(this.context)
-                await lastWindow.setWindowPrivacyMode(false)
+                lastWindow.setWindowPrivacyMode(false)
               })
             })
 
@@ -215,20 +282,26 @@ export default struct Me {
             })
             .width('100%')
             .onClick(() => {
-              this.isShowPasswordgenerateSheet = !this.isShowPasswordgenerateSheet
+              this.isShowPasswordgenerateSheet = true
             })
-            .bindSheet($$this.isShowPasswordgenerateSheet, this.PasswordgenerateSheetBuilder(), {
+            .bindSheet(this.isShowPasswordgenerateSheet!!, this.PasswordgenerateSheetBuilder(), {
               preferType: this.preferType,
               title: {
                 title: '密码随机生成'
               },
               onAppear: (async () => {
-                const lastWindow = await window.getLastWindow(this.context)
-                await lastWindow.setWindowPrivacyMode(true)
+                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: 'commonSetting'
+                })
+                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                if (disallowScreenshot) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  lastWindow.setWindowPrivacyMode(true)
+                }
               }),
               onDisappear: (async () => {
                 const lastWindow = await window.getLastWindow(this.context)
-                await lastWindow.setWindowPrivacyMode(false)
+                lastWindow.setWindowPrivacyMode(false)
               })
             })
           }
@@ -260,8 +333,9 @@ export default struct Me {
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
                 .width(24)
-              Text('恶意 URL 检测')
+              Text('恶意URL检测')
                 .fontWeight(FontWeight.Medium)
+                .enableAutoSpacing(true)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -280,9 +354,9 @@ export default struct Me {
             })
             .width('100%')
             .onClick(() => {
-              this.isShowUrlcheckSheet = !this.isShowUrlcheckSheet
+              this.isShowUrlcheckSheet = true
             })
-            .bindSheet($$this.isShowUrlcheckSheet, this.UrlcheckSheetBuilder(), {
+            .bindSheet(this.isShowUrlcheckSheet!!, this.UrlcheckSheetBuilder(), {
               preferType: this.preferType,
               title: {
                 title: '恶意 URL 检测'
@@ -329,10 +403,13 @@ export default struct Me {
           })
           .width('100%')
           .onClick(() => {
-            this.isShowSettingSheet = !this.isShowSettingSheet
+            this.isShowSettingSheet = true
           })
-          .bindSheet($$this.isShowSettingSheet, this.SettingSheetBuilder(), {
-            preferType: this.preferType
+          .bindSheet(this.isShowSettingSheet!!, this.SettingSheetBuilder(), {
+            preferType: this.preferType,
+            onDisappear: (() => {
+              this.get()
+            })
           })
         }
         .backgroundColor($r('sys.color.comp_background_primary'))
@@ -368,8 +445,10 @@ export default struct Me {
                 await preferences.deletePreferences(this.context, {
                   name: 'login'
                 })
+                this.uid = ''
                 this.email = ''
-                promptAction.showToast({
+                this.endDate = ''
+                promptAction.openToast({
                   message: '退出成功'
                 })
               }
@@ -392,9 +471,9 @@ export default struct Me {
         this.preferType = 0
       }
       this.context.eventHub.on('refreshMe', () => {
-        this.getEmail()
+        this.get()
       })
-      this.getEmail()
+      this.get()
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshMe')

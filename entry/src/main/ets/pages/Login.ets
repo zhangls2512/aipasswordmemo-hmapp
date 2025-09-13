@@ -1,8 +1,7 @@
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { privacyManager } from '@kit.AppGalleryKit'
-import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
+import { netBoost } from '@kit.NetworkBoostKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -18,11 +17,10 @@ export default struct Login {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  context = getContext(this)
+  context = this.getUIContext().getHostContext()
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      .onClickLoginWithHuaweiIDButton(async (err: BusinessError,
-        response: loginComponentManager.HuaweiIDCredential) => {
+      .onClickLoginWithHuaweiIDButton(async (err, response) => {
         if (response) {
           const dialogControllerProgress = new CustomDialogController({
             builder: LoadingDialog({
@@ -30,28 +28,37 @@ export default struct Login {
             })
           })
           dialogControllerProgress.open()
+          netBoost.setSceneDesc({
+            scene: 'login',
+            sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
+          })
           const res = await request('/account/getAccessToken', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode
           })
+          netBoost.setSceneDesc({
+            scene: 'login',
+            sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
+          })
           dialogControllerProgress.close()
           if (res !== 'fail') {
             const accessToken = JSON.parse(res).accessToken as string
+            const uid = JSON.parse(res).uid as string
+            const email = JSON.parse(res).email as string
             const endDate = JSON.parse(res).endDate as number
-            set(accessToken)
-            const loginDataPreferences = preferences.getPreferencesSync(this.context, {
-              name: 'login'
+            set(accessToken, {
+              uid: uid,
+              email: email,
+              endDate: endDate
             })
-            loginDataPreferences.putSync('endDate', endDate)
-            loginDataPreferences.flushSync()
-            promptAction.showToast({
+            promptAction.openToast({
               message: '登录成功'
             })
             this.isShowLoginSheet = false
           }
         }
         if (err) {
-          promptAction.showToast({
+          promptAction.openToast({
             message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
           })
         }
@@ -77,7 +84,7 @@ export default struct Login {
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                .onChange((isChecked: boolean) => {
+                .onChange((isChecked) => {
                   if (isChecked) {
                     this.type = 'password'
                   }
@@ -94,7 +101,7 @@ export default struct Login {
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                .onChange((isChecked: boolean) => {
+                .onChange((isChecked) => {
                   if (isChecked) {
                     this.type = 'mfa'
                   }
@@ -111,7 +118,7 @@ export default struct Login {
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-                .onChange((isChecked: boolean) => {
+                .onChange((isChecked) => {
                   if (isChecked) {
                     this.type = 'emailcode'
                   }
@@ -129,10 +136,11 @@ export default struct Login {
               })
               .width('15%')
             TextInput({
-              text: $$this.email,
+              text: this.email!!,
               placeholder: '请输入邮箱'
             })
               .contentType(ContentType.EMAIL_ADDRESS)
+              .enableAutoSpacing(true)
               .type(InputType.Email)
               .width('80%')
           }
@@ -149,10 +157,11 @@ export default struct Login {
                 })
                 .width('15%')
               TextInput({
-                text: $$this.password,
+                text: this.password!!,
                 placeholder: '请输入密码'
               })
                 .contentType(ContentType.PASSWORD)
+                .enableAutoSpacing(true)
                 .maxLength(30)
                 .type(InputType.Password)
                 .width('80%')
@@ -170,11 +179,12 @@ export default struct Login {
                 })
                 .width('15%')
               TextInput({
-                text: $$this.mfa,
+                text: this.mfa!!,
                 placeholder: '请输入 MFA'
               })
+                .enableAutoSpacing(true)
                 .maxLength(6)
-                .type(InputType.Number)
+                .type(InputType.ONE_TIME_CODE)
                 .width('80%')
             }
             .margin({
@@ -190,11 +200,12 @@ export default struct Login {
                 })
                 .width('15%')
               TextInput({
-                text: $$this.emailcode,
+                text: this.emailcode!!,
                 placeholder: '请输入邮箱验证码'
               })
+                .enableAutoSpacing(true)
                 .maxLength(8)
-                .type(InputType.Number)
+                .type(InputType.ONE_TIME_CODE)
                 .width('80%')
             }
             .margin({
@@ -210,7 +221,7 @@ export default struct Login {
               .width('100%')
               .onClick(async () => {
                 if (!this.email) {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '请输入邮箱'
                   })
                   return
@@ -226,7 +237,7 @@ export default struct Login {
                 })
                 dialogControllerProgress.close()
                 if (res !== 'fail') {
-                  promptAction.showToast({
+                  promptAction.openToast({
                     message: '验证码已成功发送到邮箱：' + this.email
                   })
                   this.buttonEnabled = false
@@ -252,25 +263,25 @@ export default struct Login {
             .width('100%')
             .onClick(async () => {
               if (!this.email) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入邮箱'
                 })
                 return
               }
               if (this.type === 'password' && this.password.length < 8) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入正确的密码'
                 })
                 return
               }
               if (this.type === 'mfa' && this.mfa.length !== 6) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入正确的 MFA'
                 })
                 return
               }
               if (this.type === 'emailcode' && this.emailcode.length !== 8) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入正确的邮箱验证码'
                 })
                 return
@@ -291,22 +302,31 @@ export default struct Login {
                 })
               })
               dialogControllerProgress.open()
+              netBoost.setSceneDesc({
+                scene: 'login',
+                sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
+              })
               const res = await request('/account/getAccessToken', {
                 verifyType: this.type,
                 verifyCode: code,
                 email: this.email
               })
+              netBoost.setSceneDesc({
+                scene: 'login',
+                sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
+              })
               dialogControllerProgress.close()
               if (res !== 'fail') {
                 const accessToken = JSON.parse(res).accessToken as string
+                const uid = JSON.parse(res).uid as string
+                const email = JSON.parse(res).email as string
                 const endDate = JSON.parse(res).endDate as number
-                set(accessToken)
-                const loginDataPreferences = preferences.getPreferencesSync(this.context, {
-                  name: 'login'
+                set(accessToken, {
+                  uid: uid,
+                  email: email,
+                  endDate: endDate
                 })
-                loginDataPreferences.putSync('endDate', endDate)
-                loginDataPreferences.flushSync()
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '登录成功'
                 })
                 this.isShowLoginSheet = false
@@ -341,9 +361,9 @@ export default struct Login {
             Column() {
               Toggle({
                 type: ToggleType.Checkbox,
-                isOn: $$this.agree
+                isOn: this.agree!!
               })
-                .onChange((isOn: boolean) => {
+                .onChange((isOn) => {
                   this.controller.setEnabled(isOn)
                 })
             }
@@ -362,7 +382,7 @@ export default struct Login {
                       privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 2)
                     openLink(appPrivacyLink?.url as string)
                   } catch (err) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }
@@ -375,7 +395,7 @@ export default struct Login {
                       privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
                     openLink(appPrivacyLink?.url as string)
                   } catch (err) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }

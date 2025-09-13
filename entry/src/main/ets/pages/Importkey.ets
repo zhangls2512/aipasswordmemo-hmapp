@@ -1,3 +1,5 @@
+import { common } from '@kit.AbilityKit'
+import { preferences } from '@kit.ArkData'
 import { window } from '@kit.ArkUI'
 import { setCustomKey } from '../common/Crypto'
 
@@ -9,7 +11,7 @@ export function ImportkeyBuilder() {
 @ComponentV2
 struct Importkey {
   @Local keyValue: string = ''
-  context = getContext(this)
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -19,8 +21,9 @@ struct Importkey {
           Column() {
             TextArea({
               placeholder: '请输入 Base64 编码、长度 44 的 AES256 密钥',
-              text: $$this.keyValue
+              text: this.keyValue!!
             })
+              .enableAutoSpacing(true)
               .maxLength(44)
               .showCounter(true)
             Button('导入')
@@ -48,16 +51,22 @@ struct Importkey {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('导入自定义密钥')
-    .onReady((context: NavDestinationContext) => {
+    .onReady((context) => {
       this.pageInfos = context.pathStack
     })
     .onShown(async () => {
-      const lastWindow = await window.getLastWindow(this.context)
-      await lastWindow.setWindowPrivacyMode(true)
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+      if (disallowScreenshot) {
+        const lastWindow = await window.getLastWindow(this.context)
+        lastWindow.setWindowPrivacyMode(true)
+      }
     })
     .onHidden(async () => {
       const lastWindow = await window.getLastWindow(this.context)
-      await lastWindow.setWindowPrivacyMode(false)
+      lastWindow.setWindowPrivacyMode(false)
     })
   }
 }
