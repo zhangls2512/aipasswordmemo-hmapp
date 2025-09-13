@@ -12,7 +12,7 @@ export interface RepeatItem {
   list: ListItem[]
 }
 
-export async function getRepeatPasswordList(): Promise<RepeatItem[]> {
+export async function getRepeatPasswordList() {
   const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',

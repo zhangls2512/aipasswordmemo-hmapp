@@ -1,5 +1,10 @@
 import { preferences } from '@kit.ArkData'
 
+interface Type {
+  name: string,
+  value: string
+}
+
 @Builder
 export function AutocloudbackupsettingBuilder() {
   Autocloudbackupsetting()
@@ -7,21 +12,28 @@ export function AutocloudbackupsettingBuilder() {
 
 @ComponentV2
 struct Autocloudbackupsetting {
-  @Local password: boolean = false
-  @Local info: boolean = false
-  @Local tag: boolean = false
-  context = getContext(this)
+  @Local autoOn: string[] = []
+  context = this.getUIContext().getHostContext()
   cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'cloudbackupSetting'
   })
-  autoOn: string[] = []
+  typeArray: Type[] = [
+    {
+      name: '密码',
+      value: 'password'
+    },
+    {
+      name: '常用信息',
+      value: 'info'
+    },
+    {
+      name: '标签',
+      value: 'tag'
+    }
+  ]
 
   getSetting() {
-    const autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', [])
-    this.autoOn = autoOn as string[]
-    this.password = this.autoOn.includes('password')
-    this.info = this.autoOn.includes('info')
-    this.tag = this.autoOn.includes('tag')
+    this.autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
   }
 
   build() {
@@ -29,90 +41,39 @@ struct Autocloudbackupsetting {
       List() {
         ListItem() {
           Column() {
-            Row() {
-              Text('密码')
-                .fontWeight(FontWeight.Medium)
-              Blank()
-              Toggle({
-                type: ToggleType.Switch,
-                isOn: this.password
-              })
-                .onChange((isOn: boolean) => {
-                  let autoOn: string[] = []
-                  if (!isOn) {
-                    autoOn = this.autoOn.filter(item => item !== 'password')
-                  }
-                  if (isOn) {
-                    autoOn = [...this.autoOn, 'password']
-                  }
-                  this.cloudbackupSettingDataPreferences.putSync('autoOn', autoOn)
-                  this.cloudbackupSettingDataPreferences.flushSync()
-                  this.getSetting()
+            ForEach(this.typeArray, (item: Type, index) => {
+              if (index !== 0) {
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+              }
+              Row() {
+                Text(item.name)
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.autoOn.includes(item.value)
                 })
-            }
-            .borderRadius(12)
-            .padding(12)
-            .width('100%')
-
-            Divider()
-              .padding({
-                left: 12,
-                right: 12
-              })
-            Row() {
-              Text('常用信息')
-                .fontWeight(FontWeight.Medium)
-              Blank()
-              Toggle({
-                type: ToggleType.Switch,
-                isOn: this.info
-              })
-                .onChange((isOn: boolean) => {
-                  let autoOn: string[] = []
-                  if (!isOn) {
-                    autoOn = this.autoOn.filter(item => item !== 'info')
-                  }
-                  if (isOn) {
-                    autoOn = [...this.autoOn, 'info']
-                  }
-                  this.cloudbackupSettingDataPreferences.putSync('autoOn', autoOn)
-                  this.cloudbackupSettingDataPreferences.flushSync()
-                  this.getSetting()
-                })
-            }
-            .borderRadius(12)
-            .padding(12)
-            .width('100%')
-
-            Divider()
-              .padding({
-                left: 12,
-                right: 12
-              })
-            Row() {
-              Text('标签')
-                .fontWeight(FontWeight.Medium)
-              Blank()
-              Toggle({
-                type: ToggleType.Switch,
-                isOn: this.tag
-              })
-                .onChange((isOn: boolean) => {
-                  let autoOn: string[] = []
-                  if (!isOn) {
-                    autoOn = this.autoOn.filter(item => item !== 'tag')
-                  }
-                  if (isOn) {
-                    autoOn = [...this.autoOn, 'tag']
-                  }
-                  this.cloudbackupSettingDataPreferences.putSync('autoOn', autoOn)
-                  this.cloudbackupSettingDataPreferences.flushSync()
-                  this.getSetting()
-                })
-            }
-            .borderRadius(12)
-            .padding(12)
-            .width('100%')
+                  .onChange((isOn) => {
+                    let autoOn: string[] = []
+                    if (!isOn) {
+                      autoOn = this.autoOn.filter(itema => itema !== item.value)
+                    }
+                    if (isOn) {
+                      autoOn = [...this.autoOn, item.value]
+                    }
+                    this.cloudbackupSettingDataPreferences.putSync('autoOn', autoOn)
+                    this.cloudbackupSettingDataPreferences.flushSync()
+                    this.getSetting()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+            })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -130,7 +91,7 @@ struct Autocloudbackupsetting {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('云备份自动开启设置')
-    .onReady(() => {
+    .onAppear(() => {
       this.getSetting()
     })
   }

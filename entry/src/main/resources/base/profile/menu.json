@@ -9,7 +9,8 @@
           "menuKind": 1,
           "menuRule": "single",
           "fileSupportType": [
-            ".txt"
+            ".txt",
+            ".csv"
           ]
         }
       ]

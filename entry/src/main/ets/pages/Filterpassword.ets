@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getTagList, getTypeInfoList, PasswordInfoItem } from '../common/Dataget'
@@ -14,19 +15,20 @@ export default struct Filterpassword {
   @Local infoArray: string[] = []
   @Local passwordTagArray: string[] = []
   @Local tagArray: string[] = []
-  context = getContext(this)
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  specialTypes: string[] = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
   })
-  specialTypes: string[] = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   build() {
     List() {
       ListItem() {
         TextInput({
           placeholder: '请输入名称关键词',
-          text: $$this.passwordNameKeyword
+          text: this.passwordNameKeyword!!
         })
+          .enableAutoSpacing(true)
       }
 
       ListItem() {
@@ -51,9 +53,9 @@ export default struct Filterpassword {
             { value: 'URL' },
             { value: '自定义' }
           ])
-            .selected($$this.infoTypeIndex)
-            .value($$this.infoTypeValue)
-            .onSelect(async (index: number, value: string) => {
+            .selected(this.infoTypeIndex!!)
+            .value(this.infoTypeValue!!)
+            .onSelect(async (index, value) => {
               if (index === 9) {
                 this.infoType = ''
                 this.infoArray = []
@@ -66,12 +68,13 @@ export default struct Filterpassword {
           if (!this.specialTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入类型',
-              text: $$this.infoType
+              text: this.infoType!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onChange(async (value: string) => {
+              .onChange(async (value) => {
                 if (this.specialTypes.includes(value)) {
                   this.infoTypeIndex = this.specialTypes.indexOf(value)
                   this.infoTypeValue = value
@@ -82,9 +85,10 @@ export default struct Filterpassword {
           if (this.infoType === '昵称') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.NICKNAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -92,9 +96,10 @@ export default struct Filterpassword {
           if (this.infoType === '用户名') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.USER_NAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -103,9 +108,10 @@ export default struct Filterpassword {
           if (this.infoType === '密码') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .enableAutoFill(false)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -114,9 +120,10 @@ export default struct Filterpassword {
           if (this.infoType === '姓名') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.PERSON_FULL_NAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -124,9 +131,10 @@ export default struct Filterpassword {
           if (this.infoType === '手机号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.PHONE_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -135,9 +143,10 @@ export default struct Filterpassword {
           if (this.infoType === '邮箱') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.EMAIL_ADDRESS)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -146,9 +155,10 @@ export default struct Filterpassword {
           if (this.infoType === '银行卡号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.BANK_CARD_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -157,9 +167,10 @@ export default struct Filterpassword {
           if (this.infoType === '身份证号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.ID_CARD_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -167,8 +178,9 @@ export default struct Filterpassword {
           if (this.infoType === 'URL') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -177,8 +189,9 @@ export default struct Filterpassword {
           if (!this.specialTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -195,14 +208,14 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
+                .width('87%')
               Blank()
                 .width('5%')
-              Button('添加')
-                .width('20%')
+              Image($r('app.media.add'))
+                .width('8%')
                 .onClick(() => {
                   if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '已添加此类型信息'
                     })
                     return
@@ -230,19 +243,19 @@ export default struct Filterpassword {
           Button('添加')
             .onClick(async () => {
               if (!this.infoType) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入类型'
                 })
                 return
               }
               if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '已添加此类型信息'
                 })
                 return
               }
               if (!this.infoValue) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入内容'
                 })
                 return
@@ -279,13 +292,12 @@ export default struct Filterpassword {
                   })
               }
               .alignItems(HorizontalAlign.Start)
-              .width('75%')
+              .width('87%')
 
               Blank()
                 .width('5%')
-              Button('删除')
-                .role(ButtonRole.ERROR)
-                .width('20%')
+              Image($r('app.media.delete'))
+                .width('8%')
                 .onClick(() => {
                   this.passwordInfoArray.splice(index, 1)
                 })
@@ -327,14 +339,14 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
+                .width('87%')
               Blank()
                 .width('5%')
-              Button('添加')
-                .width('20%')
+              Image($r('app.media.add'))
+                .width('8%')
                 .onClick(() => {
                   if (this.passwordTagArray.some(tagItem => tagItem === item)) {
-                    promptAction.showToast({
+                    promptAction.openToast({
                       message: '已添加此标签'
                     })
                     return
@@ -367,12 +379,11 @@ export default struct Filterpassword {
           Column() {
             Row() {
               Text(item)
-                .width('75%')
+                .width('87%')
               Blank()
                 .width('5%')
-              Button('删除')
-                .role(ButtonRole.ERROR)
-                .width('20%')
+              Image($r('app.media.delete'))
+                .width('8%')
                 .onClick(() => {
                   this.passwordTagArray.splice(index, 1)
                 })

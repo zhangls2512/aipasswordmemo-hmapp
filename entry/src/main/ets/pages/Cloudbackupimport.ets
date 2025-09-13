@@ -1,36 +1,11 @@
+import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { get } from '../common/Accesstoken'
-import { decrypt, getKey } from '../common/Crypto'
-import { Info, Password, PasswordInfoItem, Tag } from '../common/Dataget'
-import { importInfo, importPassword, importTag } from '../common/Dataimport'
-import request from '../common/Request'
+import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackimport'
+import { getKey } from '../common/Crypto'
 
-interface Item {
-  id: number,
-  content: string,
-  iv: string
-}
-
-interface PasswordCloudBackup {
+interface Type {
   name: string,
-  info: PasswordInfoItem[],
-  tag: string[],
-  updateTime: number,
-  cloudBackupTime: number
-}
-
-interface InfoCloudBackup {
-  type: string,
-  value: string,
-  updateTime: number,
-  cloudBackupTime: number
-}
-
-interface TagCloudBackup {
-  value: string,
-  color: string,
-  updateTime: number,
-  cloudBackupTime: number
+  value: string
 }
 
 @Builder
@@ -42,11 +17,34 @@ export function CloudbackupimportBuilder() {
 struct Cloudbackupimport {
   @Local index: number = 0
   @Local value: string = '保留'
+  @Local autoImport: string[] = []
+  context = this.getUIContext().getHostContext()
+  cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'cloudbackupSetting'
+  })
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '导入中...'
     })
   })
+  typeArray: Type[] = [
+    {
+      name: '密码',
+      value: 'password'
+    },
+    {
+      name: '常用信息',
+      value: 'info'
+    },
+    {
+      name: '标签',
+      value: 'tag'
+    }
+  ]
+
+  getSetting() {
+    this.autoImport = this.cloudbackupSettingDataPreferences.getSync('autoImport', []) as string[]
+  }
 
   build() {
     NavDestination() {
@@ -61,8 +59,8 @@ struct Cloudbackupimport {
                 { value: '保留' },
                 { value: '覆盖' }
               ])
-                .selected($$this.index)
-                .value($$this.value)
+                .selected(this.index!!)
+                .value(this.value!!)
             }
             .borderRadius(12)
             .padding(12)
@@ -78,7 +76,65 @@ struct Cloudbackupimport {
 
         ListItem() {
           Column() {
-            Text('导入')
+            Text('自动 (应用启动时，冲突解决模式：保留)')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              ForEach(this.typeArray, (item: Type, index) => {
+                if (index !== 0) {
+                  Divider()
+                    .padding({
+                      left: 12,
+                      right: 12
+                    })
+                }
+                Row() {
+                  Text(item.name)
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.autoImport.includes(item.value)
+                  })
+                    .onChange((isOn) => {
+                      let autoImport: string[] = []
+                      if (!isOn) {
+                        autoImport = this.autoImport.filter(itema => itema !== item.value)
+                      }
+                      if (isOn) {
+                        autoImport = [...this.autoImport, item.value]
+                      }
+                      const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                        name: 'cloudbackupSetting'
+                      })
+                      cloudbackupSettingDataPreferences.putSync('autoImport', autoImport)
+                      cloudbackupSettingDataPreferences.flushSync()
+                      this.getSetting()
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('手动')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
@@ -122,54 +178,11 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const countres = await request('/password/getBackupCount', {
-                  accessToken: get()
+                await importCloudBackupPassword()
+                this.dialogControllerProgress.close()
+                promptAction.openToast({
+                  message: '导入成功'
                 })
-                if (countres !== 'fail') {
-                  const total = JSON.parse(countres).count.password as number
-                  for (let i = 0; i < total; i += 10) {
-                    const listres = await request('/password/getBackupList', {
-                      accessToken: get(),
-                      type: 'password',
-                      skip: i
-                    })
-                    if (listres !== 'fail') {
-                      const listarray = JSON.parse(listres).data as Item[]
-                      const array: Password[] = []
-                      const promises = listarray.map(async (item) => {
-                        const itemstring = await decrypt({
-                          content: item.content,
-                          iv: item.iv
-                        })
-                        if (itemstring !== 'fail') {
-                          const itemobject = JSON.parse(itemstring) as PasswordCloudBackup
-                          array.push({
-                            id: item.id,
-                            name: itemobject.name,
-                            info: itemobject.info,
-                            tag: itemobject.tag,
-                            updateTime: itemobject.updateTime,
-                            cloudBackupTime: itemobject.cloudBackupTime
-                          })
-                        }
-                      })
-                      await Promise.all(promises)
-                      let conflictResolution = 0
-                      if (this.index === 1) {
-                        conflictResolution = 5
-                      }
-                      await importPassword(JSON.stringify(array), conflictResolution)
-                    } else {
-                      this.dialogControllerProgress.close()
-                    }
-                  }
-                  this.dialogControllerProgress.close()
-                  promptAction.showToast({
-                    message: '导入成功'
-                  })
-                } else {
-                  this.dialogControllerProgress.close()
-                }
               })
 
               Divider()
@@ -212,53 +225,11 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const countres = await request('/password/getBackupCount', {
-                  accessToken: get()
+                await importCloudBackupInfo()
+                this.dialogControllerProgress.close()
+                promptAction.openToast({
+                  message: '导入成功'
                 })
-                if (countres !== 'fail') {
-                  const total = JSON.parse(countres).count.info as number
-                  for (let i = 0; i < total; i += 10) {
-                    const listres = await request('/password/getBackupList', {
-                      accessToken: get(),
-                      type: 'info',
-                      skip: i
-                    })
-                    if (listres !== 'fail') {
-                      const listarray = JSON.parse(listres).data as Item[]
-                      const array: Info[] = []
-                      const promises = listarray.map(async (item) => {
-                        const itemstring = await decrypt({
-                          content: item.content,
-                          iv: item.iv
-                        })
-                        if (itemstring !== 'fail') {
-                          const itemobject = JSON.parse(itemstring) as InfoCloudBackup
-                          array.push({
-                            id: item.id,
-                            type: itemobject.type,
-                            value: itemobject.value,
-                            updateTime: itemobject.updateTime,
-                            cloudBackupTime: itemobject.cloudBackupTime
-                          })
-                        }
-                      })
-                      await Promise.all(promises)
-                      let conflictResolution = 0
-                      if (this.index === 1) {
-                        conflictResolution = 5
-                      }
-                      await importInfo(JSON.stringify(array), conflictResolution)
-                    } else {
-                      this.dialogControllerProgress.close()
-                    }
-                  }
-                  this.dialogControllerProgress.close()
-                  promptAction.showToast({
-                    message: '导入成功'
-                  })
-                } else {
-                  this.dialogControllerProgress.close()
-                }
               })
 
               Divider()
@@ -301,53 +272,11 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const countres = await request('/password/getBackupCount', {
-                  accessToken: get()
+                await importCloudBackupTag()
+                this.dialogControllerProgress.close()
+                promptAction.openToast({
+                  message: '导入成功'
                 })
-                if (countres !== 'fail') {
-                  const total = JSON.parse(countres).count.tag as number
-                  for (let i = 0; i < total; i += 10) {
-                    const listres = await request('/password/getBackupList', {
-                      accessToken: get(),
-                      type: 'tag',
-                      skip: i
-                    })
-                    if (listres !== 'fail') {
-                      const listarray = JSON.parse(listres).data as Item[]
-                      const array: Tag[] = []
-                      const promises = listarray.map(async (item) => {
-                        const itemstring = await decrypt({
-                          content: item.content,
-                          iv: item.iv
-                        })
-                        if (itemstring !== 'fail') {
-                          const itemobject = JSON.parse(itemstring) as TagCloudBackup
-                          array.push({
-                            id: item.id,
-                            value: itemobject.value,
-                            color: itemobject.color,
-                            updateTime: itemobject.updateTime,
-                            cloudBackupTime: itemobject.cloudBackupTime
-                          })
-                        }
-                      })
-                      await Promise.all(promises)
-                      let conflictResolution = 0
-                      if (this.index === 1) {
-                        conflictResolution = 5
-                      }
-                      await importTag(JSON.stringify(array), conflictResolution)
-                    } else {
-                      this.dialogControllerProgress.close()
-                    }
-                  }
-                  this.dialogControllerProgress.close()
-                  promptAction.showToast({
-                    message: '导入成功'
-                  })
-                } else {
-                  this.dialogControllerProgress.close()
-                }
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -368,5 +297,8 @@ struct Cloudbackupimport {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('导入云备份')
+    .onAppear(() => {
+      this.getSetting()
+    })
   }
 }

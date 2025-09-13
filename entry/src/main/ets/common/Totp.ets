@@ -5,7 +5,7 @@ interface Totp {
   secondsRemaining: number
 }
 
-function base32Decode(key: string): Uint8Array {
+function base32Decode(key: string) {
   const BASE32_MAP: Record<string, number> = {
     'A': 0,
     'B': 1,
@@ -69,7 +69,7 @@ function base32Decode(key: string): Uint8Array {
   return array
 }
 
-function numberToBigEndianUint8Array(num: bigint): Uint8Array {
+function numberToBigEndianUint8Array(num: bigint) {
   const buffer = new ArrayBuffer(8)
   const view = new DataView(buffer)
   for (let i = 0; i < 8; i++) {

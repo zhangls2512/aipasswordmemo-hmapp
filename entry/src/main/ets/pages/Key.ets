@@ -1,3 +1,5 @@
+import { common } from '@kit.AbilityKit'
+import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
 import { getKey, removeKey, setRandomKey } from '../common/Crypto'
 import copy from '../common/Pasteboard'
@@ -10,7 +12,7 @@ export function KeyBuilder() {
 @ComponentV2
 struct Keypage {
   @Local keyValue: string = ''
-  context = getContext(this)
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -197,7 +199,7 @@ struct Keypage {
         }
         .margin({
           top: this.keyValue ? $r('sys.float.ohos_id_elements_margin_vertical_l') :
-          $r('sys.float.ohos_id_elements_margin_vertical_m')
+            $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
       .padding({
@@ -208,7 +210,7 @@ struct Keypage {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('密钥')
-    .onReady((context: NavDestinationContext) => {
+    .onReady((context) => {
       this.pageInfos = context.pathStack
       this.keyValue = getKey()
       this.context.eventHub.on('refreshKey', () => {
@@ -219,12 +221,18 @@ struct Keypage {
       this.context.eventHub.off('refreshKey')
     })
     .onShown(async () => {
-      const lastWindow = await window.getLastWindow(this.context)
-      await lastWindow.setWindowPrivacyMode(true)
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+      if (disallowScreenshot) {
+        const lastWindow = await window.getLastWindow(this.context)
+        lastWindow.setWindowPrivacyMode(true)
+      }
     })
     .onHidden(async () => {
       const lastWindow = await window.getLastWindow(this.context)
-      await lastWindow.setWindowPrivacyMode(false)
+      lastWindow.setWindowPrivacyMode(false)
     })
   }
 }

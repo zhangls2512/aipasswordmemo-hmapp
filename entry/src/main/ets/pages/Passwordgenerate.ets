@@ -44,7 +44,7 @@ export default struct Passwordgenerate {
             Blank()
             Toggle({
               type: ToggleType.Switch,
-              isOn: $$this.digit
+              isOn: this.digit!!
             })
           }
           .borderRadius(12)
@@ -62,7 +62,7 @@ export default struct Passwordgenerate {
             Blank()
             Toggle({
               type: ToggleType.Switch,
-              isOn: $$this.lowercaseLetter
+              isOn: this.lowercaseLetter!!
             })
           }
           .borderRadius(12)
@@ -80,7 +80,7 @@ export default struct Passwordgenerate {
             Blank()
             Toggle({
               type: ToggleType.Switch,
-              isOn: $$this.uppercaseLetter
+              isOn: this.uppercaseLetter!!
             })
           }
           .borderRadius(12)
@@ -98,7 +98,7 @@ export default struct Passwordgenerate {
             Blank()
             Toggle({
               type: ToggleType.Switch,
-              isOn: $$this.specialCharacter
+              isOn: this.specialCharacter!!
             })
           }
           .borderRadius(12)
@@ -134,9 +134,9 @@ export default struct Passwordgenerate {
               const typeCount = allowCharacters.length
               const baseCount = Math.floor(this.length / typeCount)
               const remainCount = this.length % typeCount
-              let characterPool: string[] = []
+              const characterPool: string[] = []
               for (let i = 0; i < typeCount; i++) {
-                const currentType = allowCharacters[i];
+                const currentType = allowCharacters[i]
                 const count = i === typeCount - 1 ? baseCount + remainCount : baseCount
                 for (let j = 0; j < count; j++) {
                   const randomIndex = Math.floor(Math.random() * currentType.length)

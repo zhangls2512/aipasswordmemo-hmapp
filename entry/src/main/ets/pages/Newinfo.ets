@@ -32,9 +32,9 @@ export default struct Newinfo {
             { value: 'URL' },
             { value: '自定义' }
           ])
-            .selected($$this.infoTypeIndex)
-            .value($$this.infoTypeValue)
-            .onSelect((index: number, value: string) => {
+            .selected(this.infoTypeIndex!!)
+            .value(this.infoTypeValue!!)
+            .onSelect((index, value) => {
               if (index === 9) {
                 this.infoType = ''
               }
@@ -45,12 +45,14 @@ export default struct Newinfo {
           if (!this.specialTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入类型',
-              text: $$this.infoType
+              text: this.infoType!!
             })
+              .defaultFocus(true)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onChange((value: string) => {
+              .onChange((value) => {
                 if (this.specialTypes.includes(value)) {
                   this.infoTypeIndex = this.specialTypes.indexOf(value)
                   this.infoTypeValue = value
@@ -60,9 +62,10 @@ export default struct Newinfo {
           if (this.infoType === '昵称') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.NICKNAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -70,9 +73,10 @@ export default struct Newinfo {
           if (this.infoType === '用户名') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.USER_NAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -81,9 +85,10 @@ export default struct Newinfo {
           if (this.infoType === '密码') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .enableAutoFill(false)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -92,9 +97,10 @@ export default struct Newinfo {
           if (this.infoType === '姓名') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.PERSON_FULL_NAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -102,9 +108,10 @@ export default struct Newinfo {
           if (this.infoType === '手机号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.PHONE_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -113,9 +120,10 @@ export default struct Newinfo {
           if (this.infoType === '邮箱') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.EMAIL_ADDRESS)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -124,9 +132,10 @@ export default struct Newinfo {
           if (this.infoType === '银行卡号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.BANK_CARD_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -135,9 +144,10 @@ export default struct Newinfo {
           if (this.infoType === '身份证号') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
               .contentType(ContentType.ID_CARD_NUMBER)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -145,8 +155,9 @@ export default struct Newinfo {
           if (this.infoType === 'URL') {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -155,8 +166,9 @@ export default struct Newinfo {
           if (!this.specialTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入内容',
-              text: $$this.infoValue
+              text: this.infoValue!!
             })
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -174,7 +186,7 @@ export default struct Newinfo {
               Blank()
               Toggle({
                 type: ToggleType.Switch,
-                isOn: $$this.cloudBackup
+                isOn: this.cloudBackup!!
               })
                 .enabled(this.allowCloudBackup)
             }
@@ -208,13 +220,13 @@ export default struct Newinfo {
           Button('新增')
             .onClick(async () => {
               if (!this.infoType) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入类型'
                 })
                 return
               }
               if (!this.infoValue) {
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '请输入内容'
                 })
                 return
@@ -251,7 +263,7 @@ export default struct Newinfo {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const abilityContext = getContext(this)
+          const abilityContext = this.getUIContext().getHostContext()
           const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(abilityContext, {
             name: 'cloudbackupSetting'
           })

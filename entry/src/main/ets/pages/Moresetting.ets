@@ -7,7 +7,7 @@ export function MoresettingBuilder() {
 
 @ComponentV2
 struct Moresetting {
-  context = getContext(this) as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -95,7 +95,7 @@ struct Moresetting {
         ListItem() {
           Column() {
             Row() {
-              Text('清除设置数据')
+              Text('清理数据')
                 .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
@@ -116,7 +116,7 @@ struct Moresetting {
             .width('100%')
             .onClick(() => {
               this.pageInfos.pushPath({
-                name: 'Clearsettings'
+                name: 'Cleardata'
               })
             })
           }
@@ -136,7 +136,7 @@ struct Moresetting {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('其他')
-    .onReady((context: NavDestinationContext) => {
+    .onReady((context) => {
       this.pageInfos = context.pathStack
     })
     .onDisAppear(() => {

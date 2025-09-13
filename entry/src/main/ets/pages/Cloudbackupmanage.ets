@@ -25,19 +25,22 @@ struct Cloudbackupmanage {
   @Local infoSelected: boolean = false
   @Local tagSelected: boolean = false
   @Local types: string[] = []
+  @Local accessToken: string = ''
 
   async getCount() {
-    this.loading = true
-    const infores = await request('/password/getBackupCount', {
-      accessToken: get()
-    })
-    this.loading = false
-    if (infores !== 'fail') {
-      const count = JSON.parse(infores).count as Count
-      this.total = String(count.password + count.info + count.tag)
-      this.password = String(count.password)
-      this.info = String(count.info)
-      this.tag = String(count.tag)
+    if (this.accessToken) {
+      this.loading = true
+      const countres = await request('/password/getBackupCount', {
+        accessToken: this.accessToken
+      })
+      this.loading = false
+      if (countres !== 'fail') {
+        const count = JSON.parse(countres).count as Count
+        this.total = String(count.password + count.info + count.tag)
+        this.password = String(count.password)
+        this.info = String(count.info)
+        this.tag = String(count.tag)
+      }
     }
   }
 
@@ -66,8 +69,8 @@ struct Cloudbackupmanage {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .selectAll($$this.allSelected)
-                    .onChange((itemName: CheckboxGroupResult) => {
+                    .selectAll(this.allSelected!!)
+                    .onChange((itemName) => {
                       this.types = itemName.name
                     })
                   Text('全部')
@@ -95,7 +98,7 @@ struct Cloudbackupmanage {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .select($$this.passwordSelected)
+                    .select(this.passwordSelected!!)
                   Text('密码')
                     .fontWeight(FontWeight.Medium)
                   Blank()
@@ -121,7 +124,7 @@ struct Cloudbackupmanage {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .select($$this.infoSelected)
+                    .select(this.infoSelected!!)
                   Text('常用信息')
                     .fontWeight(FontWeight.Medium)
                   Blank()
@@ -147,7 +150,7 @@ struct Cloudbackupmanage {
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .select($$this.tagSelected)
+                    .select(this.tagSelected!!)
                   Text('标签')
                     .fontWeight(FontWeight.Medium)
                   Blank()
@@ -164,7 +167,7 @@ struct Cloudbackupmanage {
               .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
               Button('清理')
-                .enabled(this.types.length > 0)
+                .enabled(this.accessToken !== '' && this.types.length > 0)
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_l')
                 })
@@ -192,12 +195,12 @@ struct Cloudbackupmanage {
                     })
                     dialogControllerProgress.open()
                     const res = await request('/password/clearBackup', {
-                      accessToken: get(),
+                      accessToken: this.accessToken,
                       types: this.types
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.showToast({
+                      promptAction.openToast({
                         message: '清理成功'
                       })
                       this.getCount()
@@ -221,7 +224,8 @@ struct Cloudbackupmanage {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('管理云备份')
-    .onReady(() => {
+    .onAppear(async () => {
+      this.accessToken = await get()
       this.getCount()
     })
   }

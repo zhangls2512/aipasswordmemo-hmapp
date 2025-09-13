@@ -1,0 +1,32 @@
+{
+  "ruleSet": [
+    "plugin:@typescript-eslint/all",
+    "plugin:@security/all",
+    "plugin:@performance/all",
+    "plugin:@previewer/all",
+    "plugin:@cross-device-app-dev/all",
+    "plugin:@hw-stylistic/all",
+    "plugin:@correctness/all"
+  ],
+  "rules": {
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/no-magic-numbers": "off",
+    "@typescript-eslint/quotes": [
+      "error",
+      "single"
+    ],
+    "@typescript-eslint/semi": [
+      "error",
+      "never"
+    ],
+    "@performance/avoid-overusing-custom-component-check": "off",
+    "@performance/bad-deep-clone-check": "off",
+    "@performance/foreach-args-check": "off",
+    "@performance/js-code-cache-by-precompile-check": "off",
+    "@cross-device-app-dev/one-multi-breakpoint-check": "off",
+    "@hw-stylistic/space-before-function-paren": [
+      "error",
+      "never"
+    ]
+  }
+}

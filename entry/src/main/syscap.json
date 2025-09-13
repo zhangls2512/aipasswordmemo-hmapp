@@ -3,8 +3,7 @@
     "general": [
       "phone",
       "tablet",
-      "2in1",
-      "tv"
+      "2in1"
     ]
   },
   "development": {

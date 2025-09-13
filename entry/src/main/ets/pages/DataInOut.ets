@@ -1,16 +1,35 @@
-import { util } from '@kit.ArkTS'
+import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
-import { fileIo as fs, picker } from '@kit.CoreFileKit'
-import { getInfoList, getPasswordList, getTagList, PasswordInfoItem } from '../common/Dataget'
+import { fileIo, picker } from '@kit.CoreFileKit'
+import { importCsvPassword, parseCsvLine } from '../common/Csv'
+import { getInfoList, getPasswordList, getPasswordMaxId, getTagList, PasswordInfoItem } from '../common/Dataget'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
+import { read } from '../common/File'
+import openLink from '../common/Openlink'
 
-interface PasswordOutItem {
+export interface PasswordOutItem {
   id: number,
   name: string,
   info: PasswordInfoItem[],
   tag: string[],
   updateTime: number,
-  cloudBackupTime: number
+  cloudBackupTime: string
+}
+
+interface InfoOutItem {
+  id: number,
+  type: string,
+  value: string,
+  updateTime: number,
+  cloudBackupTime: string
+}
+
+interface TagOutItem {
+  id: number,
+  value: string,
+  color: string,
+  updateTime: number,
+  cloudBackupTime: string
 }
 
 @Builder
@@ -22,7 +41,8 @@ export function DataInOutBuilder() {
 struct DataInOut {
   @Local index: number = 0
   @Local value: string = '保留'
-  context = getContext(this)
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  pageInfos = new NavPathStack()
 
   build() {
     NavDestination() {
@@ -37,8 +57,8 @@ struct DataInOut {
                 { value: '保留' },
                 { value: '覆盖' }
               ])
-                .selected($$this.index)
-                .value($$this.value)
+                .selected(this.index!!)
+                .value(this.value!!)
             }
             .borderRadius(12)
             .padding(12)
@@ -86,24 +106,24 @@ struct DataInOut {
               .onClick(async () => {
                 const documentSelectOptions = new picker.DocumentSelectOptions()
                 documentSelectOptions.maxSelectNumber = 1
-                documentSelectOptions.fileSuffixFilters = ['.txt']
+                documentSelectOptions.fileSuffixFilters = ['.txt', '.csv']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const file = fs.openSync(uris[0])
-                const size = fs.statSync(file.fd).size
-                const filebuffer = new ArrayBuffer(size)
-                fs.readSync(file.fd, filebuffer)
-                const decoder = util.TextDecoder.create()
-                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                fs.closeSync(file)
+                const filePath = uris[0]
+                const filestring = read(filePath)
                 let conflictResolution = 0
                 if (this.index === 1) {
                   conflictResolution = 5
                 }
-                await importPassword(filestring, conflictResolution)
-                promptAction.showToast({
-                  message: '导入成功'
-                })
+                if (filePath.endsWith('.txt')) {
+                  await importPassword(filestring, conflictResolution)
+                  promptAction.openToast({
+                    message: '导入成功'
+                  })
+                }
+                if (filePath.endsWith('.csv')) {
+                  importCsvPassword(filestring)
+                }
               })
 
               Divider()
@@ -137,19 +157,14 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const file = fs.openSync(uris[0])
-                const size = fs.statSync(file.fd).size
-                const filebuffer = new ArrayBuffer(size)
-                fs.readSync(file.fd, filebuffer)
-                const decoder = util.TextDecoder.create()
-                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                fs.closeSync(file)
+                const filePath = uris[0]
+                const filestring = read(filePath)
                 let conflictResolution = 0
                 if (this.index === 1) {
                   conflictResolution = 5
                 }
                 await importInfo(filestring, conflictResolution)
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '导入成功'
                 })
               })
@@ -185,19 +200,14 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const file = fs.openSync(uris[0])
-                const size = fs.statSync(file.fd).size
-                const filebuffer = new ArrayBuffer(size)
-                fs.readSync(file.fd, filebuffer)
-                const decoder = util.TextDecoder.create()
-                const filestring = decoder.decodeToString(new Uint8Array(filebuffer))
-                fs.closeSync(file)
+                const filePath = uris[0]
+                const filestring = read(filePath)
                 let conflictResolution = 0
                 if (this.index === 1) {
                   conflictResolution = 5
                 }
                 await importTag(filestring, conflictResolution)
-                promptAction.showToast({
+                promptAction.openToast({
                   message: '导入成功'
                 })
               })
@@ -205,6 +215,136 @@ struct DataInOut {
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text() {
+              Span('导入密码须知：txt文件需为从本页面下方导出的、csv文件需为')
+                .fontColor($r('sys.color.font_secondary'))
+              Span('此文档')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontWeight(FontWeight.Medium)
+                .onClick(() => {
+                  openLink('https://docs.qq.com/doc/p/a12dc0f6d9e9ab998d81ddd1ddc95b5445518209')
+                })
+              Span('中所述的标准格式。\n因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导入。')
+                .fontColor($r('sys.color.font_secondary'))
+            }
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
+            .enableAutoSpacing(true)
+            .margin({
+              top: 6,
+              left: 12,
+              right: 12
+            })
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('导入第三方密码')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12
+              })
+            Column() {
+              Row() {
+                Text('Edge、Chrome')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(async () => {
+                const documentSelectOptions = new picker.DocumentSelectOptions()
+                documentSelectOptions.maxSelectNumber = 1
+                documentSelectOptions.fileSuffixFilters = ['.csv']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.select(documentSelectOptions)
+                const filePath = uris[0]
+                const filestring = read(filePath)
+                let conflictResolution = 0
+                if (this.index === 1) {
+                  conflictResolution = 5
+                }
+                const lines = filestring.split('\n').filter(line => line.trim() !== '')
+                const result: PasswordOutItem[] = []
+                const maxId = await getPasswordMaxId()
+                let idCounter = maxId + 1
+                for (let i = 1; i < lines.length; i++) {
+                  const line = lines[i]
+                  const parsedFields = parseCsvLine(line)
+                  const name = parsedFields[0]
+                  const url = parsedFields[1]
+                  const username = parsedFields[2]
+                  const password = parsedFields[3]
+                  const info: PasswordInfoItem[] = []
+                  if (username) {
+                    info.push({ type: '用户名', value: username })
+                  }
+                  if (password) {
+                    info.push({ type: '密码', value: password })
+                  }
+                  if (url) {
+                    info.push({ type: 'URL', value: url })
+                  }
+                  result.push({
+                    id: idCounter++,
+                    name,
+                    info,
+                    tag: [],
+                    updateTime: Date.now(),
+                    cloudBackupTime: JSON.stringify([])
+                  })
+                }
+                await importPassword(JSON.stringify(result), conflictResolution)
+                promptAction.openToast({
+                  message: '导入成功'
+                })
+              })
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text() {
+              Span('联系')
+                .fontColor($r('sys.color.font_secondary'))
+              Span('客服')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontWeight(FontWeight.Medium)
+                .onClick(() => {
+                  this.pageInfos.pushPath({
+                    name: 'About'
+                  })
+                })
+              Span('申请适配更多第三方')
+                .fontColor($r('sys.color.font_secondary'))
+            }
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
+            .margin({
+              top: 6,
+              left: 12,
+              right: 12
+            })
           }
           .alignItems(HorizontalAlign.Start)
         }
@@ -249,19 +389,26 @@ struct DataInOut {
                 documentSaveOptions.fileSuffixChoices = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.save(documentSaveOptions)
-                const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
+                const filePath = uris[0]
+                const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
                 const array = await getPasswordList()
-                const arrayOut = array.map((item): PasswordOutItem => ({
-                  id: item.id,
-                  name: item.name,
-                  info: item.info,
-                  tag: item.tag.map(item => item.value),
-                  updateTime: item.updateTime,
-                  cloudBackupTime: item.cloudBackupTime
-                }))
-                fs.writeSync(file.fd, JSON.stringify(arrayOut))
-                fs.closeSync(file)
-                promptAction.showToast({
+                const arrayOut = array.map((item): PasswordOutItem => {
+                  let cloudBackupTime = JSON.stringify([])
+                  if (typeof (item.cloudBackupTime) === 'string') {
+                    cloudBackupTime = item.cloudBackupTime
+                  }
+                  return {
+                    id: item.id,
+                    name: item.name,
+                    info: item.info.filter(itema => itema.type !== '图标'),
+                    tag: item.tag.map(item => item.value),
+                    updateTime: item.updateTime,
+                    cloudBackupTime: cloudBackupTime
+                  }
+                })
+                fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                fileIo.closeSync(file)
+                promptAction.openToast({
                   message: '导出成功'
                 })
               })
@@ -297,11 +444,25 @@ struct DataInOut {
                 documentSaveOptions.fileSuffixChoices = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.save(documentSaveOptions)
-                const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
+                const filePath = uris[0]
+                const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
                 const array = await getInfoList()
-                fs.writeSync(file.fd, JSON.stringify(array))
-                fs.closeSync(file)
-                promptAction.showToast({
+                const arrayOut = array.map((item): InfoOutItem => {
+                  let cloudBackupTime = JSON.stringify([])
+                  if (typeof (item.cloudBackupTime) === 'string') {
+                    cloudBackupTime = item.cloudBackupTime
+                  }
+                  return {
+                    id: item.id,
+                    type: item.type,
+                    value: item.value,
+                    updateTime: item.updateTime,
+                    cloudBackupTime: cloudBackupTime
+                  }
+                })
+                fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                fileIo.closeSync(file)
+                promptAction.openToast({
                   message: '导出成功'
                 })
               })
@@ -337,11 +498,25 @@ struct DataInOut {
                 documentSaveOptions.fileSuffixChoices = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.save(documentSaveOptions)
-                const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE)
+                const filePath = uris[0]
+                const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
                 const array = await getTagList()
-                fs.writeSync(file.fd, JSON.stringify(array))
-                fs.closeSync(file)
-                promptAction.showToast({
+                const arrayOut = array.map((item): TagOutItem => {
+                  let cloudBackupTime = JSON.stringify([])
+                  if (typeof (item.cloudBackupTime) === 'string') {
+                    cloudBackupTime = item.cloudBackupTime
+                  }
+                  return {
+                    id: item.id,
+                    value: item.value,
+                    color: item.color,
+                    updateTime: item.updateTime,
+                    cloudBackupTime: cloudBackupTime
+                  }
+                })
+                fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                fileIo.closeSync(file)
+                promptAction.openToast({
                   message: '导出成功'
                 })
               })
@@ -349,6 +524,15 @@ struct DataInOut {
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text('因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导出。')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body3'))
+              .margin({
+                top: 6,
+                left: 12,
+                right: 12
+              })
           }
           .alignItems(HorizontalAlign.Start)
         }
@@ -364,5 +548,8 @@ struct DataInOut {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('数据导入与导出')
+    .onReady((context) => {
+      this.pageInfos = context.pathStack
+    })
   }
 }
