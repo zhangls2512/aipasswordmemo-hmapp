@@ -24,6 +24,7 @@ import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import getDeviceToken from '../common/Devicetoken'
 import { read } from '../common/File'
+import openLink from '../common/Openlink'
 import request from '../common/Request'
 
 export default class EntryAbility extends UIAbility {
@@ -31,6 +32,9 @@ export default class EntryAbility extends UIAbility {
     const accessToken = await get()
     if (notificationManager.isNotificationEnabledSync()) {
       notificationManager.setBadgeNumber(0)
+    }
+    if (want.parameters?.noticeUrl) {
+      openLink(want.parameters.noticeUrl as string)
     }
     if (want.parameters?.shortcutId === 'newPassword') {
       this.context.eventHub.emit('newPassword')
@@ -85,7 +89,7 @@ export default class EntryAbility extends UIAbility {
       if (want.uri === 'storage:///clearcache') {
         promptAction.showDialog({
           title: '提示',
-          message: '请前往“我的”>“设置”>“其他”>“清理数据”清理数据。',
+          message: '请前往“我的”>“设置”>“更多”>“其他”>“清理数据”清理数据。',
           buttons: [
             {
               text: '确定',
@@ -551,7 +555,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 14) {
+    if (wantParam.version !== 15) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

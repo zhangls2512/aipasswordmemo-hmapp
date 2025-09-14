@@ -88,7 +88,7 @@ export default struct Passwordinfo {
                   .width('10%')
                   .onError((err) => {
                     promptAction.openToast({
-                      message: '发生错误，错误码：' + err.error?.code + '，错误信息：' + err.error?.message
+                      message: '发生错误，错误信息：' + err.error?.message
                     })
                   })
               }
