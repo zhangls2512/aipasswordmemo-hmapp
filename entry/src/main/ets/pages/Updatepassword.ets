@@ -187,7 +187,6 @@ export default struct Updatepassword {
             { value: 'URL' },
             { value: '自定义' }
           ])
-            .enabled((this.infoType === '图标' && this.infoValue === '') || this.infoType !== '图标')
             .selected(this.infoTypeIndex!!)
             .value(this.infoTypeValue!!)
             .onSelect(async (index, value) => {
