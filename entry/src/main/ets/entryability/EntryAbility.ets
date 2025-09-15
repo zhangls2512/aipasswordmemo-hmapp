@@ -87,16 +87,7 @@ export default class EntryAbility extends UIAbility {
     }
     if (want.uri) {
       if (want.uri === 'storage:///clearcache') {
-        promptAction.showDialog({
-          title: '提示',
-          message: '请前往“我的”>“设置”>“更多”>“其他”>“清理数据”清理数据。',
-          buttons: [
-            {
-              text: '确定',
-              color: $r('sys.color.font_emphasize')
-            }
-          ]
-        })
+        this.context.eventHub.emit('clearData')
       }
       if (want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
         const urires = new uri.URI(want.uri)
@@ -296,7 +287,7 @@ export default class EntryAbility extends UIAbility {
           eventTypes: [hiAppEvent.EventType.FAULT]
         }
       ],
-      onReceive: async (domain, appEventGroups) => {
+      onReceive: (domain, appEventGroups) => {
         const autoUploadErrorLogType = debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
           'APP_CRASH',
           'APP_FREEZE',
@@ -555,7 +546,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 15) {
+    if (wantParam.version !== 16) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

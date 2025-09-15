@@ -305,6 +305,18 @@ export default struct Setting {
                   })
                   .width(20)
               }
+              Text('账号中心')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                .fontWeight(FontWeight.Medium)
+                .margin({
+                  top: 6,
+                  left: 12,
+                  right: 12
+                })
+                .onClick(() => {
+                  openLink('https://www.zhangls2512.cn/product/account/panel')
+                })
             }
             .alignItems(HorizontalAlign.Start)
           }

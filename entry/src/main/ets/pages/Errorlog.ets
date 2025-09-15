@@ -104,7 +104,7 @@ struct Errorlog {
             })
             .selected(0)
             .value('全部')
-            .onSelect(async (index: number) => {
+            .onSelect((index: number) => {
               if (index === 0) {
                 this.get()
               }

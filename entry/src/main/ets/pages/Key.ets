@@ -21,36 +21,49 @@ struct Keypage {
         if (this.keyValue) {
           ListItem() {
             Column() {
-              Row() {
-                Text('密钥')
-                  .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(this.keyValue)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
+              Column() {
+                Row() {
+                  Text('密钥')
+                    .fontWeight(FontWeight.Medium)
+                    .width('45%')
+                  Blank()
+                    .width('5%')
+                  Text(this.keyValue)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .textAlign(TextAlign.End)
+                    .width('50%')
                 }
-              })
-              .width('100%')
-              .onClick(() => {
-                copy(this.keyValue)
-              })
+                .borderRadius(12)
+                .padding(12)
+                .stateStyles({
+                  normal: {
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  pressed: {
+                    .backgroundColor($r('sys.color.interactive_pressed'))
+                  }
+                })
+                .width('100%')
+                .onClick(() => {
+                  copy(this.keyValue)
+                })
+              }
+              .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+              Text('建议点击上方密钥内容将其复制到剪贴板并妥善备份，防止其丢失导致无法解密使用其加密的云备份数据。')
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                .fontWeight(FontWeight.Medium)
+                .margin({
+                  top: 6,
+                  left: 12,
+                  right: 12
+                })
             }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+            .alignItems(HorizontalAlign.Start)
           }
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')

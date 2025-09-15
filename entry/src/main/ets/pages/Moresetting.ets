@@ -8,7 +8,6 @@ export function MoresettingBuilder() {
 @ComponentV2
 struct Moresetting {
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  pageInfos = new NavPathStack()
 
   build() {
     NavDestination() {
@@ -115,9 +114,7 @@ struct Moresetting {
             })
             .width('100%')
             .onClick(() => {
-              this.pageInfos.pushPath({
-                name: 'Cleardata'
-              })
+              this.context.eventHub.emit('clearData')
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -136,9 +133,6 @@ struct Moresetting {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('其他')
-    .onReady((context) => {
-      this.pageInfos = context.pathStack
-    })
     .onDisAppear(() => {
       this.context.eventHub.emit('refreshSetting')
     })
