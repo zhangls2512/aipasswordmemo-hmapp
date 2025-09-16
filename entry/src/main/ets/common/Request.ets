@@ -3,8 +3,8 @@ import { promptAction } from '@kit.ArkUI'
 import { rcp } from '@kit.RemoteCommunicationKit'
 
 interface ErrorResponse {
-  errCode: number
-  errMsg: string
+  errCode: number,
+  errMsg: string,
   errFix: string
 }
 

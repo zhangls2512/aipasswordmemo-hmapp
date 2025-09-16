@@ -202,7 +202,6 @@ export default struct Updatepassword {
               }
               if (index !== 11) {
                 this.infoType = value
-                this.infoArray = await getTypeInfoList(value)
               }
               if (index === 0) {
                 this.infoValue = ''
@@ -210,6 +209,9 @@ export default struct Updatepassword {
               if (index === 11) {
                 this.infoType = ''
                 this.infoArray = []
+              }
+              if (value !== '图标' && value !== 'MFA') {
+                this.infoArray = await getTypeInfoList(value)
               }
             })
           if (!this.specialTypes.includes(this.infoType)) {
@@ -229,7 +231,9 @@ export default struct Updatepassword {
                 if (value === '图标') {
                   this.infoValue = ''
                 }
-                this.infoArray = await getTypeInfoList(value)
+                if (value !== '图标' && value !== 'MFA') {
+                  this.infoArray = await getTypeInfoList(value)
+                }
               })
           }
           if (this.infoType === '图标') {

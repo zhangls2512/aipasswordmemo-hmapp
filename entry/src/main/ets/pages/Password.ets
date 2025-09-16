@@ -310,7 +310,7 @@ export default struct PasswordPage {
               this.nameKeyword = value
               this.filterPasswordDataPreferences.putSync('nameKeyword', value)
             })
-            .onSubmit(async () => {
+            .onSubmit(() => {
               this.loading = true
             })
         }
@@ -478,7 +478,7 @@ export default struct PasswordPage {
             this.enableCloudBackup = true
           }
         })
-        this.context.eventHub.on('refreshFilterPassword', async () => {
+        this.context.eventHub.on('refreshFilterPassword', () => {
           const data: Data = {
             nameKeyword: this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string,
             info: this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[],

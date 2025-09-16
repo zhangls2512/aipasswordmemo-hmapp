@@ -62,6 +62,8 @@ export default struct Filterpassword {
               }
               if (index !== 9) {
                 this.infoType = value
+              }
+              if (value !== '图标' && value !== 'MFA') {
                 this.infoArray = await getTypeInfoList(value)
               }
             })
@@ -79,7 +81,9 @@ export default struct Filterpassword {
                   this.infoTypeIndex = this.specialTypes.indexOf(value)
                   this.infoTypeValue = value
                 }
-                this.infoArray = await getTypeInfoList(value)
+                if (value !== '图标' && value !== 'MFA') {
+                  this.infoArray = await getTypeInfoList(value)
+                }
               })
           }
           if (this.infoType === '昵称') {

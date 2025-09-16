@@ -48,8 +48,10 @@ export default struct Passwordinfo {
                 Blank()
                   .width('5%')
                 Text(item.value)
+                  .copyOption(CopyOptions.LocalDevice)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .enableDataDetector(true)
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
