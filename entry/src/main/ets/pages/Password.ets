@@ -62,7 +62,6 @@ export default struct PasswordPage {
         startIcon: $r('app.media.delete'),
         content: '删除'
       })
-        .enabled(!item.info.some(itema => itema.type === '图标'))
         .onClick(async () => {
           const promptAction = this.getUIContext().getPromptAction()
           const data = await promptAction.showDialog({
@@ -311,7 +310,7 @@ export default struct PasswordPage {
               this.nameKeyword = value
               this.filterPasswordDataPreferences.putSync('nameKeyword', value)
             })
-            .onSubmit(async () => {
+            .onSubmit(() => {
               this.loading = true
             })
         }
@@ -339,7 +338,7 @@ export default struct PasswordPage {
                     .width('10%')
                     .onError((err) => {
                       promptAction.openToast({
-                        message: '发生错误，错误码：' + err.error?.code + '，错误信息：' + err.error?.message
+                        message: '发生错误，错误信息：' + err.error?.message
                       })
                     })
                 }
@@ -479,7 +478,7 @@ export default struct PasswordPage {
             this.enableCloudBackup = true
           }
         })
-        this.context.eventHub.on('refreshFilterPassword', async () => {
+        this.context.eventHub.on('refreshFilterPassword', () => {
           const data: Data = {
             nameKeyword: this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string,
             info: this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[],

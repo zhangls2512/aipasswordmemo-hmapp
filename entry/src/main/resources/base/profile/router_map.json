@@ -121,11 +121,6 @@
       "buildFunction": "AutocloudbackupsettingBuilder"
     },
     {
-      "name": "Cleardata",
-      "pageSourceFile": "src/main/ets/pages/Cleardata.ets",
-      "buildFunction": "CleardataBuilder"
-    },
-    {
       "name": "DataInOut",
       "pageSourceFile": "src/main/ets/pages/DataInOut.ets",
       "buildFunction": "DataInOutBuilder"

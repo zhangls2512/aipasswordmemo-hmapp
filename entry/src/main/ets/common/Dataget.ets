@@ -99,7 +99,7 @@ export async function getPasswordInfo(id: number) {
   return 'fail'
 }
 
-export async function getPasswordList(orderColumn: string = 'updateTime') {
+export async function getPasswordList() {
   try {
     const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
@@ -109,12 +109,6 @@ export async function getPasswordList(orderColumn: string = 'updateTime') {
       allowRebuild: true
     })
     const predicates = new relationalStore.RdbPredicates('password')
-    if (orderColumn === 'updateTime') {
-      predicates.orderByDesc('updateTime')
-    }
-    if (orderColumn === 'name') {
-      predicates.orderByAsc('name')
-    }
     const resultSet = await rdbStore.query(predicates)
     const idIndex = resultSet.getColumnIndex('id')
     const nameIndex = resultSet.getColumnIndex('name')

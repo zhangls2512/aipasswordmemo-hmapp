@@ -150,7 +150,13 @@ export default struct Updatepassword {
                 return
               }
               if (this.infoValue) {
-                fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                try {
+                  fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                } catch (err) {
+                  promptAction.openToast({
+                    message: '发生错误，错误码：' + err.code
+                  })
+                }
               }
               const passwordIconDir = this.context.filesDir + '/media/passwordicon'
               if (!fileIo.accessSync(passwordIconDir)) {
@@ -181,17 +187,31 @@ export default struct Updatepassword {
             { value: 'URL' },
             { value: '自定义' }
           ])
-            .enabled((this.infoType === '图标' && this.infoValue === '') || this.infoType !== '图标')
             .selected(this.infoTypeIndex!!)
             .value(this.infoTypeValue!!)
             .onSelect(async (index, value) => {
+              if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
+                try {
+                  fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                } catch (err) {
+                  promptAction.openToast({
+                    message: '发生错误，错误码：' + err.code
+                  })
+                }
+                this.infoValue = ''
+              }
               if (index !== 11) {
                 this.infoType = value
-                this.infoArray = await getTypeInfoList(value)
+              }
+              if (index === 0) {
+                this.infoValue = ''
               }
               if (index === 11) {
                 this.infoType = ''
                 this.infoArray = []
+              }
+              if (value !== '图标' && value !== 'MFA') {
+                this.infoArray = await getTypeInfoList(value)
               }
             })
           if (!this.specialTypes.includes(this.infoType)) {
@@ -208,7 +228,12 @@ export default struct Updatepassword {
                   this.infoTypeIndex = this.specialTypes.indexOf(value)
                   this.infoTypeValue = value
                 }
-                this.infoArray = await getTypeInfoList(value)
+                if (value === '图标') {
+                  this.infoValue = ''
+                }
+                if (value !== '图标' && value !== 'MFA') {
+                  this.infoArray = await getTypeInfoList(value)
+                }
               })
           }
           if (this.infoType === '图标') {
@@ -541,8 +566,25 @@ export default struct Updatepassword {
           Column() {
             Row() {
               Column() {
-                Text(item.value)
-                  .fontWeight(FontWeight.Medium)
+                if (item.type === '图标') {
+                  Image(item.value)
+                    .copyOption(CopyOptions.LocalDevice)
+                    .width('10%')
+                    .onError((err) => {
+                      promptAction.openToast({
+                        message: '发生错误，错误信息：' + err.error?.message
+                      })
+                    })
+                }
+                if (item.type === 'MFA') {
+                  Text('密钥：' + item.value.split('\0')[0] + '\n步长：' + item.value.split('\0')[1] + '\n位数：' +
+                  item.value.split('\0')[2])
+                    .fontWeight(FontWeight.Medium)
+                }
+                if (item.type !== '图标' && item.type !== 'MFA') {
+                  Text(item.value)
+                    .fontWeight(FontWeight.Medium)
+                }
                 Text(item.type)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))

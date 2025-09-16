@@ -6,13 +6,16 @@ import Password from './Password'
 import Info from './Info'
 import Tag from './Tag'
 import Me from './Me'
+import Cleardata from './Cleardata'
 
 @Entry
 @ComponentV2
 struct Index {
   @Local index: number = 0
   @Local title: string = '密码'
+  @Local isShowCleardataSheet: boolean = false
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  preferType = 1
 
   @Builder
   tabBuilder(index: number, image: Resource, title: string) {
@@ -28,6 +31,11 @@ struct Index {
           top: 4
         })
     }
+  }
+
+  @Builder
+  CleardataSheetBuilder() {
+    Cleardata()
   }
 
   build() {
@@ -109,6 +117,22 @@ struct Index {
     .padding({
       bottom: 36,
       top: 12
+    })
+    .onAppear(() => {
+      if (deviceInfo.deviceType === 'phone') {
+        this.preferType = 0
+      }
+      this.context.eventHub.on('clearData', () => {
+        if (!this.isShowCleardataSheet) {
+          this.isShowCleardataSheet = true
+        }
+      })
+    })
+    .bindSheet(this.isShowCleardataSheet!!, this.CleardataSheetBuilder(), {
+      preferType: this.preferType,
+      title: {
+        title: '清理数据'
+      }
     })
   }
 }

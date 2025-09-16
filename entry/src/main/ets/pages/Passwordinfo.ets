@@ -48,8 +48,10 @@ export default struct Passwordinfo {
                 Blank()
                   .width('5%')
                 Text(item.value)
+                  .copyOption(CopyOptions.LocalDevice)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .enableDataDetector(true)
                   .textAlign(TextAlign.End)
                   .width('50%')
               }
@@ -88,7 +90,7 @@ export default struct Passwordinfo {
                   .width('10%')
                   .onError((err) => {
                     promptAction.openToast({
-                      message: '发生错误，错误码：' + err.error?.code + '，错误信息：' + err.error?.message
+                      message: '发生错误，错误信息：' + err.error?.message
                     })
                   })
               }

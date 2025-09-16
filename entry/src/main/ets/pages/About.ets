@@ -32,31 +32,29 @@ struct About {
                 TapGesture({
                   count: 2
                 })
-                  .onAction(async (event) => {
-                    if (event) {
-                      const data = await promptAction.showActionMenu({
-                        title: '调试',
-                        buttons: [
-                          {
-                            text: '设置',
-                            color: $r('sys.color.font_primary')
-                          },
-                          {
-                            text: '信息',
-                            color: $r('sys.color.font_primary')
-                          }
-                        ]
+                  .onAction(async () => {
+                    const data = await promptAction.showActionMenu({
+                      title: '调试',
+                      buttons: [
+                        {
+                          text: '设置',
+                          color: $r('sys.color.font_primary')
+                        },
+                        {
+                          text: '信息',
+                          color: $r('sys.color.font_primary')
+                        }
+                      ]
+                    })
+                    if (data.index === 0) {
+                      this.pageInfos.pushPath({
+                        name: 'Debugsetting'
                       })
-                      if (data.index === 0) {
-                        this.pageInfos.pushPath({
-                          name: 'Debugsetting'
-                        })
-                      }
-                      if (data.index === 1) {
-                        promptAction.openToast({
-                          message: '暂未上线，敬请期待'
-                        })
-                      }
+                    }
+                    if (data.index === 1) {
+                      promptAction.openToast({
+                        message: '暂未上线，敬请期待'
+                      })
                     }
                   })
               )
