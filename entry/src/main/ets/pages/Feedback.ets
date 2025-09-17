@@ -1,4 +1,5 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import request from '../common/Request'
 
 @Builder
@@ -146,6 +147,13 @@ struct Feedback {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('意见反馈')
     .onReady((context) => {
       this.pageInfos = context.pathStack

@@ -3,6 +3,8 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 
+//import { HdsNavDestination } from '@kit.UIDesignKit'
+
 @Builder
 export function ServicemodeBuilder() {
   Servicemode()
@@ -130,6 +132,13 @@ struct Servicemode {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('应用服务模式')
     .onReady((context) => {
       this.pageInfos = context.pathStack

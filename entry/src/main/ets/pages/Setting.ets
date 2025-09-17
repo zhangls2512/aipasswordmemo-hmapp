@@ -4,6 +4,7 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { formProvider } from '@kit.FormKit'
+//import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
@@ -1135,6 +1136,14 @@ export default struct Setting {
     .padding({
       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
     })
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })
+    .titleMode(HdsNavigationTitleMode.MINI)*/
     .title('设置')
     .titleMode(NavigationTitleMode.Mini)
     .onAppear(() => {

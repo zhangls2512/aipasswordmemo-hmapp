@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getKey, removeKey, setRandomKey } from '../common/Crypto'
 import copy from '../common/Pasteboard'
 
@@ -222,6 +223,13 @@ struct Keypage {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('密钥')
     .onReady((context) => {
       this.pageInfos = context.pathStack
@@ -240,12 +248,12 @@ struct Keypage {
       const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
       if (disallowScreenshot) {
         const lastWindow = await window.getLastWindow(this.context)
-        lastWindow.setWindowPrivacyMode(true)
+        await lastWindow.setWindowPrivacyMode(true)
       }
     })
     .onHidden(async () => {
       const lastWindow = await window.getLastWindow(this.context)
-      lastWindow.setWindowPrivacyMode(false)
+      await lastWindow.setWindowPrivacyMode(false)
     })
   }
 }

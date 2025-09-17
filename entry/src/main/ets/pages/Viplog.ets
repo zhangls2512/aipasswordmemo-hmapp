@@ -1,5 +1,6 @@
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -203,6 +204,13 @@ struct Viplog {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('会员开通记录')
     .onAppear(async () => {
       this.accessToken = await get()

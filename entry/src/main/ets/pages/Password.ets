@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
+import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
@@ -194,7 +195,7 @@ export default struct PasswordPage {
                   const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
                   if (disallowScreenshot) {
                     const lastWindow = await window.getLastWindow(this.context)
-                    lastWindow.setWindowPrivacyMode(true)
+                    await lastWindow.setWindowPrivacyMode(true)
                   }
                 }),
                 onDisappear: (async () => {
@@ -230,6 +231,12 @@ export default struct PasswordPage {
               .margin({
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
               .bindMenu([
                 {
                   value: '修改时间',
@@ -252,6 +259,12 @@ export default struct PasswordPage {
               })
             Button('筛选')
               .buttonStyle(ButtonStyleMode.NORMAL)
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
               .onClick(() => {
                 this.isShowFilterSheet = true
               })
@@ -267,13 +280,13 @@ export default struct PasswordPage {
                   const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
                   if (disallowScreenshot) {
                     const lastWindow = await window.getLastWindow(this.context)
-                    lastWindow.setWindowPrivacyMode(true)
+                    await lastWindow.setWindowPrivacyMode(true)
                   }
                 }),
                 onDisappear: (async () => {
                   if (!this.showPassword) {
                     const lastWindow = await window.getLastWindow(this.context)
-                    lastWindow.setWindowPrivacyMode(false)
+                    await lastWindow.setWindowPrivacyMode(false)
                   }
                 }),
                 onWillDismiss: (async (DismissSheetAction) => {
@@ -420,7 +433,7 @@ export default struct PasswordPage {
               const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
               if (disallowScreenshot) {
                 const lastWindow = await window.getLastWindow(this.context)
-                lastWindow.setWindowPrivacyMode(true)
+                await lastWindow.setWindowPrivacyMode(true)
               }
             }),
             onDisappear: (async () => {
@@ -513,7 +526,7 @@ export default struct PasswordPage {
           const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
           if (disallowScreenshot) {
             const lastWindow = await window.getLastWindow(this.context)
-            lastWindow.setWindowPrivacyMode(true)
+            await lastWindow.setWindowPrivacyMode(true)
           }
         }),
         onDisappear: (async () => {

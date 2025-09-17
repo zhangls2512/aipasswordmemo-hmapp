@@ -1,4 +1,5 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -223,6 +224,13 @@ struct Cloudbackupmanage {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('管理云备份')
     .onAppear(async () => {
       this.accessToken = await get()

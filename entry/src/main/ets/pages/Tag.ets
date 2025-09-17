@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
+import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
@@ -168,6 +169,12 @@ export default struct TagPage {
             Blank()
             Button('按' + this.orderColumnText + '排序')
               .buttonStyle(ButtonStyleMode.NORMAL)
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
               .bindMenu([
                 {
                   value: '修改时间',
@@ -195,17 +202,6 @@ export default struct TagPage {
           bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
-        if (this.loading) {
-          ListItem() {
-            LoadingProgress()
-              .width('10%')
-          }
-          .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-          .width('100%')
-        }
         ForEach(this.tagArray, (item: Tag) => {
           ListItem() {
             Column() {

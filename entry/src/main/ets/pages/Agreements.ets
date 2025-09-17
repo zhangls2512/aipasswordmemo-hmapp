@@ -1,5 +1,6 @@
 import { privacyManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import openLink from '../common/Openlink'
 
 @Builder
@@ -60,6 +61,13 @@ struct Agreements {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('服务协议与规则')
   }
 }

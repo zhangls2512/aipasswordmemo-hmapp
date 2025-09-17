@@ -6,6 +6,7 @@ import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { generateBarcode, scanCore } from '@kit.ScanKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
+import { hdsEffect } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
 import copy from '../common/Pasteboard'
@@ -26,13 +27,6 @@ struct Invite {
   @Local accessToken: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-  shareData = new systemShare.SharedData({
-    utd: uniformTypeDescriptor.UniformDataType.HYPERLINK,
-    title: '邀请您使用轩铭密码智能备忘录',
-    description: '邀请您使用轩铭密码智能备忘录，方便、智能地记录、管理密码。',
-    thumbnail: this.context.resourceManager.getMediaByNameSync('icon'),
-    content: 'https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode
-  })
 
   build() {
     NavDestination() {
@@ -63,12 +57,19 @@ struct Invite {
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                 })
                 .onClick(() => {
-                  const shareController = new systemShare.ShareController(this.shareData)
+                  const shareData = new systemShare.SharedData({
+                    utd: uniformTypeDescriptor.UniformDataType.HYPERLINK,
+                    title: '邀请您使用轩铭密码智能备忘录',
+                    description: '邀请您使用轩铭密码智能备忘录，方便、智能地记录、管理密码。',
+                    thumbnail: this.context.resourceManager.getMediaByNameSync('icon'),
+                    content: 'https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode
+                  })
+                  const shareController = new systemShare.ShareController(shareData)
                   shareController.show(this.context, {})
                 })
               Row() {
                 Text('邀请二维码')
-                  .fontWeight(FontWeight.Medium)
+                  .fontWeight(FontWeight.Bold)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
@@ -112,6 +113,12 @@ struct Invite {
                   })
                 Button('保存')
                   .buttonStyle(ButtonStyleMode.NORMAL)
+                  .visualEffect(new hdsEffect.HdsEffectBuilder()
+                    .pointLight({
+                      sourceType: hdsEffect.PointLightSourceType.SOFT,
+                      illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                    })
+                    .buildEffect())
                   .onClick(async () => {
                     const qrcodeDir = this.context.filesDir + '/media/invitationqrcode'
                     const qrcodePath = qrcodeDir + '/' + this.invitationcode + '.png'
@@ -164,6 +171,10 @@ struct Invite {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
 
+              QRCode('https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode)
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                })
               Row() {
                 Text('已邀请新用户数')
                   .fontWeight(FontWeight.Bold)
@@ -311,6 +322,13 @@ struct Invite {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('邀请新用户，免费得会员')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
@@ -324,11 +342,18 @@ struct Invite {
         })
         if (userres !== 'fail') {
           this.invitationcode = JSON.parse(userres).data.invitationCode as string
+          const shareData = new systemShare.SharedData({
+            utd: uniformTypeDescriptor.UniformDataType.HYPERLINK,
+            title: '邀请您使用轩铭密码智能备忘录',
+            description: '邀请您使用轩铭密码智能备忘录，方便、智能地记录、管理密码。',
+            thumbnail: this.context.resourceManager.getMediaByNameSync('icon'),
+            content: 'https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode
+          })
           harmonyShare.on('knockShare', (sharableTarget) => {
-            sharableTarget.share(this.shareData)
+            sharableTarget.share(shareData)
           })
           harmonyShare.on('gesturesShare', (sharableTarget) => {
-            sharableTarget.share(this.shareData)
+            sharableTarget.share(shareData)
           })
         }
         const countres = await request('/product/getInviteUserCount', {

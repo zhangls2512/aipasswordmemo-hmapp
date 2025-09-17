@@ -1,4 +1,5 @@
 import { promptAction } from '@kit.ArkUI'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import openLink from '../common/Openlink'
 
 interface Item {
@@ -50,7 +51,7 @@ struct License {
     {
       property: '深色模式',
       value: '轩铭2512适备12号-5S',
-      desc: '界面跟随“我的”>“设置”>“通用”>“深色模式”设置改变颜色主题'
+      desc: '界面跟随“我的”>“设置”>“通用”>“通用”>“界面”>“深色模式”设置改变颜色主题'
     }
   ]
 
@@ -441,6 +442,13 @@ struct License {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('资质证照')
   }
 }

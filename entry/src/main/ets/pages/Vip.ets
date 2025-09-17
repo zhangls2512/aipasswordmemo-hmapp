@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { netBoost } from '@kit.NetworkBoostKit'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { get, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -463,6 +464,13 @@ struct Vip {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('会员中心')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

@@ -1,4 +1,5 @@
 import { preferences } from '@kit.ArkData'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { backupTable, recoveryTable } from '../common/Table'
 
 interface Type {
@@ -335,6 +336,13 @@ struct DataBackupRecovery {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('数据备份与恢复')
     .onAppear(() => {
       this.getSetting()
