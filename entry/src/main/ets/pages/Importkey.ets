@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { window } from '@kit.ArkUI'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { setCustomKey } from '../common/Crypto'
 
 @Builder
@@ -50,6 +51,13 @@ struct Importkey {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('导入自定义密钥')
     .onReady((context) => {
       this.pageInfos = context.pathStack
@@ -61,12 +69,12 @@ struct Importkey {
       const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
       if (disallowScreenshot) {
         const lastWindow = await window.getLastWindow(this.context)
-        lastWindow.setWindowPrivacyMode(true)
+        await lastWindow.setWindowPrivacyMode(true)
       }
     })
     .onHidden(async () => {
       const lastWindow = await window.getLastWindow(this.context)
-      lastWindow.setWindowPrivacyMode(false)
+      await lastWindow.setWindowPrivacyMode(false)
     })
   }
 }

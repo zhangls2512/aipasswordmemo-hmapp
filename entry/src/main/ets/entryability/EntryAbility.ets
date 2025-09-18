@@ -29,10 +29,59 @@ import request from '../common/Request'
 
 export default class EntryAbility extends UIAbility {
   async appInit(want: Want) {
-    const accessToken = await get()
-    if (notificationManager.isNotificationEnabledSync()) {
-      notificationManager.setBadgeNumber(0)
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    const iconMode = commonSettingDataPreferences.getSync('iconMode', 1)
+    const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
+    if (iconMode === 0) {
+      if (colorMode === 0) {
+        const systemColorMode = uiAppearance.getDarkMode()
+        if (systemColorMode === 0) {
+          await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+        }
+        if (systemColorMode === 1) {
+          try {
+            await appInfoManager.disableDynamicIcon()
+          } catch (err) {
+            if (err.code !== 1006800012) {
+              promptAction.openToast({
+                message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+              })
+            }
+          }
+        }
+      }
+      if (colorMode === 1) {
+        try {
+          await appInfoManager.disableDynamicIcon()
+        } catch (err) {
+          if (err.code !== 1006800012) {
+            promptAction.openToast({
+              message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+            })
+          }
+        }
+      }
+      if (colorMode === 2) {
+        await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+      }
     }
+    if (iconMode === 1) {
+      try {
+        await appInfoManager.disableDynamicIcon()
+      } catch (err) {
+        if (err.code !== 1006800012) {
+          promptAction.openToast({
+            message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+          })
+        }
+      }
+    }
+    if (iconMode === 2) {
+      await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+    }
+    await notificationManager.setBadgeNumber(0)
     if (want.parameters?.noticeUrl) {
       openLink(want.parameters.noticeUrl as string)
     }
@@ -93,6 +142,7 @@ export default class EntryAbility extends UIAbility {
         const urires = new uri.URI(want.uri)
         const invitationCode = urires.getQueryValue('invitationcode')
         const vipCode = urires.getQueryValue('vipcode')
+        const accessToken = await get()
         if (invitationCode) {
           if (accessToken) {
             const deviceToken = await getDeviceToken()
@@ -104,14 +154,28 @@ export default class EntryAbility extends UIAbility {
                 invitationcode: invitationCode
               })
               if (res !== 'fail') {
-                promptAction.openToast({
-                  message: '邀请码使用成功'
+                promptAction.showDialog({
+                  title: '提示',
+                  message: '邀请码使用成功',
+                  buttons: [
+                    {
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
                 })
               }
             }
           } else {
-            promptAction.openToast({
-              message: '邀请码使用失败，原因：未登录账号'
+            promptAction.showDialog({
+              title: '提示',
+              message: '邀请码使用失败，原因：未登录账号',
+              buttons: [
+                {
+                  text: '确定',
+                  color: $r('sys.color.font_emphasize')
+                }
+              ]
             })
           }
         }
@@ -122,13 +186,27 @@ export default class EntryAbility extends UIAbility {
               vipcode: vipCode
             })
             if (res !== 'fail') {
-              promptAction.openToast({
-                message: '兑换码使用成功'
+              promptAction.showDialog({
+                title: '提示',
+                message: '兑换码使用成功',
+                buttons: [
+                  {
+                    text: '确定',
+                    color: $r('sys.color.font_emphasize')
+                  }
+                ]
               })
             }
           } else {
-            promptAction.openToast({
-              message: '兑换码使用失败，原因：未登录账号'
+            promptAction.showDialog({
+              title: '提示',
+              message: '兑换码使用失败，原因：未登录账号',
+              buttons: [
+                {
+                  text: '确定',
+                  color: $r('sys.color.font_emphasize')
+                }
+              ]
             })
           }
         }
@@ -145,9 +223,11 @@ export default class EntryAbility extends UIAbility {
       await windowStage.setWindowRectAutoSave(windowRectAutoSave)
     }
     await windowStage.loadContent('pages/Index')
-    const lastWindow = await window.getLastWindow(this.context)
-    const windowTopmost = commonSettingDataPreferences.getSync('windowTopmost', false) as boolean
-    await lastWindow.setWindowTopmost(windowTopmost)
+    if (deviceInfo.deviceType !== 'phone') {
+      const lastWindow = await window.getLastWindow(this.context)
+      const windowTopmost = commonSettingDataPreferences.getSync('windowTopmost', false) as boolean
+      await lastWindow.setWindowTopmost(windowTopmost)
+    }
     if (!notificationManager.isNotificationEnabledSync()) {
       notificationManager.requestEnableNotification(this.context)
     }
@@ -179,31 +259,6 @@ export default class EntryAbility extends UIAbility {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
     })
-    const iconMode = commonSettingDataPreferences.getSync('iconMode', 1)
-    const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
-    if (iconMode === 0) {
-      if (colorMode === 0) {
-        const systemColorMode = uiAppearance.getDarkMode()
-        if (systemColorMode === 0) {
-          await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-        }
-        if (systemColorMode === 1) {
-          await appInfoManager.disableDynamicIcon()
-        }
-      }
-      if (colorMode === 1) {
-        await appInfoManager.disableDynamicIcon()
-      }
-      if (colorMode === 2) {
-        await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-      }
-    }
-    if (iconMode === 1) {
-      await appInfoManager.disableDynamicIcon()
-    }
-    if (iconMode === 2) {
-      await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-    }
     const allowContinue = commonSettingDataPreferences.getSync('allowContinue', true)
     if (!allowContinue) {
       await this.context.setMissionContinueState(AbilityConstant.ContinueState.INACTIVE)
@@ -214,6 +269,7 @@ export default class EntryAbility extends UIAbility {
     const allowRestore = commonSettingDataPreferences.getSync('allowRestore', true) as boolean
     this.context.setRestoreEnabled(allowRestore)
     const applicationContext = this.context.getApplicationContext()
+    const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
     if (colorMode === 0) {
       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
     }
@@ -228,17 +284,16 @@ export default class EntryAbility extends UIAbility {
     })
     const processCache = debugSettingDataPreferences.getSync('processCache', true) as boolean
     applicationContext.setSupportedProcessCache(processCache)
-    const globalErrorShowType = debugSettingDataPreferences.getSync('globalErrorShowType', 0)
     errorManager.on('error', {
       onUnhandledException(errMsg) {
-        if (globalErrorShowType === 0) {
+        if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 0) {
           promptAction.openToast({
             message: 'js 运行异常：' + errMsg
           })
         }
       },
       onException(err) {
-        if (globalErrorShowType === 1) {
+        if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 1) {
           let message = '名称：' + err.name + '\n信息：' + err.message
           if (typeof (err.stack) === 'string') {
             message = message + '\n堆栈：' + err.stack
@@ -257,12 +312,12 @@ export default class EntryAbility extends UIAbility {
       }
     })
     errorManager.on('unhandledRejection', (err: Error) => {
-      if (globalErrorShowType === 0) {
+      if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 0) {
         promptAction.openToast({
           message: 'js 运行异常，错误名称：' + err.name + '，错误信息：' + err.message + '，错误堆栈：' + err.stack
         })
       }
-      if (globalErrorShowType === 1) {
+      if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 1) {
         let message = '名称：' + err.name + '\n信息：' + err.message
         if (typeof (err.stack) === 'string') {
           message = message + '\n堆栈：' + err.stack
@@ -288,18 +343,6 @@ export default class EntryAbility extends UIAbility {
         }
       ],
       onReceive: (domain, appEventGroups) => {
-        const autoUploadErrorLogType = debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
-          'APP_CRASH',
-          'APP_FREEZE',
-          'APP_KILLED',
-          'APP_LAUNCH',
-          'RESOURCE_OVERLIMIT',
-          'ADDRESS_SANITIZER',
-          'MAIN_THREAD_JANK',
-          'SCROLL_JANK',
-          'CPU_USAGE_HIGH',
-          'BATTERY_USAGE'
-        ]) as string[]
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
           const errorLogDir = this.context.filesDir + '/log/error'
           if (!fileIo.accessSync(errorLogDir)) {
@@ -315,7 +358,18 @@ export default class EntryAbility extends UIAbility {
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
           appEventGroups.map(async (item) => {
-            if (autoUploadErrorLogType.includes(item.name)) {
+            if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
+              'APP_CRASH',
+              'APP_FREEZE',
+              'APP_KILLED',
+              'APP_LAUNCH',
+              'RESOURCE_OVERLIMIT',
+              'ADDRESS_SANITIZER',
+              'MAIN_THREAD_JANK',
+              'SCROLL_JANK',
+              'CPU_USAGE_HIGH',
+              'BATTERY_USAGE'
+            ]) as string[]).includes(item.name)) {
               const res = await request('/debug/newErrorLog', {
                 key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
                 object: item
@@ -546,7 +600,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 16) {
+    if (wantParam.version !== 17) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

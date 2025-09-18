@@ -4,6 +4,8 @@ import { preferences } from '@kit.ArkData'
 import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 
+//import { HdsNavDestination } from '@kit.UIDesignKit'
+
 @Builder
 export function CommonsettingBuilder() {
   Commonsetting()
@@ -357,29 +359,31 @@ struct Commonsetting {
                 .padding(12)
                 .width('100%')
               }
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('窗口置顶')
-                  .fontWeight(FontWeight.Medium)
-                Blank()
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: this.windowTopmost!!
-                })
-                  .onChange(async (isOn) => {
-                    const lastWindow = await window.getLastWindow(this.context)
-                    await lastWindow.setWindowTopmost(isOn)
-                    this.commonSettingDataPreferences.putSync('windowTopmost', isOn)
-                    this.commonSettingDataPreferences.flushSync()
+              if (deviceInfo.deviceType !== 'phone') {
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
                   })
+                Row() {
+                  Text('窗口置顶')
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.windowTopmost!!
+                  })
+                    .onChange(async (isOn) => {
+                      const lastWindow = await window.getLastWindow(this.context)
+                      await lastWindow.setWindowTopmost(isOn)
+                      this.commonSettingDataPreferences.putSync('windowTopmost', isOn)
+                      this.commonSettingDataPreferences.flushSync()
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
               }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
 
               Divider()
                 .padding({
@@ -564,6 +568,13 @@ struct Commonsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('通用')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

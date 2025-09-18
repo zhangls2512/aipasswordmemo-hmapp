@@ -1,5 +1,6 @@
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackimport'
 import { getKey } from '../common/Crypto'
 
@@ -167,7 +168,7 @@ struct Cloudbackupimport {
                 if (!getKey()) {
                   promptAction.showDialog({
                     title: '导入失败',
-                    message: '未导入密钥。请前往“我的”>“设置”>“密钥”导入密钥',
+                    message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
                     buttons: [
                       {
                         text: '确定',
@@ -214,7 +215,7 @@ struct Cloudbackupimport {
                 if (!getKey()) {
                   promptAction.showDialog({
                     title: '导入失败',
-                    message: '未导入密钥。请前往“我的”>“设置”>“密钥”导入密钥',
+                    message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
                     buttons: [
                       {
                         text: '确定',
@@ -261,7 +262,7 @@ struct Cloudbackupimport {
                 if (!getKey()) {
                   promptAction.showDialog({
                     title: '导入失败',
-                    message: '未导入密钥。请前往“我的”>“设置”>“密钥”导入密钥',
+                    message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
                     buttons: [
                       {
                         text: '确定',
@@ -296,6 +297,13 @@ struct Cloudbackupimport {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('导入云备份')
     .onAppear(() => {
       this.getSetting()

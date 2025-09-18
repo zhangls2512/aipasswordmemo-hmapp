@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { read } from '../common/File'
 import copy from '../common/Pasteboard'
 
@@ -287,6 +288,13 @@ struct Errorlog {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('故障日志')
     .onAppear(() => {
       this.get()

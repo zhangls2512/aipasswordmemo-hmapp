@@ -2,6 +2,8 @@ import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { webview } from '@kit.ArkWeb'
 
+//import { HdsNavDestination } from '@kit.UIDesignKit'
+
 @Builder
 export function WebviewBuilder() {
   Webview()
@@ -49,6 +51,13 @@ struct Webview {
         })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle:
+        }
+      }
+    })*/
     .title(this.title)
     .onReady((context) => {
       this.url = context.pathInfo.param as string

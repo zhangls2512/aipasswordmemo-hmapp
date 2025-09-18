@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
+import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo, remove } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
@@ -107,7 +108,7 @@ export default struct Me {
               const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
               if (disallowScreenshot) {
                 const lastWindow = await window.getLastWindow(this.context)
-                lastWindow.setWindowPrivacyMode(true)
+                await lastWindow.setWindowPrivacyMode(true)
               }
             }),
             onDisappear: (async () => {
@@ -135,10 +136,10 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor($r('sys.color.comp_background_primary'))
               },
               pressed: {
-                .backgroundColor($r('sys.color.interactive_pressed'))
+                .backgroundColor($r('sys.color.comp_background_secondary'))
               }
             })
             .width('100%')
@@ -171,10 +172,10 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor($r('sys.color.comp_background_primary'))
               },
               pressed: {
-                .backgroundColor($r('sys.color.interactive_pressed'))
+                .backgroundColor($r('sys.color.comp_background_secondary'))
               }
             })
             .width('100%')
@@ -240,12 +241,12 @@ export default struct Me {
                 const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
-                  lastWindow.setWindowPrivacyMode(true)
+                  await lastWindow.setWindowPrivacyMode(true)
                 }
               }),
               onDisappear: (async () => {
                 const lastWindow = await window.getLastWindow(this.context)
-                lastWindow.setWindowPrivacyMode(false)
+                await lastWindow.setWindowPrivacyMode(false)
               })
             })
 
@@ -296,12 +297,12 @@ export default struct Me {
                 const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
-                  lastWindow.setWindowPrivacyMode(true)
+                  await lastWindow.setWindowPrivacyMode(true)
                 }
               }),
               onDisappear: (async () => {
                 const lastWindow = await window.getLastWindow(this.context)
-                lastWindow.setWindowPrivacyMode(false)
+                await lastWindow.setWindowPrivacyMode(false)
               })
             })
           }
@@ -425,6 +426,12 @@ export default struct Me {
           Button('退出登录')
             .buttonStyle(ButtonStyleMode.NORMAL)
             .fontColor($r('sys.color.warning'))
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
             .onClick(async () => {
               const data = await promptAction.showDialog({
                 title: '提示',

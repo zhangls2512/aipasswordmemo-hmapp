@@ -2,6 +2,7 @@ import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { netBoost } from '@kit.NetworkBoostKit'
+import { hdsEffect } from '@kit.UIDesignKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -218,6 +219,12 @@ export default struct Login {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
               .width('100%')
               .onClick(async () => {
                 if (!this.email) {
