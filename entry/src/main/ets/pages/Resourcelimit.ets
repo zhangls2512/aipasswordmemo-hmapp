@@ -1,6 +1,8 @@
 import { promptAction } from '@kit.ArkUI'
 import { hidebug } from '@kit.PerformanceAnalysisKit'
 
+//import { HdsNavDestination } from '@kit.UIDesignKit'
+
 @Builder
 export function ResourcelimitBuilder() {
   Resourcelimit()
@@ -168,6 +170,13 @@ struct Resourcelimit {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('应用资源限制设置')
     .onReady((context) => {
       this.pageInfos = context.pathStack

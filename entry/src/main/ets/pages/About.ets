@@ -1,8 +1,9 @@
 import { common } from '@kit.AbilityKit'
 import { FunctionComponent, FunctionController } from '@kit.AgentFrameworkKit'
-import { commentManager, updateManager } from '@kit.AppGalleryKit'
+import { updateManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
 import { call } from '@kit.TelephonyKit'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
 
@@ -290,13 +291,14 @@ struct About {
             })
             .width('100%')
             .onClick(() => {
-              try {
-                commentManager.showCommentDialog(this.context)
+              this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+              /*try {
+                await commentManager.showCommentDialog(this.context)
               } catch (err) {
                 promptAction.openToast({
                   message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
-              }
+              }*/
             })
 
             Divider()
@@ -356,6 +358,7 @@ struct About {
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
+          .width('100%')
         }
 
         ListItem() {
@@ -740,6 +743,13 @@ struct About {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('关于')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

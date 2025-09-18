@@ -1,5 +1,7 @@
 import { common } from '@kit.AbilityKit'
 
+//import { HdsNavDestination } from '@kit.UIDesignKit'
+
 @Builder
 export function MoresettingBuilder() {
   Moresetting()
@@ -132,6 +134,13 @@ struct Moresetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('其他')
     .onDisAppear(() => {
       this.context.eventHub.emit('refreshSetting')

@@ -17,7 +17,7 @@ export default async function request(path: string, body: rcp.RequestContent, hi
   if (!allService) {
     promptAction.showDialog({
       title: '全量模式未开启',
-      message: '全量模式未开启，无法使用在线功能。如需使用在线功能，请前往“我的”>“设置”>“应用服务模式”，开启全量模式。',
+      message: '全量模式未开启，无法使用在线功能。如需使用在线功能，请前往“我的”>“设置”>“更多”>“应用服务模式”，开启全量模式。',
       buttons: [
         {
           text: '确定',
@@ -44,7 +44,7 @@ export default async function request(path: string, body: rcp.RequestContent, hi
       if (res.errCode === 3061 && !hideDialog) {
         promptAction.showDialog({
           title: '提示',
-          message: '此华为账号未绑定轩铭 2512 统一账号。请您使用其他验证方式 (密码、MFA、邮箱验证码) 登录轩铭 2512 统一账号，依次进入“设置”>“绑定华为账号”，绑定华为账号后即可使用华为账号登录。',
+          message: '此华为账号未绑定轩铭 2512 统一账号。请您使用其他验证方式 (密码、MFA、邮箱验证码) 登录轩铭 2512 统一账号，依次进入“设置”>“账号”>“绑定华为账号”，绑定华为账号后即可使用华为账号登录。',
           buttons: [
             {
               text: '确定',

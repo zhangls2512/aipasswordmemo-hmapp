@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import request from '../common/Request'
@@ -132,6 +133,13 @@ struct Cloudservice {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle:
+        }
+      }
+    })*/
     .title(this.cloudService ? '取消开通云服务' : '开通云服务')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

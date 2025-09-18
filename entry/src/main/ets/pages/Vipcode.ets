@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
-import { commentManager } from '@kit.AppGalleryKit'
+//import { commentManager } from '@kit.AppGalleryKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -72,13 +73,14 @@ struct Vipcode {
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })
               .onClick(() => {
-                try {
-                  commentManager.showCommentDialog(this.context)
+                this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+                /*try {
+                  await commentManager.showCommentDialog(this.context)
                 } catch (err) {
                   promptAction.openToast({
                     message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                   })
-                }
+                }*/
               })
             Text('· 提供有效反馈')
               .fontColor($r('sys.color.font_emphasize'))
@@ -127,6 +129,13 @@ struct Vipcode {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('兑换会员')
     .onReady((context) => {
       this.pageInfos = context.pathStack

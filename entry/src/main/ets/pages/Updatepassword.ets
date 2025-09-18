@@ -11,6 +11,7 @@ import {
   CollaborationServiceStateDialog,
   createCollaborationServiceMenuItems
 } from '@kit.ServiceCollaborationKit'
+import { hdsEffect } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { updatePassword } from '../common/Datachange'
@@ -242,6 +243,12 @@ export default struct Updatepassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
               .bindMenu(this.ChooseImageMenu, {
                 hapticFeedbackMode: HapticFeedbackMode.AUTO
               })
@@ -508,6 +515,12 @@ export default struct Updatepassword {
             if (this.infoType === 'MFA') {
               Button('扫码添加')
                 .buttonStyle(ButtonStyleMode.NORMAL)
+                .visualEffect(new hdsEffect.HdsEffectBuilder()
+                  .pointLight({
+                    sourceType: hdsEffect.PointLightSourceType.SOFT,
+                    illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                  })
+                  .buildEffect())
                 .onClick(async () => {
                   if (this.passwordInfoArray.some(item => item.type === 'MFA')) {
                     promptAction.openToast({
@@ -876,7 +889,7 @@ export default struct Updatepassword {
       }
       if (res) {
         if (!key) {
-          this.alertText = '未导入密钥，云备份不可用。请前往“我的”>“设置”>“密钥”导入密钥'
+          this.alertText = '未导入密钥，云备份不可用。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥'
         }
         if (key) {
           this.allowCloudBackup = true

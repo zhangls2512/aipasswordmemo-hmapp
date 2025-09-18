@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { hdsEffect } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -186,6 +187,12 @@ struct Huaweiaccount {
                   .margin({
                     top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                   })
+                  .visualEffect(new hdsEffect.HdsEffectBuilder()
+                    .pointLight({
+                      sourceType: hdsEffect.PointLightSourceType.SOFT,
+                      illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                    })
+                    .buildEffect())
                   .width('100%')
                   .onClick(async () => {
                     const dialogControllerProgress = new CustomDialogController({
@@ -343,6 +350,13 @@ struct Huaweiaccount {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle:
+        }
+      }
+    })*/
     .title(this.isBind ? '解绑华为账号' : '绑定华为账号')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

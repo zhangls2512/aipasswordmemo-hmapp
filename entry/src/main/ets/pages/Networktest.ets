@@ -1,6 +1,8 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { rcp } from '@kit.RemoteCommunicationKit'
 
+//import { HdsNavDestination } from '@kit.UIDesignKit'
+
 interface Response {
   errCode: number,
   errMsg: string,
@@ -351,6 +353,13 @@ struct Networktest {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    /*.titleBar({
+      content: {
+        title: {
+          mainTitle: ''
+        }
+      }
+    })*/
     .title('网络测试')
   }
 }
