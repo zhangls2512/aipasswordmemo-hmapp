@@ -77,11 +77,12 @@ struct Index {
         }
         .tabBar(this.tabBuilder(3, $r('app.media.me'), '我的'))
       }
-      .barOverlap(true)
+      .barOverlap(deviceInfo.deviceType === 'phone' ? true : false)
       .barPosition(deviceInfo.deviceType === 'phone' ? BarPosition.End : BarPosition.Start)
       /*.divider({
         mode: DividerMode.FOLLOW_SCROLL
       })*/
+      .scrollable(deviceInfo.deviceType === 'phone' ? true : false)
       .vertical(deviceInfo.deviceType === 'phone' ? false : true)
       .onAnimationStart(async (index, targetIndex) => {
         if (targetIndex !== 1) {
