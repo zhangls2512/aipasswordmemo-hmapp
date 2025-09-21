@@ -14,7 +14,7 @@ export default struct Updateinfo {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  specialTypes: string[] = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
+  specialInfoTypes: string[] = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   build() {
     List() {
@@ -129,7 +129,7 @@ export default struct Updateinfo {
               })
               .type(InputType.URL)
           }
-          if (!this.specialTypes.includes(this.infoType)) {
+          if (!this.specialInfoTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -181,34 +181,32 @@ export default struct Updateinfo {
       })
 
       ListItem() {
-        Column() {
-          Button('修改')
-            .onClick(async () => {
-              if (!this.infoType) {
-                promptAction.openToast({
-                  message: '请输入类型'
-                })
-                return
-              }
-              if (!this.infoValue) {
-                promptAction.openToast({
-                  message: '请输入内容'
-                })
-                return
-              }
-              await updateInfo(this.infoId, {
-                type: this.infoType,
-                value: this.infoValue,
-                cloudBackup: this.cloudBackup
+        Button('修改')
+          .onClick(async () => {
+            if (!this.infoType) {
+              promptAction.openToast({
+                message: '请输入类型'
               })
-              this.isShowUpdateSheet = false
+              return
+            }
+            if (!this.infoValue) {
+              promptAction.openToast({
+                message: '请输入内容'
+              })
+              return
+            }
+            await updateInfo(this.infoId, {
+              type: this.infoType,
+              value: this.infoValue,
+              cloudBackup: this.cloudBackup
             })
-        }
-        .width('100%')
+            this.isShowUpdateSheet = false
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
+      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

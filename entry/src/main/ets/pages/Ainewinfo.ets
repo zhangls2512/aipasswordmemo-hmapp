@@ -28,47 +28,49 @@ export default struct Ainewinfo {
 
   async getList(value: string) {
     this.list = []
-    const entity = await textProcessing.getEntity(value, {
-      entityTypes: [
-        EntityType.EMAIL,
-        EntityType.NAME,
-        EntityType.PHONE_NO,
-        EntityType.URL,
-        EntityType.ID_NO
-      ]
-    })
-    entity.forEach((item) => {
-      if (item.type === EntityType.EMAIL) {
-        this.list.push({
-          type: '邮箱',
-          value: item.text
-        })
-      }
-      if (item.type === EntityType.NAME) {
-        this.list.push({
-          type: '姓名',
-          value: item.text
-        })
-      }
-      if (item.type === EntityType.PHONE_NO) {
-        this.list.push({
-          type: '手机号',
-          value: item.text
-        })
-      }
-      if (item.type === EntityType.URL) {
-        this.list.push({
-          type: 'URL',
-          value: item.text
-        })
-      }
-      if (item.type === EntityType.ID_NO) {
-        this.list.push({
-          type: '身份证号',
-          value: item.text
-        })
-      }
-    })
+    if (value) {
+      const entity = await textProcessing.getEntity(value, {
+        entityTypes: [
+          EntityType.EMAIL,
+          EntityType.NAME,
+          EntityType.PHONE_NO,
+          EntityType.URL,
+          EntityType.ID_NO
+        ]
+      })
+      entity.forEach((item) => {
+        if (item.type === EntityType.EMAIL) {
+          this.list.push({
+            type: '邮箱',
+            value: item.text
+          })
+        }
+        if (item.type === EntityType.NAME) {
+          this.list.push({
+            type: '姓名',
+            value: item.text
+          })
+        }
+        if (item.type === EntityType.PHONE_NO) {
+          this.list.push({
+            type: '手机号',
+            value: item.text
+          })
+        }
+        if (item.type === EntityType.URL) {
+          this.list.push({
+            type: 'URL',
+            value: item.text
+          })
+        }
+        if (item.type === EntityType.ID_NO) {
+          this.list.push({
+            type: '身份证号',
+            value: item.text
+          })
+        }
+      })
+    }
   }
 
   @Builder
@@ -258,8 +260,8 @@ export default struct Ainewinfo {
 
       ListItem() {
         Text('AI识别结果')
-          .fontWeight(FontWeight.Medium)
           .enableAutoSpacing(true)
+          .fontWeight(FontWeight.Medium)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')

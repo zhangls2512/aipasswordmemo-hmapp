@@ -206,6 +206,7 @@ export default struct PasswordPage {
                   this.loading = true
                 }),
                 onWillDismiss: (async (DismissSheetAction) => {
+                  const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showDialog({
                     title: '提示',
                     message: '数据尚未保存，确定退出？',
@@ -290,6 +291,7 @@ export default struct PasswordPage {
                   }
                 }),
                 onWillDismiss: (async (DismissSheetAction) => {
+                  const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showDialog({
                     title: '提示',
                     message: '数据尚未保存，确定退出？',
@@ -351,12 +353,13 @@ export default struct PasswordPage {
                     .width('10%')
                     .onError((err) => {
                       promptAction.openToast({
-                        message: '发生错误，错误信息：' + err.error?.message
+                        message: '发生错误，错误信息：' + err.message
                       })
                     })
                 }
                 Column() {
                   Text(item.name)
+                    .enableAutoSpacing(true)
                     .fontWeight(FontWeight.Bold)
                   if (this.showPassword && item.info.findIndex(infoItem => infoItem.type === '密码') !== -1) {
                     Row() {
@@ -366,6 +369,7 @@ export default struct PasswordPage {
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
                       Text(item.info[item.info.findIndex(infoItem => infoItem.type === '密码')].value)
+                        .copyOption(CopyOptions.LocalDevice)
                     }
                     .margin({
                       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -382,6 +386,7 @@ export default struct PasswordPage {
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
                       Text(item.value)
+                        .enableAutoSpacing(true)
                         .fontWeight(FontWeight.Medium)
                     }
                     .margin({
@@ -537,6 +542,7 @@ export default struct PasswordPage {
           this.loading = true
         }),
         onWillDismiss: (async (DismissSheetAction) => {
+          const promptAction = this.getUIContext().getPromptAction()
           const data = await promptAction.showDialog({
             title: '提示',
             message: '数据尚未保存，确定退出？',

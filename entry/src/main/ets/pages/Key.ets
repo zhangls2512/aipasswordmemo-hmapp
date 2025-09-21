@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { promptAction, window } from '@kit.ArkUI'
+import { window } from '@kit.ArkUI'
 //import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getKey, removeKey, setRandomKey } from '../common/Crypto'
 import copy from '../common/Pasteboard'
@@ -94,6 +94,7 @@ struct Keypage {
             .width('100%')
             .onClick(async () => {
               if (!this.keyValue) {
+                const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showActionMenu({
                   title: '选择导入方式',
                   buttons: [
@@ -117,6 +118,7 @@ struct Keypage {
                   })
                 }
               } else {
+                const promptAction = this.getUIContext().getPromptAction()
                 const confirm = await promptAction.showDialog({
                   title: '提示',
                   message: '导入成功后新密钥将覆盖当前密钥，当前密钥无法恢复，需重新导入当前密钥才可解密使用当前密钥加密的云备份数据，确定导入？',
@@ -132,6 +134,7 @@ struct Keypage {
                   ]
                 })
                 if (confirm.index === 1) {
+                  const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showActionMenu({
                     title: '选择导入方式',
                     buttons: [
@@ -186,6 +189,7 @@ struct Keypage {
               })
               .width('100%')
               .onClick(async () => {
+                const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
                   message: '删除成功后无法恢复，需重新导入此密钥才可解密使用此密钥加密的云备份数据，确定删除？',

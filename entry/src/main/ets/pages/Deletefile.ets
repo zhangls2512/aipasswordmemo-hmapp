@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 
 //import { HdsNavDestination } from '@kit.UIDesignKit'
@@ -33,6 +32,7 @@ struct Deletefile {
               .enabled(this.fileUri !== '')
               .role(ButtonRole.ERROR)
               .onClick(async () => {
+                const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
                   message: '删除成功后无法恢复，确定删除？',

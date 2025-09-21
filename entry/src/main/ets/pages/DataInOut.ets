@@ -45,6 +45,14 @@ struct DataInOut {
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
+  escapeCsvField(value?: string) {
+    const outValue = String(value)
+    if (/[,"\n]/.test(outValue)) {
+      return '"' + outValue.replace(/"/g, '""') + '"'
+    }
+    return outValue
+  }
+
   build() {
     NavDestination() {
       List() {
@@ -229,8 +237,8 @@ struct DataInOut {
               Span('中所述的标准格式。\n因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导入。')
                 .fontColor($r('sys.color.font_secondary'))
             }
-            .fontSize($r('sys.float.ohos_id_text_size_body3'))
             .enableAutoSpacing(true)
+            .fontSize($r('sys.float.ohos_id_text_size_body3'))
             .margin({
               top: 6,
               left: 12,
@@ -385,13 +393,6 @@ struct DataInOut {
               })
               .width('100%')
               .onClick(async () => {
-                const documentSaveOptions = new picker.DocumentSaveOptions()
-                documentSaveOptions.newFileNames = ['password']
-                documentSaveOptions.fileSuffixChoices = ['.txt']
-                const documentViewPicker = new picker.DocumentViewPicker(this.context)
-                const uris = await documentViewPicker.save(documentSaveOptions)
-                const filePath = uris[0]
-                const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
                 const array = await getPasswordList()
                 const arrayOut = array.map((item): PasswordOutItem => {
                   let cloudBackupTime = JSON.stringify([])
@@ -407,8 +408,67 @@ struct DataInOut {
                     cloudBackupTime: cloudBackupTime
                   }
                 })
-                fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
-                fileIo.closeSync(file)
+                const documentSaveOptions = new picker.DocumentSaveOptions()
+                documentSaveOptions.newFileNames = ['password']
+                const promptAction = this.getUIContext().getPromptAction()
+                const data = await promptAction.showActionMenu({
+                  title: '选择格式',
+                  buttons: [
+                    {
+                      text: 'txt (完整)',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: 'csv (无修改时间、云备份时间)',
+                      color: $r('sys.color.font_primary')
+                    }
+                  ]
+                })
+                if (data.index === 0) {
+                  documentSaveOptions.fileSuffixChoices = ['.txt']
+                  const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                  const uris = await documentViewPicker.save(documentSaveOptions)
+                  const filePath = uris[0]
+                  const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                  fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                  fileIo.closeSync(file)
+                }
+                if (data.index === 1) {
+                  let filestring = ''
+                  if (arrayOut.length > 0) {
+                    const allInfoTypesArray: string[] = []
+                    arrayOut.forEach(item => {
+                      item.info.forEach(itema => {
+                        if (!allInfoTypesArray.includes(itema.type)) {
+                          allInfoTypesArray.push(itema.type)
+                        }
+                      })
+                    })
+                    const collator = new Intl.Collator('zh', {
+                      sensitivity: 'base',
+                      numeric: true
+                    })
+                    allInfoTypesArray.sort(collator.compare)
+                    const headers = ['名称'].concat(allInfoTypesArray)
+                    const rows = arrayOut.map((item) => {
+                      const values = [item.name]
+                      for (const infotype of allInfoTypesArray) {
+                        const value = item.info.findIndex(item => item.type === infotype) === -1 ? '' :
+                          item.info.find(item => item.type === infotype)?.value
+                        values.push(this.escapeCsvField(value))
+                      }
+                      return values.join(',')
+                    })
+                    filestring = [headers.join(','), ...rows].join('\n')
+                  }
+                  documentSaveOptions.fileSuffixChoices = ['.csv']
+                  const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                  const uris = await documentViewPicker.save(documentSaveOptions)
+                  const filePath = uris[0]
+                  const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                  fileIo.writeSync(file.fd, filestring)
+                  fileIo.closeSync(file)
+                }
                 promptAction.openToast({
                   message: '导出成功'
                 })

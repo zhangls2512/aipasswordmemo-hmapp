@@ -1,4 +1,5 @@
 import { preferences } from '@kit.ArkData'
+import { uri } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
@@ -7,15 +8,24 @@ import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
 import getTotp from '../common/Totp'
 
+interface InfoItem {
+  type: string,
+  value: string,
+  isHide: boolean
+}
+
 @ComponentV2
 export default struct Passwordinfo {
   @Consumer() isShowInfoSheet: boolean = false
   @Param passwordId: number = 0
   @Local passwordName: string = ''
   @Local passwordInfo: PasswordInfoItem[] = []
+  @Local hidePasswordInfoType: string[] = []
+  @Local passwordInfoValueDataDetector: boolean = false
   @Local mfaValue: string = ''
   @Local mfaStep: number = 30
   @Local mfaSecondsRemaining: number = 0
+  @Local mfaOtpauthUri: string = ''
   @Local mfaSecondsRemainingColor: Color = Color.Transparent
   @Local mfaSecondsRemainingStyle: string = ''
   @Local passwordTag: PasswordTagItem[] = []
@@ -25,6 +35,7 @@ export default struct Passwordinfo {
     List() {
       ListItem() {
         Text(this.passwordName)
+          .enableAutoSpacing(true)
           .fontWeight(FontWeight.Bold)
       }
 
@@ -37,38 +48,60 @@ export default struct Passwordinfo {
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
 
-      ForEach(this.passwordInfo, (item: PasswordInfoItem) => {
+      ForEach(this.passwordInfo, (item: PasswordInfoItem, index) => {
         if (item.type !== '图标' && item.type !== 'MFA' && item.type !== 'URL') {
           ListItem() {
             Column() {
               Row() {
                 Text(item.type)
+                  .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
+                  .width('34%')
                 Blank()
                   .width('5%')
-                Text(item.value)
-                  .copyOption(CopyOptions.LocalDevice)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .enableDataDetector(true)
-                  .textAlign(TextAlign.End)
-                  .width('50%')
+                if (!this.hidePasswordInfoType.includes(item.type)) {
+                  Text(item.value)
+                    .copyOption(CopyOptions.LocalDevice)
+                    .enableAutoSpacing(true)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .enableDataDetector(this.passwordInfoValueDataDetector)
+                    .textAlign(TextAlign.End)
+                    .width('50%')
+                    .onClick(() => {
+                      copy(item.value)
+                    })
+                  Blank()
+                    .width('3%')
+                  Image($r('app.media.hide'))
+                    .fillColor($r('sys.color.icon_secondary'))
+                    .width('8%')
+                    .onClick(() => {
+                      this.hidePasswordInfoType.push(item.type)
+                    })
+                }
+                if (this.hidePasswordInfoType.includes(item.type)) {
+                  Text('***')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .textAlign(TextAlign.End)
+                    .width('50%')
+                    .onClick(() => {
+                      copy(item.value)
+                    })
+                  Blank()
+                    .width('3%')
+                  Image($r('app.media.show'))
+                    .fillColor($r('sys.color.icon_secondary'))
+                    .width('8%')
+                    .onClick(() => {
+                      this.hidePasswordInfoType.splice(this.hidePasswordInfoType.indexOf(item.type), 1)
+                    })
+                }
               }
               .borderRadius(12)
               .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
               .width('100%')
-              .onClick(() => {
-                copy(item.value)
-              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -90,7 +123,7 @@ export default struct Passwordinfo {
                   .width('10%')
                   .onError((err) => {
                     promptAction.openToast({
-                      message: '发生错误，错误信息：' + err.error?.message
+                      message: '发生错误，错误信息：' + err.message
                     })
                   })
               }
@@ -183,6 +216,12 @@ export default struct Passwordinfo {
               .onClick(() => {
                 copy(this.mfaValue)
               })
+              .gesture(
+                LongPressGesture()
+                  .onAction(() => {
+                    copy(this.mfaOtpauthUri)
+                  })
+              )
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -202,6 +241,7 @@ export default struct Passwordinfo {
                 Blank()
                   .width('5%')
                 Text(item.value)
+                  .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
@@ -269,6 +309,7 @@ export default struct Passwordinfo {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                 Text(item.value)
+                  .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
               }
               .width('95%')
@@ -295,6 +336,9 @@ export default struct Passwordinfo {
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
         name: 'commonSetting'
       })
+      this.hidePasswordInfoType = commonSettingDataPreferences.getSync('defaultHidePasswordInfoType', []) as string[]
+      this.passwordInfoValueDataDetector =
+        commonSettingDataPreferences.getSync('passwordInfoValueDataDetector', true) as boolean
       const mfaSecondsRemainingStyleIndex = commonSettingDataPreferences.getSync('mfaSecondsRemainingStyle', 0)
       if (mfaSecondsRemainingStyleIndex === 0) {
         this.mfaSecondsRemainingStyle = 'progress'
@@ -310,6 +354,11 @@ export default struct Passwordinfo {
       if (mfaInfo) {
         setInterval(() => {
           const mfaInfoArray = mfaInfo.value.split('\0')
+          let mfaOthauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
+          mfaOthauthUri = mfaOthauthUri.addQueryValue('secret', mfaInfoArray[0])
+          mfaOthauthUri = mfaOthauthUri.addQueryValue('period', mfaInfoArray[1])
+          mfaOthauthUri = mfaOthauthUri.addQueryValue('digits', mfaInfoArray[2])
+          this.mfaOtpauthUri = mfaOthauthUri.toString()
           this.mfaStep = Number(mfaInfoArray[1])
           const res = getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
           this.mfaValue = res.value

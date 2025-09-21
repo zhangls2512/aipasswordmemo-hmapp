@@ -31,14 +31,16 @@ struct Errorlog {
         const filestring = read(item)
         const errorLog = JSON.parse(filestring) as hiAppEvent.AppEventGroup
         const externalLog: string[] = []
-        errorLog.appEventInfos.forEach((item) => {
-          const external_log = item.params['external_log'] as string[] | undefined
-          if (external_log) {
-            external_log.forEach((item) => {
-              externalLog.push(item)
-            })
-          }
-        })
+        if (errorLog.appEventInfos) {
+          errorLog.appEventInfos.forEach((item) => {
+            const external_log = item.params['external_log'] as string[] | undefined
+            if (external_log) {
+              external_log.forEach((item) => {
+                externalLog.push(item)
+              })
+            }
+          })
+        }
         return {
           type: errorLog.name,
           content: filestring,
@@ -61,14 +63,16 @@ struct Errorlog {
         const filestring = read(item)
         const errorLog = JSON.parse(filestring) as hiAppEvent.AppEventGroup
         const externalLog: string[] = []
-        errorLog.appEventInfos.forEach((item) => {
-          const external_log = item.params['external_log'] as string[] | undefined
-          if (external_log) {
-            external_log.forEach((item) => {
-              externalLog.push(item)
-            })
-          }
-        })
+        if (errorLog.appEventInfos) {
+          errorLog.appEventInfos.forEach((item) => {
+            const external_log = item.params['external_log'] as string[] | undefined
+            if (external_log) {
+              external_log.forEach((item) => {
+                externalLog.push(item)
+              })
+            }
+          })
+        }
         return {
           type: errorLog.name,
           content: filestring,
@@ -89,6 +93,7 @@ struct Errorlog {
         ListItem() {
           Select([
             { value: '全部' },
+            { value: 'js 运行异常' },
             { value: '应用崩溃' },
             { value: '应用冻屏' },
             { value: '应用查杀' },
@@ -110,33 +115,36 @@ struct Errorlog {
                 this.get()
               }
               if (index === 1) {
-                this.filter('APP_CRASH')
+                this.filter('JS_ERROR')
               }
               if (index === 2) {
-                this.filter('APP_FREEZE')
+                this.filter('APP_CRASH')
               }
               if (index === 3) {
-                this.filter('APP_KILLED')
+                this.filter('APP_FREEZE')
               }
               if (index === 4) {
-                this.filter('APP_LAUNCH')
+                this.filter('APP_KILLED')
               }
               if (index === 5) {
-                this.filter('RESOURCE_OVERLIMIT')
+                this.filter('APP_LAUNCH')
               }
               if (index === 6) {
-                this.filter('ADDRESS_SANITIZER')
+                this.filter('RESOURCE_OVERLIMIT')
               }
               if (index === 7) {
-                this.filter('MAIN_THREAD_JANK')
+                this.filter('ADDRESS_SANITIZER')
               }
               if (index === 8) {
-                this.filter('SCROLL_JANK')
+                this.filter('MAIN_THREAD_JANK')
               }
               if (index === 9) {
-                this.filter('CPU_USAGE_HIGH')
+                this.filter('SCROLL_JANK')
               }
               if (index === 10) {
+                this.filter('CPU_USAGE_HIGH')
+              }
+              if (index === 11) {
                 this.filter('BATTERY_USAGE')
               }
             })
@@ -247,6 +255,7 @@ struct Errorlog {
                 .onClick(async () => {
                   try {
                     const filestring = read(externalLogItem)
+                    const promptAction = this.getUIContext().getPromptAction()
                     const data = await promptAction.showDialog({
                       title: externalLogItem,
                       message: filestring,

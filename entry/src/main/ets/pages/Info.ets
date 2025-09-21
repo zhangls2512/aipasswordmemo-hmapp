@@ -1,12 +1,15 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
+import { fileIo } from '@kit.CoreFileKit'
+import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { CloudBackupTimeItem, getInfoList, Info } from '../common/Dataget'
+import copy from '../common/Pasteboard'
 import AinewInfo from './Ainewinfo'
 import NewInfo from './Newinfo'
 import UpdateInfo from './Updateinfo'
@@ -27,6 +30,39 @@ export default struct InfoPage {
   @Builder
   MenuBuilder(item: Info) {
     Menu() {
+      MenuItem({
+        startIcon: item.type === '图标' ? $r('app.media.save') : $r('app.media.copy'),
+        content: item.type === '图标' ? '保存' : '复制'
+      })
+        .onClick(async () => {
+          if (item.type !== '图标') {
+            copy(item.type + '：' + item.value, false)
+          }
+          if (item.type === '图标') {
+            const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
+            try {
+              const uris = await phAccessHelper.showAssetsCreationDialog([item.value], [{
+                fileNameExtension: 'png',
+                photoType: photoAccessHelper.PhotoType.IMAGE
+              }])
+              const srcFile = fileIo.openSync(item.value)
+              const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
+              fileIo.copyFileSync(srcFile.fd, destFile.fd)
+              fileIo.closeSync(srcFile)
+              fileIo.closeSync(destFile)
+              promptAction.openToast({
+                message: '保存成功'
+              })
+            } catch (err) {
+              if (err.code === 13900020) {
+                return
+              }
+              promptAction.openToast({
+                message: '发生错误，错误码：' + err.code
+              })
+            }
+          }
+        })
       MenuItem({
         startIcon: $r('app.media.delete'),
         content: '删除'
@@ -155,6 +191,7 @@ export default struct InfoPage {
                   this.loading = true
                 }),
                 onWillDismiss: (async (DismissSheetAction) => {
+                  const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showDialog({
                     title: '提示',
                     message: '数据尚未保存，确定退出？',
@@ -212,9 +249,23 @@ export default struct InfoPage {
                     .width('5%')
                 }
                 Column() {
-                  Text(item.value)
-                    .fontWeight(FontWeight.Medium)
+                  if (item.type !== '图标') {
+                    Text(item.value)
+                      .enableAutoSpacing(true)
+                      .fontWeight(FontWeight.Medium)
+                  }
+                  if (item.type === '图标') {
+                    Image(item.value)
+                      .copyOption(CopyOptions.LocalDevice)
+                      .width('10%')
+                      .onError((err) => {
+                        promptAction.openToast({
+                          message: '发生错误，错误信息：' + err.message
+                        })
+                      })
+                  }
                   Text(item.type)
+                    .enableAutoSpacing(true)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
@@ -236,6 +287,12 @@ export default struct InfoPage {
               })
               .width('100%')
               .onClick(() => {
+                if (item.type === '图标') {
+                  promptAction.openToast({
+                    message: '图标类型不支持修改'
+                  })
+                  return
+                }
                 this.updateId = item.id
                 this.isShowUpdateSheet = true
               })
@@ -289,6 +346,7 @@ export default struct InfoPage {
           this.loading = true
         }),
         onWillDismiss: (async (DismissSheetAction) => {
+          const promptAction = this.getUIContext().getPromptAction()
           const data = await promptAction.showDialog({
             title: '提示',
             message: '数据尚未保存，确定退出？',

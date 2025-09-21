@@ -127,8 +127,8 @@ struct Networktest {
                 })
               Row() {
                 Text('请求IP')
-                  .fontWeight(FontWeight.Medium)
                   .enableAutoSpacing(true)
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -170,8 +170,8 @@ struct Networktest {
                 })
               Row() {
                 Text('HTTP版本')
-                  .fontWeight(FontWeight.Medium)
                   .enableAutoSpacing(true)
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -192,8 +192,8 @@ struct Networktest {
                 })
               Row() {
                 Text('DNS解析所需的时间')
-                  .fontWeight(FontWeight.Medium)
                   .enableAutoSpacing(true)
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')
@@ -235,8 +235,8 @@ struct Networktest {
                 })
               Row() {
                 Text('从开始到远程主机 (或代理) 的 TLS 握手完成的时间')
-                  .fontWeight(FontWeight.Medium)
                   .enableAutoSpacing(true)
+                  .fontWeight(FontWeight.Medium)
                   .width('45%')
                 Blank()
                   .width('5%')

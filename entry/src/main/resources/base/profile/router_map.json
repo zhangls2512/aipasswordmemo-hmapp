@@ -164,6 +164,16 @@
       "name": "Resourcelimit",
       "pageSourceFile": "src/main/ets/pages/Resourcelimit.ets",
       "buildFunction": "ResourcelimitBuilder"
+    },
+    {
+      "name": "Oftenusedinfotype",
+      "pageSourceFile": "src/main/ets/pages/Oftenusedinfotype.ets",
+      "buildFunction": "OftenusedinfotypeBuilder"
+    },
+    {
+      "name": "Defaulthidepasswordinfotype",
+      "pageSourceFile": "src/main/ets/pages/Defaulthidepasswordinfotype.ets",
+      "buildFunction": "DefaulthidepasswordinfotypeBuilder"
     }
   ]
 }

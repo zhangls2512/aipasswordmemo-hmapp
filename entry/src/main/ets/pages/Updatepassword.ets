@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
@@ -14,30 +15,38 @@ import {
 import { hdsEffect } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
-import { updatePassword } from '../common/Datachange'
+import { newInfo, newTag, updatePassword } from '../common/Datachange'
 import { getPasswordInfo, getTagList, getTypeInfoList, Password, PasswordInfoItem } from '../common/Dataget'
+import { SelectItem } from './Newpassword'
+import Passwordgenerate from './Passwordgenerate'
 
 @ComponentV2
 export default struct Updatepassword {
   @Consumer() isShowUpdateSheet: boolean = false
+  @Provider() isShowPasswordgenerateSheet: boolean = false
   @Param passwordId: number = 0
   @Local passwordName: string = ''
   @Local passwordInfoArray: PasswordInfoItem[] = []
-  @Local infoType: string = '密码'
-  @Local infoTypeIndex: number = 3
-  @Local infoTypeValue: string = '密码'
+  @Local infoType: string = ''
+  @Local infoTypeIndex: number = 0
+  @Local infoTypeValue: string = ''
   @Local infoValue: string = ''
+  @Local otpauthUri: string = ''
   @Local mfaStep: string = '30'
   @Local mfaDigits: string = '6'
   @Local infoArray: string[] = []
   @Local passwordTagArray: string[] = []
   @Local passwordTag: string = ''
   @Local tagArray: string[] = []
+  @Local autoNewInfo: boolean = false
+  @Local autoNewTag: boolean = false
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  specialTypes: string[] =
+  preferType = 1
+  oftenUsedInfoTypes: string[] = ['自定义']
+  specialInfoTypes: string[] =
     ['图标', '昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   @Builder
@@ -107,6 +116,13 @@ export default struct Updatepassword {
     }
   }
 
+  @Builder
+  PasswordgenerateSheetBuilder() {
+    Passwordgenerate({
+      inputPassword: true
+    })
+  }
+
   build() {
     List() {
       ListItem() {
@@ -174,23 +190,30 @@ export default struct Updatepassword {
               this.infoValue = fileUri.getUriFromPath(filePath)
             }
           })
-          Select([
-            { value: '图标' },
-            { value: '昵称' },
-            { value: '用户名' },
-            { value: '密码' },
-            { value: 'MFA' },
-            { value: '姓名' },
-            { value: '手机号' },
-            { value: '邮箱' },
-            { value: '银行卡号' },
-            { value: '身份证号' },
-            { value: 'URL' },
-            { value: '自定义' }
-          ])
+          Select(this.oftenUsedInfoTypes.map((item): SelectItem => {
+            return {
+              value: item
+            }
+          }))
             .selected(this.infoTypeIndex!!)
             .value(this.infoTypeValue!!)
             .onSelect(async (index, value) => {
+              if (value === '图标') {
+                this.infoValue = ''
+              }
+              if (value !== 'MFA') {
+                this.infoArray = await getTypeInfoList(value)
+              }
+              if (value === 'MFA') {
+                this.infoArray = []
+              }
+              if (value !== '自定义') {
+                this.infoType = value
+              }
+              if (value === '自定义') {
+                this.infoType = ''
+                this.infoArray = []
+              }
               if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                 try {
                   fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
@@ -201,21 +224,8 @@ export default struct Updatepassword {
                 }
                 this.infoValue = ''
               }
-              if (index !== 11) {
-                this.infoType = value
-              }
-              if (index === 0) {
-                this.infoValue = ''
-              }
-              if (index === 11) {
-                this.infoType = ''
-                this.infoArray = []
-              }
-              if (value !== '图标' && value !== 'MFA') {
-                this.infoArray = await getTypeInfoList(value)
-              }
             })
-          if (!this.specialTypes.includes(this.infoType)) {
+          if (this.infoTypeValue === '自定义') {
             TextInput({
               placeholder: '请输入类型',
               text: this.infoType!!
@@ -225,15 +235,28 @@ export default struct Updatepassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .onChange(async (value) => {
-                if (this.specialTypes.includes(value)) {
-                  this.infoTypeIndex = this.specialTypes.indexOf(value)
+                if (this.oftenUsedInfoTypes.includes(value)) {
+                  this.infoTypeIndex = this.oftenUsedInfoTypes.indexOf(value)
                   this.infoTypeValue = value
                 }
                 if (value === '图标') {
                   this.infoValue = ''
                 }
-                if (value !== '图标' && value !== 'MFA') {
+                if (value !== 'MFA') {
                   this.infoArray = await getTypeInfoList(value)
+                }
+                if (value === 'MFA' || value === '自定义') {
+                  this.infoArray = []
+                }
+                if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
+                  try {
+                    fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                  } catch (err) {
+                    promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code
+                    })
+                  }
+                  this.infoValue = ''
                 }
               })
           }
@@ -256,8 +279,8 @@ export default struct Updatepassword {
               placeholder: '请选择图片',
               text: this.infoValue
             })
-              .enabled(false)
               .enableAutoSpacing(true)
+              .enabled(false)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -286,6 +309,27 @@ export default struct Updatepassword {
               .type(InputType.USER_NAME)
           }
           if (this.infoType === '密码') {
+            Button('随机生成')
+              .buttonStyle(ButtonStyleMode.NORMAL)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
+              .onClick(() => {
+                this.isShowPasswordgenerateSheet = true
+              })
+              .bindSheet(this.isShowPasswordgenerateSheet!!, this.PasswordgenerateSheetBuilder(), {
+                height: SheetSize.FIT_CONTENT,
+                preferType: this.preferType,
+                title: {
+                  title: '密码随机生成'
+                }
+              })
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -299,33 +343,44 @@ export default struct Updatepassword {
           }
           if (this.infoType === 'MFA') {
             TextInput({
-              placeholder: '请输入密钥',
-              text: this.infoValue!!
+              placeholder: 'otpauth://...',
+              text: this.otpauthUri!!
             })
               .enableAutoFill(false)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .type(InputType.Password)
-            TextInput({
-              placeholder: '请输入步长 (单位：秒)',
-              text: this.mfaStep!!
-            })
-              .enableAutoSpacing(true)
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            if (!this.otpauthUri) {
+              TextInput({
+                placeholder: '请输入密钥',
+                text: this.infoValue!!
               })
-              .type(InputType.Number)
-            TextInput({
-              placeholder: '请输入位数',
-              text: this.mfaDigits!!
-            })
-              .enableAutoSpacing(true)
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                .enableAutoFill(false)
+                .enableAutoSpacing(true)
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                })
+                .type(InputType.Password)
+              TextInput({
+                placeholder: '请输入步长 (单位：秒)',
+                text: this.mfaStep!!
               })
-              .type(InputType.Number)
+                .enableAutoSpacing(true)
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                })
+                .type(InputType.Number)
+              TextInput({
+                placeholder: '请输入位数',
+                text: this.mfaDigits!!
+              })
+                .enableAutoSpacing(true)
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                })
+                .type(InputType.Number)
+            }
           }
           if (this.infoType === '姓名') {
             TextInput({
@@ -396,7 +451,7 @@ export default struct Updatepassword {
               })
               .type(InputType.URL)
           }
-          if (!this.specialTypes.includes(this.infoType)) {
+          if (!this.specialInfoTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -414,39 +469,58 @@ export default struct Updatepassword {
       })
 
       ForEach(this.infoArray, (item: string) => {
-        ListItem() {
-          Column() {
-            Row() {
-              Text(item)
-                .width('87%')
-              Blank()
-                .width('5%')
-              Image($r('app.media.add'))
-                .width('8%')
-                .onClick(() => {
-                  if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
-                    promptAction.openToast({
-                      message: '已添加此类型信息'
+        if (!this.passwordInfoArray.some(itema => itema.value === item)) {
+          ListItem() {
+            Column() {
+              Row() {
+                if (this.infoType !== '图标') {
+                  Text(item)
+                    .enableAutoSpacing(true)
+                    .width('87%')
+                  Blank()
+                    .width('5%')
+                }
+                if (this.infoType === '图标') {
+                  Image(item)
+                    .copyOption(CopyOptions.LocalDevice)
+                    .width('10%')
+                    .onError((err) => {
+                      promptAction.openToast({
+                        message: '发生错误，错误信息：' + err.message
+                      })
                     })
-                    return
-                  }
-                  this.passwordInfoArray.push({
-                    type: this.infoType,
-                    value: item
+                  Blank()
+                    .width('82%')
+                }
+                Blank()
+                  .width('5%')
+                Image($r('app.media.add'))
+                  .width('8%')
+                  .onClick(() => {
+                    if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
+                      promptAction.openToast({
+                        message: '已添加此类型信息'
+                      })
+                      return
+                    }
+                    this.passwordInfoArray.push({
+                      type: this.infoType,
+                      value: item
+                    })
                   })
-                })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
             }
-            .borderRadius(12)
-            .padding(12)
-            .width('100%')
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
-          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-          .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
         }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
       })
       ListItem() {
         Column() {
@@ -482,35 +556,69 @@ export default struct Updatepassword {
                   return
                 }
                 if (this.infoType === 'MFA') {
-                  if (!value) {
-                    promptAction.openToast({
-                      message: '请输入密钥'
-                    })
-                    return
+                  if (!this.otpauthUri) {
+                    if (!value) {
+                      promptAction.openToast({
+                        message: '请输入密钥'
+                      })
+                      return
+                    }
+                    if (!this.mfaStep) {
+                      promptAction.openToast({
+                        message: '请输入步长'
+                      })
+                      return
+                    }
+                    if (!this.mfaDigits) {
+                      promptAction.openToast({
+                        message: '请输入位数'
+                      })
+                      return
+                    }
+                    value = this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits
                   }
-                  if (!this.mfaStep) {
-                    promptAction.openToast({
-                      message: '请输入步长'
-                    })
-                    return
+                  if (this.otpauthUri) {
+                    const uriInstance = new uri.URI(this.otpauthUri)
+                    if (uriInstance.scheme !== 'otpauth') {
+                      promptAction.openToast({
+                        message: '请输入有效的 otpauthUri'
+                      })
+                      return
+                    }
+                    const uriSecret = uriInstance.getQueryValue('secret')
+                    if (!uriSecret) {
+                      promptAction.openToast({
+                        message: '请输入有效的 otpauthUri'
+                      })
+                      return
+                    }
+                    let step = '30'
+                    let digits = '6'
+                    const uriStep = uriInstance.getQueryValue('period')
+                    const uriDigits = uriInstance.getQueryValue('digits')
+                    if (uriStep) {
+                      step = uriStep
+                    }
+                    if (uriDigits) {
+                      digits = uriDigits
+                    }
+                    value = uriSecret + '\0' + step + '\0' + digits
                   }
-                  if (!this.mfaDigits) {
-                    promptAction.openToast({
-                      message: '请输入位数'
-                    })
-                    return
-                  }
-                  value = this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits
                 }
                 this.passwordInfoArray.push({
                   type: this.infoType,
                   value: value
                 })
-                this.infoType = '密码'
-                this.infoTypeIndex = 3
-                this.infoTypeValue = '密码'
+                this.infoType = this.oftenUsedInfoTypes[0]
+                this.infoTypeIndex = 0
+                this.infoTypeValue = this.oftenUsedInfoTypes[0]
                 this.infoValue = ''
-                this.infoArray = await getTypeInfoList('密码')
+                this.otpauthUri = ''
+                this.mfaStep = '30'
+                this.mfaDigits = '6'
+                if (this.oftenUsedInfoTypes[0] !== 'MFA' && this.oftenUsedInfoTypes[0] !== '自定义') {
+                  this.infoArray = await getTypeInfoList(this.oftenUsedInfoTypes[0])
+                }
               })
             if (this.infoType === 'MFA') {
               Button('扫码添加')
@@ -559,11 +667,16 @@ export default struct Updatepassword {
                     type: 'MFA',
                     value: uriSecret + '\0' + step + '\0' + digits
                   })
-                  this.infoType = '密码'
-                  this.infoTypeIndex = 3
-                  this.infoTypeValue = '密码'
+                  this.infoType = this.oftenUsedInfoTypes[0]
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
                   this.infoValue = ''
-                  this.infoArray = await getTypeInfoList('密码')
+                  this.otpauthUri = ''
+                  this.mfaStep = '30'
+                  this.mfaDigits = '6'
+                  if (this.oftenUsedInfoTypes[0] !== 'MFA' && this.oftenUsedInfoTypes[0] !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.oftenUsedInfoTypes[0])
+                  }
                 })
             }
           }
@@ -585,7 +698,7 @@ export default struct Updatepassword {
                     .width('10%')
                     .onError((err) => {
                       promptAction.openToast({
-                        message: '发生错误，错误信息：' + err.error?.message
+                        message: '发生错误，错误信息：' + err.message
                       })
                     })
                 }
@@ -596,9 +709,11 @@ export default struct Updatepassword {
                 }
                 if (item.type !== '图标' && item.type !== 'MFA') {
                   Text(item.value)
+                    .enableAutoSpacing(true)
                     .fontWeight(FontWeight.Medium)
                 }
                 Text(item.type)
+                  .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -643,15 +758,6 @@ export default struct Updatepassword {
               Image($r('app.media.delete'))
                 .width('8%')
                 .onClick(() => {
-                  if (item.type === '图标') {
-                    try {
-                      fileIo.unlinkSync(item.value.replace('file://com.zhangxm.aipasswordmemo', ''))
-                    } catch (err) {
-                      promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code
-                      })
-                    }
-                  }
                   this.passwordInfoArray.splice(index, 1)
                 })
             }
@@ -687,68 +793,70 @@ export default struct Updatepassword {
       })
 
       ForEach(this.tagArray, (item: string) => {
-        ListItem() {
-          Column() {
-            Row() {
-              Text(item)
-                .width('87%')
-              Blank()
-                .width('5%')
-              Image($r('app.media.add'))
-                .width('8%')
-                .onClick(() => {
-                  if (this.passwordTagArray.some(tagItem => tagItem === item)) {
-                    promptAction.openToast({
-                      message: '已添加此标签'
-                    })
-                    return
-                  }
-                  this.passwordTagArray.push(item)
-                })
+        if (!this.passwordTagArray.includes(item)) {
+          ListItem() {
+            Column() {
+              Row() {
+                Text(item)
+                  .enableAutoSpacing(true)
+                  .width('87%')
+                Blank()
+                  .width('5%')
+                Image($r('app.media.add'))
+                  .width('8%')
+                  .onClick(() => {
+                    if (this.passwordTagArray.some(tagItem => tagItem === item)) {
+                      promptAction.openToast({
+                        message: '已添加此标签'
+                      })
+                      return
+                    }
+                    this.passwordTagArray.push(item)
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
             }
-            .borderRadius(12)
-            .padding(12)
-            .width('100%')
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
-          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-          .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
         }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
       })
       ListItem() {
-        Column() {
-          Button('添加')
-            .onClick(() => {
-              if (!this.passwordTag) {
-                promptAction.openToast({
-                  message: '请输入内容'
-                })
-                return
-              }
-              if (this.passwordTagArray.some(item => item === this.passwordTag)) {
-                promptAction.openToast({
-                  message: '已添加此标签'
-                })
-                return
-              }
-              this.passwordTagArray.push(this.passwordTag)
-              this.passwordTag = ''
-            })
-        }
-        .width('100%')
+        Button('添加')
+          .onClick(() => {
+            if (!this.passwordTag) {
+              promptAction.openToast({
+                message: '请输入内容'
+              })
+              return
+            }
+            if (this.passwordTagArray.some(item => item === this.passwordTag)) {
+              promptAction.openToast({
+                message: '已添加此标签'
+              })
+              return
+            }
+            this.passwordTagArray.push(this.passwordTag)
+            this.passwordTag = ''
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
+      .width('100%')
 
       ForEach(this.passwordTagArray, (item: string, index) => {
         ListItem() {
           Column() {
             Row() {
               Text(item)
+                .enableAutoSpacing(true)
                 .width('65%')
               Blank()
                 .width('5%')
@@ -800,6 +908,59 @@ export default struct Updatepassword {
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       })
+
+      ListItem() {
+        Column() {
+          Text('自动新增')
+            .fontColor($r('sys.color.font_secondary'))
+            .fontSize($r('sys.float.ohos_id_text_size_body2'))
+            .fontWeight(FontWeight.Medium)
+            .margin({
+              bottom: 6,
+              left: 12
+            })
+          Column() {
+            Row() {
+              Text('常用信息')
+                .fontWeight(FontWeight.Medium)
+              Blank()
+              Toggle({
+                type: ToggleType.Switch,
+                isOn: this.autoNewInfo!!
+              })
+            }
+            .borderRadius(12)
+            .padding(12)
+            .width('100%')
+
+            Divider()
+              .padding({
+                left: 12,
+                right: 12
+              })
+            Row() {
+              Text('标签')
+                .fontWeight(FontWeight.Medium)
+              Blank()
+              Toggle({
+                type: ToggleType.Switch,
+                isOn: this.autoNewTag!!
+              })
+            }
+            .borderRadius(12)
+            .padding(12)
+            .width('100%')
+          }
+          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+          .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+          .padding($r('sys.float.ohos_id_corner_radius_mark'))
+        }
+        .alignItems(HorizontalAlign.Start)
+      }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+      })
+
       ListItem() {
         Column() {
           Column() {
@@ -839,35 +1000,63 @@ export default struct Updatepassword {
       })
 
       ListItem() {
-        Column() {
-          Button('修改')
-            .onClick(async () => {
-              if (!this.passwordName) {
-                promptAction.openToast({
-                  message: '请输入名称'
-                })
-                return
-              }
-              if (this.passwordInfoArray.length === 0) {
-                promptAction.openToast({
-                  message: '请添加信息'
-                })
-                return
-              }
-              await updatePassword(this.passwordId, {
-                name: this.passwordName,
-                info: this.passwordInfoArray,
-                tag: this.passwordTagArray,
-                cloudBackup: this.cloudBackup
+        Button('修改')
+          .onClick(async () => {
+            if (!this.passwordName) {
+              promptAction.openToast({
+                message: '请输入名称'
               })
-              this.isShowUpdateSheet = false
+              return
+            }
+            if (this.passwordInfoArray.length === 0) {
+              promptAction.openToast({
+                message: '请添加信息'
+              })
+              return
+            }
+            await updatePassword(this.passwordId, {
+              name: this.passwordName,
+              info: this.passwordInfoArray,
+              tag: this.passwordTagArray,
+              cloudBackup: this.cloudBackup
             })
-        }
-        .width('100%')
+            let infoCloudBackup = false
+            let tagCloudBackup = false
+            const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+              name: 'cloudbackupSetting'
+            })
+            const autoOn: string[] = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+            if (this.allowCloudBackup && autoOn.includes('info')) {
+              infoCloudBackup = true
+            }
+            if (this.allowCloudBackup && autoOn.includes('tag')) {
+              tagCloudBackup = true
+            }
+            if (this.autoNewInfo) {
+              this.passwordInfoArray.forEach(item => {
+                newInfo({
+                  type: item.type,
+                  value: item.value,
+                  cloudBackup: infoCloudBackup
+                })
+              })
+            }
+            if (this.autoNewTag) {
+              this.passwordTagArray.forEach(item => {
+                newTag({
+                  value: item,
+                  color: 'rgba(0,0,0,0)',
+                  cloudBackup: tagCloudBackup
+                })
+              })
+            }
+            this.isShowUpdateSheet = false
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
+      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
@@ -875,6 +1064,24 @@ export default struct Updatepassword {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
+      if (deviceInfo.deviceType === 'phone') {
+        this.preferType = 0
+      }
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码']) as string[]
+      this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
+      if (this.oftenUsedInfoTypes[0] !== '自定义') {
+        this.infoType = this.oftenUsedInfoTypes[0]
+      }
+      this.infoTypeValue = this.oftenUsedInfoTypes[0]
+      if (this.oftenUsedInfoTypes[0] !== 'MFA' && this.oftenUsedInfoTypes[0] !== '自定义') {
+        this.infoArray = await getTypeInfoList(this.oftenUsedInfoTypes[0])
+      }
+      this.context.eventHub.on('inputPassword', (password: string) => {
+        this.infoValue = password
+      })
       const passwordInfo = await getPasswordInfo(this.passwordId) as Password
       this.passwordName = passwordInfo.name
       this.passwordInfoArray = passwordInfo.info

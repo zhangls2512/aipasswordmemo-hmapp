@@ -1,4 +1,4 @@
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LoadingDialog } from '@kit.ArkUI'
 //import { HdsNavDestination } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -174,6 +174,7 @@ struct Cloudbackupmanage {
                 })
                 .role(ButtonRole.ERROR)
                 .onClick(async () => {
+                  const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showDialog({
                     title: '提示',
                     message: '清理成功后数据无法恢复。确定清理？',

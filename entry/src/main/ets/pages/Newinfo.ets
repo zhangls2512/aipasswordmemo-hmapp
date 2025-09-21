@@ -1,62 +1,233 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
+import { fileIo, fileUri } from '@kit.CoreFileKit'
+import { image } from '@kit.ImageKit'
+import { photoAccessHelper } from '@kit.MediaLibraryKit'
+import {
+  CollaborationServiceFilter,
+  CollaborationServiceStateDialog,
+  createCollaborationServiceMenuItems
+} from '@kit.ServiceCollaborationKit'
+import { hdsEffect } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { newInfo } from '../common/Datachange'
+import { SelectItem } from './Newpassword'
 
 @ComponentV2
 export default struct Newinfo {
   @Consumer() isShowNewSheet: boolean = false
-  @Local infoType: string = '昵称'
+  @Local infoType: string = ''
   @Local infoTypeIndex: number = 0
-  @Local infoTypeValue: string = '昵称'
+  @Local infoTypeValue: string = ''
   @Local infoValue: string = ''
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  specialTypes: string[] = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  oftenUsedInfoTypes: string[] = ['自定义']
+  specialInfoTypes: string[] =
+    ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
+
+  @Builder
+  ChooseImageMenu() {
+    Menu() {
+      MenuItem({ content: '本设备' })
+        .onClick(async () => {
+          try {
+            const photoPicker = new photoAccessHelper.PhotoViewPicker()
+            const pickerres = await photoPicker.select({
+              MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+              maxSelectNumber: 1,
+              isPhotoTakingSupported: false
+            })
+            const fileSource = await fileIo.open(pickerres.photoUris[0])
+            const imageSource = image.createImageSource(fileSource.fd)
+            const imagePixelMap = await imageSource.createPixelMap()
+            const imageSize = imagePixelMap.getImageInfoSync().size
+            if (imageSize.width !== imageSize.height) {
+              promptAction.openToast({
+                message: '请选择宽高比为 1:1 的图片'
+              })
+              return
+            }
+            if (this.infoValue) {
+              try {
+                fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+              } catch (err) {
+                promptAction.openToast({
+                  message: '发生错误，错误码：' + err.code
+                })
+              }
+            }
+            const passwordIconDir = this.context.filesDir + '/media/passwordicon'
+            if (!fileIo.accessSync(passwordIconDir)) {
+              fileIo.mkdirSync(passwordIconDir, true)
+            }
+            const filePath = passwordIconDir + '/' + Date.now() + '.png'
+            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+            const imagePacker = image.createImagePacker()
+            await imagePacker.packToFile(imagePixelMap, file.fd, {
+              format: 'image/png',
+              quality: 100
+            })
+            fileIo.closeSync(file)
+            this.infoValue = fileUri.getUriFromPath(filePath)
+          } catch (err) {
+            if (err.code === 13900020) {
+              return
+            }
+            promptAction.openToast({
+              message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+            })
+          }
+        })
+      MenuItem({
+        content: '其他设备',
+        builder: this.SubMenu()
+      })
+    }
+  }
+
+  @Builder
+  SubMenu() {
+    Menu() {
+      createCollaborationServiceMenuItems([CollaborationServiceFilter.IMAGE_PICKER], 1)
+    }
+  }
 
   build() {
     List() {
       ListItem() {
         Column() {
-          Select([
-            { value: '昵称' },
-            { value: '用户名' },
-            { value: '密码' },
-            { value: '姓名' },
-            { value: '手机号' },
-            { value: '邮箱' },
-            { value: '银行卡号' },
-            { value: '身份证号' },
-            { value: 'URL' },
-            { value: '自定义' }
-          ])
+          CollaborationServiceStateDialog({
+            async onState(stateCode: number, bufferType: string, buffer: ArrayBuffer) {
+              if (stateCode !== 0) {
+                promptAction.openToast({
+                  message: '发生错误，错误码：' + stateCode
+                })
+                return
+              }
+              if (bufferType !== 'general.image') {
+                promptAction.openToast({
+                  message: '请选择图片'
+                })
+                return
+              }
+              const imageSource = image.createImageSource(buffer)
+              const imagePixelMap = await imageSource.createPixelMap()
+              const imageSize = imagePixelMap.getImageInfoSync().size
+              if (imageSize.width !== imageSize.height) {
+                promptAction.openToast({
+                  message: '请选择宽高比为 1:1 的图片'
+                })
+                return
+              }
+              if (this.infoValue) {
+                try {
+                  fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                } catch (err) {
+                  promptAction.openToast({
+                    message: '发生错误，错误码：' + err.code
+                  })
+                }
+              }
+              const passwordIconDir = this.context.filesDir + '/media/passwordicon'
+              if (!fileIo.accessSync(passwordIconDir)) {
+                fileIo.mkdirSync(passwordIconDir, true)
+              }
+              const filePath = passwordIconDir + '/' + Date.now() + '.png'
+              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+              const imagePacker = image.createImagePacker()
+              await imagePacker.packToFile(imagePixelMap, file.fd, {
+                format: 'image/png',
+                quality: 100
+              })
+              fileIo.closeSync(file)
+              this.infoValue = fileUri.getUriFromPath(filePath)
+            }
+          })
+          Select(this.oftenUsedInfoTypes.map((item): SelectItem => {
+            return {
+              value: item
+            }
+          }))
             .selected(this.infoTypeIndex!!)
             .value(this.infoTypeValue!!)
             .onSelect((index, value) => {
-              if (index === 9) {
-                this.infoType = ''
+              if (value === '图标') {
+                this.infoValue = ''
               }
-              if (index !== 9) {
+              if (value !== '自定义') {
                 this.infoType = value
               }
+              if (value === '自定义') {
+                this.infoType = ''
+              }
+              if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
+                try {
+                  fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                } catch (err) {
+                  promptAction.openToast({
+                    message: '发生错误，错误码：' + err.code
+                  })
+                }
+                this.infoValue = ''
+              }
             })
-          if (!this.specialTypes.includes(this.infoType)) {
+          if (this.infoTypeValue === '自定义') {
             TextInput({
               placeholder: '请输入类型',
               text: this.infoType!!
             })
-              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .onChange((value) => {
-                if (this.specialTypes.includes(value)) {
-                  this.infoTypeIndex = this.specialTypes.indexOf(value)
+                if (this.oftenUsedInfoTypes.includes(value)) {
+                  this.infoTypeIndex = this.oftenUsedInfoTypes.indexOf(value)
                   this.infoTypeValue = value
                 }
+                if (value === '图标') {
+                  this.infoValue = ''
+                }
+                if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
+                  try {
+                    fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                  } catch (err) {
+                    promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code
+                    })
+                  }
+                  this.infoValue = ''
+                }
+              })
+          }
+          if (this.infoType === '图标') {
+            Button('选择图片')
+              .buttonStyle(ButtonStyleMode.NORMAL)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
+              .bindMenu(this.ChooseImageMenu, {
+                hapticFeedbackMode: HapticFeedbackMode.AUTO
+              })
+            TextInput({
+              placeholder: '请选择图片',
+              text: this.infoValue
+            })
+              .enableAutoSpacing(true)
+              .enabled(false)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
           }
           if (this.infoType === '昵称') {
@@ -163,7 +334,7 @@ export default struct Newinfo {
               })
               .type(InputType.URL)
           }
-          if (!this.specialTypes.includes(this.infoType)) {
+          if (!this.specialInfoTypes.includes(this.infoType)) {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -216,34 +387,32 @@ export default struct Newinfo {
       })
 
       ListItem() {
-        Column() {
-          Button('新增')
-            .onClick(async () => {
-              if (!this.infoType) {
-                promptAction.openToast({
-                  message: '请输入类型'
-                })
-                return
-              }
-              if (!this.infoValue) {
-                promptAction.openToast({
-                  message: '请输入内容'
-                })
-                return
-              }
-              await newInfo({
-                type: this.infoType,
-                value: this.infoValue,
-                cloudBackup: this.cloudBackup
+        Button('新增')
+          .onClick(async () => {
+            if (!this.infoType) {
+              promptAction.openToast({
+                message: '请输入类型'
               })
-              this.isShowNewSheet = false
+              return
+            }
+            if (!this.infoValue) {
+              promptAction.openToast({
+                message: '请输入内容'
+              })
+              return
+            }
+            await newInfo({
+              type: this.infoType,
+              value: this.infoValue,
+              cloudBackup: this.cloudBackup
             })
-        }
-        .width('100%')
+            this.isShowNewSheet = false
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
+      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
@@ -251,6 +420,15 @@ export default struct Newinfo {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码']) as string[]
+      this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
+      if (this.oftenUsedInfoTypes[0] !== '自定义') {
+        this.infoType = this.oftenUsedInfoTypes[0]
+      }
+      this.infoTypeValue = this.oftenUsedInfoTypes[0]
       const res = await getCloudServiceStatus()
       const key = getKey()
       if (!res) {
