@@ -8,12 +8,6 @@ import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
 import getTotp from '../common/Totp'
 
-interface InfoItem {
-  type: string,
-  value: string,
-  isHide: boolean
-}
-
 @ComponentV2
 export default struct Passwordinfo {
   @Consumer() isShowInfoSheet: boolean = false
@@ -48,7 +42,7 @@ export default struct Passwordinfo {
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
 
-      ForEach(this.passwordInfo, (item: PasswordInfoItem, index) => {
+      ForEach(this.passwordInfo, (item: PasswordInfoItem) => {
         if (item.type !== '图标' && item.type !== 'MFA' && item.type !== 'URL') {
           ListItem() {
             Column() {
