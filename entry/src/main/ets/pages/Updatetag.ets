@@ -123,34 +123,32 @@ export default struct Updatetag {
       })
 
       ListItem() {
-        Column() {
-          Button('修改')
-            .onClick(async () => {
-              if (!this.tagValue) {
-                promptAction.openToast({
-                  message: '请输入内容'
-                })
-                return
-              }
-              if (!this.tagColor) {
-                promptAction.openToast({
-                  message: '请输入颜色'
-                })
-                return
-              }
-              await updateTag(this.tagId, {
-                value: this.tagValue,
-                color: this.tagColor,
-                cloudBackup: this.cloudBackup
+        Button('修改')
+          .onClick(async () => {
+            if (!this.tagValue) {
+              promptAction.openToast({
+                message: '请输入内容'
               })
-              this.isShowUpdateSheet = false
+              return
+            }
+            if (!this.tagColor) {
+              promptAction.openToast({
+                message: '请输入颜色'
+              })
+              return
+            }
+            await updateTag(this.tagId, {
+              value: this.tagValue,
+              color: this.tagColor,
+              cloudBackup: this.cloudBackup
             })
-        }
-        .width('100%')
+            this.isShowUpdateSheet = false
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
+      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

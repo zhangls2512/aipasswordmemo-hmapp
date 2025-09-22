@@ -79,8 +79,10 @@ export async function importCloudBackupPassword() {
           await importPassword(JSON.stringify(array), 0)
         }
       }
+      return 'success'
     }
   }
+  return 'fail'
 }
 
 export async function importCloudBackupInfo() {
@@ -129,8 +131,10 @@ export async function importCloudBackupInfo() {
           await importInfo(JSON.stringify(array), 0)
         }
       }
+      return 'success'
     }
   }
+  return 'fail'
 }
 
 export async function importCloudBackupTag() {
@@ -179,6 +183,8 @@ export async function importCloudBackupTag() {
           await importTag(JSON.stringify(array), 0)
         }
       }
+      return 'success'
     }
   }
+  return 'fail'
 }

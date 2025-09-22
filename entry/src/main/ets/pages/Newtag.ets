@@ -122,34 +122,32 @@ export default struct Newtag {
       })
 
       ListItem() {
-        Column() {
-          Button('新增')
-            .onClick(async () => {
-              if (!this.tagValue) {
-                promptAction.openToast({
-                  message: '请输入内容'
-                })
-                return
-              }
-              if (!this.tagColor) {
-                promptAction.openToast({
-                  message: '请输入颜色'
-                })
-                return
-              }
-              await newTag({
-                value: this.tagValue,
-                color: this.tagColor,
-                cloudBackup: this.cloudBackup
+        Button('新增')
+          .onClick(async () => {
+            if (!this.tagValue) {
+              promptAction.openToast({
+                message: '请输入内容'
               })
-              this.isShowNewSheet = false
+              return
+            }
+            if (!this.tagColor) {
+              promptAction.openToast({
+                message: '请输入颜色'
+              })
+              return
+            }
+            await newTag({
+              value: this.tagValue,
+              color: this.tagColor,
+              cloudBackup: this.cloudBackup
             })
-        }
-        .width('100%')
+            this.isShowNewSheet = false
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
+      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

@@ -22,36 +22,34 @@ export default struct Urlcheck {
       })
 
       ListItem() {
-        Column() {
-          Button('添加')
-            .onClick(() => {
-              if (this.urlArray.length >= 10) {
-                promptAction.openToast({
-                  message: '数量达到上限'
-                })
-                return
-              }
-              if (!this.url) {
-                promptAction.openToast({
-                  message: '请输入 URL'
-                })
-                return
-              }
-              if (this.urlArray.includes(this.url)) {
-                promptAction.openToast({
-                  message: '已添加此 URL'
-                })
-                return
-              }
-              this.urlArray.push(this.url)
-              this.url = ''
-            })
-        }
-        .width('100%')
+        Button('添加')
+          .onClick(() => {
+            if (this.urlArray.length >= 10) {
+              promptAction.openToast({
+                message: '数量达到上限'
+              })
+              return
+            }
+            if (!this.url) {
+              promptAction.openToast({
+                message: '请输入 URL'
+              })
+              return
+            }
+            if (this.urlArray.includes(this.url)) {
+              promptAction.openToast({
+                message: '已添加此 URL'
+              })
+              return
+            }
+            this.urlArray.push(this.url)
+            this.url = ''
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
+      .width('100%')
 
       ForEach(this.urlArray, (item: string, index) => {
         ListItem() {
@@ -80,41 +78,39 @@ export default struct Urlcheck {
         })
       })
       ListItem() {
-        Column() {
-          Button('检测')
-            .onClick(async () => {
-              if (this.urlArray.length === 0) {
-                promptAction.openToast({
-                  message: '请添加 URL'
-                })
-                return
-              }
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '检测中...'
-                })
+        Button('检测')
+          .onClick(async () => {
+            if (this.urlArray.length === 0) {
+              promptAction.openToast({
+                message: '请添加 URL'
               })
-              dialogControllerProgress.open()
-              try {
-                const res = await safetyDetect.checkUrlThreat({
-                  urls: [...this.urlArray]
-                })
-                dialogControllerProgress.close()
-                this.resultArray = res.results
-              } catch (err) {
-                dialogControllerProgress.close()
-                promptAction.openToast({
-                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                })
-              }
+              return
+            }
+            const dialogControllerProgress = new CustomDialogController({
+              builder: LoadingDialog({
+                content: '检测中...'
+              })
             })
-        }
-        .width('100%')
+            dialogControllerProgress.open()
+            try {
+              const res = await safetyDetect.checkUrlThreat({
+                urls: [...this.urlArray]
+              })
+              dialogControllerProgress.close()
+              this.resultArray = res.results
+            } catch (err) {
+              dialogControllerProgress.close()
+              promptAction.openToast({
+                message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+              })
+            }
+          })
       }
       .margin({
         bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
+      .width('100%')
 
       ForEach(this.resultArray, (item: safetyDetect.UrlCheckResult) => {
         ListItem() {
@@ -144,7 +140,7 @@ export default struct Urlcheck {
               }
               if (item.threat === safetyDetect.UrlThreatType.OTHERS) {
                 Text('其他')
-                  .fontColor(Color.Gray)
+                  .fontColor(Color.Grey)
                   .textAlign(TextAlign.End)
                   .width('15%')
               }

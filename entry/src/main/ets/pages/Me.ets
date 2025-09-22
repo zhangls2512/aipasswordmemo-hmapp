@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { promptAction, window } from '@kit.ArkUI'
+import { window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo, remove } from '../common/Accesstoken'
@@ -335,8 +335,8 @@ export default struct Me {
                 })
                 .width(24)
               Text('恶意URL检测')
-                .fontWeight(FontWeight.Medium)
                 .enableAutoSpacing(true)
+                .fontWeight(FontWeight.Medium)
               Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -433,6 +433,7 @@ export default struct Me {
               })
               .buildEffect())
             .onClick(async () => {
+              const promptAction = this.getUIContext().getPromptAction()
               const data = await promptAction.showDialog({
                 title: '提示',
                 message: '确定退出登录？',

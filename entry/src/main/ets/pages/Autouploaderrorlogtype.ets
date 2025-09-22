@@ -21,6 +21,10 @@ struct Autouploaderrorlogtype {
   })
   typeArray: Type[] = [
     {
+      name: 'js 运行异常',
+      value: 'JS_ERROR'
+    },
+    {
       name: '应用崩溃',
       value: 'APP_CRASH'
     },
@@ -64,6 +68,7 @@ struct Autouploaderrorlogtype {
 
   getSetting() {
     this.autoUploadErrorLogType = this.debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
+      'JS_ERROR',
       'APP_CRASH',
       'APP_FREEZE',
       'APP_KILLED',
@@ -92,8 +97,8 @@ struct Autouploaderrorlogtype {
               }
               Row() {
                 Text(item.name)
-                  .fontWeight(FontWeight.Medium)
                   .enableAutoSpacing(true)
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Toggle({
                   type: ToggleType.Switch,

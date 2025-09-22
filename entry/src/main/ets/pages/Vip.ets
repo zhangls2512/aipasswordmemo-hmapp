@@ -220,8 +220,8 @@ struct Vip {
                     }
                     Row() {
                       Text(item.name)
-                        .fontWeight(FontWeight.Medium)
                         .enableAutoSpacing(true)
+                        .fontWeight(FontWeight.Medium)
                       Blank()
                       Text(item.price)
                         .fontColor($r('sys.color.font_secondary'))

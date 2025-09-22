@@ -23,6 +23,14 @@
     {
       "name": "searchPassword",
       "value": "搜索密码"
+    },
+    {
+      "name": "card_displayname",
+      "value": "新增、搜索密码"
+    },
+    {
+      "name": "card_description",
+      "value": "新增、搜索密码快捷入口"
     }
   ]
 }

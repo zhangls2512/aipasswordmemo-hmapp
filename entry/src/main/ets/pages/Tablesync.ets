@@ -192,6 +192,7 @@ struct Tablesync {
             .fontWeight(FontWeight.Medium)
         }
         .margin({
+          bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
@@ -321,7 +322,7 @@ struct Tablesync {
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
         if (this.autoSyncDevices.length === 0) {
@@ -329,7 +330,7 @@ struct Tablesync {
             Text('无数据')
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .width('100%')
         }
@@ -411,6 +412,7 @@ struct Tablesync {
           }
         }
         .margin({
+          bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
@@ -562,8 +564,9 @@ struct Tablesync {
               })
               .width('100%')
               .onClick(async () => {
+                const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showActionMenu({
-                  title: '选择数据项',
+                  title: '选择数据类型',
                   buttons: [
                     {
                       text: '密码',
@@ -616,8 +619,9 @@ struct Tablesync {
               })
               .width('100%')
               .onClick(async () => {
+                const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showActionMenu({
-                  title: '选择数据项',
+                  title: '选择数据类型',
                   buttons: [
                     {
                       text: '密码',
@@ -649,7 +653,7 @@ struct Tablesync {
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
         if (this.availableDeviceArray.length === 0) {
@@ -657,7 +661,7 @@ struct Tablesync {
             Text('无数据')
           }
           .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .width('100%')
         }
