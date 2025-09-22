@@ -33,10 +33,10 @@ struct Infolist {
         ListItem() {
           Column() {
             Text('IP地址及其归属地、运营商')
+              .enableAutoSpacing(true)
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
-              .enableAutoSpacing(true)
               .margin({
                 bottom: 6,
                 left: 12
@@ -46,9 +46,9 @@ struct Infolist {
                 Text('使用场景')
                   .fontWeight(FontWeight.Medium)
                 Text('查询轩铭2512统一账号登录日志时')
+                  .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -67,9 +67,9 @@ struct Infolist {
                 Text('使用目的')
                   .fontWeight(FontWeight.Medium)
                 Text('生成、存储轩铭2512统一账号登录日志')
+                  .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -88,9 +88,9 @@ struct Infolist {
                 Text('收集时机')
                   .fontWeight(FontWeight.Medium)
                 Text('轩铭2512统一账号登录成功时')
+                  .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -152,10 +152,10 @@ struct Infolist {
         ListItem() {
           Column() {
             Text('华为账号UnionID')
+              .enableAutoSpacing(true)
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
-              .enableAutoSpacing(true)
               .margin({
                 bottom: 6,
                 left: 12
@@ -185,9 +185,9 @@ struct Infolist {
                 Text('使用目的')
                   .fontWeight(FontWeight.Medium)
                 Text('关联华为账号与轩铭2512统一账号')
+                  .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -269,10 +269,10 @@ struct Infolist {
         ListItem() {
           Column() {
             Text('订单号、商品ID')
+              .enableAutoSpacing(true)
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
-              .enableAutoSpacing(true)
               .margin({
                 bottom: 6,
                 left: 12
@@ -477,6 +477,7 @@ struct Infolist {
                 const deviceToken = await getDeviceToken()
                 dialogControllerProgress.close()
                 if (deviceToken) {
+                  const promptAction = this.getUIContext().getPromptAction()
                   promptAction.showDialog({
                     title: 'DeviceToken',
                     message: deviceToken,
@@ -575,9 +576,9 @@ struct Infolist {
                 Text('信息内容')
                   .fontWeight(FontWeight.Medium)
                 Text('数据类型、数据行ID、数据密文、密钥初始向量')
+                  .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -691,6 +692,7 @@ struct Infolist {
               .onClick(async () => {
                 try {
                   const pushToken = await pushService.getToken()
+                  const promptAction = this.getUIContext().getPromptAction()
                   promptAction.showDialog({
                     title: 'PushToken',
                     message: pushToken,

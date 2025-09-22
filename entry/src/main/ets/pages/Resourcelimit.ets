@@ -133,26 +133,24 @@ struct Resourcelimit {
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })
             Text('2. native内存范围：[1024,4194304]。')
-              .fontWeight(FontWeight.Medium)
               .enableAutoSpacing(true)
+              .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
               })
             Text('3. js堆内存范围：[85,95]。')
-              .fontWeight(FontWeight.Medium)
               .enableAutoSpacing(true)
+              .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
               })
             Text('4. 文件描述符范围：[10,10000]。')
               .fontWeight(FontWeight.Medium)
-              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
               })
             Text('5. 线程范围：[1,1000]。')
               .fontWeight(FontWeight.Medium)
-              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
               })

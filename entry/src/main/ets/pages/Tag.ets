@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LoadingDialog } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
@@ -147,6 +147,7 @@ export default struct TagPage {
                   this.loading = true
                 }),
                 onWillDismiss: (async (DismissSheetAction) => {
+                  const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showDialog({
                     title: '提示',
                     message: '数据尚未保存，确定退出？',
@@ -223,6 +224,7 @@ export default struct TagPage {
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
                   Text(item.value)
+                    .enableAutoSpacing(true)
                     .fontWeight(FontWeight.Medium)
                 }
                 .width('90%')
@@ -292,6 +294,7 @@ export default struct TagPage {
           this.loading = true
         }),
         onWillDismiss: (async (DismissSheetAction) => {
+          const promptAction = this.getUIContext().getPromptAction()
           const data = await promptAction.showDialog({
             title: '提示',
             message: '数据尚未保存，确定退出？',

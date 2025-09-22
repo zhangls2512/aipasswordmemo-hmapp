@@ -45,9 +45,9 @@ struct Viplog {
                 Blank()
                   .width('5%')
                 Text(item.duration === 0 ? '终身' : String(item.duration) + '天')
+                  .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .enableAutoSpacing(true)
                   .textAlign(TextAlign.End)
                   .width('50%')
               }

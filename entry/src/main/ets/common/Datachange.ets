@@ -1,6 +1,5 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { fileIo } from '@kit.CoreFileKit'
 import { get, getAccountInfo } from './Accesstoken'
 import { encrypt } from './Crypto'
 import { CloudBackupTimeItem } from './Dataget'
@@ -387,21 +386,6 @@ export async function deleteData(type: string, id: number) {
   })
   const predicates = new relationalStore.RdbPredicates(type)
   predicates.equalTo('id', id)
-  const resultSet = await rdbStore.query(predicates)
-  if (resultSet.goToNextRow()) {
-    const info = JSON.parse(resultSet.getValue(resultSet.getColumnIndex('info')) as string) as PasswordInfoItem[]
-    resultSet.close()
-    const iconIndex = info.findIndex(item => item.type === '图标')
-    if (iconIndex !== -1) {
-      try {
-        fileIo.unlinkSync(info[iconIndex].value.replace('file://com.zhangxm.aipasswordmemo', ''))
-      } catch (err) {
-        promptAction.openToast({
-          message: '发生错误，错误码：' + err.code
-        })
-      }
-    }
-  }
   rdbStore.deleteSync(predicates)
   promptAction.openToast({
     message: '删除成功'

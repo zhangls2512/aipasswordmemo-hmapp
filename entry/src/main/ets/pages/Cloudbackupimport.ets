@@ -166,6 +166,7 @@ struct Cloudbackupimport {
               .width('100%')
               .onClick(async () => {
                 if (!getKey()) {
+                  const promptAction = this.getUIContext().getPromptAction()
                   promptAction.showDialog({
                     title: '导入失败',
                     message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
@@ -179,11 +180,18 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                await importCloudBackupPassword()
+                const res = await importCloudBackupPassword()
                 this.dialogControllerProgress.close()
-                promptAction.openToast({
-                  message: '导入成功'
-                })
+                if (res === 'success') {
+                  promptAction.openToast({
+                    message: '导入成功'
+                  })
+                }
+                if (res === 'fail') {
+                  promptAction.openToast({
+                    message: '导入失败'
+                  })
+                }
               })
 
               Divider()
@@ -213,6 +221,7 @@ struct Cloudbackupimport {
               .width('100%')
               .onClick(async () => {
                 if (!getKey()) {
+                  const promptAction = this.getUIContext().getPromptAction()
                   promptAction.showDialog({
                     title: '导入失败',
                     message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
@@ -226,11 +235,18 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                await importCloudBackupInfo()
+                const res = await importCloudBackupInfo()
                 this.dialogControllerProgress.close()
-                promptAction.openToast({
-                  message: '导入成功'
-                })
+                if (res === 'success') {
+                  promptAction.openToast({
+                    message: '导入成功'
+                  })
+                }
+                if (res === 'fail') {
+                  promptAction.openToast({
+                    message: '导入失败'
+                  })
+                }
               })
 
               Divider()
@@ -260,6 +276,7 @@ struct Cloudbackupimport {
               .width('100%')
               .onClick(async () => {
                 if (!getKey()) {
+                  const promptAction = this.getUIContext().getPromptAction()
                   promptAction.showDialog({
                     title: '导入失败',
                     message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
@@ -273,11 +290,18 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                await importCloudBackupTag()
+                const res = await importCloudBackupTag()
                 this.dialogControllerProgress.close()
-                promptAction.openToast({
-                  message: '导入成功'
-                })
+                if (res === 'success') {
+                  promptAction.openToast({
+                    message: '导入成功'
+                  })
+                }
+                if (res === 'fail') {
+                  promptAction.openToast({
+                    message: '导入失败'
+                  })
+                }
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

@@ -1,13 +1,17 @@
+import { common } from '@kit.AbilityKit'
 import copy from '../common/Pasteboard'
 
 @ComponentV2
 export default struct Passwordgenerate {
+  @Consumer() isShowPasswordgenerateSheet: boolean = false
+  @Param inputPassword: boolean = false
   @Local length: number = 16
   @Local digit: boolean = true
   @Local lowercaseLetter: boolean = true
   @Local uppercaseLetter: boolean = true
   @Local specialCharacter: boolean = false
   @Local password: string = ''
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   build() {
     List() {
@@ -114,49 +118,47 @@ export default struct Passwordgenerate {
       })
 
       ListItem() {
-        Column() {
-          Button('生成')
-            .enabled(this.digit || this.lowercaseLetter || this.uppercaseLetter || this.specialCharacter)
-            .onClick(() => {
-              const allowCharacters: string[] = []
-              if (this.digit) {
-                allowCharacters.push('0123456789')
+        Button('生成')
+          .enabled(this.digit || this.lowercaseLetter || this.uppercaseLetter || this.specialCharacter)
+          .onClick(() => {
+            const allowCharacters: string[] = []
+            if (this.digit) {
+              allowCharacters.push('0123456789')
+            }
+            if (this.lowercaseLetter) {
+              allowCharacters.push('abcdefghijklmnopqrstuvwxyz')
+            }
+            if (this.uppercaseLetter) {
+              allowCharacters.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+            }
+            if (this.specialCharacter) {
+              allowCharacters.push('!@#$%^&*()_+-=[]{}|;:,.<>?')
+            }
+            const typeCount = allowCharacters.length
+            const baseCount = Math.floor(this.length / typeCount)
+            const remainCount = this.length % typeCount
+            const characterPool: string[] = []
+            for (let i = 0; i < typeCount; i++) {
+              const currentType = allowCharacters[i]
+              const count = i === typeCount - 1 ? baseCount + remainCount : baseCount
+              for (let j = 0; j < count; j++) {
+                const randomIndex = Math.floor(Math.random() * currentType.length)
+                characterPool.push(currentType[randomIndex])
               }
-              if (this.lowercaseLetter) {
-                allowCharacters.push('abcdefghijklmnopqrstuvwxyz')
-              }
-              if (this.uppercaseLetter) {
-                allowCharacters.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-              }
-              if (this.specialCharacter) {
-                allowCharacters.push('!@#$%^&*()_+-=[]{}|;:,.<>?')
-              }
-              const typeCount = allowCharacters.length
-              const baseCount = Math.floor(this.length / typeCount)
-              const remainCount = this.length % typeCount
-              const characterPool: string[] = []
-              for (let i = 0; i < typeCount; i++) {
-                const currentType = allowCharacters[i]
-                const count = i === typeCount - 1 ? baseCount + remainCount : baseCount
-                for (let j = 0; j < count; j++) {
-                  const randomIndex = Math.floor(Math.random() * currentType.length)
-                  characterPool.push(currentType[randomIndex])
-                }
-              }
-              for (let i = characterPool.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1))
-                const temp = characterPool[i]
-                characterPool[i] = characterPool[j]
-                characterPool[j] = temp
-              }
-              this.password = characterPool.join('')
-            })
-        }
-        .width('100%')
+            }
+            for (let i = characterPool.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1))
+              const temp = characterPool[i]
+              characterPool[i] = characterPool[j]
+              characterPool[j] = temp
+            }
+            this.password = characterPool.join('')
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
+      .width('100%')
 
       if (this.password) {
         ListItem() {
@@ -186,6 +188,19 @@ export default struct Passwordgenerate {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
+      }
+      if (this.inputPassword && this.password) {
+        ListItem() {
+          Button('填入')
+            .onClick(() => {
+              this.context.eventHub.emit('inputPassword', this.password)
+              this.isShowPasswordgenerateSheet = false
+            })
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+        .width('100%')
       }
     }
     .padding({

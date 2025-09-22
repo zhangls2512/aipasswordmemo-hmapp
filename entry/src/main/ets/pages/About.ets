@@ -34,6 +34,7 @@ struct About {
                   count: 2
                 })
                   .onAction(async () => {
+                    const promptAction = this.getUIContext().getPromptAction()
                     const data = await promptAction.showActionMenu({
                       title: '调试',
                       buttons: [
@@ -497,8 +498,8 @@ struct About {
               Row() {
                 Column() {
                   Text('QQ群')
-                    .fontWeight(FontWeight.Medium)
                     .enableAutoSpacing(true)
+                    .fontWeight(FontWeight.Medium)
                   Text('https://qm.qq.com/q/8Ugei32784')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -537,8 +538,8 @@ struct About {
               Row() {
                 Column() {
                   Text('MeoW频道')
-                    .fontWeight(FontWeight.Medium)
                     .enableAutoSpacing(true)
+                    .fontWeight(FontWeight.Medium)
                   Text('接收官方通知，包括但不限于公告、活动')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))

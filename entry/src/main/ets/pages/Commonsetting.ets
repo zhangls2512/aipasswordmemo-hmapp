@@ -27,6 +27,7 @@ struct Commonsetting {
   @Local keepScreenOn: boolean = false
   @Local disallowScreenshot: boolean = true
   @Local showPasswordInIndex: boolean = false
+  @Local passwordInfoValueDataDetector: boolean = true
   @Local mfaSecondsRemainingStyleIndex: number = 0
   @Local mfaSecondsRemainingStyleValue: string = 'progress'
   @Local checkVersionUpdateIndex: number = 1
@@ -90,9 +91,11 @@ struct Commonsetting {
                         await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
                       }
                     } catch (err) {
-                      promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                      })
+                      if (err.code !== 1006800012) {
+                        promptAction.openToast({
+                          message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                        })
+                      }
                     }
                     this.commonSettingDataPreferences.putSync('iconMode', index)
                     this.commonSettingDataPreferences.flushSync()
@@ -118,6 +121,7 @@ struct Commonsetting {
                   .onChange(async (isOn) => {
                     this.commonSettingDataPreferences.putSync('allowContinue', isOn)
                     this.commonSettingDataPreferences.flushSync()
+                    const promptAction = this.getUIContext().getPromptAction()
                     const data = await promptAction.showDialog({
                       title: '提示',
                       message: '设置成功，需重启应用生效，是否重启？',
@@ -183,6 +187,7 @@ struct Commonsetting {
                   .onChange(async (isOn) => {
                     this.commonSettingDataPreferences.putSync('allowRestore', isOn)
                     this.commonSettingDataPreferences.flushSync()
+                    const promptAction = this.getUIContext().getPromptAction()
                     const data = await promptAction.showDialog({
                       title: '提示',
                       message: '设置成功，需重启应用生效，是否重启？',
@@ -253,6 +258,48 @@ struct Commonsetting {
               .borderRadius(12)
               .padding(12)
               .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('防窥保护')
+                  .fontWeight('medium')
+                Blank()
+                Text('去设置')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.context.startAbility({
+                  bundleName: 'com.huawei.hmos.settings',
+                  abilityName: 'com.huawei.hmos.settings.MainAbility',
+                  uri: 'privacy_settings',
+                  parameters: {
+                    pushParams: 'com.zhangxm.aipasswordmemo'
+                  }
+                })
+              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -332,6 +379,7 @@ struct Commonsetting {
                     .onChange(async (isOn) => {
                       this.commonSettingDataPreferences.putSync('windowRectAutoSave', isOn)
                       this.commonSettingDataPreferences.flushSync()
+                      const promptAction = this.getUIContext().getPromptAction()
                       const data = await promptAction.showDialog({
                         title: '提示',
                         message: '设置成功，需重启应用生效，是否重启？',
@@ -467,9 +515,104 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
+                Text('常用信息类型')
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Oftenusedinfotype'
+                })
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('默认隐藏内容密码信息类型')
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Defaulthidepasswordinfotype'
+                })
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Column() {
+                  Text('密码信息内容特殊实体识别')
+                    .fontWeight(FontWeight.Medium)
+                  Text('图标、MFA类型除外')
+                    .enableAutoSpacing(true)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                }
+                .alignItems(HorizontalAlign.Start)
+
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.passwordInfoValueDataDetector!!
+                })
+                  .onChange((isOn) => {
+                    this.commonSettingDataPreferences.putSync('passwordInfoValueDataDetector', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
                 Text('MFA倒计时样式')
-                  .fontWeight(FontWeight.Medium)
                   .enableAutoSpacing(true)
+                  .fontWeight(FontWeight.Medium)
                 Blank()
                 Select([
                   { value: '进度条' },
@@ -612,6 +755,8 @@ struct Commonsetting {
       this.keepScreenOn = lastWindow.getWindowProperties().isKeepScreenOn
       this.disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
       this.showPasswordInIndex = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
+      this.passwordInfoValueDataDetector =
+        this.commonSettingDataPreferences.getSync('passwordInfoValueDataDetector', true) as boolean
       const mfaSecondsRemainingStyle = this.commonSettingDataPreferences.getSync('mfaSecondsRemainingStyle', 0)
       this.mfaSecondsRemainingStyleIndex = mfaSecondsRemainingStyle as number
       if (mfaSecondsRemainingStyle === 0) {

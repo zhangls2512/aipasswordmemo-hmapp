@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI'
 //import { HdsNavDestination } from '@kit.UIDesignKit'
 import openLink from '../common/Openlink'
 
@@ -205,8 +204,8 @@ struct License {
 
               Column() {
                 Text('轩铭2512许12号-1M')
-                  .fontColor($r('sys.color.font_emphasize'))
                   .enableAutoSpacing(true)
+                  .fontColor($r('sys.color.font_emphasize'))
                   .textAlign(TextAlign.Center)
                   .onClick(() => {
                     openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512许12号-1M')
@@ -284,6 +283,7 @@ struct License {
                     .fontColor($r('sys.color.font_emphasize'))
                     .textAlign(TextAlign.Center)
                     .onClick(() => {
+                      const promptAction = this.getUIContext().getPromptAction()
                       promptAction.showDialog({
                         title: '描述',
                         message: item.desc,
@@ -309,8 +309,8 @@ struct License {
 
                 Column() {
                   Text(item.value)
-                    .fontColor($r('sys.color.font_emphasize'))
                     .enableAutoSpacing(true)
+                    .fontColor($r('sys.color.font_emphasize'))
                     .textAlign(TextAlign.Center)
                     .onClick(() => {
                       openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=' + item.value)
@@ -401,8 +401,8 @@ struct License {
 
               Column() {
                 Text('轩铭2512私安备12号-1')
-                  .fontColor($r('sys.color.font_emphasize'))
                   .enableAutoSpacing(true)
+                  .fontColor($r('sys.color.font_emphasize'))
                   .textAlign(TextAlign.Center)
                   .onClick(() => {
                     openLink('https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512私安备12号-1')

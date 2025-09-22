@@ -5,7 +5,7 @@ import { webview } from '@kit.ArkWeb'
 import { asset } from '@kit.AssetStoreKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { stringToArray } from '../common/Crypto'
-import { getPasswordList } from '../common/Dataget'
+import { getPasswordList, getTypeInfoList } from '../common/Dataget'
 
 @Builder
 export default function CleardataBuilder() {
@@ -243,6 +243,7 @@ struct Cleardata {
           .enabled(this.setting.length > 0)
           .role(ButtonRole.ERROR)
           .onClick(async () => {
+            const promptAction = this.getUIContext().getPromptAction()
             const data = await promptAction.showDialog({
               title: '提示',
               message: '清理成功后将恢复所选设置为默认，无法恢复。确定清理？',
@@ -372,9 +373,9 @@ struct Cleardata {
                 Text('Webview')
                   .fontWeight(FontWeight.Medium)
                 Text('Webview缓存')
+                  .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .enableAutoSpacing(true)
                   .margin({
                     top: $r('sys.float.ohos_id_text_margin_vertical')
                   })
@@ -452,56 +453,63 @@ struct Cleardata {
       })
 
       ListItem() {
-        Column() {
-          Button('清理缓存')
-            .enabled(this.cache.length > 0)
-            .role(ButtonRole.ERROR)
-            .onClick(async () => {
-              const data = await promptAction.showDialog({
-                title: '提示',
-                message: '清理成功后性能可能略微降低，但不会影响正常使用。确定清理？',
-                buttons: [
-                  {
-                    text: '取消',
-                    color: $r('sys.color.font_primary')
-                  },
-                  {
-                    text: '清理',
-                    color: $r('sys.color.warning')
-                  }
-                ]
-              })
-              if (data.index === 1) {
-                this.cache.forEach((item) => {
-                  if (item === 'appCache') {
-                    const cacheDir = this.context.cacheDir
-                    const filenames = fileIo.listFileSync(cacheDir)
-                    for (let i = 0; i < filenames.length; i++) {
-                      const path = cacheDir + '/' + filenames[i]
-                      if (fileIo.statSync(path).isDirectory()) {
-                        fileIo.rmdirSync(path)
-                      } else {
-                        fileIo.unlinkSync(path)
-                      }
+        Button('清理缓存')
+          .enabled(this.cache.length > 0)
+          .role(ButtonRole.ERROR)
+          .onClick(async () => {
+            const promptAction = this.getUIContext().getPromptAction()
+            const data = await promptAction.showDialog({
+              title: '提示',
+              message: '清理成功后性能可能略微降低，但不会影响正常使用。确定清理？',
+              buttons: [
+                {
+                  text: '取消',
+                  color: $r('sys.color.font_primary')
+                },
+                {
+                  text: '清理',
+                  color: $r('sys.color.warning')
+                }
+              ]
+            })
+            if (data.index === 1) {
+              this.cache.forEach((item) => {
+                if (item === 'appCache') {
+                  const cacheDir = this.context.cacheDir
+                  const filenames = fileIo.listFileSync(cacheDir)
+                  for (let i = 0; i < filenames.length; i++) {
+                    const path = cacheDir + '/' + filenames[i]
+                    if (fileIo.statSync(path).isDirectory()) {
+                      fileIo.rmdirSync(path)
+                    } else {
+                      fileIo.unlinkSync(path)
                     }
                   }
-                  if (item === 'webviewCache') {
-                    webview.WebviewController.removeAllCache(true)
-                  }
-                  if (item === 'invitationQrcodeCache') {
+                }
+                if (item === 'webviewCache') {
+                  webview.WebviewController.removeAllCache(true)
+                }
+                if (item === 'invitationQrcodeCache') {
+                  try {
                     const invitationcodeQrcodeDir = this.context.filesDir + '/media/invitationqrcode'
                     const filenames = fileIo.listFileSync(invitationcodeQrcodeDir)
                     for (let i = 0; i < filenames.length; i++) {
                       fileIo.unlinkSync(invitationcodeQrcodeDir + '/' + filenames[i])
                     }
+                  } catch (err) {
+                    if (err.code !== 13900002) {
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.code
+                      })
+                    }
                   }
-                })
-                promptAction.openToast({
-                  message: '清理成功'
-                })
-              }
-            })
-        }
+                }
+              })
+              promptAction.openToast({
+                message: '清理成功'
+              })
+            }
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -581,41 +589,48 @@ struct Cleardata {
       })
 
       ListItem() {
-        Column() {
-          Button('清理日志')
-            .enabled(this.log.length > 0)
-            .role(ButtonRole.ERROR)
-            .onClick(async () => {
-              const data = await promptAction.showDialog({
-                title: '提示',
-                message: '日志有助于开发者定位问题。清理成功后无法恢复，确定清理？',
-                buttons: [
-                  {
-                    text: '取消',
-                    color: $r('sys.color.font_primary')
-                  },
-                  {
-                    text: '清理',
-                    color: $r('sys.color.warning')
-                  }
-                ]
-              })
-              if (data.index === 1) {
-                this.log.forEach((item) => {
-                  if (item === 'errorLog') {
+        Button('清理日志')
+          .enabled(this.log.length > 0)
+          .role(ButtonRole.ERROR)
+          .onClick(async () => {
+            const promptAction = this.getUIContext().getPromptAction()
+            const data = await promptAction.showDialog({
+              title: '提示',
+              message: '日志有助于开发者定位问题。清理成功后无法恢复，确定清理？',
+              buttons: [
+                {
+                  text: '取消',
+                  color: $r('sys.color.font_primary')
+                },
+                {
+                  text: '清理',
+                  color: $r('sys.color.warning')
+                }
+              ]
+            })
+            if (data.index === 1) {
+              this.log.forEach((item) => {
+                if (item === 'errorLog') {
+                  try {
                     const errorLogDir = this.context.filesDir + '/log/error'
                     const filenames = fileIo.listFileSync(errorLogDir)
                     for (let i = 0; i < filenames.length; i++) {
                       fileIo.unlinkSync(errorLogDir + '/' + filenames[i])
                     }
+                  } catch (err) {
+                    if (err.code !== 13900002) {
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.code
+                      })
+                    }
                   }
-                })
-                promptAction.openToast({
-                  message: '清理成功'
-                })
-              }
-            })
-        }
+                }
+              })
+              promptAction.openToast({
+                message: '清理成功'
+              })
+            }
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -669,8 +684,8 @@ struct Cleardata {
                 .select(this.speakSettingNouse!!)
               Column() {
                 Text('AI助手设置数据')
-                  .fontWeight(FontWeight.Medium)
                   .enableAutoSpacing(true)
+                  .fontWeight(FontWeight.Medium)
                 Text('语音播报、连续对话')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -760,24 +775,32 @@ struct Cleardata {
       })
 
       ListItem() {
-        Column() {
-          Button('清理无用数据')
-            .enabled(this.nouse.length > 0)
-            .role(ButtonRole.ERROR)
-            .onClick(() => {
-              this.nouse.forEach(async (item) => {
-                if (item === 'oldaccountNouse') {
+        Button('清理无用数据')
+          .enabled(this.nouse.length > 0)
+          .role(ButtonRole.ERROR)
+          .onClick(() => {
+            this.nouse.forEach(async (item) => {
+              if (item === 'oldaccountNouse') {
+                try {
                   const query: asset.AssetMap = new Map()
                   query.set(asset.Tag.ALIAS, stringToArray('accessToken'))
                   asset.removeSync(query)
                   await preferences.deletePreferences(this.context, {
                     name: 'login'
                   })
+                } catch (err) {
+                  if (err.code !== 24000002) {
+                    promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code
+                    })
+                  }
                 }
-                if (item === 'speakSettingNouse') {
-                  preferences.deletePreferences(this.context, 'speakSetting')
-                }
-                if (item === 'passwordIconNouse') {
+              }
+              if (item === 'speakSettingNouse') {
+                preferences.deletePreferences(this.context, 'speakSetting')
+              }
+              if (item === 'passwordIconNouse') {
+                try {
                   const passwordIconDir = this.context.filesDir + '/media/passwordicon'
                   const passwordIconFileArray =
                     fileIo.listFileSync(passwordIconDir).map(item => passwordIconDir + '/' + item)
@@ -790,19 +813,26 @@ struct Cleardata {
                         ''))
                     }
                   })
-                  const passwordIconPathSet = new Set(passwordIconPathArray)
-                  const nousePasswordIconFilePathArray =
-                    passwordIconFileArray.filter(item => !passwordIconPathSet.has(item))
+                  const infoArray = await getTypeInfoList('图标')
+                  const infoIconPathArray = infoArray.map(item => item.replace('file://com.zhangxm.aipasswordmemo', ''))
+                  const iconPathSet = new Set(passwordIconPathArray.concat(infoIconPathArray))
+                  const nousePasswordIconFilePathArray = passwordIconFileArray.filter(item => !iconPathSet.has(item))
                   nousePasswordIconFilePathArray.forEach(item => {
                     fileIo.unlinkSync(item)
                   })
+                } catch (err) {
+                  if (err.code !== 13900002) {
+                    promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code
+                    })
+                  }
                 }
-              })
-              promptAction.openToast({
-                message: '清理成功'
-              })
+              }
             })
-        }
+            promptAction.openToast({
+              message: '清理成功'
+            })
+          })
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -813,6 +843,9 @@ struct Cleardata {
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
       left: $r('sys.float.ohos_id_max_padding_start'),
       right: $r('sys.float.ohos_id_max_padding_end')
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.emit('refreshSetting')
     })
   }
 }

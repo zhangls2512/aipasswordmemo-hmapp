@@ -142,8 +142,5 @@ struct Moresetting {
       }
     })*/
     .title('其他')
-    .onDisAppear(() => {
-      this.context.eventHub.emit('refreshSetting')
-    })
   }
 }

@@ -288,8 +288,8 @@ struct Invite {
             Text('活动说明')
               .fontWeight(FontWeight.Bold)
             Text('1. 其他账号每使用本账号邀请码一次，本账号获得7天会员，其他账号获得30天会员。')
-              .fontWeight(FontWeight.Medium)
               .enableAutoSpacing(true)
+              .fontWeight(FontWeight.Medium)
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })

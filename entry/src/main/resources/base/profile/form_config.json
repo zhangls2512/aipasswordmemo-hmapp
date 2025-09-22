@@ -2,7 +2,8 @@
   "forms": [
     {
       "name": "passwordentrance",
-      "displayName": "新增、搜索密码快捷入口",
+      "displayName": "$string:card_displayname",
+      "description": "$string:card_description",
       "src": "./ets/widget/pages/PasswordentranceCard.ets",
       "uiSyntax": "arkts",
       "isDefault": true,

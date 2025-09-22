@@ -56,3 +56,32 @@ export async function getRepeatPasswordList() {
   const array = Array.from(arrayMap.values()).filter(item => item.count !== 1).sort((a, b) => b.count - a.count)
   return array
 }
+
+export async function getOldPasswordList() {
+  const context = getContext()
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: 'password',
+    securityLevel: 4,
+    encrypt: true,
+    allowRebuild: true
+  })
+  const predicates = new relationalStore.RdbPredicates('password')
+  const resultSet = await rdbStore.query(predicates)
+  const idIndex = resultSet.getColumnIndex('id')
+  const nameIndex = resultSet.getColumnIndex('name')
+  const infoIndex = resultSet.getColumnIndex('info')
+  const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+  const array: ListItem[] = []
+  while (resultSet.goToNextRow()) {
+    const infoArray = JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[]
+    const updateTime = resultSet.getValue(updateTimeIndex) as number
+    if (infoArray.findIndex(item => item.type === '密码') !== -1 && updateTime < Date.now() - 31536000000) {
+      array.push({
+        id: resultSet.getValue(idIndex) as number,
+        name: resultSet.getValue(nameIndex) as string
+      })
+    }
+  }
+  resultSet.close()
+  return array
+}
