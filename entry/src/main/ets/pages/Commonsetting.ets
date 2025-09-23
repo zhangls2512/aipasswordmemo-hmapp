@@ -5,7 +5,6 @@ import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 
 //import { HdsNavDestination } from '@kit.UIDesignKit'
-
 @Builder
 export function CommonsettingBuilder() {
   Commonsetting()
@@ -30,6 +29,7 @@ struct Commonsetting {
   @Local passwordInfoValueDataDetector: boolean = true
   @Local mfaSecondsRemainingStyleIndex: number = 0
   @Local mfaSecondsRemainingStyleValue: string = 'progress'
+  @Local pushItemWhenBlur: boolean = false
   @Local checkVersionUpdateIndex: number = 1
   @Local checkVersionUpdateValue: string = '仅 WLAN 下'
   @Local openLinkTypeIndex: number = 0
@@ -432,7 +432,6 @@ struct Commonsetting {
                 .padding(12)
                 .width('100%')
               }
-
               Divider()
                 .padding({
                   left: 12,
@@ -628,6 +627,40 @@ struct Commonsetting {
               .borderRadius(12)
               .padding(12)
               .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Column() {
+                  Text('密码信息内容、标签输入框失焦时自动添加信息、标签')
+                    .fontWeight(FontWeight.Medium)
+                  Text('MFA信息类型仅对输入otpauthUri时生效')
+                    .enableAutoSpacing(true)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .width('85%')
+
+                Blank()
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.pushItemWhenBlur!!
+                })
+                  .onChange((isOn) => {
+                    this.commonSettingDataPreferences.putSync('pushItemWhenBlur', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -765,6 +798,7 @@ struct Commonsetting {
       if (mfaSecondsRemainingStyle === 1) {
         this.mfaSecondsRemainingStyleValue = '数字'
       }
+      this.pushItemWhenBlur = this.commonSettingDataPreferences.getSync('pushItemWhenBlur', false) as boolean
       const checkVersionUpdate = this.commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
       this.checkVersionUpdateIndex = checkVersionUpdate as number
       if (checkVersionUpdate === 0) {

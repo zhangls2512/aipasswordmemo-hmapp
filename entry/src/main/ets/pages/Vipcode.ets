@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit'
-//import { commentManager } from '@kit.AppGalleryKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 //import { HdsNavDestination } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
@@ -74,13 +73,6 @@ struct Vipcode {
               })
               .onClick(() => {
                 this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
-                /*try {
-                  await commentManager.showCommentDialog(this.context)
-                } catch (err) {
-                  promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                  })
-                }*/
               })
             Text('· 提供有效反馈')
               .fontColor($r('sys.color.font_emphasize'))

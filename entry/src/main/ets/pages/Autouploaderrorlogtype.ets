@@ -1,7 +1,6 @@
 import { preferences } from '@kit.ArkData'
 
 //import { HdsNavDestination } from '@kit.UIDesignKit'
-
 interface Type {
   name: string,
   value: string

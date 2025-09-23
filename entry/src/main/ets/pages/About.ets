@@ -293,13 +293,6 @@ struct About {
             .width('100%')
             .onClick(() => {
               this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
-              /*try {
-                await commentManager.showCommentDialog(this.context)
-              } catch (err) {
-                promptAction.openToast({
-                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                })
-              }*/
             })
 
             Divider()
@@ -361,7 +354,6 @@ struct About {
           })
           .width('100%')
         }
-
         ListItem() {
           Column() {
             Text('人工客服')

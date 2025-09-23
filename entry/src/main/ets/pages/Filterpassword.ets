@@ -17,12 +17,21 @@ export default struct Filterpassword {
   @Local passwordTagArray: string[] = []
   @Local tagArray: string[] = []
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  pushItemWhenBlur = false
   oftenUsedInfoTypes: string[] = ['自定义']
   specialInfoTypes: string[] =
-    ['图标', '昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
+    ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
   })
+
+  getCurrentInfoType() {
+    let infoType = this.infoType
+    if (this.infoTypeValue !== '自定义') {
+      infoType = this.infoTypeValue
+    }
+    return infoType
+  }
 
   build() {
     List() {
@@ -53,11 +62,9 @@ export default struct Filterpassword {
             .value(this.infoTypeValue!!)
             .onSelect(async (index, value) => {
               if (value !== '自定义') {
-                this.infoType = value
                 this.infoArray = await getTypeInfoList(value)
               }
               if (value === '自定义') {
-                this.infoType = ''
                 this.infoArray = []
               }
             })
@@ -74,6 +81,7 @@ export default struct Filterpassword {
                 if (this.oftenUsedInfoTypes.includes(value)) {
                   this.infoTypeIndex = this.oftenUsedInfoTypes.indexOf(value)
                   this.infoTypeValue = value
+                  this.infoType = ''
                 }
                 if (value !== '自定义') {
                   this.infoArray = await getTypeInfoList(value)
@@ -83,7 +91,7 @@ export default struct Filterpassword {
                 }
               })
           }
-          if (this.infoType === '昵称') {
+          if (this.getCurrentInfoType() === '昵称') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -93,8 +101,25 @@ export default struct Filterpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
+              })
           }
-          if (this.infoType === '用户名') {
+          if (this.getCurrentInfoType() === '用户名') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -105,8 +130,25 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.USER_NAME)
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
+              })
           }
-          if (this.infoType === '密码') {
+          if (this.getCurrentInfoType() === '密码') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -117,8 +159,25 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Password)
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
+              })
           }
-          if (this.infoType === '姓名') {
+          if (this.getCurrentInfoType() === '姓名') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -128,8 +187,25 @@ export default struct Filterpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
+              })
           }
-          if (this.infoType === '手机号') {
+          if (this.getCurrentInfoType() === '手机号') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -140,8 +216,25 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.PhoneNumber)
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
+              })
           }
-          if (this.infoType === '邮箱') {
+          if (this.getCurrentInfoType() === '邮箱') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -152,8 +245,25 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Email)
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
+              })
           }
-          if (this.infoType === '银行卡号') {
+          if (this.getCurrentInfoType() === '银行卡号') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -164,8 +274,25 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Number)
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
+              })
           }
-          if (this.infoType === '身份证号') {
+          if (this.getCurrentInfoType() === '身份证号') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -175,8 +302,25 @@ export default struct Filterpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
+              })
           }
-          if (this.infoType === 'URL') {
+          if (this.getCurrentInfoType() === 'URL') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -186,8 +330,25 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.URL)
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
+              })
           }
-          if (!this.specialInfoTypes.includes(this.infoType)) {
+          if (!this.specialInfoTypes.includes(this.getCurrentInfoType())) {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -195,6 +356,23 @@ export default struct Filterpassword {
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .onBlur(async () => {
+                const infoType = this.getCurrentInfoType()
+                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+                this.infoValue) {
+                  this.passwordInfoArray.push({
+                    type: infoType,
+                    value: this.infoValue
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  if (this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  }
+                }
               })
           }
         }
@@ -209,14 +387,14 @@ export default struct Filterpassword {
           ListItem() {
             Column() {
               Row() {
-                if (this.infoType !== '图标') {
+                if (this.getCurrentInfoType() !== '图标') {
                   Text(item)
                     .enableAutoSpacing(true)
                     .width('87%')
                   Blank()
                     .width('5%')
                 }
-                if (this.infoType === '图标') {
+                if (this.getCurrentInfoType() === '图标') {
                   Image(item)
                     .copyOption(CopyOptions.LocalDevice)
                     .width('10%')
@@ -233,14 +411,14 @@ export default struct Filterpassword {
                 Image($r('app.media.add'))
                   .width('8%')
                   .onClick(() => {
-                    if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
+                    if (this.passwordInfoArray.some(item => item.type === this.getCurrentInfoType())) {
                       promptAction.openToast({
                         message: '已添加此类型信息'
                       })
                       return
                     }
                     this.passwordInfoArray.push({
-                      type: this.infoType,
+                      type: this.getCurrentInfoType(),
                       value: item
                     })
                   })
@@ -258,17 +436,18 @@ export default struct Filterpassword {
           })
         }
       })
-      if (this.infoType !== '图标') {
+      if (this.getCurrentInfoType() !== '图标') {
         ListItem() {
           Button('添加')
             .onClick(async () => {
-              if (!this.infoType) {
+              const infoType = this.getCurrentInfoType()
+              if (!infoType) {
                 promptAction.openToast({
                   message: '请输入类型'
                 })
                 return
               }
-              if (this.passwordInfoArray.some(item => item.type === this.infoType)) {
+              if (this.passwordInfoArray.some(item => item.type === infoType)) {
                 promptAction.openToast({
                   message: '已添加此类型信息'
                 })
@@ -281,15 +460,15 @@ export default struct Filterpassword {
                 return
               }
               this.passwordInfoArray.push({
-                type: this.infoType,
+                type: infoType,
                 value: this.infoValue
               })
-              this.infoType = this.oftenUsedInfoTypes[0]
+              this.infoType = ''
               this.infoTypeIndex = 0
               this.infoTypeValue = this.oftenUsedInfoTypes[0]
               this.infoValue = ''
-              if (this.oftenUsedInfoTypes[0] !== 'MFA' && this.oftenUsedInfoTypes[0] !== '自定义') {
-                this.infoArray = await getTypeInfoList(this.oftenUsedInfoTypes[0])
+              if (this.infoTypeValue !== '自定义') {
+                this.infoArray = await getTypeInfoList(this.infoTypeValue)
               }
             })
         }
@@ -298,7 +477,6 @@ export default struct Filterpassword {
         })
         .width('100%')
       }
-
       ForEach(this.passwordInfoArray, (item: PasswordInfoItem, index) => {
         ListItem() {
           Column() {
@@ -452,21 +630,18 @@ export default struct Filterpassword {
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
         name: 'commonSetting'
       })
-      const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码']) as string[]
+      this.pushItemWhenBlur = commonSettingDataPreferences.getSync('pushItemWhenBlur', false) as boolean
+      const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码', '图标']) as string[]
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
-      if (this.oftenUsedInfoTypes[0] !== '自定义') {
-        this.infoType = this.oftenUsedInfoTypes[0]
-      }
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
-      if (this.oftenUsedInfoTypes[0] !== '自定义') {
-        this.infoArray = await getTypeInfoList(this.oftenUsedInfoTypes[0])
+      if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
+        this.infoArray = await getTypeInfoList(this.infoTypeValue)
       }
+      const tagArray = await getTagList()
+      this.tagArray = tagArray.map(item => item.value)
       this.passwordNameKeyword = this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string
       this.passwordInfoArray = this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[]
       this.passwordTagArray = this.filterPasswordDataPreferences.getSync('tag', []) as string[]
-      this.infoArray = await getTypeInfoList(this.infoType)
-      const tagArray = await getTagList()
-      this.tagArray = tagArray.map(item => item.value)
     })
   }
 }

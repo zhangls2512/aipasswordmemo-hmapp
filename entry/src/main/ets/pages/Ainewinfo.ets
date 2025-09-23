@@ -78,54 +78,70 @@ export default struct Ainewinfo {
     Menu() {
       MenuItem({ content: '拍照' })
         .onClick(async () => {
-          const pickerres = await picker.pick(this.context, [picker.PickerMediaType.PHOTO], {
-            cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK
-          })
-          const fileSource = await fileIo.open(pickerres.resultUri)
-          const imageSource = image.createImageSource(fileSource.fd)
-          const imagePixelMap = await imageSource.createPixelMap()
-          const dialogControllerProgress = new CustomDialogController({
-            builder: LoadingDialog({
-              content: '识别中...'
+          try {
+            const pickerres = await picker.pick(this.context, [picker.PickerMediaType.PHOTO], {
+              cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK
             })
-          })
-          dialogControllerProgress.open()
-          const initres = await textRecognition.init()
-          if (initres) {
-            const textrecognitionres = await textRecognition.recognizeText({
-              pixelMap: imagePixelMap
+            const fileSource = await fileIo.open(pickerres.resultUri)
+            const imageSource = image.createImageSource(fileSource.fd)
+            const imagePixelMap = await imageSource.createPixelMap()
+            const dialogControllerProgress = new CustomDialogController({
+              builder: LoadingDialog({
+                content: '识别中...'
+              })
             })
-            dialogControllerProgress.close()
-            this.text = textrecognitionres.value
-            await textRecognition.release()
-            this.getList(this.text)
+            dialogControllerProgress.open()
+            const initres = await textRecognition.init()
+            if (initres) {
+              const textrecognitionres = await textRecognition.recognizeText({
+                pixelMap: imagePixelMap
+              })
+              dialogControllerProgress.close()
+              this.text = textrecognitionres.value
+              await textRecognition.release()
+              this.getList(this.text)
+            }
+          } catch (err) {
+            if (err.code !== 13900002) {
+              promptAction.openToast({
+                message: '发生错误，错误码：' + err.code
+              })
+            }
           }
         })
       MenuItem({ content: '从图库中选择' })
         .onClick(async () => {
-          const photoPicker = new photoAccessHelper.PhotoViewPicker()
-          const pickerres = await photoPicker.select({
-            MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
-            maxSelectNumber: 1
-          })
-          const fileSource = await fileIo.open(pickerres.photoUris[0])
-          const imageSource = image.createImageSource(fileSource.fd)
-          const imagePixelMap = await imageSource.createPixelMap()
-          const dialogControllerProgress = new CustomDialogController({
-            builder: LoadingDialog({
-              content: '识别中...'
+          try {
+            const photoPicker = new photoAccessHelper.PhotoViewPicker()
+            const pickerres = await photoPicker.select({
+              MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+              maxSelectNumber: 1
             })
-          })
-          dialogControllerProgress.open()
-          const initres = await textRecognition.init()
-          if (initres) {
-            const textrecognitionres = await textRecognition.recognizeText({
-              pixelMap: imagePixelMap
+            const fileSource = await fileIo.open(pickerres.photoUris[0])
+            const imageSource = image.createImageSource(fileSource.fd)
+            const imagePixelMap = await imageSource.createPixelMap()
+            const dialogControllerProgress = new CustomDialogController({
+              builder: LoadingDialog({
+                content: '识别中...'
+              })
             })
-            dialogControllerProgress.close()
-            this.text = textrecognitionres.value
-            await textRecognition.release()
-            this.getList(this.text)
+            dialogControllerProgress.open()
+            const initres = await textRecognition.init()
+            if (initres) {
+              const textrecognitionres = await textRecognition.recognizeText({
+                pixelMap: imagePixelMap
+              })
+              dialogControllerProgress.close()
+              this.text = textrecognitionres.value
+              await textRecognition.release()
+              this.getList(this.text)
+            }
+          } catch (err) {
+            if (err.code !== 13900020) {
+              promptAction.openToast({
+                message: '发生错误，错误码：' + err.code
+              })
+            }
           }
         })
       MenuItem({

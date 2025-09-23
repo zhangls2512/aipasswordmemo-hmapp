@@ -4,7 +4,6 @@ import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 
 //import { HdsNavDestination } from '@kit.UIDesignKit'
-
 @Builder
 export function ServicemodeBuilder() {
   Servicemode()

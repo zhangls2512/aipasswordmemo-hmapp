@@ -148,14 +148,15 @@ struct Viplog {
                   }
                 })
                 .width('100%')
-                .onClick(() => {
-                  const context = getContext()
+                .onClick(async () => {
                   try {
-                    iap.createRefundRequest(context, item.info)
+                    await iap.createRefundRequest(this.getUIContext().getHostContext(), item.info)
                   } catch (err) {
-                    promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                    })
+                    if (err.code !== 1001860000) {
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                      })
+                    }
                   }
                 })
               }

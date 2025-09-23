@@ -4,7 +4,7 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { formProvider } from '@kit.FormKit'
-//import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
+//import { HdsNavigation, HdsNavigationAttribute, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
@@ -1139,11 +1139,17 @@ export default struct Setting {
       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
     })
     /*.titleBar({
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.COMMON_BLUR
+        }
+      },
       content: {
         title: {
           mainTitle: ''
         }
-      }
+      },
+      enableComponentSafeArea: true
     })
     .titleMode(HdsNavigationTitleMode.MINI)*/
     .title('设置')
