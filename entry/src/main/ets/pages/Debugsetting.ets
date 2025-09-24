@@ -3,7 +3,6 @@ import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 
 //import { HdsNavDestination } from '@kit.UIDesignKit'
-
 @Builder
 export function DebugsettingBuilder() {
   Debugsetting()
@@ -265,37 +264,6 @@ struct Debugsetting {
               .borderRadius(12)
               .padding(12)
               .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('应用资源限制')
-                  .fontWeight('medium')
-                Blank()
-                Image($r('app.media.right'))
-                  .fillColor($r('sys.color.icon_fourth'))
-                  .height(12)
-                  .width(12)
-              }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onClick(() => {
-                this.pageInfos.pushPath({
-                  name: 'Resourcelimit'
-                })
-              })
 
               Divider()
                 .padding({

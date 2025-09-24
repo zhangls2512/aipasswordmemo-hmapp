@@ -18,7 +18,6 @@ export default struct TagPage {
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
-  @Local orderColumnText: string = '修改时间'
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   preferType = 1
   orderColumn = 'updateTime'
@@ -133,69 +132,81 @@ export default struct TagPage {
       List() {
         ListItem() {
           Row() {
-            Button('新增')
-              .onClick(() => {
-                this.isShowNewSheet = true
-              })
-              .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
-                height: SheetSize.FIT_CONTENT,
-                preferType: this.preferType,
-                title: {
-                  title: '新增标签'
-                },
-                onDisappear: (() => {
-                  this.loading = true
-                }),
-                onWillDismiss: (async (DismissSheetAction) => {
-                  const promptAction = this.getUIContext().getPromptAction()
-                  const data = await promptAction.showDialog({
-                    title: '提示',
-                    message: '数据尚未保存，确定退出？',
-                    buttons: [
-                      {
-                        text: '取消',
-                        color: $r('sys.color.font_primary')
-                      },
-                      {
-                        text: '确定',
-                        color: $r('sys.color.font_emphasize')
-                      }
-                    ]
-                  })
-                  if (data.index === 1) {
-                    DismissSheetAction.dismiss()
-                  }
+            Column() {
+              Image($r('app.media.new_white'))
+            }
+            .backgroundColor($r('sys.color.background_emphasize'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .width(40)
+            .onClick(() => {
+              this.isShowNewSheet = true
+            })
+            .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
+              height: SheetSize.FIT_CONTENT,
+              preferType: this.preferType,
+              title: {
+                title: '新增标签'
+              },
+              onDisappear: (() => {
+                this.loading = true
+              }),
+              onWillDismiss: (async (DismissSheetAction) => {
+                const promptAction = this.getUIContext().getPromptAction()
+                const data = await promptAction.showDialog({
+                  title: '提示',
+                  message: '数据尚未保存，确定退出？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
                 })
-              })
-            Blank()
-            Button('按' + this.orderColumnText + '排序')
-              .buttonStyle(ButtonStyleMode.NORMAL)
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
-              .bindMenu([
-                {
-                  value: '修改时间',
-                  action: () => {
-                    this.orderColumn = 'updateTime'
-                    this.orderColumnText = '修改时间'
-                    this.loading = true
-                  }
-                },
-                {
-                  value: '内容',
-                  action: () => {
-                    this.orderColumn = 'value'
-                    this.orderColumnText = '内容'
-                    this.loading = true
-                  }
+                if (data.index === 1) {
+                  DismissSheetAction.dismiss()
                 }
-              ], {
-                hapticFeedbackMode: HapticFeedbackMode.AUTO
               })
+            })
+
+            Blank()
+            Column() {
+              Image($r('app.media.sort'))
+            }
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .bindMenu([
+              {
+                value: '按修改时间排序',
+                action: () => {
+                  this.orderColumn = 'updateTime'
+                  this.loading = true
+                }
+              },
+              {
+                value: '按内容排序',
+                action: () => {
+                  this.orderColumn = 'value'
+                  this.loading = true
+                }
+              }
+            ], {
+              hapticFeedbackMode: HapticFeedbackMode.AUTO
+            })
           }
           .width('100%')
         }

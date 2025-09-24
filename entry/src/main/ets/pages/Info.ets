@@ -54,12 +54,11 @@ export default struct InfoPage {
                 message: '保存成功'
               })
             } catch (err) {
-              if (err.code === 13900020) {
-                return
+              if (err.code !== 13900020) {
+                promptAction.openToast({
+                  message: '发生错误，错误码：' + err.code
+                })
               }
-              promptAction.openToast({
-                message: '发生错误，错误码：' + err.code
-              })
             }
           }
         })
@@ -174,49 +173,76 @@ export default struct InfoPage {
       List() {
         ListItem() {
           Row() {
-            Button('新增')
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
-              .onClick(() => {
-                this.isShowNewSheet = true
-              })
-              .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
-                height: SheetSize.FIT_CONTENT,
-                preferType: this.preferType,
-                title: {
-                  title: '新增常用信息'
-                },
-                onDisappear: (() => {
-                  this.loading = true
-                }),
-                onWillDismiss: (async (DismissSheetAction) => {
-                  const promptAction = this.getUIContext().getPromptAction()
-                  const data = await promptAction.showDialog({
-                    title: '提示',
-                    message: '数据尚未保存，确定退出？',
-                    buttons: [
-                      {
-                        text: '取消',
-                        color: $r('sys.color.font_primary')
-                      },
-                      {
-                        text: '确定',
-                        color: $r('sys.color.font_emphasize')
-                      }
-                    ]
-                  })
-                  if (data.index === 1) {
-                    DismissSheetAction.dismiss()
-                  }
+            Column() {
+              Image($r('app.media.new_white'))
+            }
+            .backgroundColor($r('sys.color.background_emphasize'))
+            .borderRadius(20)
+            .height(40)
+            .margin({
+              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+            })
+            .padding(11)
+            .width(40)
+            .onClick(() => {
+              this.isShowNewSheet = true
+            })
+            .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
+              height: SheetSize.FIT_CONTENT,
+              preferType: this.preferType,
+              title: {
+                title: '新增常用信息'
+              },
+              onDisappear: (() => {
+                this.loading = true
+              }),
+              onWillDismiss: (async (DismissSheetAction) => {
+                const promptAction = this.getUIContext().getPromptAction()
+                const data = await promptAction.showDialog({
+                  title: '提示',
+                  message: '数据尚未保存，确定退出？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
                 })
+                if (data.index === 1) {
+                  DismissSheetAction.dismiss()
+                }
               })
+            })
+
             Button('AI 识别新增')
               .buttonStyle(ButtonStyleMode.NORMAL)
               .visualEffect(new hdsEffect.HdsEffectBuilder()
                 .pointLight({
                   sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.CONTENT
+                })
+                .shaderEffect({
+                  effectType: hdsEffect.EffectType.DUAL_EDGE_FLOW_LIGHT,
+                  animation: {
+                    duration: 5000,
+                    iterations: -1
+                  },
+                  params: {
+                    firstEdgeFlowLight: {
+                      startPos: 0,
+                      endPos: 1.0,
+                      color: '#1AD0F1'
+                    },
+                    secondEdgeFlowLight: {
+                      startPos: 0.5,
+                      endPos: 1.5,
+                      color: '#FFA4E5'
+                    }
+                  }
                 })
                 .buildEffect())
               .onClick(() => {

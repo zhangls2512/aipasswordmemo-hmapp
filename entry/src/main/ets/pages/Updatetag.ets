@@ -11,6 +11,10 @@ export default struct Updatetag {
   @Param tagId: number = 0
   @Local tagValue: string = ''
   @Local tagColor: string = 'rgba(0,0,0,0)'
+  @Local red: number = 0
+  @Local green: number = 0
+  @Local blue: number = 0
+  @Local alpha: number = 0
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
@@ -76,9 +80,56 @@ export default struct Updatetag {
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
 
-          Text('颜色示例：#FFFFFF、#FF000000、rgb(255, 100, 255)、rgba(255, 100, 255, 0.5)')
+          Text('颜色示例：#FFFFFF、#FF000000、rgb(255,100,255)、rgba(255,100, 255,0.5)')
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+          Slider({
+            value: this.red!!,
+            max: 255
+          })
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .selectedColor(Color.Red)
+            .trackColor(Color.Red)
+            .onChange(() => {
+              this.tagColor = 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')'
+            })
+          Slider({
+            value: this.green!!,
+            max: 255
+          })
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .selectedColor(Color.Green)
+            .trackColor(Color.Green)
+            .onChange(() => {
+              this.tagColor = 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')'
+            })
+          Slider({
+            value: this.blue!!,
+            max: 255
+          })
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .selectedColor(Color.Blue)
+            .trackColor(Color.Blue)
+            .onChange(() => {
+              this.tagColor = 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')'
+            })
+          Slider({
+            value: this.alpha!!,
+            max: 1,
+            step: 0.01
+          })
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .onChange(() => {
+              this.tagColor = 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')'
             })
         }
         .alignItems(HorizontalAlign.Start)
@@ -137,12 +188,14 @@ export default struct Updatetag {
               })
               return
             }
-            await updateTag(this.tagId, {
+            const res = await updateTag(this.tagId, {
               value: this.tagValue,
               color: this.tagColor,
               cloudBackup: this.cloudBackup
             })
-            this.isShowUpdateSheet = false
+            if (res === 'success') {
+              this.isShowUpdateSheet = false
+            }
           })
       }
       .margin({

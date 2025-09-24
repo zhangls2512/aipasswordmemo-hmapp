@@ -3,7 +3,6 @@ import { promptAction } from '@kit.ArkUI'
 import { webview } from '@kit.ArkWeb'
 
 //import { HdsNavDestination } from '@kit.UIDesignKit'
-
 @Builder
 export function WebviewBuilder() {
   Webview()

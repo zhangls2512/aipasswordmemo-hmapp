@@ -30,6 +30,14 @@ export default struct Newinfo {
   specialInfoTypes: string[] =
     ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
+  getCurrentInfoType() {
+    let infoType = this.infoType
+    if (this.infoTypeValue !== '自定义') {
+      infoType = this.infoTypeValue
+    }
+    return infoType
+  }
+
   @Builder
   ChooseImageMenu() {
     Menu() {
@@ -75,12 +83,11 @@ export default struct Newinfo {
             fileIo.closeSync(file)
             this.infoValue = fileUri.getUriFromPath(filePath)
           } catch (err) {
-            if (err.code === 13900020) {
-              return
+            if (err.code !== 13900020) {
+              promptAction.openToast({
+                message: '发生错误，错误码：' + err.code
+              })
             }
-            promptAction.openToast({
-              message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-            })
           }
         })
       MenuItem({
@@ -159,12 +166,6 @@ export default struct Newinfo {
               if (value === '图标') {
                 this.infoValue = ''
               }
-              if (value !== '自定义') {
-                this.infoType = value
-              }
-              if (value === '自定义') {
-                this.infoType = ''
-              }
               if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                 try {
                   fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
@@ -189,6 +190,7 @@ export default struct Newinfo {
                 if (this.oftenUsedInfoTypes.includes(value)) {
                   this.infoTypeIndex = this.oftenUsedInfoTypes.indexOf(value)
                   this.infoTypeValue = value
+                  this.infoType = ''
                 }
                 if (value === '图标') {
                   this.infoValue = ''
@@ -205,7 +207,7 @@ export default struct Newinfo {
                 }
               })
           }
-          if (this.infoType === '图标') {
+          if (this.getCurrentInfoType() === '图标') {
             Button('选择图片')
               .buttonStyle(ButtonStyleMode.NORMAL)
               .margin({
@@ -230,7 +232,7 @@ export default struct Newinfo {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
           }
-          if (this.infoType === '昵称') {
+          if (this.getCurrentInfoType() === '昵称') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -241,7 +243,7 @@ export default struct Newinfo {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
           }
-          if (this.infoType === '用户名') {
+          if (this.getCurrentInfoType() === '用户名') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -253,7 +255,7 @@ export default struct Newinfo {
               })
               .type(InputType.USER_NAME)
           }
-          if (this.infoType === '密码') {
+          if (this.getCurrentInfoType() === '密码') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -265,7 +267,7 @@ export default struct Newinfo {
               })
               .type(InputType.Password)
           }
-          if (this.infoType === '姓名') {
+          if (this.getCurrentInfoType() === '姓名') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -276,7 +278,7 @@ export default struct Newinfo {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
           }
-          if (this.infoType === '手机号') {
+          if (this.getCurrentInfoType() === '手机号') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -288,7 +290,7 @@ export default struct Newinfo {
               })
               .type(InputType.PhoneNumber)
           }
-          if (this.infoType === '邮箱') {
+          if (this.getCurrentInfoType() === '邮箱') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -300,7 +302,7 @@ export default struct Newinfo {
               })
               .type(InputType.Email)
           }
-          if (this.infoType === '银行卡号') {
+          if (this.getCurrentInfoType() === '银行卡号') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -312,7 +314,7 @@ export default struct Newinfo {
               })
               .type(InputType.Number)
           }
-          if (this.infoType === '身份证号') {
+          if (this.getCurrentInfoType() === '身份证号') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -323,7 +325,7 @@ export default struct Newinfo {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
           }
-          if (this.infoType === 'URL') {
+          if (this.getCurrentInfoType() === 'URL') {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -334,7 +336,7 @@ export default struct Newinfo {
               })
               .type(InputType.URL)
           }
-          if (!this.specialInfoTypes.includes(this.infoType)) {
+          if (!this.specialInfoTypes.includes(this.getCurrentInfoType())) {
             TextInput({
               placeholder: '请输入内容',
               text: this.infoValue!!
@@ -389,7 +391,8 @@ export default struct Newinfo {
       ListItem() {
         Button('新增')
           .onClick(async () => {
-            if (!this.infoType) {
+            const infoType = this.getCurrentInfoType()
+            if (!infoType) {
               promptAction.openToast({
                 message: '请输入类型'
               })
@@ -401,12 +404,14 @@ export default struct Newinfo {
               })
               return
             }
-            await newInfo({
-              type: this.infoType,
+            const res = await newInfo({
+              type: infoType,
               value: this.infoValue,
               cloudBackup: this.cloudBackup
             })
-            this.isShowNewSheet = false
+            if (res === 'success') {
+              this.isShowNewSheet = false
+            }
           })
       }
       .margin({
@@ -423,11 +428,8 @@ export default struct Newinfo {
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
         name: 'commonSetting'
       })
-      const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码']) as string[]
+      const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码', '图标']) as string[]
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
-      if (this.oftenUsedInfoTypes[0] !== '自定义') {
-        this.infoType = this.oftenUsedInfoTypes[0]
-      }
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
       const res = await getCloudServiceStatus()
       const key = getKey()

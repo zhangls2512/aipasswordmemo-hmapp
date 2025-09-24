@@ -234,7 +234,15 @@ export default class EntryAbility extends UIAbility {
       await lastWindow.setWindowTopmost(windowTopmost)
     }
     if (!notificationManager.isNotificationEnabledSync()) {
-      notificationManager.requestEnableNotification(this.context)
+      try {
+        notificationManager.requestEnableNotification(this.context)
+      } catch (err) {
+        if (err.code !== 1600004) {
+          promptAction.openToast({
+            message: '发生错误，错误码：' + err.code
+          })
+        }
+      }
     }
   }
 
@@ -716,7 +724,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 18) {
+    if (wantParam.version !== 19) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

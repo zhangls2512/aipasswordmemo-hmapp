@@ -158,12 +158,11 @@ struct Invite {
                         message: '保存成功'
                       })
                     } catch (err) {
-                      if (err.code === 13900020) {
-                        return
+                      if (err.code !== 13900020) {
+                        promptAction.openToast({
+                          message: '发生错误，错误码：' + err.code
+                        })
                       }
-                      promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code
-                      })
                     }
                   })
               }
