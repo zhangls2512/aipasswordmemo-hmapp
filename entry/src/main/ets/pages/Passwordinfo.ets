@@ -148,12 +148,11 @@ export default struct Passwordinfo {
                     message: '保存成功'
                   })
                 } catch (err) {
-                  if (err.code === 13900020) {
-                    return
+                  if (err.code !== 13900020) {
+                    promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code
+                    })
                   }
-                  promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
                 }
               })
             }
@@ -288,7 +287,6 @@ export default struct Passwordinfo {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
       }
-
       ForEach(this.passwordTag, (item: PasswordTagItem) => {
         ListItem() {
           Column() {

@@ -35,7 +35,6 @@ export default struct PasswordPage {
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
-  @Local orderColumnText: string = '修改时间'
   @Local nameKeyword: string = ''
   @Local info: PasswordInfoItem[] = []
   @Local tag: string[] = []
@@ -179,138 +178,159 @@ export default struct PasswordPage {
       List() {
         ListItem() {
           Row() {
-            Button('新增')
-              .onClick(() => {
-                this.isShowNewSheet = true
-              })
-              .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
-                preferType: this.preferType,
-                title: {
-                  title: '新增密码'
-                },
-                onAppear: (async () => {
-                  const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                    name: 'commonSetting'
-                  })
-                  const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-                  if (disallowScreenshot) {
-                    const lastWindow = await window.getLastWindow(this.context)
-                    await lastWindow.setWindowPrivacyMode(true)
-                  }
-                }),
-                onDisappear: (async () => {
-                  if (!this.showPassword) {
-                    const lastWindow = await window.getLastWindow(this.context)
-                    await lastWindow.setWindowPrivacyMode(false)
-                  }
-                  this.loading = true
-                }),
-                onWillDismiss: (async (DismissSheetAction) => {
-                  const promptAction = this.getUIContext().getPromptAction()
-                  const data = await promptAction.showDialog({
-                    title: '提示',
-                    message: '数据尚未保存，确定退出？',
-                    buttons: [
-                      {
-                        text: '取消',
-                        color: $r('sys.color.font_primary')
-                      },
-                      {
-                        text: '确定',
-                        color: $r('sys.color.font_emphasize')
-                      }
-                    ]
-                  })
-                  if (data.index === 1) {
-                    DismissSheetAction.dismiss()
-                  }
+            Column() {
+              Image($r('app.media.new_white'))
+            }
+            .backgroundColor($r('sys.color.background_emphasize'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .width(40)
+            .onClick(() => {
+              this.isShowNewSheet = true
+            })
+            .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
+              height: SheetSize.FIT_CONTENT,
+              preferType: this.preferType,
+              title: {
+                title: '新增密码'
+              },
+              onAppear: (async () => {
+                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: 'commonSetting'
                 })
-              })
-            Blank()
-            Button('按' + this.orderColumnText + '排序')
-              .buttonStyle(ButtonStyleMode.NORMAL)
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
-              .bindMenu([
-                {
-                  value: '修改时间',
-                  action: () => {
-                    this.orderColumn = 'updateTime'
-                    this.orderColumnText = '修改时间'
-                    this.loading = true
-                  }
-                },
-                {
-                  value: '名称',
-                  action: () => {
-                    this.orderColumn = 'name'
-                    this.orderColumnText = '名称'
-                    this.loading = true
-                  }
+                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                if (disallowScreenshot) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  await lastWindow.setWindowPrivacyMode(true)
                 }
-              ], {
-                hapticFeedbackMode: HapticFeedbackMode.AUTO
-              })
-            Button('筛选')
-              .buttonStyle(ButtonStyleMode.NORMAL)
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              }),
+              onDisappear: (async () => {
+                if (!this.showPassword) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  await lastWindow.setWindowPrivacyMode(false)
+                }
+                this.loading = true
+              }),
+              onWillDismiss: (async (DismissSheetAction) => {
+                const promptAction = this.getUIContext().getPromptAction()
+                const data = await promptAction.showDialog({
+                  title: '提示',
+                  message: '数据尚未保存，确定退出？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
                 })
-                .buildEffect())
-              .onClick(() => {
-                this.isShowFilterSheet = true
+                if (data.index === 1) {
+                  DismissSheetAction.dismiss()
+                }
               })
-              .bindSheet(this.isShowFilterSheet!!, this.FilterSheetBuilder(), {
-                preferType: this.preferType,
-                title: {
-                  title: '筛选密码'
-                },
-                onAppear: (async () => {
-                  const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                    name: 'commonSetting'
-                  })
-                  const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-                  if (disallowScreenshot) {
-                    const lastWindow = await window.getLastWindow(this.context)
-                    await lastWindow.setWindowPrivacyMode(true)
-                  }
-                }),
-                onDisappear: (async () => {
-                  if (!this.showPassword) {
-                    const lastWindow = await window.getLastWindow(this.context)
-                    await lastWindow.setWindowPrivacyMode(false)
-                  }
-                }),
-                onWillDismiss: (async (DismissSheetAction) => {
-                  const promptAction = this.getUIContext().getPromptAction()
-                  const data = await promptAction.showDialog({
-                    title: '提示',
-                    message: '数据尚未保存，确定退出？',
-                    buttons: [
-                      {
-                        text: '取消',
-                        color: $r('sys.color.font_primary')
-                      },
-                      {
-                        text: '确定',
-                        color: $r('sys.color.font_emphasize')
-                      }
-                    ]
-                  })
-                  if (data.index === 1) {
-                    DismissSheetAction.dismiss()
-                  }
+            })
+
+            Blank()
+            Column() {
+              Image($r('app.media.sort'))
+            }
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .margin({
+              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+            })
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .bindMenu([
+              {
+                value: '按修改时间排序',
+                action: () => {
+                  this.orderColumn = 'updateTime'
+                  this.loading = true
+                }
+              },
+              {
+                value: '按名称排序',
+                action: () => {
+                  this.orderColumn = 'name'
+                  this.loading = true
+                }
+              }
+            ], {
+              hapticFeedbackMode: HapticFeedbackMode.AUTO
+            })
+
+            Column() {
+              Image($r('app.media.search_icon'))
+            }
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .onClick(() => {
+              this.isShowFilterSheet = true
+            })
+            .bindSheet(this.isShowFilterSheet!!, this.FilterSheetBuilder(), {
+              height: SheetSize.FIT_CONTENT,
+              preferType: this.preferType,
+              title: {
+                title: '筛选密码'
+              },
+              onAppear: (async () => {
+                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: 'commonSetting'
                 })
+                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                if (disallowScreenshot) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  await lastWindow.setWindowPrivacyMode(true)
+                }
+              }),
+              onDisappear: (async () => {
+                if (!this.showPassword) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  await lastWindow.setWindowPrivacyMode(false)
+                }
+              }),
+              onWillDismiss: (async (DismissSheetAction) => {
+                const promptAction = this.getUIContext().getPromptAction()
+                const data = await promptAction.showDialog({
+                  title: '提示',
+                  message: '数据尚未保存，确定退出？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
+                })
+                if (data.index === 1) {
+                  DismissSheetAction.dismiss()
+                }
               })
+            })
           }
           .width('100%')
         }
@@ -520,6 +540,7 @@ export default struct PasswordPage {
         this.context.eventHub.off('refreshFilterPassword')
       })
       .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
+        height: SheetSize.FIT_CONTENT,
         preferType: this.preferType,
         title: {
           title: '修改密码'

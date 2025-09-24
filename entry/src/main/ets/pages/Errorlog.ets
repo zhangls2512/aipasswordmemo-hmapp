@@ -49,9 +49,11 @@ struct Errorlog {
         }
       })
     } catch (err) {
-      promptAction.openToast({
-        message: '发生错误，错误码：' + err.code
-      })
+      if (err.code !== 13900002) {
+        promptAction.openToast({
+          message: '发生错误，错误码：' + err.code
+        })
+      }
     }
   }
 
@@ -81,9 +83,11 @@ struct Errorlog {
         }
       }).filter(item => item.type === type)
     } catch (err) {
-      promptAction.openToast({
-        message: '发生错误，错误码：' + err.code
-      })
+      if (err.code !== 13900002) {
+        promptAction.openToast({
+          message: '发生错误，错误码：' + err.code
+        })
+      }
     }
   }
 
@@ -105,9 +109,6 @@ struct Errorlog {
             { value: 'CPU 高负载' },
             { value: '24 小时功耗器件分解统计' }
           ])
-            .margin({
-              bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
             .selected(0)
             .value('全部')
             .onSelect((index: number) => {
@@ -150,9 +151,19 @@ struct Errorlog {
             })
         }
         .margin({
+          bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
+        if (this.errorLogArray.length === 0) {
+          ListItem() {
+            Text('无数据')
+          }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+          .width('100%')
+        }
         ForEach(this.errorLogArray, (item: Item) => {
           ListItem() {
             Column() {

@@ -2,7 +2,6 @@ import { appRecovery } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 
 //import { HdsNavDestination } from '@kit.UIDesignKit'
-
 @Builder
 export function RecoverysettingBuilder() {
   Recoverysetting()

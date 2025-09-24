@@ -152,7 +152,7 @@ export async function newInfo(data: InfoInput) {
     promptAction.openToast({
       message: '新增失败：已存在'
     })
-    throw new Error('fail')
+    return 'fail'
   }
   resultSet.close()
   const updateTime = Date.now()
@@ -184,6 +184,7 @@ export async function newInfo(data: InfoInput) {
       })
     })
   }
+  return 'success'
 }
 
 export async function updateInfo(id: number, data: InfoInput) {
@@ -203,7 +204,7 @@ export async function updateInfo(id: number, data: InfoInput) {
     promptAction.openToast({
       message: '修改失败：已存在'
     })
-    throw new Error('fail')
+    return 'fail'
   }
   resultSeta.close()
   const predicatesb = new relationalStore.RdbPredicates('info')
@@ -252,6 +253,7 @@ export async function updateInfo(id: number, data: InfoInput) {
       })
     })
   }
+  return 'success'
 }
 
 export async function newTag(data: TagInput) {
@@ -270,7 +272,7 @@ export async function newTag(data: TagInput) {
     promptAction.openToast({
       message: '新增失败：已存在'
     })
-    throw new Error('fail')
+    return 'fail'
   }
   resultSet.close()
   const updateTime = Date.now()
@@ -302,6 +304,7 @@ export async function newTag(data: TagInput) {
       })
     })
   }
+  return 'success'
 }
 
 export async function updateTag(id: number, data: TagInput) {
@@ -321,7 +324,7 @@ export async function updateTag(id: number, data: TagInput) {
     promptAction.openToast({
       message: '修改失败：已存在'
     })
-    throw new Error('fail')
+    return 'fail'
   }
   resultSeta.close()
   const predicatesb = new relationalStore.RdbPredicates('tag')
@@ -370,6 +373,7 @@ export async function updateTag(id: number, data: TagInput) {
       })
     })
   }
+  return 'success'
 }
 
 export async function deleteData(type: string, id: number) {

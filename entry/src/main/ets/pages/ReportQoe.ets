@@ -2,7 +2,6 @@ import { promptAction } from '@kit.ArkUI'
 import { netQuality } from '@kit.NetworkBoostKit'
 
 //import { HdsNavDestination } from '@kit.UIDesignKit'
-
 @Builder
 export function ReportQoeBuilder() {
   ReportQoe()

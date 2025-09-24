@@ -195,12 +195,14 @@ export default struct Updateinfo {
               })
               return
             }
-            await updateInfo(this.infoId, {
+            const res = await updateInfo(this.infoId, {
               type: this.infoType,
               value: this.infoValue,
               cloudBackup: this.cloudBackup
             })
-            this.isShowUpdateSheet = false
+            if (res === 'success') {
+              this.isShowUpdateSheet = false
+            }
           })
       }
       .margin({

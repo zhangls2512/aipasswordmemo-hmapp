@@ -161,11 +161,6 @@
       "buildFunction": "DeletefileBuilder"
     },
     {
-      "name": "Resourcelimit",
-      "pageSourceFile": "src/main/ets/pages/Resourcelimit.ets",
-      "buildFunction": "ResourcelimitBuilder"
-    },
-    {
       "name": "Oftenusedinfotype",
       "pageSourceFile": "src/main/ets/pages/Oftenusedinfotype.ets",
       "buildFunction": "OftenusedinfotypeBuilder"
