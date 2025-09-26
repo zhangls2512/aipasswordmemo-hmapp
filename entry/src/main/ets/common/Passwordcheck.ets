@@ -33,14 +33,7 @@ export async function getRepeatPasswordList() {
       const password = passwordInfo.value
       const id = resultSet.getValue(idIndex) as number
       const name = resultSet.getValue(nameIndex) as string
-      if (arrayMap.has(password)) {
-        const item = arrayMap.get(password)!
-        item.count++
-        item.list.push({
-          id: id,
-          name: name
-        })
-      } else {
+      if (!arrayMap.has(password)) {
         arrayMap.set(password, {
           password,
           count: 1,
@@ -48,6 +41,14 @@ export async function getRepeatPasswordList() {
             id: id,
             name: name
           }]
+        })
+      }
+      if (arrayMap.has(password)) {
+        const item = arrayMap.get(password)!
+        item.count++
+        item.list.push({
+          id: id,
+          name: name
         })
       }
     }

@@ -321,13 +321,6 @@ struct Invite {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('邀请新用户，免费得会员')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

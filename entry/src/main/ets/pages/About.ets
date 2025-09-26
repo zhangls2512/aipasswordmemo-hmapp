@@ -3,7 +3,6 @@ import { FunctionComponent, FunctionController } from '@kit.AgentFrameworkKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
 import { call } from '@kit.TelephonyKit'
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
 
@@ -136,9 +135,7 @@ struct About {
             .width('100%')
             .onClick(async () => {
               try {
-                if (this.hasUpdate === 1) {
-                  updateManager.showUpdateDialog(this.context)
-                } else {
+                if (this.hasUpdate !== 1) {
                   this.updateLoading = true
                   const res = await updateManager.checkAppUpdate(this.context)
                   this.updateLoading = false
@@ -146,6 +143,9 @@ struct About {
                   if (res.updateAvailable === 1) {
                     updateManager.showUpdateDialog(this.context)
                   }
+                }
+                if (this.hasUpdate === 1) {
+                  updateManager.showUpdateDialog(this.context)
                 }
               } catch (err) {
                 this.updateLoading = false
@@ -736,13 +736,6 @@ struct About {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('关于')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

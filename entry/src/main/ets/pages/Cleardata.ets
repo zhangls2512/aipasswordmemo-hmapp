@@ -7,13 +7,8 @@ import { fileIo } from '@kit.CoreFileKit'
 import { stringToArray } from '../common/Crypto'
 import { getPasswordList, getTypeInfoList } from '../common/Dataget'
 
-@Builder
-export default function CleardataBuilder() {
-  Cleardata()
-}
-
 @ComponentV2
-struct Cleardata {
+export default struct Cleardata {
   @Local setting: string[] = []
   @Local allSetting: boolean = false
   @Local cloudbackupSetting: boolean = false

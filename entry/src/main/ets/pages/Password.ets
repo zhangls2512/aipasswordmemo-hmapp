@@ -98,7 +98,8 @@ export default struct PasswordPage {
           const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
           if (cloudBackupTimeIndex !== -1) {
             cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-          } else {
+          }
+          if (cloudBackupTimeIndex === -1) {
             cloudBackupTimeArray.push({
               uid: accountInfo.uid,
               time: Date.now()

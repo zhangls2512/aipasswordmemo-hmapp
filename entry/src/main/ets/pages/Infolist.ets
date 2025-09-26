@@ -1,6 +1,5 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { pushService } from '@kit.PushKit'
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { get } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
 import openLink from '../common/Openlink'
@@ -930,13 +929,6 @@ struct Infolist {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('已收集个人信息清单')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

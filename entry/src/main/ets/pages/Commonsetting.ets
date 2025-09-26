@@ -4,7 +4,6 @@ import { preferences } from '@kit.ArkData'
 import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 @Builder
 export function CommonsettingBuilder() {
   Commonsetting()
@@ -744,13 +743,6 @@ struct Commonsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('通用')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

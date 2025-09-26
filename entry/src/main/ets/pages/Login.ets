@@ -1,7 +1,9 @@
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { privacyManager } from '@kit.AppGalleryKit'
+import { util } from '@kit.ArkTS'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { netBoost } from '@kit.NetworkBoostKit'
+import { fido2 } from '@kit.OnlineAuthenticationKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
@@ -354,6 +356,66 @@ export default struct Login {
             .height(40)
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+          Button('通行密钥登录')
+          //.enabled(this.agree)
+            .enabled(false)
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .width('100%')
+            .onClick(async () => {
+              try {
+                const resa = await fido2.authenticate(this.context, {
+                  publicKey: {
+                    challenge: new util.TextEncoder().encodeInto(String(Date.now()).slice(0, -5) + '00000')
+                  }
+                })
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '登录中...'
+                  })
+                })
+                dialogControllerProgress.open()
+                netBoost.setSceneDesc({
+                  scene: 'login',
+                  sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
+                })
+                const resb = await request('/account/getAccessToken', {
+                  verifyType: 'passkey',
+                  rawId: new util.Base64Helper().encodeToStringSync(resa.rawId, util.Type.BASIC_URL_SAFE),
+                  authenticatorData: new util.Base64Helper().encodeToStringSync(resa.response.authenticatorData,
+                    util.Type.BASIC_URL_SAFE),
+                  clientDataJSON: new util.Base64Helper().encodeToStringSync(resa.response.clientDataJson,
+                    util.Type.BASIC_URL_SAFE),
+                  signature: new util.Base64Helper().encodeToStringSync(resa.response.signature,
+                    util.Type.BASIC_URL_SAFE)
+                })
+                netBoost.setSceneDesc({
+                  scene: 'login',
+                  sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
+                })
+                dialogControllerProgress.close()
+                if (resb !== 'fail') {
+                  const accessToken = JSON.parse(resb).accessToken as string
+                  const uid = JSON.parse(resb).uid as string
+                  const email = JSON.parse(resb).email as string
+                  const endDate = JSON.parse(resb).endDate as number
+                  set(accessToken, {
+                    uid: uid,
+                    email: email,
+                    endDate: endDate
+                  })
+                  promptAction.openToast({
+                    message: '登录成功'
+                  })
+                  this.isShowLoginSheet = false
+                }
+              } catch (err) {
+                promptAction.openToast({
+                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                })
+              }
             })
           Text('注册账号')
             .fontColor($r('sys.color.font_emphasize'))

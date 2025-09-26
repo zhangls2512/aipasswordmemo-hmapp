@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsEffect } from '@kit.UIDesignKit'
-import { get } from '../common/Accesstoken'
+import { get, getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
 
 export interface Account {
@@ -17,10 +17,10 @@ export function HuaweiaccountBuilder() {
 
 @ComponentV2
 struct Huaweiaccount {
+  @Local email: string = ''
   @Local loading: boolean = false
   @Local isBind: boolean = false
   @Local type: string = 'mfa'
-  @Local email: string = ''
   @Local mfa: string = ''
   @Local emailcode: string = ''
   @Local agree: boolean = false
@@ -350,37 +350,24 @@ struct Huaweiaccount {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle:
-        }
-      }
-    })*/
     .title(this.isBind ? '解绑华为账号' : '绑定华为账号')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.controller.setEnabled(false)
+      const accountInfo = await getAccountInfo()
+      this.email = accountInfo.email
       const accessToken = await get()
       if (accessToken) {
         this.loading = true
-        const infores = await request('/account/getAccountInfo', {
+        const res = await request('/account/getExternalAccount', {
           accessToken: accessToken
         })
-        if (infores !== 'fail') {
-          this.email = JSON.parse(infores).data.email as string
-          const accountres = await request('/account/getExternalAccount', {
-            accessToken: accessToken
-          })
-          this.loading = false
-          if (accountres !== 'fail') {
-            const account = JSON.parse(accountres).data as Account[]
-            if (account.some(item => item.platform === 'huawei')) {
-              this.isBind = true
-            }
+        this.loading = false
+        if (res !== 'fail') {
+          const account = JSON.parse(res).data as Account[]
+          if (account.some(item => item.platform === 'huawei')) {
+            this.isBind = true
           }
-        } else {
-          this.loading = false
         }
       }
     })

@@ -2,7 +2,6 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
-//import { DividerMode, HdsTabs } from '@kit.UIDesignKit'
 import Password from './Password'
 import Info from './Info'
 import Tag from './Tag'
@@ -79,9 +78,6 @@ struct Index {
       }
       .barOverlap(deviceInfo.deviceType === 'phone' ? true : false)
       .barPosition(deviceInfo.deviceType === 'phone' ? BarPosition.End : BarPosition.Start)
-      /*.divider({
-        mode: DividerMode.FOLLOW_SCROLL
-      })*/
       .scrollable(deviceInfo.deviceType === 'phone' ? true : false)
       .vertical(deviceInfo.deviceType === 'phone' ? false : true)
       .onAnimationStart(async (index, targetIndex) => {

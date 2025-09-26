@@ -2,7 +2,6 @@ import { appRecovery, common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 @Builder
 export function DebugsettingBuilder() {
   Debugsetting()
@@ -980,13 +979,6 @@ struct Debugsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('调试设置')
     .onReady((context) => {
       this.pageInfos = context.pathStack
