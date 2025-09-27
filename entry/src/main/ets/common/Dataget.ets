@@ -358,6 +358,36 @@ export async function getInfoList() {
   }
 }
 
+export async function getInfoTypeList() {
+  try {
+    const context = getContext()
+    const rdbStore = await relationalStore.getRdbStore(context, {
+      name: 'info',
+      securityLevel: 4,
+      encrypt: true,
+      allowRebuild: true
+    })
+    const predicates = new relationalStore.RdbPredicates('info')
+    predicates.orderByAsc('type')
+    const resultSet = await rdbStore.query(predicates)
+    const typeIndex = resultSet.getColumnIndex('type')
+    const array: string[] = []
+    while (resultSet.goToNextRow()) {
+      const type = resultSet.getValue(typeIndex) as string
+      if (!array.includes(type)) {
+        array.push(type)
+      }
+    }
+    resultSet.close()
+    return array
+  } catch (err) {
+    promptAction.openToast({
+      message: '发生错误，错误码：' + err.code
+    })
+    return []
+  }
+}
+
 export async function getTypeInfoList(type: string) {
   try {
     const context = getContext()
@@ -403,7 +433,7 @@ async function getTagColor(value: string) {
     return color
   }
   resultSet.close()
-  return 'rgba(0,0,0,0)'
+  return ''
 }
 
 export async function getTagInfo(id: number) {

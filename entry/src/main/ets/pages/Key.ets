@@ -116,6 +116,7 @@ struct Keypage {
                     name: 'Importkey'
                   })
                 }
+                return
               }
               if (this.keyValue) {
                 const promptAction = this.getUIContext().getPromptAction()

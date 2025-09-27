@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
@@ -351,6 +351,7 @@ export default struct PasswordPage {
             })
         }
         .margin({
+          bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
@@ -396,23 +397,22 @@ export default struct PasswordPage {
                       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                     })
                   }
-                  ForEach(item.tag, (item: PasswordTagItem) => {
-                    Row() {
-                      Circle({
-                        height: 16,
-                        width: 16
-                      })
-                        .fill(item.color)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
+                  Flex({
+                    wrap: FlexWrap.Wrap,
+                    space: {
+                      main: LengthMetrics.vp(8),
+                      cross: LengthMetrics.vp(8)
+                    }
+                  }) {
+                    ForEach(item.tag, (item: PasswordTagItem) => {
                       Text(item.value)
                         .enableAutoSpacing(true)
+                        .fontColor(item.color)
                         .fontWeight(FontWeight.Medium)
-                    }
-                    .margin({
-                      top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                     })
+                  }
+                  .margin({
+                    top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                   })
                 }
                 .alignItems(HorizontalAlign.Start)

@@ -78,7 +78,7 @@ struct Index {
       }
       .barOverlap(deviceInfo.deviceType === 'phone' ? true : false)
       .barPosition(deviceInfo.deviceType === 'phone' ? BarPosition.End : BarPosition.Start)
-      .scrollable(deviceInfo.deviceType === 'phone' ? true : false)
+      .scrollable(false)
       .vertical(deviceInfo.deviceType === 'phone' ? false : true)
       .onAnimationStart(async (index, targetIndex) => {
         if (targetIndex !== 1) {

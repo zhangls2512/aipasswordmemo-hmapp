@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LoadingDialog } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
@@ -215,58 +215,56 @@ export default struct TagPage {
           bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
-        ForEach(this.tagArray, (item: Tag) => {
-          ListItem() {
-            Column() {
-              Row() {
-                if (item.isCloudBackup) {
-                  Image($r('app.media.cloud'))
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                    .width('5%')
-                }
+        ListItem() {
+          Flex({
+            wrap: FlexWrap.Wrap,
+            space: {
+              main: LengthMetrics.vp(8),
+              cross: LengthMetrics.vp(8)
+            }
+          }) {
+            ForEach(this.tagArray, (item: Tag) => {
+              Column() {
                 Row() {
-                  Circle({
-                    height: 16,
-                    width: 16
-                  })
-                    .fill(item.color)
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
+                  if (item.isCloudBackup) {
+                    Image($r('app.media.cloud'))
+                      .height(16)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
+                      .width(16)
+                  }
                   Text(item.value)
                     .enableAutoSpacing(true)
+                    .fontColor(item.color)
                     .fontWeight(FontWeight.Medium)
                 }
-                .width('90%')
+                .borderRadius(12)
+                .padding(12)
+                .stateStyles({
+                  normal: {
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  pressed: {
+                    .backgroundColor($r('sys.color.interactive_pressed'))
+                  }
+                })
+                .onClick(() => {
+                  this.updateId = item.id
+                  this.isShowUpdateSheet = true
+                })
+                .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress | ResponseType.RightClick, {
+                  hapticFeedbackMode: HapticFeedbackMode.AUTO
+                })
               }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onClick(() => {
-                this.updateId = item.id
-                this.isShowUpdateSheet = true
-              })
-              .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress | ResponseType.RightClick, {
-                hapticFeedbackMode: HapticFeedbackMode.AUTO
-              })
-            }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+              .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .padding($r('sys.float.ohos_id_corner_radius_mark'))
+            })
           }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
       .height('100%')

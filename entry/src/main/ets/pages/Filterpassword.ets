@@ -15,12 +15,12 @@ export default struct Filterpassword {
   @Local infoValue: string = ''
   @Local infoArray: string[] = []
   @Local passwordTagArray: string[] = []
+  @Local passwordTag: string = ''
   @Local tagArray: string[] = []
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pushItemWhenBlur = false
-  oftenUsedInfoTypes: string[] = ['自定义']
-  specialInfoTypes: string[] =
-    ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
+  oftenUsedInfoTypes = ['自定义']
+  specialInfoTypes = ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
   })
@@ -406,8 +406,6 @@ export default struct Filterpassword {
                   Blank()
                     .width('82%')
                 }
-                Blank()
-                  .width('5%')
                 Image($r('app.media.add'))
                   .width('8%')
                   .onClick(() => {
@@ -521,21 +519,27 @@ export default struct Filterpassword {
           .fontWeight(FontWeight.Medium)
       }
       .margin({
-        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
 
-      if (this.tagArray.length === 0) {
-        ListItem() {
-          Column() {
-            Text('无数据')
-          }
-          .width('100%')
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      ListItem() {
+        TextInput({
+          placeholder: '请输入内容',
+          text: this.passwordTag!!
         })
+          .enableAutoSpacing(true)
+          .onBlur(() => {
+            if (this.pushItemWhenBlur && this.passwordTag &&
+              !this.passwordTagArray.some(item => item === this.passwordTag)) {
+              this.passwordTagArray.push(this.passwordTag)
+              this.passwordTag = ''
+            }
+          })
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+      })
+
       ForEach(this.tagArray, (item: string) => {
         if (!this.passwordTagArray.includes(item)) {
           ListItem() {
@@ -571,14 +575,30 @@ export default struct Filterpassword {
           })
         }
       })
-      if (this.passwordTagArray.length > 0) {
-        ListItem() {
-          Divider()
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
+      ListItem() {
+        Button('添加')
+          .onClick(() => {
+            if (!this.passwordTag) {
+              promptAction.openToast({
+                message: '请输入内容'
+              })
+              return
+            }
+            if (this.passwordTagArray.some(item => item === this.passwordTag)) {
+              promptAction.openToast({
+                message: '已添加此标签'
+              })
+              return
+            }
+            this.passwordTagArray.push(this.passwordTag)
+            this.passwordTag = ''
+          })
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
+      .width('100%')
+
       ForEach(this.passwordTagArray, (item: string, index) => {
         ListItem() {
           Column() {
