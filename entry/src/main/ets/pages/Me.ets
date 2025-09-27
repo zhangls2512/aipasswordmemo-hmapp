@@ -97,9 +97,16 @@ export default struct Me {
                 .fontWeight(FontWeight.Bold)
             }
             if (this.uid) {
-              Text(this.email)
-                .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-                .fontWeight(FontWeight.Bold)
+              if (!this.email) {
+                Text('未绑定邮箱')
+                  .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+                  .fontWeight(FontWeight.Bold)
+              }
+              if (this.email) {
+                Text(this.email)
+                  .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+                  .fontWeight(FontWeight.Bold)
+              }
             }
           }
           .borderRadius(12)
@@ -141,7 +148,7 @@ export default struct Me {
             })
           })
 
-          if (this.email) {
+          if (this.uid) {
             Divider()
               .padding({
                 left: 12,
@@ -538,7 +545,7 @@ export default struct Me {
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
 
-      if (this.email !== '') {
+      if (this.uid) {
         ListItem() {
           Button('退出登录')
             .buttonStyle(ButtonStyleMode.NORMAL)

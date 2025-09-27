@@ -95,7 +95,7 @@ export async function check() {
         const res = await request('/account/getAccessToken', {
           verifyType: 'huaweiaipasswordmemoapp',
           verifyCode: resa.data?.authorizationCode
-        }, true)
+        })
         netBoost.setSceneDesc({
           scene: 'login',
           sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
@@ -157,7 +157,7 @@ export async function check() {
           const uid = JSON.parse(resb).uid as string
           const email = JSON.parse(resb).email as string
           const endDate = JSON.parse(resb).endDate as number
-          set(accessToken, {
+          await set(accessToken, {
             uid: uid,
             email: email,
             endDate: endDate

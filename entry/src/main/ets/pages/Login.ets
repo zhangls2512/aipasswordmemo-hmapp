@@ -4,7 +4,6 @@ import { util } from '@kit.ArkTS'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { netBoost } from '@kit.NetworkBoostKit'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
-import { hdsEffect } from '@kit.UIDesignKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -49,7 +48,7 @@ export default struct Login {
             const uid = JSON.parse(res).uid as string
             const email = JSON.parse(res).email as string
             const endDate = JSON.parse(res).endDate as number
-            set(accessToken, {
+            await set(accessToken, {
               uid: uid,
               email: email,
               endDate: endDate
@@ -74,9 +73,6 @@ export default struct Login {
           Row() {
             Text('方式')
               .fontWeight(FontWeight.Medium)
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
               .width('15%')
             Row() {
               Radio({
@@ -134,10 +130,7 @@ export default struct Login {
           Row() {
             Text('邮箱')
               .fontWeight(FontWeight.Medium)
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
-              .width('15%')
+              .width('20%')
             TextInput({
               text: this.email!!,
               placeholder: '请输入邮箱'
@@ -145,7 +138,7 @@ export default struct Login {
               .contentType(ContentType.EMAIL_ADDRESS)
               .enableAutoSpacing(true)
               .type(InputType.Email)
-              .width('80%')
+              .width('75%')
           }
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -155,10 +148,7 @@ export default struct Login {
             Row() {
               Text('密码')
                 .fontWeight(FontWeight.Medium)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .width('15%')
+                .width('20%')
               TextInput({
                 text: this.password!!,
                 placeholder: '请输入密码'
@@ -167,7 +157,7 @@ export default struct Login {
                 .enableAutoSpacing(true)
                 .maxLength(30)
                 .type(InputType.Password)
-                .width('80%')
+                .width('75%')
             }
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -177,10 +167,7 @@ export default struct Login {
             Row() {
               Text('MFA')
                 .fontWeight(FontWeight.Medium)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .width('15%')
+                .width('20%')
               TextInput({
                 text: this.mfa!!,
                 placeholder: '请输入 MFA'
@@ -188,7 +175,7 @@ export default struct Login {
                 .enableAutoSpacing(true)
                 .maxLength(6)
                 .type(InputType.ONE_TIME_CODE)
-                .width('80%')
+                .width('75%')
             }
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -198,10 +185,7 @@ export default struct Login {
             Row() {
               Text('验证码')
                 .fontWeight(FontWeight.Medium)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .width('15%')
+                .width('20%')
               TextInput({
                 text: this.emailcode!!,
                 placeholder: '请输入邮箱验证码'
@@ -209,7 +193,7 @@ export default struct Login {
                 .enableAutoSpacing(true)
                 .maxLength(8)
                 .type(InputType.ONE_TIME_CODE)
-                .width('80%')
+                .width('75%')
             }
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -221,12 +205,6 @@ export default struct Login {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
               .width('100%')
               .onClick(async () => {
                 if (!this.email) {
@@ -330,7 +308,7 @@ export default struct Login {
                 const uid = JSON.parse(res).uid as string
                 const email = JSON.parse(res).email as string
                 const endDate = JSON.parse(res).endDate as number
-                set(accessToken, {
+                await set(accessToken, {
                   uid: uid,
                   email: email,
                   endDate: endDate
@@ -401,7 +379,7 @@ export default struct Login {
                   const uid = JSON.parse(resb).uid as string
                   const email = JSON.parse(resb).email as string
                   const endDate = JSON.parse(resb).endDate as number
-                  set(accessToken, {
+                  await set(accessToken, {
                     uid: uid,
                     email: email,
                     endDate: endDate

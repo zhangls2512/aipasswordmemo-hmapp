@@ -4,7 +4,7 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { formProvider } from '@kit.FormKit'
-import { get } from '../common/Accesstoken'
+import { get, getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import { checkPermission } from '../common/Permission'
@@ -15,6 +15,7 @@ import { Account } from './Huaweiaccount'
 export default struct Setting {
   @Local allService: boolean = false
   @Local agreedPrivacyAgreement: number | undefined = undefined
+  @Local email: string = ''
   @Local isBindHuaweiAccount: boolean = false
   @Local cloudService: boolean = false
   @Local accountLoading: boolean = false
@@ -39,6 +40,8 @@ export default struct Setting {
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
+    const accountInfo = await getAccountInfo()
+    this.email = accountInfo.email
     this.accessToken = await get()
     if (this.accessToken) {
       const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
@@ -78,36 +81,40 @@ export default struct Setting {
                   left: 12
                 })
               Column() {
-                Row() {
-                  Text('设备间同步')
-                    .fontWeight(FontWeight.Medium)
-                  Blank()
-                  Toggle({
-                    type: ToggleType.Switch,
-                    isOn: this.accountDataSync!!
+                if (!this.email) {
+                  Row() {
+                    Text('绑定邮箱')
+                      .fontColor($r('sys.color.font_emphasize'))
+                      .fontWeight(FontWeight.Medium)
+                    Blank()
+                    Image($r('app.media.right'))
+                      .fillColor($r('sys.color.icon_fourth'))
+                      .height(12)
+                      .width(12)
+                  }
+                  .borderRadius(12)
+                  .padding(12)
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.interactive_pressed'))
+                    }
                   })
-                    .enabled(this.accountDataSyncEnabled)
-                    .onChange(async (isOn) => {
-                      try {
-                        const appAccountManager = appAccount.createAppAccountManager()
-                        await appAccountManager.setDataSyncEnabled('default', isOn)
-                      } catch (err) {
-                        this.accountDataSync = false
-                        promptAction.openToast({
-                          message: '发生错误，错误码：' + err.code
-                        })
-                      }
+                  .width('100%')
+                  .onClick(() => {
+                    this.pageInfos.pushPath({
+                      name: 'Email'
+                    })
+                  })
+
+                  Divider()
+                    .padding({
+                      left: 12,
+                      right: 12
                     })
                 }
-                .borderRadius(12)
-                .padding(12)
-                .width('100%')
-
-                Divider()
-                  .padding({
-                    left: 12,
-                    right: 12
-                  })
                 Row() {
                   if (!this.isBindHuaweiAccount) {
                     Text('绑定华为账号')
@@ -137,6 +144,12 @@ export default struct Setting {
                 })
                 .width('100%')
                 .onClick(() => {
+                  if (!this.email) {
+                    promptAction.openToast({
+                      message: '轩铭 2512 统一账号未绑定邮箱，无法使用此功能'
+                    })
+                    return
+                  }
                   this.pageInfos.pushPath({
                     name: 'Huaweiaccount'
                   })
@@ -205,6 +218,12 @@ export default struct Setting {
                 })
                 .width('100%')
                 .onClick(() => {
+                  if (!this.email) {
+                    promptAction.openToast({
+                      message: '轩铭 2512 统一账号未绑定邮箱，无法使用此功能'
+                    })
+                    return
+                  }
                   if (1 === 1) {
                     promptAction.openToast({
                       message: '暂未上线，敬请期待'
@@ -247,6 +266,36 @@ export default struct Setting {
                       })
                       commonSettingDataPreferences.putSync('autoLoginByPasskey', isOn)
                       commonSettingDataPreferences.flushSync()
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  Text('设备间同步')
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.accountDataSync!!
+                  })
+                    .enabled(this.accountDataSyncEnabled)
+                    .onChange(async (isOn) => {
+                      try {
+                        const appAccountManager = appAccount.createAppAccountManager()
+                        await appAccountManager.setDataSyncEnabled('default', isOn)
+                      } catch (err) {
+                        this.accountDataSync = false
+                        promptAction.openToast({
+                          message: '发生错误，错误码：' + err.code
+                        })
+                      }
                     })
                 }
                 .borderRadius(12)

@@ -164,6 +164,11 @@
       "name": "Newpasskey",
       "pageSourceFile": "src/main/ets/pages/Newpasskey.ets",
       "buildFunction": "NewpasskeyBuilder"
+    },
+    {
+      "name": "Email",
+      "pageSourceFile": "src/main/ets/pages/Email.ets",
+      "buildFunction": "EmailBuilder"
     }
   ]
 }
