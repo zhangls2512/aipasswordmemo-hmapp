@@ -189,6 +189,12 @@ export default struct Updateinfo {
               })
               return
             }
+            if (this.infoType === '图标') {
+              promptAction.openToast({
+                message: '不支持修改为图标类型'
+              })
+              return
+            }
             if (!this.infoValue) {
               promptAction.openToast({
                 message: '请输入内容'

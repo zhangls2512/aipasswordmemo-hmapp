@@ -486,6 +486,7 @@ export default struct Setting {
               .alignItems(HorizontalAlign.Start)
             }
             .margin({
+              bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
               top: $r('sys.float.ohos_id_elements_margin_vertical_l')
             })
           }
@@ -596,8 +597,7 @@ export default struct Setting {
           .alignItems(HorizontalAlign.Start)
         }
         .margin({
-          top: this.accessToken ? $r('sys.float.ohos_id_elements_margin_vertical_l') :
-            $r('sys.float.ohos_id_elements_margin_vertical_m')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
         ListItem() {
