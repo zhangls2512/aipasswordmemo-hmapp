@@ -1,8 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { hdsEffect } from '@kit.UIDesignKit'
-import { get } from '../common/Accesstoken'
+import { get, getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
 
 export interface Account {
@@ -17,10 +16,10 @@ export function HuaweiaccountBuilder() {
 
 @ComponentV2
 struct Huaweiaccount {
+  @Local email: string = ''
   @Local loading: boolean = false
   @Local isBind: boolean = false
   @Local type: string = 'mfa'
-  @Local email: string = ''
   @Local mfa: string = ''
   @Local emailcode: string = ''
   @Local agree: boolean = false
@@ -99,10 +98,7 @@ struct Huaweiaccount {
               Row() {
                 Text('方式')
                   .fontWeight(FontWeight.Medium)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                  .width('15%')
+                  .width('20%')
                 Row() {
                   Radio({
                     value: 'mfa',
@@ -136,17 +132,14 @@ struct Huaweiaccount {
                     })
                   Text('邮箱验证码')
                 }
-                .width('80%')
+                .width('75%')
               }
 
               if (this.type === 'mfa') {
                 Row() {
                   Text('MFA')
                     .fontWeight(FontWeight.Medium)
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                    .width('15%')
+                    .width('20%')
                   TextInput({
                     text: this.mfa!!,
                     placeholder: '请输入 MFA'
@@ -154,7 +147,7 @@ struct Huaweiaccount {
                     .enableAutoSpacing(true)
                     .maxLength(6)
                     .type(InputType.ONE_TIME_CODE)
-                    .width('80%')
+                    .width('75%')
                 }
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -164,10 +157,7 @@ struct Huaweiaccount {
                 Row() {
                   Text('验证码')
                     .fontWeight(FontWeight.Medium)
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                    .width('15%')
+                    .width('20%')
                   TextInput({
                     text: this.emailcode!!,
                     placeholder: '请输入邮箱验证码'
@@ -175,7 +165,7 @@ struct Huaweiaccount {
                     .enableAutoSpacing(true)
                     .maxLength(8)
                     .type(InputType.ONE_TIME_CODE)
-                    .width('80%')
+                    .width('75%')
                 }
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -187,12 +177,6 @@ struct Huaweiaccount {
                   .margin({
                     top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                   })
-                  .visualEffect(new hdsEffect.HdsEffectBuilder()
-                    .pointLight({
-                      sourceType: hdsEffect.PointLightSourceType.SOFT,
-                      illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                    })
-                    .buildEffect())
                   .width('100%')
                   .onClick(async () => {
                     const dialogControllerProgress = new CustomDialogController({
@@ -342,7 +326,6 @@ struct Huaweiaccount {
           .width('100%')
         }
       }
-      .backgroundColor($r('app.color.sheet_background'))
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_max_padding_start'),
@@ -350,37 +333,24 @@ struct Huaweiaccount {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle:
-        }
-      }
-    })*/
     .title(this.isBind ? '解绑华为账号' : '绑定华为账号')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.controller.setEnabled(false)
+      const accountInfo = await getAccountInfo()
+      this.email = accountInfo.email
       const accessToken = await get()
       if (accessToken) {
         this.loading = true
-        const infores = await request('/account/getAccountInfo', {
+        const res = await request('/account/getExternalAccount', {
           accessToken: accessToken
         })
-        if (infores !== 'fail') {
-          this.email = JSON.parse(infores).data.email as string
-          const accountres = await request('/account/getExternalAccount', {
-            accessToken: accessToken
-          })
-          this.loading = false
-          if (accountres !== 'fail') {
-            const account = JSON.parse(accountres).data as Account[]
-            if (account.some(item => item.platform === 'huawei')) {
-              this.isBind = true
-            }
+        this.loading = false
+        if (res !== 'fail') {
+          const account = JSON.parse(res).data as Account[]
+          if (account.some(item => item.platform === 'huawei')) {
+            this.isBind = true
           }
-        } else {
-          this.loading = false
         }
       }
     })

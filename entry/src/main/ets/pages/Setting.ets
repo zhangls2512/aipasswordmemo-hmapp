@@ -4,8 +4,7 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { formProvider } from '@kit.FormKit'
-//import { HdsNavigation, HdsNavigationAttribute, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
-import { get } from '../common/Accesstoken'
+import { get, getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import { checkPermission } from '../common/Permission'
@@ -16,15 +15,14 @@ import { Account } from './Huaweiaccount'
 export default struct Setting {
   @Local allService: boolean = false
   @Local agreedPrivacyAgreement: number | undefined = undefined
+  @Local email: string = ''
   @Local isBindHuaweiAccount: boolean = false
   @Local cloudService: boolean = false
   @Local accountLoading: boolean = false
   @Local accountDataSync: boolean = false
   @Local accountDataSyncEnabled: boolean = false
   @Local autoLoginByHuaweiAccount: boolean = false
-  @Local vipStatus: string = '未开通'
-  @Local vipStatusColor: string = 'red'
-  @Local vipStatusLoading: boolean = false
+  @Local autoLoginByPasskey: boolean = false
   @Local accessToken: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
@@ -42,6 +40,8 @@ export default struct Setting {
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
+    const accountInfo = await getAccountInfo()
+    this.email = accountInfo.email
     this.accessToken = await get()
     if (this.accessToken) {
       const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
@@ -60,32 +60,8 @@ export default struct Setting {
           const account = JSON.parse(accountres).data as Account[]
           this.isBindHuaweiAccount = account.some(item => item.platform === 'huawei')
         }
-        const cloudServiceStatus = await getCloudServiceStatus()
+        this.cloudService = await getCloudServiceStatus()
         this.accountLoading = false
-        this.cloudService = cloudServiceStatus
-        if (cloudServiceStatus) {
-          this.vipStatusLoading = true
-          const userres = await request('/product/getUserInfo', {
-            accessToken: this.accessToken,
-            product: 'password'
-          })
-          this.vipStatusLoading = false
-          if (userres !== 'fail') {
-            const vipenddate = JSON.parse(userres).data.vipEndDate as number
-            if (vipenddate < 0) {
-              this.vipStatus = '未开通'
-              this.vipStatusColor = 'red'
-            }
-            if (vipenddate === 0 || vipenddate >= Date.now()) {
-              this.vipStatus = '已开通'
-              this.vipStatusColor = '#FFD700'
-            }
-            if (vipenddate > 0 && vipenddate < Date.now()) {
-              this.vipStatus = '已过期'
-              this.vipStatusColor = 'red'
-            }
-          }
-        }
       }
     }
   }
@@ -105,36 +81,40 @@ export default struct Setting {
                   left: 12
                 })
               Column() {
-                Row() {
-                  Text('设备间同步')
-                    .fontWeight(FontWeight.Medium)
-                  Blank()
-                  Toggle({
-                    type: ToggleType.Switch,
-                    isOn: this.accountDataSync!!
+                if (!this.email) {
+                  Row() {
+                    Text('绑定邮箱')
+                      .fontColor($r('sys.color.font_emphasize'))
+                      .fontWeight(FontWeight.Medium)
+                    Blank()
+                    Image($r('app.media.right'))
+                      .fillColor($r('sys.color.icon_fourth'))
+                      .height(12)
+                      .width(12)
+                  }
+                  .borderRadius(12)
+                  .padding(12)
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.interactive_pressed'))
+                    }
                   })
-                    .enabled(this.accountDataSyncEnabled)
-                    .onChange(async (isOn) => {
-                      try {
-                        const appAccountManager = appAccount.createAppAccountManager()
-                        await appAccountManager.setDataSyncEnabled('default', isOn)
-                      } catch (err) {
-                        this.accountDataSync = false
-                        promptAction.openToast({
-                          message: '发生错误，错误码：' + err.code
-                        })
-                      }
+                  .width('100%')
+                  .onClick(() => {
+                    this.pageInfos.pushPath({
+                      name: 'Email'
+                    })
+                  })
+
+                  Divider()
+                    .padding({
+                      left: 12,
+                      right: 12
                     })
                 }
-                .borderRadius(12)
-                .padding(12)
-                .width('100%')
-
-                Divider()
-                  .padding({
-                    left: 12,
-                    right: 12
-                  })
                 Row() {
                   if (!this.isBindHuaweiAccount) {
                     Text('绑定华为账号')
@@ -164,6 +144,12 @@ export default struct Setting {
                 })
                 .width('100%')
                 .onClick(() => {
+                  if (!this.email) {
+                    promptAction.openToast({
+                      message: '轩铭 2512 统一账号未绑定邮箱，无法使用此功能'
+                    })
+                    return
+                  }
                   this.pageInfos.pushPath({
                     name: 'Huaweiaccount'
                   })
@@ -192,6 +178,7 @@ export default struct Setting {
                     type: ToggleType.Switch,
                     isOn: this.autoLoginByHuaweiAccount!!
                   })
+                    .enabled(!this.autoLoginByPasskey)
                     .onChange((isOn) => {
                       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
                         name: 'commonSetting'
@@ -204,110 +191,121 @@ export default struct Setting {
                 .padding(12)
                 .width('100%')
 
-                if (!this.accountLoading) {
-                  Divider()
-                    .padding({
-                      left: 12,
-                      right: 12
-                    })
-                  Row() {
-                    if (!this.cloudService) {
-                      Text('开通云服务')
-                        .fontColor($r('sys.color.font_emphasize'))
-                        .fontWeight(FontWeight.Medium)
-                    }
-                    if (this.cloudService) {
-                      Text('取消开通云服务')
-                        .fontColor($r('sys.color.warning'))
-                        .fontWeight(FontWeight.Medium)
-                    }
-                    Blank()
-                    Image($r('app.media.right'))
-                      .fillColor($r('sys.color.icon_fourth'))
-                      .height(12)
-                      .width(12)
-                  }
-                  .borderRadius(12)
-                  .padding(12)
-                  .stateStyles({
-                    normal: {
-                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                    },
-                    pressed: {
-                      .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
                   })
-                  .width('100%')
-                  .onClick(() => {
-                    this.pageInfos.pushPath({
-                      name: 'Cloudservice'
-                    })
-                  })
-
-                  if (this.cloudService) {
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('会员中心')
-                        .fontColor('#FFD700')
-                        .fontWeight(FontWeight.Medium)
-                      Blank()
-                      if (!this.vipStatusLoading) {
-                        Text(this.vipStatus)
-                          .fontColor(this.vipStatusColor)
-                          .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                          .margin({
-                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                          })
-                      }
-                      if (this.vipStatusLoading) {
-                        LoadingProgress()
-                          .height(14)
-                          .margin({
-                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                          })
-                          .width(14)
-                      }
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onClick(() => {
-                      this.pageInfos.pushPath({
-                        name: 'Vip'
-                      })
-                    })
-                  }
+                Row() {
+                  Text('新增通行密钥')
+                    .fontColor($r('sys.color.font_emphasize'))
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Image($r('app.media.right'))
+                    .fillColor($r('sys.color.icon_fourth'))
+                    .height(12)
+                    .width(12)
                 }
+                .borderRadius(12)
+                .padding(12)
+                .stateStyles({
+                  normal: {
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  pressed: {
+                    .backgroundColor($r('sys.color.interactive_pressed'))
+                  }
+                })
+                .width('100%')
+                .onClick(() => {
+                  if (!this.email) {
+                    promptAction.openToast({
+                      message: '轩铭 2512 统一账号未绑定邮箱，无法使用此功能'
+                    })
+                    return
+                  }
+                  if (1 === 1) {
+                    promptAction.openToast({
+                      message: '暂未上线，敬请期待'
+                    })
+                    return
+                  }
+                  this.pageInfos.pushPath({
+                    name: 'Newpasskey'
+                  })
+                })
+
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  Column() {
+                    Text('通行密钥静默登录')
+                      .fontWeight(FontWeight.Medium)
+                    Text('需新增通行密钥')
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .margin({
+                        top: $r('sys.float.ohos_id_text_margin_vertical')
+                      })
+                  }
+                  .alignItems(HorizontalAlign.Start)
+
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.autoLoginByPasskey!!
+                  })
+                  //.enabled(!this.autoLoginByHuaweiAccount)
+                    .enabled(false)
+                    .onChange((isOn) => {
+                      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                        name: 'commonSetting'
+                      })
+                      commonSettingDataPreferences.putSync('autoLoginByPasskey', isOn)
+                      commonSettingDataPreferences.flushSync()
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  Text('设备间同步')
+                    .fontWeight(FontWeight.Medium)
+                  Blank()
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.accountDataSync!!
+                  })
+                    .enabled(this.accountDataSyncEnabled)
+                    .onChange(async (isOn) => {
+                      try {
+                        const appAccountManager = appAccount.createAppAccountManager()
+                        await appAccountManager.setDataSyncEnabled('default', isOn)
+                      } catch (err) {
+                        this.accountDataSync = false
+                        promptAction.openToast({
+                          message: '发生错误，错误码：' + err.code
+                        })
+                      }
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
               }
               .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
               .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
-              if (this.accountLoading) {
-                LoadingProgress()
-                  .height(20)
-                  .margin({
-                    top: 6,
-                    left: 12
-                  })
-                  .width(20)
-              }
               Text('账号中心')
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontSize($r('sys.float.ohos_id_text_size_body3'))
@@ -327,7 +325,17 @@ export default struct Setting {
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
 
-          if (!this.accountLoading && this.cloudService) {
+          if (this.accountLoading) {
+            ListItem() {
+              LoadingProgress()
+                .height(20)
+                .width(20)
+            }
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
+          }
+          if (this.cloudService && !this.accountLoading) {
             ListItem() {
               Column() {
                 Text('云备份')
@@ -1138,20 +1146,6 @@ export default struct Setting {
     .padding({
       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
     })
-    /*.titleBar({
-      style: {
-        scrollEffectOpts: {
-          scrollEffectType: ScrollEffectType.COMMON_BLUR
-        }
-      },
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      },
-      enableComponentSafeArea: true
-    })
-    .titleMode(HdsNavigationTitleMode.MINI)*/
     .title('设置')
     .titleMode(NavigationTitleMode.Mini)
     .onAppear(() => {

@@ -1,4 +1,3 @@
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 import openLink from '../common/Openlink'
 
 interface Item {
@@ -442,13 +441,6 @@ struct License {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('资质证照')
   }
 }

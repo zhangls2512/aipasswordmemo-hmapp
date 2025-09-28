@@ -1,8 +1,9 @@
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { privacyManager } from '@kit.AppGalleryKit'
+import { util } from '@kit.ArkTS'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { netBoost } from '@kit.NetworkBoostKit'
-import { hdsEffect } from '@kit.UIDesignKit'
+import { fido2 } from '@kit.OnlineAuthenticationKit'
 import { set } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -47,7 +48,7 @@ export default struct Login {
             const uid = JSON.parse(res).uid as string
             const email = JSON.parse(res).email as string
             const endDate = JSON.parse(res).endDate as number
-            set(accessToken, {
+            await set(accessToken, {
               uid: uid,
               email: email,
               endDate: endDate
@@ -72,9 +73,6 @@ export default struct Login {
           Row() {
             Text('方式')
               .fontWeight(FontWeight.Medium)
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
               .width('15%')
             Row() {
               Radio({
@@ -132,10 +130,7 @@ export default struct Login {
           Row() {
             Text('邮箱')
               .fontWeight(FontWeight.Medium)
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
-              .width('15%')
+              .width('20%')
             TextInput({
               text: this.email!!,
               placeholder: '请输入邮箱'
@@ -143,7 +138,7 @@ export default struct Login {
               .contentType(ContentType.EMAIL_ADDRESS)
               .enableAutoSpacing(true)
               .type(InputType.Email)
-              .width('80%')
+              .width('75%')
           }
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -153,10 +148,7 @@ export default struct Login {
             Row() {
               Text('密码')
                 .fontWeight(FontWeight.Medium)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .width('15%')
+                .width('20%')
               TextInput({
                 text: this.password!!,
                 placeholder: '请输入密码'
@@ -165,7 +157,7 @@ export default struct Login {
                 .enableAutoSpacing(true)
                 .maxLength(30)
                 .type(InputType.Password)
-                .width('80%')
+                .width('75%')
             }
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -175,10 +167,7 @@ export default struct Login {
             Row() {
               Text('MFA')
                 .fontWeight(FontWeight.Medium)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .width('15%')
+                .width('20%')
               TextInput({
                 text: this.mfa!!,
                 placeholder: '请输入 MFA'
@@ -186,7 +175,7 @@ export default struct Login {
                 .enableAutoSpacing(true)
                 .maxLength(6)
                 .type(InputType.ONE_TIME_CODE)
-                .width('80%')
+                .width('75%')
             }
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -196,10 +185,7 @@ export default struct Login {
             Row() {
               Text('验证码')
                 .fontWeight(FontWeight.Medium)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .width('15%')
+                .width('20%')
               TextInput({
                 text: this.emailcode!!,
                 placeholder: '请输入邮箱验证码'
@@ -207,7 +193,7 @@ export default struct Login {
                 .enableAutoSpacing(true)
                 .maxLength(8)
                 .type(InputType.ONE_TIME_CODE)
-                .width('80%')
+                .width('75%')
             }
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -219,12 +205,6 @@ export default struct Login {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
               .width('100%')
               .onClick(async () => {
                 if (!this.email) {
@@ -328,7 +308,7 @@ export default struct Login {
                 const uid = JSON.parse(res).uid as string
                 const email = JSON.parse(res).email as string
                 const endDate = JSON.parse(res).endDate as number
-                set(accessToken, {
+                await set(accessToken, {
                   uid: uid,
                   email: email,
                   endDate: endDate
@@ -354,6 +334,66 @@ export default struct Login {
             .height(40)
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+          Button('通行密钥登录')
+          //.enabled(this.agree)
+            .enabled(false)
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .width('100%')
+            .onClick(async () => {
+              try {
+                const resa = await fido2.authenticate(this.context, {
+                  publicKey: {
+                    challenge: new util.TextEncoder().encodeInto(String(Date.now()).slice(0, -5) + '00000')
+                  }
+                })
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '登录中...'
+                  })
+                })
+                dialogControllerProgress.open()
+                netBoost.setSceneDesc({
+                  scene: 'login',
+                  sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
+                })
+                const resb = await request('/account/getAccessToken', {
+                  verifyType: 'passkey',
+                  rawId: new util.Base64Helper().encodeToStringSync(resa.rawId, util.Type.BASIC_URL_SAFE),
+                  authenticatorData: new util.Base64Helper().encodeToStringSync(resa.response.authenticatorData,
+                    util.Type.BASIC_URL_SAFE),
+                  clientDataJSON: new util.Base64Helper().encodeToStringSync(resa.response.clientDataJson,
+                    util.Type.BASIC_URL_SAFE),
+                  signature: new util.Base64Helper().encodeToStringSync(resa.response.signature,
+                    util.Type.BASIC_URL_SAFE)
+                })
+                netBoost.setSceneDesc({
+                  scene: 'login',
+                  sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
+                })
+                dialogControllerProgress.close()
+                if (resb !== 'fail') {
+                  const accessToken = JSON.parse(resb).accessToken as string
+                  const uid = JSON.parse(resb).uid as string
+                  const email = JSON.parse(resb).email as string
+                  const endDate = JSON.parse(resb).endDate as number
+                  await set(accessToken, {
+                    uid: uid,
+                    email: email,
+                    endDate: endDate
+                  })
+                  promptAction.openToast({
+                    message: '登录成功'
+                  })
+                  this.isShowLoginSheet = false
+                }
+              } catch (err) {
+                promptAction.openToast({
+                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                })
+              }
             })
           Text('注册账号')
             .fontColor($r('sys.color.font_emphasize'))

@@ -1,6 +1,5 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getPermission } from '../common/Permission'
 
 @Builder
@@ -121,13 +120,6 @@ struct Permissionsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('权限管理')
     .onAppear(() => {
       this.writePasteBoard = this.permissionSettingDataPreferences.getSync('writePasteBoard', false) as boolean

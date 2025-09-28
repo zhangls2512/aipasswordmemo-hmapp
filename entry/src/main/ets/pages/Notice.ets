@@ -2,7 +2,6 @@ import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { notificationManager } from '@kit.NotificationKit'
 import { pushService } from '@kit.PushKit'
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 import request from '../common/Request'
 
 interface NoticeItem {
@@ -77,11 +76,11 @@ struct Notice {
           ListItem() {
             LoadingProgress()
               .height(20)
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-              })
               .width(20)
           }
+          .margin({
+            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          })
         }
         if (!this.loading && this.noticeArray.length > 0) {
           ListItem() {
@@ -163,13 +162,6 @@ struct Notice {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('消息通知')
     .onAppear(async () => {
       try {

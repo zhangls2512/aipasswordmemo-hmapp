@@ -2,7 +2,6 @@ import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { netBoost } from '@kit.NetworkBoostKit'
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { get, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -14,13 +13,8 @@ interface VipItem {
   price: string
 }
 
-@Builder
-export function VipBuilder() {
-  Vip()
-}
-
 @ComponentV2
-struct Vip {
+export default struct Vip {
   @Local vipStatus: string = '未开通'
   @Local vipStatusColor: string = 'red'
   @Local vipStatusLoading: boolean = false
@@ -156,7 +150,7 @@ struct Vip {
   }
 
   build() {
-    NavDestination() {
+    Navigation(this.pageInfos) {
       List() {
         ListItem() {
           Column() {
@@ -464,16 +458,13 @@ struct Vip {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
+    .hideBackButton(true)
+    .padding({
+      top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+    })
     .title('会员中心')
-    .onReady(async (context) => {
-      this.pageInfos = context.pathStack
+    .titleMode(NavigationTitleMode.Mini)
+    .onAppear(async () => {
       this.accessToken = await get()
       if (this.accessToken) {
         const accountInfo = await getAccountInfo()
@@ -502,7 +493,6 @@ struct Vip {
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshVip')
-      this.context.eventHub.emit('refreshSetting')
     })
   }
 }

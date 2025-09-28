@@ -94,13 +94,6 @@ struct Defaulthidepasswordinfotype {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('默认隐藏内容密码信息类型')
     .onAppear(() => {
       this.defaultHidePasswordInfoTypeArray =

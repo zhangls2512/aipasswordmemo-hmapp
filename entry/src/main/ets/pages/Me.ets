@@ -3,18 +3,23 @@ import { preferences } from '@kit.ArkData'
 import { window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
-import { getAccountInfo, remove } from '../common/Accesstoken'
+import { get, getAccountInfo, remove } from '../common/Accesstoken'
+import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
+import Cloudservice from './Cloudservice'
 import Login from './Login'
 import Passwordcheck from './Passwordcheck'
 import Passwordgenerate from './Passwordgenerate'
 import Setting from './Setting'
 import Urlcheck from './Urlcheck'
+import Vip from './Vip'
 
 @ComponentV2
 export default struct Me {
   @Provider() isShowLoginSheet: boolean = false
+  @Provider() isShowCloudserviceSheet: boolean = false
+  @Local isShowVipSheet: boolean = false
   @Local isShowPasswordcheckSheet: boolean = false
   @Local isShowPasswordgenerateSheet: boolean = false
   @Local isShowUrlcheckSheet: boolean = false
@@ -22,6 +27,8 @@ export default struct Me {
   @Local uid: string = ''
   @Local email: string = ''
   @Local endDate: string = ''
+  @Local cloudService: boolean = false
+  @Local cloudServiceLoading: boolean = false
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   preferType = 1
 
@@ -30,11 +37,27 @@ export default struct Me {
     this.uid = accountInfo.uid
     this.email = accountInfo.email
     this.endDate = String(new Date(accountInfo.endDate))
+    const accessToken = await get()
+    if (accessToken) {
+      this.cloudServiceLoading = true
+      this.cloudService = await getCloudServiceStatus()
+      this.cloudServiceLoading = false
+    }
   }
 
   @Builder
   LoginSheetBuilder() {
     Login()
+  }
+
+  @Builder
+  CloudserviceSheetBuilder() {
+    Cloudservice()
+  }
+
+  @Builder
+  VipSheetBuilder() {
+    Vip()
   }
 
   @Builder
@@ -74,9 +97,16 @@ export default struct Me {
                 .fontWeight(FontWeight.Bold)
             }
             if (this.uid) {
-              Text(this.email)
-                .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-                .fontWeight(FontWeight.Bold)
+              if (!this.email) {
+                Text('未绑定邮箱')
+                  .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+                  .fontWeight(FontWeight.Bold)
+              }
+              if (this.email) {
+                Text(this.email)
+                  .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+                  .fontWeight(FontWeight.Bold)
+              }
             }
           }
           .borderRadius(12)
@@ -118,7 +148,7 @@ export default struct Me {
             })
           })
 
-          if (this.email) {
+          if (this.uid) {
             Divider()
               .padding({
                 left: 12,
@@ -182,6 +212,103 @@ export default struct Me {
             .onClick(() => {
               openLink('https://www.zhangls2512.cn/product/account/info')
             })
+
+            Divider()
+              .padding({
+                left: 12,
+                right: 12
+              })
+            Row() {
+              Text('云服务')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontWeight(FontWeight.Medium)
+              Blank()
+              if (!this.cloudServiceLoading) {
+                if (!this.cloudService) {
+                  Text('未开通')
+                    .fontColor($r('sys.color.warning'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+                }
+                if (this.cloudService) {
+                  Text('已开通')
+                    .fontColor($r('sys.color.font_emphasize'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+                }
+              }
+              if (this.cloudServiceLoading) {
+                LoadingProgress()
+                  .height(14)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                  .width(14)
+              }
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
+            }
+            .borderRadius(12)
+            .padding(12)
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.comp_background_primary'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.comp_background_secondary'))
+              }
+            })
+            .width('100%')
+            .onClick(() => {
+              this.isShowCloudserviceSheet = true
+            })
+            .bindSheet(this.isShowCloudserviceSheet!!, this.CloudserviceSheetBuilder(), {
+              preferType: this.preferType,
+              title: {
+                title: '云服务'
+              }
+            })
+
+            if (this.cloudService && !this.cloudServiceLoading) {
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('会员中心')
+                  .fontColor('#FFD700')
+                  .fontWeight(FontWeight.Medium)
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.comp_background_primary'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.comp_background_secondary'))
+                }
+              })
+              .width('100%')
+              .onClick(() => {
+                this.isShowVipSheet = true
+              })
+              .bindSheet(this.isShowVipSheet!!, this.VipSheetBuilder(), {
+                preferType: this.preferType
+              })
+            }
           }
         }
         .backgroundColor($r('sys.color.comp_background_primary'))
@@ -407,10 +534,7 @@ export default struct Me {
             this.isShowSettingSheet = true
           })
           .bindSheet(this.isShowSettingSheet!!, this.SettingSheetBuilder(), {
-            preferType: this.preferType,
-            onDisappear: (() => {
-              this.get()
-            })
+            preferType: this.preferType
           })
         }
         .backgroundColor($r('sys.color.comp_background_primary'))
@@ -421,7 +545,7 @@ export default struct Me {
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
 
-      if (this.email !== '') {
+      if (this.uid) {
         ListItem() {
           Button('退出登录')
             .buttonStyle(ButtonStyleMode.NORMAL)

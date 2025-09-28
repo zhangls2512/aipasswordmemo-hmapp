@@ -1,6 +1,5 @@
 import { fileIo } from '@kit.CoreFileKit'
 
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 @Builder
 export function DeletefileBuilder() {
   Deletefile()
@@ -74,13 +73,6 @@ struct Deletefile {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('沙箱文件删除工具')
   }
 }
