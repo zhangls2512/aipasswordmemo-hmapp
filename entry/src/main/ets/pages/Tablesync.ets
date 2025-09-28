@@ -2,7 +2,6 @@ import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { checkPermission } from '../common/Permission'
 import { syncTable } from '../common/Table'
 
@@ -673,13 +672,6 @@ struct Tablesync {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('设备间数据同步')
     .onAppear(async () => {
       this.getSetting()

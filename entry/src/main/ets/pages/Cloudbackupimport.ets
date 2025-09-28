@@ -1,6 +1,5 @@
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackimport'
 import { getKey } from '../common/Crypto'
 
@@ -321,13 +320,6 @@ struct Cloudbackupimport {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('导入云备份')
     .onAppear(() => {
       this.getSetting()

@@ -8,7 +8,7 @@ import { newTag } from '../common/Datachange'
 export default struct Newtag {
   @Consumer() isShowNewSheet: boolean = false
   @Local tagValue: string = ''
-  @Local tagColor: string = 'rgba(0,0,0,0)'
+  @Local tagColor: string = ''
   @Local red: number = 0
   @Local green: number = 0
   @Local blue: number = 0
@@ -178,12 +178,6 @@ export default struct Newtag {
             if (!this.tagValue) {
               promptAction.openToast({
                 message: '请输入内容'
-              })
-              return
-            }
-            if (!this.tagColor) {
-              promptAction.openToast({
-                message: '请输入颜色'
               })
               return
             }

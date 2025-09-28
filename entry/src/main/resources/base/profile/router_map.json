@@ -71,16 +71,6 @@
       "buildFunction": "RecoverysettingBuilder"
     },
     {
-      "name": "Cloudservice",
-      "pageSourceFile": "src/main/ets/pages/Cloudservice.ets",
-      "buildFunction": "CloudserviceBuilder"
-    },
-    {
-      "name": "Vip",
-      "pageSourceFile": "src/main/ets/pages/Vip.ets",
-      "buildFunction": "VipBuilder"
-    },
-    {
       "name": "Vipcode",
       "pageSourceFile": "src/main/ets/pages/Vipcode.ets",
       "buildFunction": "VipcodeBuilder"
@@ -169,6 +159,16 @@
       "name": "Defaulthidepasswordinfotype",
       "pageSourceFile": "src/main/ets/pages/Defaulthidepasswordinfotype.ets",
       "buildFunction": "DefaulthidepasswordinfotypeBuilder"
+    },
+    {
+      "name": "Newpasskey",
+      "pageSourceFile": "src/main/ets/pages/Newpasskey.ets",
+      "buildFunction": "NewpasskeyBuilder"
+    },
+    {
+      "name": "Email",
+      "pageSourceFile": "src/main/ets/pages/Email.ets",
+      "buildFunction": "EmailBuilder"
     }
   ]
 }

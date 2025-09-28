@@ -35,11 +35,7 @@ export async function importCsvPassword(content: string) {
   const firstLine = parseCsvLine(lines[0])
   const columnCount = firstLine.length
   const nameIndex = firstLine.findIndex(item => item === '名称')
-  if (nameIndex === -1) {
-    promptAction.openToast({
-      message: '导入失败，原因：无名称列'
-    })
-  } else {
+  if (nameIndex !== -1) {
     const infoColumnsIndex: number[] = []
     for (let i = 0; i < columnCount; i++) {
       if (i !== nameIndex) {
@@ -70,6 +66,11 @@ export async function importCsvPassword(content: string) {
     await importPassword(JSON.stringify(result), 0)
     promptAction.openToast({
       message: '导入成功'
+    })
+  }
+  if (nameIndex === -1) {
+    promptAction.openToast({
+      message: '导入失败，原因：无名称列'
     })
   }
 }

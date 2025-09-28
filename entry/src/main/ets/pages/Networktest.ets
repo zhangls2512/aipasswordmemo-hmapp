@@ -1,7 +1,6 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { rcp } from '@kit.RemoteCommunicationKit'
 
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 interface Response {
   errCode: number,
   errMsg: string,
@@ -21,13 +20,7 @@ struct Networktest {
   @Local requestIp: string = ''
   @Local timeStamp: number = 0
   @Local httpVersion: string = ''
-  @Local nameLookupTimeMs: number = 0
-  @Local connectTimeMs: number = 0
-  @Local tlsHandshakeTimeMs: number = 0
-  @Local preTransferTimeMs: number = 0
-  @Local startTransferTimeMs: number = 0
   @Local totalTimeMs: number = 0
-  @Local redirectTimeMs: number = 0
 
   build() {
     NavDestination() {
@@ -44,6 +37,7 @@ struct Networktest {
                 dialogControllerProgress.open()
                 const session = rcp.createSession()
                 try {
+                  const startTime = Date.now()
                   const response = await session.get('https://api.zhangls2512.cn/test')
                   session.close()
                   dialogControllerProgress.close()
@@ -58,13 +52,7 @@ struct Networktest {
                     this.requestIp = res.requestIp
                     this.timeStamp = res.timeStamp
                     this.httpVersion = String(response.httpVersion)
-                    this.nameLookupTimeMs = Number(response.timeInfo?.nameLookupTimeMs)
-                    this.connectTimeMs = Number(response.timeInfo?.connectTimeMs)
-                    this.tlsHandshakeTimeMs = Number(response.timeInfo?.tlsHandshakeTimeMs)
-                    this.preTransferTimeMs = Number(response.timeInfo?.preTransferTimeMs)
-                    this.startTransferTimeMs = Number(response.timeInfo?.startTransferTimeMs)
-                    this.totalTimeMs = Number(response.timeInfo?.totalTimeMs)
-                    this.redirectTimeMs = Number(response.timeInfo?.redirectTimeMs)
+                    this.totalTimeMs = Date.now() - startTime
                     promptAction.openToast({
                       message: '测试完成'
                     })
@@ -83,16 +71,37 @@ struct Networktest {
               })
             Column() {
               Row() {
+                Text('请求地址')
+                  .fontWeight(FontWeight.Medium)
+                  .width('30%')
+                Blank()
+                  .width('5%')
+                Text('https://api.zhangls2512.cn/test')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .textAlign(TextAlign.End)
+                  .width('65%')
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
                 Text('错误码')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
+                  .width('30%')
                 Blank()
                   .width('5%')
                 Text(String(this.errCode))
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
-                  .width('50%')
+                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -106,14 +115,14 @@ struct Networktest {
               Row() {
                 Text('错误信息')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
+                  .width('30%')
                 Blank()
                   .width('5%')
                 Text(this.errMsg)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
-                  .width('50%')
+                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -128,14 +137,14 @@ struct Networktest {
                 Text('请求IP')
                   .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
+                  .width('30%')
                 Blank()
                   .width('5%')
                 Text(this.requestIp)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
-                  .width('50%')
+                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -149,14 +158,14 @@ struct Networktest {
               Row() {
                 Text('请求时间戳')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
+                  .width('30%')
                 Blank()
                   .width('5%')
                 Text(String(this.timeStamp))
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
-                  .width('50%')
+                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -171,121 +180,14 @@ struct Networktest {
                 Text('HTTP版本')
                   .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
+                  .width('30%')
                 Blank()
                   .width('5%')
                 Text(this.httpVersion)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('DNS解析所需的时间')
-                  .enableAutoSpacing(true)
-                  .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(this.httpVersion) + ' ms')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('建立连接时间')
-                  .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(this.connectTimeMs) + ' ms')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('从开始到远程主机 (或代理) 的 TLS 握手完成的时间')
-                  .enableAutoSpacing(true)
-                  .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(this.tlsHandshakeTimeMs) + ' ms')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('传输开始前的时间')
-                  .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(this.preTransferTimeMs) + ' ms')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('传输开始时间')
-                  .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(this.startTransferTimeMs) + ' ms')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
+                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -299,35 +201,14 @@ struct Networktest {
               Row() {
                 Text('请求总耗时')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
+                  .width('30%')
                 Blank()
                   .width('5%')
                 Text(String(this.totalTimeMs) + ' ms')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .textAlign(TextAlign.End)
-                  .width('50%')
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('重定向所需的时间')
-                  .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(String(this.redirectTimeMs) + ' ms')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .textAlign(TextAlign.End)
-                  .width('50%')
+                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -352,13 +233,6 @@ struct Networktest {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('网络测试')
   }
 }

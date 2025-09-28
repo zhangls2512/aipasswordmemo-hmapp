@@ -1,6 +1,6 @@
 import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
-import { promptAction } from '@kit.ArkUI'
+import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { getPasswordInfo, Password, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
@@ -287,36 +287,24 @@ export default struct Passwordinfo {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
       }
-      ForEach(this.passwordTag, (item: PasswordTagItem) => {
-        ListItem() {
-          Column() {
-            Row() {
-              Row() {
-                Circle({
-                  height: 16,
-                  width: 16
-                })
-                  .fill(item.color)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Text(item.value)
-                  .enableAutoSpacing(true)
-                  .fontWeight(FontWeight.Medium)
-              }
-              .width('95%')
-            }
-            .borderRadius(12)
-            .padding(12)
-            .width('100%')
+      ListItem() {
+        Flex({
+          wrap: FlexWrap.Wrap,
+          space: {
+            main: LengthMetrics.vp(8),
+            cross: LengthMetrics.vp(8)
           }
-          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-          .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-          .padding($r('sys.float.ohos_id_corner_radius_mark'))
+        }) {
+          ForEach(this.passwordTag, (item: PasswordTagItem) => {
+            Text(item.value)
+              .enableAutoSpacing(true)
+              .fontColor(item.color)
+              .fontWeight(FontWeight.Medium)
+          })
         }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
+      }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
     }
     .padding({

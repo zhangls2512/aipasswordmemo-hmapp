@@ -149,6 +149,18 @@ export default class EntryAbility extends UIAbility {
         const vipCode = urires.getQueryValue('vipcode')
         const accessToken = await get()
         if (invitationCode) {
+          if (!accessToken) {
+            promptAction.showDialog({
+              title: '提示',
+              message: '邀请码使用失败，原因：未登录账号',
+              buttons: [
+                {
+                  text: '确定',
+                  color: $r('sys.color.font_emphasize')
+                }
+              ]
+            })
+          }
           if (accessToken) {
             const deviceToken = await getDeviceToken()
             if (deviceToken) {
@@ -171,10 +183,13 @@ export default class EntryAbility extends UIAbility {
                 })
               }
             }
-          } else {
+          }
+        }
+        if (vipCode) {
+          if (!accessToken) {
             promptAction.showDialog({
               title: '提示',
-              message: '邀请码使用失败，原因：未登录账号',
+              message: '兑换码使用失败，原因：未登录账号',
               buttons: [
                 {
                   text: '确定',
@@ -183,8 +198,6 @@ export default class EntryAbility extends UIAbility {
               ]
             })
           }
-        }
-        if (vipCode) {
           if (accessToken) {
             const res = await request('/product/useVipcode', {
               accessToken: accessToken,
@@ -202,17 +215,6 @@ export default class EntryAbility extends UIAbility {
                 ]
               })
             }
-          } else {
-            promptAction.showDialog({
-              title: '提示',
-              message: '兑换码使用失败，原因：未登录账号',
-              buttons: [
-                {
-                  text: '确定',
-                  color: $r('sys.color.font_emphasize')
-                }
-              ]
-            })
           }
         }
       }
@@ -724,7 +726,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 19) {
+    if (wantParam.version !== 22) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })
@@ -743,10 +745,10 @@ export default class EntryAbility extends UIAbility {
       name: 'commonSetting'
     })
     const acceptCollaborate = commonSettingDataPreferences.getSync('acceptCollaborate', true)
-    if (acceptCollaborate) {
-      return 0
-    } else {
+    if (!acceptCollaborate) {
       return 1
+    } else {
+      return 0
     }
   }
 

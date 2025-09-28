@@ -8,7 +8,7 @@ import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
-import { CloudBackupTimeItem, getInfoList, Info } from '../common/Dataget'
+import { CloudBackupTimeItem, getInfoList, getInfoTypeList, Info } from '../common/Dataget'
 import copy from '../common/Pasteboard'
 import AinewInfo from './Ainewinfo'
 import NewInfo from './Newinfo'
@@ -23,6 +23,8 @@ export default struct InfoPage {
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
+  @Local types: string[] = []
+  @Local selectType: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   preferType = 1
   updateId = 0
@@ -102,7 +104,8 @@ export default struct InfoPage {
           const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
           if (cloudBackupTimeIndex !== -1) {
             cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-          } else {
+          }
+          if (cloudBackupTimeIndex === -1) {
             cloudBackupTimeArray.push({
               uid: accountInfo.uid,
               time: Date.now()
@@ -259,80 +262,132 @@ export default struct InfoPage {
               })
           }
         }
+
+        ListItem() {
+          Scroll() {
+            Row() {
+              ForEach(this.types, (item: string, index) => {
+                if (item !== this.selectType) {
+                  Column() {
+                    Row() {
+                      Text(item)
+                        .enableAutoSpacing(true)
+                        .fontWeight(FontWeight.Medium)
+                    }
+                    .padding(12)
+                    .onClick(() => {
+                      this.selectType = item
+                    })
+                  }
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .margin({
+                    right: index === this.types.length - 1 ? 0 : $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                }
+                if (item === this.selectType) {
+                  Column() {
+                    Row() {
+                      Text(item)
+                        .enableAutoSpacing(true)
+                        .fontColor(Color.White)
+                        .fontWeight(FontWeight.Medium)
+                    }
+                    .padding(12)
+                    .onClick(() => {
+                      this.selectType = ''
+                    })
+                  }
+                  .backgroundColor($r('sys.color.background_emphasize'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .margin({
+                    right: index === this.types.length - 1 ? 0 : $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                }
+              })
+            }
+          }
+          .edgeEffect(EdgeEffect.Spring)
+          .scrollable(ScrollDirection.Horizontal)
+          .scrollBar(BarState.Off)
+        }
         .margin({
-          bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
         ForEach(this.infoArray, (item: Info) => {
-          ListItem() {
-            Column() {
-              Row() {
-                if (item.isCloudBackup) {
-                  Image($r('app.media.cloud'))
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                    .width('5%')
-                }
-                Column() {
-                  if (item.type !== '图标') {
-                    Text(item.value)
-                      .enableAutoSpacing(true)
-                      .fontWeight(FontWeight.Medium)
+          if (!this.selectType || item.type === this.selectType) {
+            ListItem() {
+              Column() {
+                Row() {
+                  if (item.isCloudBackup) {
+                    Image($r('app.media.cloud'))
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
+                      .width('5%')
                   }
-                  if (item.type === '图标') {
-                    Image(item.value)
-                      .copyOption(CopyOptions.LocalDevice)
-                      .width('10%')
-                      .onError((err) => {
-                        promptAction.openToast({
-                          message: '发生错误，错误信息：' + err.message
+                  Column() {
+                    if (item.type !== '图标') {
+                      Text(item.value)
+                        .enableAutoSpacing(true)
+                        .fontWeight(FontWeight.Medium)
+                    }
+                    if (item.type === '图标') {
+                      Image(item.value)
+                        .copyOption(CopyOptions.LocalDevice)
+                        .width('10%')
+                        .onError((err) => {
+                          promptAction.openToast({
+                            message: '发生错误，错误信息：' + err.message
+                          })
                         })
+                    }
+                    Text(item.type)
+                      .enableAutoSpacing(true)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                      .margin({
+                        top: $r('sys.float.ohos_id_text_margin_vertical')
                       })
                   }
-                  Text(item.type)
-                    .enableAutoSpacing(true)
-                    .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                    .margin({
-                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                  .alignItems(HorizontalAlign.Start)
+                  .width('90%')
+                }
+                .borderRadius(12)
+                .padding(12)
+                .stateStyles({
+                  normal: {
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  pressed: {
+                    .backgroundColor($r('sys.color.interactive_pressed'))
+                  }
+                })
+                .width('100%')
+                .onClick(() => {
+                  if (item.type === '图标') {
+                    promptAction.openToast({
+                      message: '图标类型不支持修改'
                     })
-                }
-                .alignItems(HorizontalAlign.Start)
-                .width('90%')
+                    return
+                  }
+                  this.updateId = item.id
+                  this.isShowUpdateSheet = true
+                })
+                .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress | ResponseType.RightClick, {
+                  hapticFeedbackMode: HapticFeedbackMode.AUTO
+                })
               }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onClick(() => {
-                if (item.type === '图标') {
-                  promptAction.openToast({
-                    message: '图标类型不支持修改'
-                  })
-                  return
-                }
-                this.updateId = item.id
-                this.isShowUpdateSheet = true
-              })
-              .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress | ResponseType.RightClick, {
-                hapticFeedbackMode: HapticFeedbackMode.AUTO
-              })
+              .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .padding($r('sys.float.ohos_id_corner_radius_mark'))
             }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
           }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
         })
       }
       .height('100%')
@@ -395,6 +450,7 @@ export default struct InfoPage {
     }
     .onRefreshing(async () => {
       this.infoArray = await getInfoList()
+      this.types = await getInfoTypeList()
       this.loading = false
     })
   }

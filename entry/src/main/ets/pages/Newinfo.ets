@@ -26,9 +26,8 @@ export default struct Newinfo {
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  oftenUsedInfoTypes: string[] = ['自定义']
-  specialInfoTypes: string[] =
-    ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
+  oftenUsedInfoTypes = ['自定义']
+  specialInfoTypes = ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   getCurrentInfoType() {
     let infoType = this.infoType

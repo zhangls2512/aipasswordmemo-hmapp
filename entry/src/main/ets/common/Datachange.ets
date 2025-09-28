@@ -115,7 +115,8 @@ export async function updatePassword(id: number, data: PasswordInput) {
     const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
     if (cloudBackupTimeIndex !== -1) {
       cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-    } else {
+    }
+    if (cloudBackupTimeIndex === -1) {
       cloudBackupTimeArray.push({
         uid: accountInfo.uid,
         time: Date.now()
@@ -236,7 +237,8 @@ export async function updateInfo(id: number, data: InfoInput) {
     const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
     if (cloudBackupTimeIndex !== -1) {
       cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-    } else {
+    }
+    if (cloudBackupTimeIndex === -1) {
       cloudBackupTimeArray.push({
         uid: accountInfo.uid,
         time: Date.now()
@@ -356,7 +358,8 @@ export async function updateTag(id: number, data: TagInput) {
     const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
     if (cloudBackupTimeIndex !== -1) {
       cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-    } else {
+    }
+    if (cloudBackupTimeIndex === -1) {
       cloudBackupTimeArray.push({
         uid: accountInfo.uid,
         time: Date.now()
@@ -441,7 +444,8 @@ export async function setCloudBackup(data: CloudBackupItem) {
           const oldCloudBackupTimeIndex = oldCloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
           if (oldCloudBackupTimeIndex !== -1) {
             oldCloudBackupTimeArray[oldCloudBackupTimeIndex].time = Date.now()
-          } else {
+          }
+          if (oldCloudBackupTimeIndex === -1) {
             oldCloudBackupTimeArray.push({
               uid: accountInfo.uid,
               time: Date.now()

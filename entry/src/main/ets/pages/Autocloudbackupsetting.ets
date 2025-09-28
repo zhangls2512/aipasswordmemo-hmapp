@@ -1,6 +1,5 @@
 import { preferences } from '@kit.ArkData'
 
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 interface Type {
   name: string,
   value: string
@@ -91,13 +90,6 @@ struct Autocloudbackupsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('云备份自动开启设置')
     .onAppear(() => {
       this.getSetting()

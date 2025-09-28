@@ -1,7 +1,6 @@
 import { promptAction } from '@kit.ArkUI'
 import { netQuality } from '@kit.NetworkBoostKit'
 
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 @Builder
 export function ReportQoeBuilder() {
   ReportQoe()
@@ -213,13 +212,6 @@ struct ReportQoe {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('反馈网络传输体验')
     .onReady((context) => {
       this.pageInfos = context.pathStack

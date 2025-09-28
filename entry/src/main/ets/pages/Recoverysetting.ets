@@ -1,7 +1,6 @@
 import { appRecovery } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 
-//import { HdsNavDestination } from '@kit.UIDesignKit'
 @Builder
 export function RecoverysettingBuilder() {
   Recoverysetting()
@@ -135,13 +134,6 @@ struct Recoverysetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    /*.titleBar({
-      content: {
-        title: {
-          mainTitle: ''
-        }
-      }
-    })*/
     .title('应用恢复设置')
     .onReady((context) => {
       this.pageInfos = context.pathStack

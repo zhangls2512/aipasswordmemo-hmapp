@@ -10,7 +10,7 @@ export default struct Updatetag {
   @Consumer() isShowUpdateSheet: boolean = false
   @Param tagId: number = 0
   @Local tagValue: string = ''
-  @Local tagColor: string = 'rgba(0,0,0,0)'
+  @Local tagColor: string = ''
   @Local red: number = 0
   @Local green: number = 0
   @Local blue: number = 0
@@ -179,12 +179,6 @@ export default struct Updatetag {
             if (!this.tagValue) {
               promptAction.openToast({
                 message: '请输入内容'
-              })
-              return
-            }
-            if (!this.tagColor) {
-              promptAction.openToast({
-                message: '请输入颜色'
               })
               return
             }
