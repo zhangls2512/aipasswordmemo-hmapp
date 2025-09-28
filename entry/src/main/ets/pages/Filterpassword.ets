@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { getTagList, getTypeInfoList, PasswordInfoItem } from '../common/Dataget'
+import { getTagList, getTypeInfoList, PasswordInfoItem, Tag } from '../common/Dataget'
 import { SelectItem } from './Newpassword'
 
 @ComponentV2
@@ -16,7 +16,7 @@ export default struct Filterpassword {
   @Local infoArray: string[] = []
   @Local passwordTagArray: string[] = []
   @Local passwordTag: string = ''
-  @Local tagArray: string[] = []
+  @Local tagArray: Tag[] = []
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pushItemWhenBlur = false
   oftenUsedInfoTypes = ['自定义']
@@ -540,26 +540,27 @@ export default struct Filterpassword {
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
 
-      ForEach(this.tagArray, (item: string) => {
-        if (!this.passwordTagArray.includes(item)) {
+      ForEach(this.tagArray, (item: Tag) => {
+        if (!this.passwordTagArray.includes(item.value)) {
           ListItem() {
             Column() {
               Row() {
-                Text(item)
+                Text(item.value)
                   .enableAutoSpacing(true)
+                  .fontColor(item.color)
                   .width('87%')
                 Blank()
                   .width('5%')
                 Image($r('app.media.add'))
                   .width('8%')
                   .onClick(() => {
-                    if (this.passwordTagArray.some(tagItem => tagItem === item)) {
+                    if (this.passwordTagArray.some(tagItem => tagItem === item.value)) {
                       promptAction.openToast({
                         message: '已添加此标签'
                       })
                       return
                     }
-                    this.passwordTagArray.push(item)
+                    this.passwordTagArray.push(item.value)
                   })
               }
               .borderRadius(12)
@@ -657,8 +658,7 @@ export default struct Filterpassword {
       if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
         this.infoArray = await getTypeInfoList(this.infoTypeValue)
       }
-      const tagArray = await getTagList()
-      this.tagArray = tagArray.map(item => item.value)
+      this.tagArray = await getTagList()
       this.passwordNameKeyword = this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string
       this.passwordInfoArray = this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[]
       this.passwordTagArray = this.filterPasswordDataPreferences.getSync('tag', []) as string[]
