@@ -3,6 +3,9 @@ import { appInfoManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
+import { fileIo } from '@kit.CoreFileKit'
+import { image } from '@kit.ImageKit'
+import { photoAccessHelper } from '@kit.MediaLibraryKit'
 
 @Builder
 export function CommonsettingBuilder() {
@@ -484,6 +487,116 @@ struct Commonsetting {
               .borderRadius(12)
               .padding(12)
               .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('背景图')
+                  .fontWeight('medium')
+                Blank()
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onClick(async () => {
+                const backgroundImagePath = this.context.filesDir + '/media/backgroundimage.png'
+                const res = fileIo.accessSync(backgroundImagePath)
+                if (!res) {
+                  try {
+                    const photoPicker = new photoAccessHelper.PhotoViewPicker()
+                    const pickerres = await photoPicker.select({
+                      MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+                      maxSelectNumber: 1,
+                      isPhotoTakingSupported: false
+                    })
+                    const fileSource = await fileIo.open(pickerres.photoUris[0])
+                    const imageSource = image.createImageSource(fileSource.fd)
+                    const imagePixelMap = await imageSource.createPixelMap()
+                    if (!fileIo.accessSync(this.context.filesDir + '/media')) {
+                      fileIo.mkdirSync(this.context.filesDir + '/media')
+                    }
+                    const file =
+                      fileIo.openSync(backgroundImagePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+                    const imagePacker = image.createImagePacker()
+                    await imagePacker.packToFile(imagePixelMap, file.fd, {
+                      format: 'image/png',
+                      quality: 100
+                    })
+                    fileIo.closeSync(file)
+                    this.context.eventHub.emit('refreshIndex')
+                  } catch (err) {
+                    if (err.code !== 13900020) {
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.code
+                      })
+                    }
+                  }
+                  return
+                }
+                if (res) {
+                  const promptAction = this.getUIContext().getPromptAction()
+                  const data = await promptAction.showActionMenu({
+                    title: '设置背景图',
+                    buttons: [
+                      {
+                        text: '从图库中选择',
+                        color: $r('sys.color.font_primary')
+                      },
+                      {
+                        text: '恢复默认',
+                        color: $r('sys.color.font_primary')
+                      }
+                    ]
+                  })
+                  if (data.index === 0) {
+                    try {
+                      const photoPicker = new photoAccessHelper.PhotoViewPicker()
+                      const pickerres = await photoPicker.select({
+                        MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+                        maxSelectNumber: 1,
+                        isPhotoTakingSupported: false
+                      })
+                      const fileSource = await fileIo.open(pickerres.photoUris[0])
+                      const imageSource = image.createImageSource(fileSource.fd)
+                      const imagePixelMap = await imageSource.createPixelMap()
+                      const file =
+                        fileIo.openSync(backgroundImagePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+                      const imagePacker = image.createImagePacker()
+                      await imagePacker.packToFile(imagePixelMap, file.fd, {
+                        format: 'image/png',
+                        quality: 100
+                      })
+                      fileIo.closeSync(file)
+                      this.context.eventHub.emit('refreshIndex')
+                    } catch (err) {
+                      if (err.code !== 13900020) {
+                        promptAction.openToast({
+                          message: '发生错误，错误码：' + err.code
+                        })
+                      }
+                    }
+                  }
+                  if (data.index === 1) {
+                    fileIo.unlinkSync(backgroundImagePath)
+                    this.context.eventHub.emit('refreshIndex')
+                  }
+                }
+              })
 
               Divider()
                 .padding({

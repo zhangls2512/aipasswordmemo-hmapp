@@ -66,6 +66,7 @@ struct Keypage {
             .alignItems(HorizontalAlign.Start)
           }
           .margin({
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         }
@@ -217,8 +218,7 @@ struct Keypage {
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
         }
         .margin({
-          top: this.keyValue ? $r('sys.float.ohos_id_elements_margin_vertical_l') :
-            $r('sys.float.ohos_id_elements_margin_vertical_m')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
       .padding({

@@ -360,7 +360,7 @@ export default struct Newinfo {
                 type: ToggleType.Switch,
                 isOn: this.cloudBackup!!
               })
-                .enabled(this.allowCloudBackup)
+                .enabled(this.allowCloudBackup && this.getCurrentInfoType() !== '图标')
             }
             .borderRadius(12)
             .padding(12)

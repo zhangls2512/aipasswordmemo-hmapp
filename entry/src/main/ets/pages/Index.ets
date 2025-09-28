@@ -2,6 +2,8 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
+import { fileIo } from '@kit.CoreFileKit'
+import { image } from '@kit.ImageKit'
 import Password from './Password'
 import Info from './Info'
 import Tag from './Tag'
@@ -11,11 +13,22 @@ import Cleardata from './Cleardata'
 @Entry
 @ComponentV2
 struct Index {
+  @Local backgroundImagePixelMap: PixelMap | undefined = undefined
   @Local index: number = 0
   @Local title: string = '密码'
   @Local isShowCleardataSheet: boolean = false
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   preferType = 1
+
+  getBackgroundImage() {
+    const backgroundImagePath = this.context.filesDir + '/media/backgroundimage.png'
+    const res = fileIo.accessSync(backgroundImagePath)
+    if (res) {
+      const backgroundImageSource = image.createImageSource(backgroundImagePath)
+      return backgroundImageSource.createPixelMapSync()
+    }
+    return
+  }
 
   @Builder
   tabBuilder(index: number, image: Resource, title: string) {
@@ -113,19 +126,25 @@ struct Index {
     }
     .alignItems(HorizontalAlign.Start)
     .backgroundColor($r('sys.color.background_secondary'))
+    .backgroundImage(this.backgroundImagePixelMap)
+    .backgroundImageSize(ImageSize.FILL)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
     .padding({
       bottom: 36,
       top: 12
     })
     .onAppear(() => {
-      if (deviceInfo.deviceType === 'phone') {
-        this.preferType = 0
-      }
       this.context.eventHub.on('clearData', () => {
         if (!this.isShowCleardataSheet) {
           this.isShowCleardataSheet = true
         }
+      })
+      if (deviceInfo.deviceType === 'phone') {
+        this.preferType = 0
+      }
+      this.backgroundImagePixelMap = this.getBackgroundImage()
+      this.context.eventHub.on('refreshIndex', () => {
+        this.backgroundImagePixelMap = this.getBackgroundImage()
       })
     })
     .bindSheet(this.isShowCleardataSheet!!, this.CleardataSheetBuilder(), {

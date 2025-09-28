@@ -16,7 +16,7 @@ import { hdsEffect } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { newInfo, newTag, updatePassword } from '../common/Datachange'
-import { getPasswordInfo, getTagList, getTypeInfoList, Password, PasswordInfoItem } from '../common/Dataget'
+import { getPasswordInfo, getTagList, getTypeInfoList, Password, PasswordInfoItem, Tag } from '../common/Dataget'
 import { SelectItem } from './Newpassword'
 import Passwordgenerate from './Passwordgenerate'
 
@@ -37,7 +37,7 @@ export default struct Updatepassword {
   @Local infoArray: string[] = []
   @Local passwordTagArray: string[] = []
   @Local passwordTag: string = ''
-  @Local tagArray: string[] = []
+  @Local tagArray: Tag[] = []
   @Local autoNewInfo: boolean = false
   @Local autoNewTag: boolean = false
   @Local cloudBackup: boolean = false
@@ -1047,26 +1047,27 @@ export default struct Updatepassword {
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
 
-      ForEach(this.tagArray, (item: string) => {
-        if (!this.passwordTagArray.includes(item)) {
+      ForEach(this.tagArray, (item: Tag) => {
+        if (!this.passwordTagArray.includes(item.value)) {
           ListItem() {
             Column() {
               Row() {
-                Text(item)
+                Text(item.value)
                   .enableAutoSpacing(true)
+                  .fontColor(item.color)
                   .width('87%')
                 Blank()
                   .width('5%')
                 Image($r('app.media.add'))
                   .width('8%')
                   .onClick(() => {
-                    if (this.passwordTagArray.some(tagItem => tagItem === item)) {
+                    if (this.passwordTagArray.some(tagItem => tagItem === item.value)) {
                       promptAction.openToast({
                         message: '已添加此标签'
                       })
                       return
                     }
-                    this.passwordTagArray.push(item)
+                    this.passwordTagArray.push(item.value)
                   })
               }
               .borderRadius(12)
@@ -1301,7 +1302,7 @@ export default struct Updatepassword {
               this.passwordTagArray.forEach(item => {
                 newTag({
                   value: item,
-                  color: 'rgba(0,0,0,0)',
+                  color: '',
                   cloudBackup: tagCloudBackup
                 })
               })
@@ -1334,8 +1335,7 @@ export default struct Updatepassword {
       if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
         this.infoArray = await getTypeInfoList(this.infoTypeValue)
       }
-      const tags = await getTagList()
-      this.tagArray = tags.map(item => item.value)
+      this.tagArray = await getTagList()
       const passwordInfo = await getPasswordInfo(this.passwordId) as Password
       this.passwordName = passwordInfo.name
       this.passwordInfoArray = passwordInfo.info

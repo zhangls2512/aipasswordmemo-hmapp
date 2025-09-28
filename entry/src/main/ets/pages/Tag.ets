@@ -18,99 +18,127 @@ export default struct TagPage {
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
+  @Local multipleSelect: boolean = false
+  @Local multipleSelectArray: Tag[] = []
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   preferType = 1
   orderColumn = 'updateTime'
   updateId = 0
 
+  async cloudBackup(item: Tag) {
+    let cloudBackupTime = JSON.stringify([])
+    if (typeof (item.cloudBackupTime) === 'string') {
+      cloudBackupTime = item.cloudBackupTime
+    }
+    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
+    const accountInfo = await getAccountInfo()
+    const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
+    if (cloudBackupTimeIndex !== -1) {
+      cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
+    }
+    if (cloudBackupTimeIndex === -1) {
+      cloudBackupTimeArray.push({
+        uid: accountInfo.uid,
+        time: Date.now()
+      })
+    }
+    await setCloudBackup({
+      type: 'tag',
+      id: item.id,
+      content: JSON.stringify({
+        value: item.value,
+        color: item.color,
+        updateTime: item.updateTime,
+        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
+      })
+    })
+  }
+
   @Builder
   MenuBuilder(item: Tag) {
     Menu() {
-      MenuItem({
-        startIcon: $r('app.media.delete'),
-        content: '删除'
-      })
-        .onClick(async () => {
-          const promptAction = this.getUIContext().getPromptAction()
-          const data = await promptAction.showDialog({
-            title: '提示',
-            message: '删除成功后无法恢复，确定删除？',
-            buttons: [
-              {
-                text: '取消',
-                color: $r('sys.color.font_primary')
-              },
-              {
-                text: '删除',
-                color: $r('sys.color.warning')
-              }
-            ]
-          })
-          if (data.index === 1) {
-            await deleteData('tag', item.id)
-            this.loading = true
-          }
+      if (this.multipleSelect) {
+        MenuItem({
+          startIcon: $r('app.media.multipleselect'),
+          content: '取消多选'
         })
-      MenuItem({
-        startIcon: $r('app.media.cloud'),
-        content: '云备份'
-      })
-        .enabled(this.enableCloudBackup && !item.isCloudBackup)
-        .onClick(async () => {
-          let cloudBackupTime = JSON.stringify([])
-          if (typeof (item.cloudBackupTime) === 'string') {
-            cloudBackupTime = item.cloudBackupTime
-          }
-          const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-          const accountInfo = await getAccountInfo()
-          const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
-          if (cloudBackupTimeIndex !== -1) {
-            cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-          }
-          if (cloudBackupTimeIndex === -1) {
-            cloudBackupTimeArray.push({
-              uid: accountInfo.uid,
-              time: Date.now()
-            })
-          }
-          const dialogControllerProgress = new CustomDialogController({
-            builder: LoadingDialog({
-              content: '云备份中...'
-            })
+          .onClick(() => {
+            this.multipleSelect = false
+            this.multipleSelectArray = []
           })
-          dialogControllerProgress.open()
-          await setCloudBackup({
-            type: 'tag',
-            id: item.id,
-            content: JSON.stringify({
-              value: item.value,
-              color: item.color,
-              updateTime: item.updateTime,
-              cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-            })
-          })
-          dialogControllerProgress.close()
-          this.loading = true
+      }
+      if (!this.multipleSelect) {
+        MenuItem({
+          startIcon: $r('app.media.multipleselect'),
+          content: '多选'
         })
-      MenuItem({
-        startIcon: $r('app.media.clouddelete'),
-        content: '删除云备份'
-      })
-        .enabled(this.enableCloudBackup && item.isCloudBackup)
-        .onClick(async () => {
-          const dialogControllerProgress = new CustomDialogController({
-            builder: LoadingDialog({
-              content: '删除云备份中...'
-            })
+          .onClick(() => {
+            this.multipleSelect = true
+            this.multipleSelectArray.push(item)
           })
-          dialogControllerProgress.open()
-          await deleteCloudBackup({
-            type: 'tag',
-            id: item.id
-          })
-          dialogControllerProgress.close()
-          this.loading = true
+        MenuItem({
+          startIcon: $r('app.media.delete'),
+          content: '删除'
         })
+          .onClick(async () => {
+            const promptAction = this.getUIContext().getPromptAction()
+            const data = await promptAction.showDialog({
+              title: '提示',
+              message: '删除成功后无法恢复，确定删除？',
+              buttons: [
+                {
+                  text: '取消',
+                  color: $r('sys.color.font_primary')
+                },
+                {
+                  text: '删除',
+                  color: $r('sys.color.warning')
+                }
+              ]
+            })
+            if (data.index === 1) {
+              await deleteData('tag', item.id)
+              this.loading = true
+            }
+          })
+        if (this.enableCloudBackup && !item.isCloudBackup) {
+          MenuItem({
+            startIcon: $r('app.media.cloud'),
+            content: '云备份'
+          })
+            .onClick(async () => {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '云备份中...'
+                })
+              })
+              dialogControllerProgress.open()
+              await this.cloudBackup(item)
+              dialogControllerProgress.close()
+              this.loading = true
+            })
+        }
+        if (this.enableCloudBackup && item.isCloudBackup) {
+          MenuItem({
+            startIcon: $r('app.media.clouddelete'),
+            content: '删除云备份'
+          })
+            .onClick(async () => {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '删除云备份中...'
+                })
+              })
+              dialogControllerProgress.open()
+              await deleteCloudBackup({
+                type: 'tag',
+                id: item.id
+              })
+              dialogControllerProgress.close()
+              this.loading = true
+            })
+        }
+      }
     }
   }
 
@@ -131,90 +159,202 @@ export default struct TagPage {
       refreshing: $$this.loading
     }) {
       List() {
-        ListItem() {
-          Row() {
-            Column() {
-              Image($r('app.media.new_white'))
-            }
-            .backgroundColor($r('sys.color.background_emphasize'))
-            .borderRadius(20)
-            .height(40)
-            .padding(11)
-            .width(40)
-            .onClick(() => {
-              this.isShowNewSheet = true
-            })
-            .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
-              height: SheetSize.FIT_CONTENT,
-              preferType: this.preferType,
-              title: {
-                title: '新增标签'
-              },
-              onDisappear: (() => {
-                this.loading = true
-              }),
-              onWillDismiss: (async (DismissSheetAction) => {
+        if (this.multipleSelect) {
+          ListItem() {
+            Row() {
+              Column() {
+                Image($r('app.media.cancel'))
+              }
+              .backgroundColor($r('sys.color.interactive_hover'))
+              .borderRadius(20)
+              .height(40)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
+              .padding(11)
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
+              .width(40)
+              .onClick(() => {
+                this.multipleSelect = false
+                this.multipleSelectArray = []
+              })
+
+              Text('已选择 ' + this.multipleSelectArray.length + ' 项')
+                .fontSize(20)
+                .fontWeight(FontWeight.Bold)
+              Blank()
+              Column() {
+                Image($r('app.media.delete'))
+              }
+              .backgroundColor($r('sys.color.interactive_hover'))
+              .borderRadius(20)
+              .height(40)
+              .padding(11)
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
+              .width(40)
+              .onClick(async () => {
                 const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
-                  message: '数据尚未保存，确定退出？',
+                  message: '删除成功后无法恢复，确定删除？',
                   buttons: [
                     {
                       text: '取消',
                       color: $r('sys.color.font_primary')
                     },
                     {
-                      text: '确定',
-                      color: $r('sys.color.font_emphasize')
+                      text: '删除',
+                      color: $r('sys.color.warning')
                     }
                   ]
                 })
                 if (data.index === 1) {
-                  DismissSheetAction.dismiss()
+                  const promises = this.multipleSelectArray.map(async (item) => {
+                    await deleteData('tag', item.id)
+                  })
+                  await Promise.all(promises)
+                  this.multipleSelect = false
+                  this.multipleSelectArray = []
+                  this.loading = true
                 }
               })
-            })
 
-            Blank()
-            Column() {
-              Image($r('app.media.sort'))
-            }
-            .backgroundColor($r('sys.color.interactive_hover'))
-            .borderRadius(20)
-            .height(40)
-            .padding(11)
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
-            .width(40)
-            .bindMenu([
-              {
-                value: '按修改时间排序',
-                action: () => {
-                  this.orderColumn = 'updateTime'
-                  this.loading = true
+              if (this.enableCloudBackup) {
+                Column() {
+                  Image($r('app.media.cloud'))
                 }
-              },
-              {
-                value: '按内容排序',
-                action: () => {
-                  this.orderColumn = 'value'
+                .backgroundColor($r('sys.color.interactive_hover'))
+                .borderRadius(20)
+                .height(40)
+                .margin({
+                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+                .padding(11)
+                .visualEffect(new hdsEffect.HdsEffectBuilder()
+                  .pointLight({
+                    sourceType: hdsEffect.PointLightSourceType.SOFT,
+                    illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                  })
+                  .buildEffect())
+                .width(40)
+                .onClick(async () => {
+                  for (let i = 0; i < this.multipleSelectArray.length; i++) {
+                    const dialogControllerProgress = new CustomDialogController({
+                      builder: LoadingDialog({
+                        content: '批量云备份中，进度：' + i + '/' + this.multipleSelectArray.length
+                      })
+                    })
+                    dialogControllerProgress.open()
+                    await this.cloudBackup(this.multipleSelectArray[i])
+                    dialogControllerProgress.close()
+                  }
+                  this.multipleSelect = false
+                  this.multipleSelectArray = []
                   this.loading = true
-                }
+                })
               }
-            ], {
-              hapticFeedbackMode: HapticFeedbackMode.AUTO
-            })
+            }
+            .width('100%')
           }
-          .width('100%')
+          .margin({
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
         }
-        .margin({
-          bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
+        if (!this.multipleSelect) {
+          ListItem() {
+            Row() {
+              Column() {
+                Image($r('app.media.new_white'))
+              }
+              .backgroundColor($r('sys.color.background_emphasize'))
+              .borderRadius(20)
+              .height(40)
+              .padding(11)
+              .width(40)
+              .onClick(() => {
+                this.isShowNewSheet = true
+              })
+              .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
+                height: SheetSize.FIT_CONTENT,
+                preferType: this.preferType,
+                title: {
+                  title: '新增标签'
+                },
+                onDisappear: (() => {
+                  this.loading = true
+                }),
+                onWillDismiss: (async (DismissSheetAction) => {
+                  const promptAction = this.getUIContext().getPromptAction()
+                  const data = await promptAction.showDialog({
+                    title: '提示',
+                    message: '数据尚未保存，确定退出？',
+                    buttons: [
+                      {
+                        text: '取消',
+                        color: $r('sys.color.font_primary')
+                      },
+                      {
+                        text: '确定',
+                        color: $r('sys.color.font_emphasize')
+                      }
+                    ]
+                  })
+                  if (data.index === 1) {
+                    DismissSheetAction.dismiss()
+                  }
+                })
+              })
 
+              Blank()
+              Column() {
+                Image($r('app.media.sort'))
+              }
+              .backgroundColor($r('sys.color.interactive_hover'))
+              .borderRadius(20)
+              .height(40)
+              .padding(11)
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
+              .width(40)
+              .bindMenu([
+                {
+                  value: '按修改时间排序',
+                  action: () => {
+                    this.orderColumn = 'updateTime'
+                    this.loading = true
+                  }
+                },
+                {
+                  value: '按内容排序',
+                  action: () => {
+                    this.orderColumn = 'value'
+                    this.loading = true
+                  }
+                }
+              ], {
+                hapticFeedbackMode: HapticFeedbackMode.AUTO
+              })
+            }
+            .width('100%')
+          }
+          .margin({
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+        }
         ListItem() {
           Flex({
             wrap: FlexWrap.Wrap,
@@ -226,6 +366,24 @@ export default struct TagPage {
             ForEach(this.tagArray, (item: Tag) => {
               Column() {
                 Row() {
+                  if (this.multipleSelect) {
+                    Toggle({
+                      type: ToggleType.Checkbox,
+                      isOn: this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+                    })
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
+                      .onChange((isOn) => {
+                        if (!isOn) {
+                          this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                          item.id), 1)
+                        }
+                        if (isOn) {
+                          this.multipleSelectArray.push(item)
+                        }
+                      })
+                  }
                   if (item.isCloudBackup) {
                     Image($r('app.media.cloud'))
                       .height(16)
@@ -243,13 +401,16 @@ export default struct TagPage {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor($r('sys.color.comp_background_primary'))
                   },
                   pressed: {
-                    .backgroundColor($r('sys.color.interactive_pressed'))
+                    .backgroundColor($r('sys.color.comp_background_secondary'))
                   }
                 })
                 .onClick(() => {
+                  if (this.multipleSelect) {
+                    return
+                  }
                   this.updateId = item.id
                   this.isShowUpdateSheet = true
                 })
@@ -257,7 +418,7 @@ export default struct TagPage {
                   hapticFeedbackMode: HapticFeedbackMode.AUTO
                 })
               }
-              .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              .backgroundColor($r('sys.color.comp_background_primary'))
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
               .padding($r('sys.float.ohos_id_corner_radius_mark'))
             })
