@@ -511,7 +511,7 @@ export async function deleteCloudBackup(data: CloudBackupItem) {
         cloudBackupTime: JSON.stringify(cloudBackupTime)
       }, predicates)
       promptAction.openToast({
-        message: '删除云备份成功'
+        message: '取消云备份成功'
       })
     }
   }
