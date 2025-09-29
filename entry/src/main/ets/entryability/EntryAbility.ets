@@ -726,7 +726,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 23) {
+    if (wantParam.version !== 24) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

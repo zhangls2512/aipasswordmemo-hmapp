@@ -47,7 +47,8 @@ export default struct Newinfo {
             const pickerres = await photoPicker.select({
               MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
               maxSelectNumber: 1,
-              isPhotoTakingSupported: false
+              isPhotoTakingSupported: false,
+              isOriginalSupported: false
             })
             const fileSource = await fileIo.open(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)

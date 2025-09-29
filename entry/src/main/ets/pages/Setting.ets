@@ -332,6 +332,7 @@ export default struct Setting {
                 .width(20)
             }
             .margin({
+              bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
               top: $r('sys.float.ohos_id_elements_margin_vertical_l')
             })
           }
