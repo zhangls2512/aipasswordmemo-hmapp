@@ -47,7 +47,8 @@ export default struct Newinfo {
             const pickerres = await photoPicker.select({
               MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
               maxSelectNumber: 1,
-              isPhotoTakingSupported: false
+              isPhotoTakingSupported: false,
+              isOriginalSupported: false
             })
             const fileSource = await fileIo.open(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)
@@ -164,6 +165,7 @@ export default struct Newinfo {
             .onSelect((index, value) => {
               if (value === '图标') {
                 this.infoValue = ''
+                this.cloudBackup = false
               }
               if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                 try {
@@ -193,6 +195,7 @@ export default struct Newinfo {
                 }
                 if (value === '图标') {
                   this.infoValue = ''
+                  this.cloudBackup = false
                 }
                 if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                   try {
@@ -447,7 +450,7 @@ export default struct Newinfo {
             name: 'cloudbackupSetting'
           })
           const autoOn: string[] = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
-          if (autoOn.includes('info')) {
+          if (autoOn.includes('info') && this.infoTypeValue !== '图标') {
             this.cloudBackup = true
           }
         }

@@ -109,7 +109,7 @@ struct Invite {
                       uri: qrcodeUri
                     })
                     const shareController = new systemShare.ShareController(shareData)
-                    await shareController.show(this.context, {})
+                    shareController.show(this.context, {})
                   })
                 Button('保存')
                   .buttonStyle(ButtonStyleMode.NORMAL)

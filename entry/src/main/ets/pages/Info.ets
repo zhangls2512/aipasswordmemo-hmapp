@@ -32,35 +32,34 @@ export default struct InfoPage {
   updateId = 0
 
   async cloudBackup(item: Info) {
-    if (item.type === '图标') {
-      return
-    }
-    let cloudBackupTime = JSON.stringify([])
-    if (typeof (item.cloudBackupTime) === 'string') {
-      cloudBackupTime = item.cloudBackupTime
-    }
-    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-    const accountInfo = await getAccountInfo()
-    const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
-    if (cloudBackupTimeIndex !== -1) {
-      cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-    }
-    if (cloudBackupTimeIndex === -1) {
-      cloudBackupTimeArray.push({
-        uid: accountInfo.uid,
-        time: Date.now()
+    if (item.type !== '图标') {
+      let cloudBackupTime = JSON.stringify([])
+      if (typeof (item.cloudBackupTime) === 'string') {
+        cloudBackupTime = item.cloudBackupTime
+      }
+      const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
+      const accountInfo = await getAccountInfo()
+      const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
+      if (cloudBackupTimeIndex !== -1) {
+        cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
+      }
+      if (cloudBackupTimeIndex === -1) {
+        cloudBackupTimeArray.push({
+          uid: accountInfo.uid,
+          time: Date.now()
+        })
+      }
+      await setCloudBackup({
+        type: 'info',
+        id: item.id,
+        content: JSON.stringify({
+          type: item.type,
+          value: item.value,
+          updateTime: item.updateTime,
+          cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
+        })
       })
     }
-    await setCloudBackup({
-      type: 'info',
-      id: item.id,
-      content: JSON.stringify({
-        type: item.type,
-        value: item.value,
-        updateTime: item.updateTime,
-        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-      })
-    })
   }
 
   @Builder
@@ -162,12 +161,12 @@ export default struct InfoPage {
         if (this.enableCloudBackup && item.isCloudBackup) {
           MenuItem({
             startIcon: $r('app.media.clouddelete'),
-            content: '删除云备份'
+            content: '取消云备份'
           })
             .onClick(async () => {
               const dialogControllerProgress = new CustomDialogController({
                 builder: LoadingDialog({
-                  content: '删除云备份中...'
+                  content: '取消云备份中...'
                 })
               })
               dialogControllerProgress.open()

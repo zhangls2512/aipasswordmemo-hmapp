@@ -68,7 +68,7 @@ export async function newPassword(data: PasswordInput) {
       id: id,
       content: JSON.stringify({
         name: data.name,
-        info: JSON.stringify(data.info),
+        info: JSON.stringify(data.info.filter(itema => itema.type !== '图标')),
         tag: JSON.stringify(data.tag),
         updateTime: updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTime)
@@ -127,7 +127,7 @@ export async function updatePassword(id: number, data: PasswordInput) {
       id: id,
       content: JSON.stringify({
         name: data.name,
-        info: JSON.stringify(data.info),
+        info: JSON.stringify(data.info.filter(itema => itema.type !== '图标')),
         tag: JSON.stringify(data.tag),
         updateTime: updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
@@ -168,7 +168,7 @@ export async function newInfo(data: InfoInput) {
   })
   autoSyncTable('info')
   autoBackupTable('info')
-  if (data.cloudBackup) {
+  if (data.cloudBackup && data.type !== '图标') {
     const accountInfo = await getAccountInfo()
     const cloudBackupTime: CloudBackupTimeItem[] = [{
       uid: accountInfo.uid,
@@ -189,6 +189,12 @@ export async function newInfo(data: InfoInput) {
 }
 
 export async function updateInfo(id: number, data: InfoInput) {
+  if (data.type === '图标') {
+    promptAction.openToast({
+      message: '修改失败：图标类型不支持'
+    })
+    return 'fail'
+  }
   const context = getContext()
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
@@ -505,7 +511,7 @@ export async function deleteCloudBackup(data: CloudBackupItem) {
         cloudBackupTime: JSON.stringify(cloudBackupTime)
       }, predicates)
       promptAction.openToast({
-        message: '删除云备份成功'
+        message: '取消云备份成功'
       })
     }
   }
