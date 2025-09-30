@@ -121,12 +121,12 @@ export default struct TagPage {
         if (this.enableCloudBackup && item.isCloudBackup) {
           MenuItem({
             startIcon: $r('app.media.clouddelete'),
-            content: '删除云备份'
+            content: '取消云备份'
           })
             .onClick(async () => {
               const dialogControllerProgress = new CustomDialogController({
                 builder: LoadingDialog({
-                  content: '删除云备份中...'
+                  content: '取消云备份中...'
                 })
               })
               dialogControllerProgress.open()

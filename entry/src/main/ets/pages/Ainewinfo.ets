@@ -115,7 +115,8 @@ export default struct Ainewinfo {
             const photoPicker = new photoAccessHelper.PhotoViewPicker()
             const pickerres = await photoPicker.select({
               MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
-              maxSelectNumber: 1
+              maxSelectNumber: 1,
+              isOriginalSupported: false
             })
             const fileSource = await fileIo.open(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)

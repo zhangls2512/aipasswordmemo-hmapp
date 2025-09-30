@@ -72,17 +72,19 @@ export async function importInfo(data: string, conflict: relationalStore.Conflic
       allowRebuild: true
     })
     array.forEach((item: InfoInItem) => {
-      let cloudBackupTime = JSON.stringify([])
-      if (typeof (item.cloudBackupTime) === 'string') {
-        cloudBackupTime = item.cloudBackupTime
+      if (item.type !== '图标') {
+        let cloudBackupTime = JSON.stringify([])
+        if (typeof (item.cloudBackupTime) === 'string') {
+          cloudBackupTime = item.cloudBackupTime
+        }
+        rdbStore.insertSync('info', {
+          id: item.id,
+          type: item.type,
+          value: item.value,
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }, conflict)
       }
-      rdbStore.insertSync('info', {
-        id: item.id,
-        type: item.type,
-        value: item.value,
-        updateTime: item.updateTime,
-        cloudBackupTime: cloudBackupTime
-      }, conflict)
     })
     autoSyncTable('info')
     autoBackupTable('info')

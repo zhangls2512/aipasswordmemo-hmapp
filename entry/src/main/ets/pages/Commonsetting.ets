@@ -522,7 +522,8 @@ struct Commonsetting {
                     const pickerres = await photoPicker.select({
                       MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
                       maxSelectNumber: 1,
-                      isPhotoTakingSupported: false
+                      isPhotoTakingSupported: false,
+                      isOriginalSupported: false
                     })
                     const fileSource = await fileIo.open(pickerres.photoUris[0])
                     const imageSource = image.createImageSource(fileSource.fd)
@@ -569,7 +570,8 @@ struct Commonsetting {
                       const pickerres = await photoPicker.select({
                         MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
                         maxSelectNumber: 1,
-                        isPhotoTakingSupported: false
+                        isPhotoTakingSupported: false,
+                        isOriginalSupported: false
                       })
                       const fileSource = await fileIo.open(pickerres.photoUris[0])
                       const imageSource = image.createImageSource(fileSource.fd)
@@ -691,7 +693,7 @@ struct Commonsetting {
                 Column() {
                   Text('密码信息内容特殊实体识别')
                     .fontWeight(FontWeight.Medium)
-                  Text('图标、MFA类型除外')
+                  Text('图标、MFA、URL类型除外')
                     .enableAutoSpacing(true)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
