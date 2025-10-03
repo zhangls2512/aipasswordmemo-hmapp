@@ -11,7 +11,7 @@ export default struct Urlcheck {
     List() {
       ListItem() {
         TextInput({
-          placeholder: '请输入 URL',
+          placeholder: '请输入URL',
           text: this.url!!
         })
           .defaultFocus(true)

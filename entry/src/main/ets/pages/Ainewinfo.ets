@@ -261,7 +261,7 @@ export default struct Ainewinfo {
               })
           }
           TextArea({
-            placeholder: '请输入待识别文本，AI 将自动识别、提取其中的邮箱、姓名、手机号、URL、身份证号',
+            placeholder: '请输入待识别文本，AI将自动识别、提取其中的邮箱、姓名、手机号、URL、身份证号',
             text: this.text!!
           })
             .enableAutoSpacing(true)

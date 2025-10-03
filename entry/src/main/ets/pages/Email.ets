@@ -80,8 +80,8 @@ struct Email {
                 .fontWeight(FontWeight.Medium)
                 .width('20%')
               TextInput({
-                text: this.email!!,
-                placeholder: '请输入邮箱'
+                placeholder: '请输入邮箱',
+                text: this.email!!
               })
                 .contentType(ContentType.EMAIL_ADDRESS)
                 .enableAutoSpacing(true)
@@ -97,8 +97,8 @@ struct Email {
                 .fontWeight(FontWeight.Medium)
                 .width('20%')
               TextInput({
-                text: this.emailcode!!,
-                placeholder: '请输入邮箱验证码'
+                placeholder: '请输入邮箱验证码',
+                text: this.emailcode!!
               })
                 .enableAutoSpacing(true)
                 .maxLength(8)

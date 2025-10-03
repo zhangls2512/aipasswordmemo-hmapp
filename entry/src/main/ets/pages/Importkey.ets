@@ -20,7 +20,7 @@ struct Importkey {
         ListItem() {
           Column() {
             TextArea({
-              placeholder: '请输入 Base64 编码、长度 44 的 AES256 密钥',
+              placeholder: '请输入Base64编码、长度44的AES256密钥',
               text: this.keyValue!!
             })
               .enableAutoSpacing(true)

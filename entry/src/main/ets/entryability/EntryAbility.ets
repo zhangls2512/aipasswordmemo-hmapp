@@ -33,6 +33,51 @@ interface JsErrorObject {
 }
 
 export default class EntryAbility extends UIAbility {
+  async importData(fileUri: string) {
+    if (!fileUri.endsWith('.txt') && !fileUri.endsWith('.csv')) {
+      return
+    }
+    const filestring = read(fileUri)
+    if (fileUri.endsWith('.txt')) {
+      const data = await promptAction.showActionMenu({
+        title: '选择导入类型',
+        buttons: [
+          {
+            text: '密码',
+            color: $r('sys.color.font_primary')
+          },
+          {
+            text: '常用信息',
+            color: $r('sys.color.font_primary')
+          },
+          {
+            text: '标签',
+            color: $r('sys.color.font_primary')
+          }
+        ]
+      })
+      if (data.index === 0) {
+        await importPassword(filestring, 0)
+        this.context.eventHub.emit('refreshPassword')
+      }
+      if (data.index === 1) {
+        await importInfo(filestring, 0)
+        this.context.eventHub.emit('refreshInfo')
+      }
+      if (data.index === 2) {
+        await importTag(filestring, 0)
+        this.context.eventHub.emit('refreshTag')
+      }
+      promptAction.openToast({
+        message: '导入成功'
+      })
+    }
+    if (fileUri.endsWith('.csv')) {
+      await importCsvPassword(filestring)
+      this.context.eventHub.emit('refreshPassword')
+    }
+  }
+
   async appInit(want: Want) {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
@@ -98,51 +143,14 @@ export default class EntryAbility extends UIAbility {
     }
     if (want.parameters?.menuHandler === 'clickMenu') {
       const uriList = want.parameters.uriList as string[]
-      const filePath = uriList[0] as string
-      const filestring = read(filePath)
-      if (filePath.endsWith('.txt')) {
-        const data = await promptAction.showActionMenu({
-          title: '选择导入类型',
-          buttons: [
-            {
-              text: '密码',
-              color: $r('sys.color.font_primary')
-            },
-            {
-              text: '常用信息',
-              color: $r('sys.color.font_primary')
-            },
-            {
-              text: '标签',
-              color: $r('sys.color.font_primary')
-            }
-          ]
-        })
-        if (data.index === 0) {
-          await importPassword(filestring, 0)
-          this.context.eventHub.emit('refreshPassword')
-        }
-        if (data.index === 1) {
-          await importInfo(filestring, 0)
-          this.context.eventHub.emit('refreshInfo')
-        }
-        if (data.index === 2) {
-          await importTag(filestring, 0)
-          this.context.eventHub.emit('refreshTag')
-        }
-        promptAction.openToast({
-          message: '导入成功'
-        })
-      }
-      if (filePath.endsWith('.csv')) {
-        await importCsvPassword(filestring)
-        this.context.eventHub.emit('refreshPassword')
-      }
+      const fileUri = uriList[0] as string
+      await this.importData(fileUri)
     }
     if (want.uri) {
       if (want.uri === 'storage:///clearcache') {
         this.context.eventHub.emit('clearData')
       }
+      await this.importData(want.uri)
       if (want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
         const urires = new uri.URI(want.uri)
         const invitationCode = urires.getQueryValue('invitationcode')
@@ -358,7 +366,7 @@ export default class EntryAbility extends UIAbility {
             'BATTERY_USAGE'
           ]) as string[]).includes('JS_ERROR')) {
             const res = await request('/debug/newErrorLog', {
-              key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
+              product: 'password',
               object: object
             })
             if (res !== 'fail') {
@@ -434,7 +442,7 @@ export default class EntryAbility extends UIAbility {
             'BATTERY_USAGE'
           ]) as string[]).includes('JS_ERROR')) {
             const res = await request('/debug/newErrorLog', {
-              key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
+              product: 'password',
               object: object
             })
             if (res !== 'fail') {
@@ -491,7 +499,7 @@ export default class EntryAbility extends UIAbility {
               'BATTERY_USAGE'
             ]) as string[]).includes(item.name)) {
               const res = await request('/debug/newErrorLog', {
-                key: 'RaGvhiCmYP8aPZ-QmmDgBQvwkfkp9TXEVCWEn8fPjshs9GyUCooG_kq7N8bHBRcT',
+                product: 'password',
                 object: item
               })
               if (res !== 'fail') {
@@ -726,7 +734,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 24) {
+    if (wantParam.version !== 25) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

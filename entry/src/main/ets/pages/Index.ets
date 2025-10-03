@@ -142,10 +142,10 @@ struct Index {
       if (deviceInfo.deviceType === 'phone') {
         this.preferType = 0
       }
-      this.backgroundImagePixelMap = this.getBackgroundImage()
       this.context.eventHub.on('refreshIndex', () => {
         this.backgroundImagePixelMap = this.getBackgroundImage()
       })
+      this.backgroundImagePixelMap = this.getBackgroundImage()
     })
     .bindSheet(this.isShowCleardataSheet!!, this.CleardataSheetBuilder(), {
       preferType: this.preferType,

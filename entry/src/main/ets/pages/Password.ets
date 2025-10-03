@@ -480,8 +480,8 @@ export default struct PasswordPage {
 
           ListItem() {
             Search({
-              value: this.nameKeyword!!,
-              placeholder: '请输入名称关键词'
+              placeholder: '请输入名称关键词',
+              value: this.nameKeyword!!
             })
               .searchButton('搜索')
               .onChange((value) => {

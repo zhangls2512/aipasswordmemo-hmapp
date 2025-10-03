@@ -132,8 +132,8 @@ export default struct Login {
               .fontWeight(FontWeight.Medium)
               .width('20%')
             TextInput({
-              text: this.email!!,
-              placeholder: '请输入邮箱'
+              placeholder: '请输入邮箱',
+              text: this.email!!
             })
               .contentType(ContentType.EMAIL_ADDRESS)
               .enableAutoSpacing(true)
@@ -150,8 +150,8 @@ export default struct Login {
                 .fontWeight(FontWeight.Medium)
                 .width('20%')
               TextInput({
-                text: this.password!!,
-                placeholder: '请输入密码'
+                placeholder: '请输入密码',
+                text: this.password!!
               })
                 .contentType(ContentType.PASSWORD)
                 .enableAutoSpacing(true)
@@ -169,8 +169,8 @@ export default struct Login {
                 .fontWeight(FontWeight.Medium)
                 .width('20%')
               TextInput({
-                text: this.mfa!!,
-                placeholder: '请输入 MFA'
+                placeholder: '请输入MFA',
+                text: this.mfa!!
               })
                 .enableAutoSpacing(true)
                 .maxLength(6)
@@ -187,8 +187,8 @@ export default struct Login {
                 .fontWeight(FontWeight.Medium)
                 .width('20%')
               TextInput({
-                text: this.emailcode!!,
-                placeholder: '请输入邮箱验证码'
+                placeholder: '请输入邮箱验证码',
+                text: this.emailcode!!
               })
                 .enableAutoSpacing(true)
                 .maxLength(8)
