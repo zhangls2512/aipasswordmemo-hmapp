@@ -59,6 +59,27 @@ export default struct Newpassword {
     return infoType
   }
 
+  async inputBlur() {
+    const infoType = this.getCurrentInfoType()
+    if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
+    this.infoValue) {
+      this.passwordInfoArray.push({
+        type: infoType,
+        value: this.infoValue
+      })
+      this.infoType = ''
+      this.infoTypeIndex = 0
+      this.infoTypeValue = this.oftenUsedInfoTypes[0]
+      this.infoValue = ''
+      this.otpauthUri = ''
+      this.mfaStep = '30'
+      this.mfaDigits = '6'
+      if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
+        this.infoArray = await getTypeInfoList(this.infoTypeValue)
+      }
+    }
+  }
+
   @Builder
   ChooseImageMenu() {
     Menu() {
@@ -300,25 +321,8 @@ export default struct Newpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '用户名') {
@@ -332,25 +336,8 @@ export default struct Newpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.USER_NAME)
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '密码') {
@@ -385,25 +372,8 @@ export default struct Newpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Password)
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === 'MFA') {
@@ -495,25 +465,8 @@ export default struct Newpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '手机号') {
@@ -527,25 +480,8 @@ export default struct Newpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.PhoneNumber)
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '邮箱') {
@@ -559,25 +495,8 @@ export default struct Newpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Email)
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '银行卡号') {
@@ -591,25 +510,8 @@ export default struct Newpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Number)
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '身份证号') {
@@ -622,25 +524,8 @@ export default struct Newpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === 'URL') {
@@ -653,25 +538,8 @@ export default struct Newpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.URL)
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
           if (!this.specialInfoTypes.includes(this.getCurrentInfoType())) {
@@ -683,25 +551,8 @@ export default struct Newpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.infoValue) {
-                  this.passwordInfoArray.push({
-                    type: infoType,
-                    value: this.infoValue
-                  })
-                  this.infoType = ''
-                  this.infoTypeIndex = 0
-                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                  this.infoValue = ''
-                  this.otpauthUri = ''
-                  this.mfaStep = '30'
-                  this.mfaDigits = '6'
-                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
-                  }
-                }
+              .onBlur(() => {
+                this.inputBlur()
               })
           }
         }

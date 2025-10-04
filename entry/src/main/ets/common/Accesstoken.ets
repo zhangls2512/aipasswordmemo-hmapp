@@ -48,7 +48,7 @@ export async function getAccountInfo(): Promise<AccountInfo> {
   const appAccountManager = appAccount.createAppAccountManager()
   try {
     const endDate = Number(appAccountManager.getCustomDataSync('default', 'endDate'))
-    if (endDate < Date.now() && endDate !== 0) {
+    if (endDate < Date.now()) {
       await appAccountManager.removeAccount('default')
       promptAction.openToast({
         message: '登录态过期，请重新登录'

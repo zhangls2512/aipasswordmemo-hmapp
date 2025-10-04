@@ -19,7 +19,7 @@ export function ViplogBuilder() {
 struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
-  @Local accessToken: string = ''
+  accessToken: string = ''
   empty: boolean | undefined = undefined
 
   build() {
