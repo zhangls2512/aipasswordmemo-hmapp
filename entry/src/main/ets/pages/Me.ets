@@ -573,14 +573,14 @@ export default struct Me {
                 ]
               })
               if (data.index === 1) {
-                remove()
+                await remove()
+                promptAction.openToast({
+                  message: '退出成功'
+                })
                 this.uid = ''
                 this.email = ''
                 this.endDate = ''
                 this.cloudService = false
-                promptAction.openToast({
-                  message: '退出成功'
-                })
               }
             })
         }

@@ -15,15 +15,21 @@ interface AccountInfo {
 }
 
 export async function set(accessToken: string, accountInfo: AccountInfo) {
-  const appAccountManager = appAccount.createAppAccountManager()
-  await appAccountManager.createAccount('default', {
-    customData: {
-      uid: accountInfo.uid,
-      email: accountInfo.email,
-      endDate: String(accountInfo.endDate)
-    }
-  })
-  await appAccountManager.setCredential('default', 'accessToken', accessToken)
+  try {
+    const appAccountManager = appAccount.createAppAccountManager()
+    await appAccountManager.createAccount('default', {
+      customData: {
+        uid: accountInfo.uid,
+        email: accountInfo.email,
+        endDate: String(accountInfo.endDate)
+      }
+    })
+    await appAccountManager.setCredential('default', 'accessToken', accessToken)
+  } catch (err) {
+    promptAction.openToast({
+      message: '发生错误，错误码：' + err.code
+    })
+  }
 }
 
 export async function get() {

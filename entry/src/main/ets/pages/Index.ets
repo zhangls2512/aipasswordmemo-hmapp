@@ -34,7 +34,7 @@ struct Index {
   tabBuilder(index: number, image: Resource, title: string) {
     Column() {
       Image(image)
-        .fillColor(this.index !== index ? $r('sys.color.icon_secondary') : $r('sys.color.icon_emphasize'))
+        .fillColor(this.index === index ? $r('sys.color.icon_emphasize') : $r('sys.color.icon_secondary'))
         .height(24)
         .width(24)
       Text(title)
