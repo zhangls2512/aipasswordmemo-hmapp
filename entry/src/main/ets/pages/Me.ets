@@ -573,16 +573,14 @@ export default struct Me {
                 ]
               })
               if (data.index === 1) {
-                remove()
-                await preferences.deletePreferences(this.context, {
-                  name: 'login'
+                await remove()
+                promptAction.openToast({
+                  message: '退出成功'
                 })
                 this.uid = ''
                 this.email = ''
                 this.endDate = ''
-                promptAction.openToast({
-                  message: '退出成功'
-                })
+                this.cloudService = false
               }
             })
         }

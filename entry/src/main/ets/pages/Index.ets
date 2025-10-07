@@ -34,7 +34,7 @@ struct Index {
   tabBuilder(index: number, image: Resource, title: string) {
     Column() {
       Image(image)
-        .fillColor(this.index !== index ? $r('sys.color.icon_secondary') : $r('sys.color.icon_emphasize'))
+        .fillColor(this.index === index ? $r('sys.color.icon_emphasize') : $r('sys.color.icon_secondary'))
         .height(24)
         .width(24)
       Text(title)
@@ -142,10 +142,10 @@ struct Index {
       if (deviceInfo.deviceType === 'phone') {
         this.preferType = 0
       }
-      this.backgroundImagePixelMap = this.getBackgroundImage()
       this.context.eventHub.on('refreshIndex', () => {
         this.backgroundImagePixelMap = this.getBackgroundImage()
       })
+      this.backgroundImagePixelMap = this.getBackgroundImage()
     })
     .bindSheet(this.isShowCleardataSheet!!, this.CleardataSheetBuilder(), {
       preferType: this.preferType,

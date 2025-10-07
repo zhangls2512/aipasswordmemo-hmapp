@@ -28,6 +28,9 @@ export function parseCsvLine(line: string) {
 }
 
 export async function importCsvPassword(content: string) {
+  if (!content) {
+    return
+  }
   const lines = content.split('\n').filter(line => line.trim() !== '')
   const result: PasswordOutItem[] = []
   const maxId = await getPasswordMaxId()

@@ -104,6 +104,27 @@ struct Infolist {
                   left: 12,
                   right: 12
                 })
+              Column() {
+                Text('删除时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('服务器自动删除距今超过30天的')
+                  .enableAutoSpacing(true)
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
               Row() {
                 Column() {
                   Text('信息内容')
@@ -205,6 +226,26 @@ struct Infolist {
                 Text('收集时机')
                   .fontWeight(FontWeight.Medium)
                 Text('绑定华为账号时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('删除时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('解绑华为账号')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -332,6 +373,26 @@ struct Infolist {
               .padding(12)
               .width('100%')
 
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('删除时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('联系客服咨询')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
               if (this.accessToken) {
                 Divider()
                   .padding({
@@ -430,6 +491,26 @@ struct Infolist {
                 Text('收集时机')
                   .fontWeight(FontWeight.Medium)
                 Text('提交邀请码时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('删除时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('服务器仅临时使用、不长期存储，无需删除')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -572,6 +653,26 @@ struct Infolist {
                   right: 12
                 })
               Column() {
+                Text('删除时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('取消、清空云备份')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
                 Text('信息内容')
                   .fontWeight(FontWeight.Medium)
                 Text('数据类型、数据行ID、数据密文、密钥初始向量')
@@ -652,6 +753,26 @@ struct Infolist {
                 Text('收集时机')
                   .fontWeight(FontWeight.Medium)
                 Text('开启通知位时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('删除时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('关闭全部通知位')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -790,6 +911,26 @@ struct Infolist {
                   left: 12,
                   right: 12
                 })
+              Column() {
+                Text('删除时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('对应故障处理完成后、联系客服申请')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
               Row() {
                 Text('信息内容')
                   .fontWeight(FontWeight.Medium)
@@ -881,6 +1022,26 @@ struct Infolist {
                 Text('收集时机')
                   .fontWeight(FontWeight.Medium)
                 Text('提交意见反馈时')
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .margin({
+                    top: $r('sys.float.ohos_id_text_margin_vertical')
+                  })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Column() {
+                Text('删除时机')
+                  .fontWeight(FontWeight.Medium)
+                Text('意见反馈处理完成后、联系客服申请')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
