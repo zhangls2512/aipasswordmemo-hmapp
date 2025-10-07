@@ -25,6 +25,11 @@ export default struct Ainewinfo {
   @Local text: string = ''
   @Local showCard: boolean = false
   context = this.getUIContext().getHostContext()
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '识别中...'
+    })
+  })
 
   async getList(value: string) {
     this.list = []
@@ -85,18 +90,13 @@ export default struct Ainewinfo {
             const fileSource = await fileIo.open(pickerres.resultUri)
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
-            const dialogControllerProgress = new CustomDialogController({
-              builder: LoadingDialog({
-                content: '识别中...'
-              })
-            })
-            dialogControllerProgress.open()
             const initres = await textRecognition.init()
             if (initres) {
+              this.dialogControllerProgress.open()
               const textrecognitionres = await textRecognition.recognizeText({
                 pixelMap: imagePixelMap
               })
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.text = textrecognitionres.value
               await textRecognition.release()
               this.getList(this.text)
@@ -121,18 +121,13 @@ export default struct Ainewinfo {
             const fileSource = await fileIo.open(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
-            const dialogControllerProgress = new CustomDialogController({
-              builder: LoadingDialog({
-                content: '识别中...'
-              })
-            })
-            dialogControllerProgress.open()
             const initres = await textRecognition.init()
             if (initres) {
+              this.dialogControllerProgress.open()
               const textrecognitionres = await textRecognition.recognizeText({
                 pixelMap: imagePixelMap
               })
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.text = textrecognitionres.value
               await textRecognition.release()
               this.getList(this.text)
@@ -180,18 +175,13 @@ export default struct Ainewinfo {
               }
               const imageSource = image.createImageSource(buffer)
               const imagePixelMap = await imageSource.createPixelMap()
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '识别中...'
-                })
-              })
-              dialogControllerProgress.open()
               const initres = await textRecognition.init()
               if (initres) {
+                this.dialogControllerProgress.open()
                 const textrecognitionres = await textRecognition.recognizeText({
                   pixelMap: imagePixelMap
                 })
-                dialogControllerProgress.close()
+                this.dialogControllerProgress.close()
                 this.text = textrecognitionres.value
                 await textRecognition.release()
                 this.getList(this.text)
