@@ -215,8 +215,7 @@ struct Viplog {
         })
         this.loading = false
         if (res !== 'fail') {
-          const viplogs = JSON.parse(res).data as Item[]
-          this.viplogArray = viplogs
+          this.viplogArray = JSON.parse(res).data as Item[]
           this.empty = false
         }
       }
