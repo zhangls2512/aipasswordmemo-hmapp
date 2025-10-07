@@ -14,7 +14,7 @@ struct Deletefile {
       List() {
         ListItem() {
           TextInput({
-            placeholder: '请输入文件 URI',
+            placeholder: '请输入文件Uri',
             text: this.fileUri!!
           })
             .defaultFocus(true)

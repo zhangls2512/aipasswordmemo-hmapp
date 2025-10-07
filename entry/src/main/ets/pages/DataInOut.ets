@@ -117,20 +117,22 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.txt', '.csv']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const filePath = uris[0]
-                const filestring = read(filePath)
-                let conflictResolution = 0
-                if (this.index === 1) {
-                  conflictResolution = 5
-                }
-                if (filePath.endsWith('.txt')) {
-                  await importPassword(filestring, conflictResolution)
-                  promptAction.openToast({
-                    message: '导入成功'
-                  })
-                }
-                if (filePath.endsWith('.csv')) {
-                  importCsvPassword(filestring)
+                if (uris.length === 1) {
+                  const filePath = uris[0]
+                  const filestring = read(filePath)
+                  let conflictResolution = 0
+                  if (this.index === 1) {
+                    conflictResolution = 5
+                  }
+                  if (filePath.endsWith('.txt')) {
+                    await importPassword(filestring, conflictResolution)
+                    promptAction.openToast({
+                      message: '导入成功'
+                    })
+                  }
+                  if (filePath.endsWith('.csv')) {
+                    importCsvPassword(filestring)
+                  }
                 }
               })
 
@@ -165,16 +167,18 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const filePath = uris[0]
-                const filestring = read(filePath)
-                let conflictResolution = 0
-                if (this.index === 1) {
-                  conflictResolution = 5
+                if (uris.length === 1) {
+                  const filePath = uris[0]
+                  const filestring = read(filePath)
+                  let conflictResolution = 0
+                  if (this.index === 1) {
+                    conflictResolution = 5
+                  }
+                  await importInfo(filestring, conflictResolution)
+                  promptAction.openToast({
+                    message: '导入成功'
+                  })
                 }
-                await importInfo(filestring, conflictResolution)
-                promptAction.openToast({
-                  message: '导入成功'
-                })
               })
 
               Divider()
@@ -208,16 +212,18 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.txt']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const filePath = uris[0]
-                const filestring = read(filePath)
-                let conflictResolution = 0
-                if (this.index === 1) {
-                  conflictResolution = 5
+                if (uris.length === 1) {
+                  const filePath = uris[0]
+                  const filestring = read(filePath)
+                  let conflictResolution = 0
+                  if (this.index === 1) {
+                    conflictResolution = 5
+                  }
+                  await importTag(filestring, conflictResolution)
+                  promptAction.openToast({
+                    message: '导入成功'
+                  })
                 }
-                await importTag(filestring, conflictResolution)
-                promptAction.openToast({
-                  message: '导入成功'
-                })
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -287,46 +293,48 @@ struct DataInOut {
                 documentSelectOptions.fileSuffixFilters = ['.csv']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
-                const filePath = uris[0]
-                const filestring = read(filePath)
-                let conflictResolution = 0
-                if (this.index === 1) {
-                  conflictResolution = 5
-                }
-                const lines = filestring.split('\n').filter(line => line.trim() !== '')
-                const result: PasswordOutItem[] = []
-                const maxId = await getPasswordMaxId()
-                let idCounter = maxId + 1
-                for (let i = 1; i < lines.length; i++) {
-                  const line = lines[i]
-                  const parsedFields = parseCsvLine(line)
-                  const name = parsedFields[0]
-                  const url = parsedFields[1]
-                  const username = parsedFields[2]
-                  const password = parsedFields[3]
-                  const info: PasswordInfoItem[] = []
-                  if (username) {
-                    info.push({ type: '用户名', value: username })
+                if (uris.length === 1) {
+                  const filePath = uris[0]
+                  const filestring = read(filePath)
+                  let conflictResolution = 0
+                  if (this.index === 1) {
+                    conflictResolution = 5
                   }
-                  if (password) {
-                    info.push({ type: '密码', value: password })
+                  const lines = filestring.split('\n').filter(line => line.trim() !== '')
+                  const result: PasswordOutItem[] = []
+                  const maxId = await getPasswordMaxId()
+                  let idCounter = maxId + 1
+                  for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i]
+                    const parsedFields = parseCsvLine(line)
+                    const name = parsedFields[0]
+                    const url = parsedFields[1]
+                    const username = parsedFields[2]
+                    const password = parsedFields[3]
+                    const info: PasswordInfoItem[] = []
+                    if (username) {
+                      info.push({ type: '用户名', value: username })
+                    }
+                    if (password) {
+                      info.push({ type: '密码', value: password })
+                    }
+                    if (url) {
+                      info.push({ type: 'URL', value: url })
+                    }
+                    result.push({
+                      id: idCounter++,
+                      name,
+                      info,
+                      tag: [],
+                      updateTime: Date.now(),
+                      cloudBackupTime: JSON.stringify([])
+                    })
                   }
-                  if (url) {
-                    info.push({ type: 'URL', value: url })
-                  }
-                  result.push({
-                    id: idCounter++,
-                    name,
-                    info,
-                    tag: [],
-                    updateTime: Date.now(),
-                    cloudBackupTime: JSON.stringify([])
+                  await importPassword(JSON.stringify(result), conflictResolution)
+                  promptAction.openToast({
+                    message: '导入成功'
                   })
                 }
-                await importPassword(JSON.stringify(result), conflictResolution)
-                promptAction.openToast({
-                  message: '导入成功'
-                })
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -424,53 +432,72 @@ struct DataInOut {
                   ]
                 })
                 if (data.index === 0) {
-                  documentSaveOptions.fileSuffixChoices = ['.txt']
-                  const documentViewPicker = new picker.DocumentViewPicker(this.context)
-                  const uris = await documentViewPicker.save(documentSaveOptions)
-                  const filePath = uris[0]
-                  const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
-                  fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
-                  fileIo.closeSync(file)
+                  try {
+                    documentSaveOptions.fileSuffixChoices = ['.txt']
+                    const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                    const uris = await documentViewPicker.save(documentSaveOptions)
+                    const filePath = uris[0]
+                    const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                    fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                    fileIo.closeSync(file)
+                    promptAction.openToast({
+                      message: '导出成功'
+                    })
+                  } catch (err) {
+                    if (err.code !== 13900020) {
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.code
+                      })
+                    }
+                  }
                 }
                 if (data.index === 1) {
-                  let filestring = ''
-                  if (arrayOut.length > 0) {
-                    const allInfoTypesArray: string[] = []
-                    arrayOut.forEach(item => {
-                      item.info.forEach(itema => {
-                        if (!allInfoTypesArray.includes(itema.type)) {
-                          allInfoTypesArray.push(itema.type)
-                        }
+                  try {
+                    let filestring = ''
+                    if (arrayOut.length > 0) {
+                      const allInfoTypesArray: string[] = []
+                      arrayOut.forEach(item => {
+                        item.info.forEach(itema => {
+                          if (!allInfoTypesArray.includes(itema.type)) {
+                            allInfoTypesArray.push(itema.type)
+                          }
+                        })
                       })
+                      const collator = new Intl.Collator('zh', {
+                        sensitivity: 'base',
+                        numeric: true
+                      })
+                      allInfoTypesArray.sort(collator.compare)
+                      const headers = ['名称'].concat(allInfoTypesArray)
+                      const rows = arrayOut.map((item) => {
+                        const values = [item.name]
+                        for (const infotype of allInfoTypesArray) {
+                          const value = item.info.findIndex(item => item.type === infotype) === -1 ? '' :
+                            item.info.find(item => item.type === infotype)?.value
+                          values.push(this.escapeCsvField(value))
+                        }
+                        return values.join(',')
+                      })
+                      filestring = [headers.join(','), ...rows].join('\n')
+                    }
+                    documentSaveOptions.fileSuffixChoices = ['.csv']
+                    const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                    const uris = await documentViewPicker.save(documentSaveOptions)
+                    const filePath = uris[0]
+                    const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                    fileIo.writeSync(file.fd, filestring)
+                    fileIo.closeSync(file)
+                    promptAction.openToast({
+                      message: '导出成功'
                     })
-                    const collator = new Intl.Collator('zh', {
-                      sensitivity: 'base',
-                      numeric: true
-                    })
-                    allInfoTypesArray.sort(collator.compare)
-                    const headers = ['名称'].concat(allInfoTypesArray)
-                    const rows = arrayOut.map((item) => {
-                      const values = [item.name]
-                      for (const infotype of allInfoTypesArray) {
-                        const value = item.info.findIndex(item => item.type === infotype) === -1 ? '' :
-                          item.info.find(item => item.type === infotype)?.value
-                        values.push(this.escapeCsvField(value))
-                      }
-                      return values.join(',')
-                    })
-                    filestring = [headers.join(','), ...rows].join('\n')
+                  } catch (err) {
+                    if (err.code !== 13900020) {
+                      promptAction.openToast({
+                        message: '发生错误，错误码：' + err.code
+                      })
+                    }
                   }
-                  documentSaveOptions.fileSuffixChoices = ['.csv']
-                  const documentViewPicker = new picker.DocumentViewPicker(this.context)
-                  const uris = await documentViewPicker.save(documentSaveOptions)
-                  const filePath = uris[0]
-                  const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
-                  fileIo.writeSync(file.fd, filestring)
-                  fileIo.closeSync(file)
                 }
-                promptAction.openToast({
-                  message: '导出成功'
-                })
               })
 
               Divider()
@@ -499,32 +526,40 @@ struct DataInOut {
               })
               .width('100%')
               .onClick(async () => {
-                const documentSaveOptions = new picker.DocumentSaveOptions()
-                documentSaveOptions.newFileNames = ['info']
-                documentSaveOptions.fileSuffixChoices = ['.txt']
-                const documentViewPicker = new picker.DocumentViewPicker(this.context)
-                const uris = await documentViewPicker.save(documentSaveOptions)
-                const filePath = uris[0]
-                const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
-                const array = await getInfoList()
-                const arrayOut = array.map((item): InfoOutItem => {
-                  let cloudBackupTime = JSON.stringify([])
-                  if (typeof (item.cloudBackupTime) === 'string') {
-                    cloudBackupTime = item.cloudBackupTime
+                try {
+                  const documentSaveOptions = new picker.DocumentSaveOptions()
+                  documentSaveOptions.newFileNames = ['info']
+                  documentSaveOptions.fileSuffixChoices = ['.txt']
+                  const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                  const uris = await documentViewPicker.save(documentSaveOptions)
+                  const filePath = uris[0]
+                  const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                  const array = await getInfoList()
+                  const arrayOut = array.map((item): InfoOutItem => {
+                    let cloudBackupTime = JSON.stringify([])
+                    if (typeof (item.cloudBackupTime) === 'string') {
+                      cloudBackupTime = item.cloudBackupTime
+                    }
+                    return {
+                      id: item.id,
+                      type: item.type,
+                      value: item.value,
+                      updateTime: item.updateTime,
+                      cloudBackupTime: cloudBackupTime
+                    }
+                  })
+                  fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                  fileIo.closeSync(file)
+                  promptAction.openToast({
+                    message: '导出成功'
+                  })
+                } catch (err) {
+                  if (err.code !== 13900020) {
+                    promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code
+                    })
                   }
-                  return {
-                    id: item.id,
-                    type: item.type,
-                    value: item.value,
-                    updateTime: item.updateTime,
-                    cloudBackupTime: cloudBackupTime
-                  }
-                })
-                fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
-                fileIo.closeSync(file)
-                promptAction.openToast({
-                  message: '导出成功'
-                })
+                }
               })
 
               Divider()
@@ -553,32 +588,40 @@ struct DataInOut {
               })
               .width('100%')
               .onClick(async () => {
-                const documentSaveOptions = new picker.DocumentSaveOptions()
-                documentSaveOptions.newFileNames = ['tag']
-                documentSaveOptions.fileSuffixChoices = ['.txt']
-                const documentViewPicker = new picker.DocumentViewPicker(this.context)
-                const uris = await documentViewPicker.save(documentSaveOptions)
-                const filePath = uris[0]
-                const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
-                const array = await getTagList()
-                const arrayOut = array.map((item): TagOutItem => {
-                  let cloudBackupTime = JSON.stringify([])
-                  if (typeof (item.cloudBackupTime) === 'string') {
-                    cloudBackupTime = item.cloudBackupTime
+                try {
+                  const documentSaveOptions = new picker.DocumentSaveOptions()
+                  documentSaveOptions.newFileNames = ['tag']
+                  documentSaveOptions.fileSuffixChoices = ['.txt']
+                  const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                  const uris = await documentViewPicker.save(documentSaveOptions)
+                  const filePath = uris[0]
+                  const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                  const array = await getTagList()
+                  const arrayOut = array.map((item): TagOutItem => {
+                    let cloudBackupTime = JSON.stringify([])
+                    if (typeof (item.cloudBackupTime) === 'string') {
+                      cloudBackupTime = item.cloudBackupTime
+                    }
+                    return {
+                      id: item.id,
+                      value: item.value,
+                      color: item.color,
+                      updateTime: item.updateTime,
+                      cloudBackupTime: cloudBackupTime
+                    }
+                  })
+                  fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                  fileIo.closeSync(file)
+                  promptAction.openToast({
+                    message: '导出成功'
+                  })
+                } catch (err) {
+                  if (err.code !== 13900020) {
+                    promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code
+                    })
                   }
-                  return {
-                    id: item.id,
-                    value: item.value,
-                    color: item.color,
-                    updateTime: item.updateTime,
-                    cloudBackupTime: cloudBackupTime
-                  }
-                })
-                fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
-                fileIo.closeSync(file)
-                promptAction.openToast({
-                  message: '导出成功'
-                })
+                }
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

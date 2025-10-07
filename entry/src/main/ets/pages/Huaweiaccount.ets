@@ -141,8 +141,8 @@ struct Huaweiaccount {
                     .fontWeight(FontWeight.Medium)
                     .width('20%')
                   TextInput({
-                    text: this.mfa!!,
-                    placeholder: '请输入 MFA'
+                    placeholder: '请输入MFA',
+                    text: this.mfa!!
                   })
                     .enableAutoSpacing(true)
                     .maxLength(6)
@@ -159,8 +159,8 @@ struct Huaweiaccount {
                     .fontWeight(FontWeight.Medium)
                     .width('20%')
                   TextInput({
-                    text: this.emailcode!!,
-                    placeholder: '请输入邮箱验证码'
+                    placeholder: '请输入邮箱验证码',
+                    text: this.emailcode!!
                   })
                     .enableAutoSpacing(true)
                     .maxLength(8)
