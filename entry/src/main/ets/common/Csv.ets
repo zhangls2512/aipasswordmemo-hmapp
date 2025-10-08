@@ -29,6 +29,9 @@ export function parseCsvLine(line: string) {
 
 export async function importCsvPassword(content: string) {
   if (!content) {
+    promptAction.openToast({
+      message: '导入失败，原因：文件为空'
+    })
     return
   }
   const lines = content.split('\n').filter(line => line.trim() !== '')
