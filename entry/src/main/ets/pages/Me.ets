@@ -131,7 +131,7 @@ export default struct Me {
             title: {
               title: '登录'
             },
-            onAppear: (async () => {
+            onAppear: async () => {
               const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
                 name: 'commonSetting'
               })
@@ -140,12 +140,12 @@ export default struct Me {
                 const lastWindow = await window.getLastWindow(this.context)
                 await lastWindow.setWindowPrivacyMode(true)
               }
-            }),
-            onDisappear: (async () => {
+            },
+            onDisappear: async () => {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(false)
               this.get()
-            })
+            }
           })
 
           if (this.uid) {
@@ -361,7 +361,7 @@ export default struct Me {
               title: {
                 title: '密码安全检查'
               },
-              onAppear: (async () => {
+              onAppear: async () => {
                 const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
                   name: 'commonSetting'
                 })
@@ -370,11 +370,11 @@ export default struct Me {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)
                 }
-              }),
-              onDisappear: (async () => {
+              },
+              onDisappear: async () => {
                 const lastWindow = await window.getLastWindow(this.context)
                 await lastWindow.setWindowPrivacyMode(false)
-              })
+              }
             })
 
             Divider()
@@ -417,7 +417,7 @@ export default struct Me {
               title: {
                 title: '密码随机生成'
               },
-              onAppear: (async () => {
+              onAppear: async () => {
                 const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
                   name: 'commonSetting'
                 })
@@ -426,11 +426,11 @@ export default struct Me {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)
                 }
-              }),
-              onDisappear: (async () => {
+              },
+              onDisappear: async () => {
                 const lastWindow = await window.getLastWindow(this.context)
                 await lastWindow.setWindowPrivacyMode(false)
-              })
+              }
             })
           }
           .backgroundColor($r('sys.color.comp_background_primary'))
@@ -591,7 +591,6 @@ export default struct Me {
       }
     }
     .padding({
-      bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
       left: $r('sys.float.ohos_id_max_padding_start'),
       right: $r('sys.float.ohos_id_max_padding_end')
     })

@@ -338,7 +338,7 @@ export default struct PasswordPage {
                 title: {
                   title: '新增密码'
                 },
-                onAppear: (async () => {
+                onAppear: async () => {
                   const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
                     name: 'commonSetting'
                   })
@@ -347,15 +347,15 @@ export default struct PasswordPage {
                     const lastWindow = await window.getLastWindow(this.context)
                     await lastWindow.setWindowPrivacyMode(true)
                   }
-                }),
-                onDisappear: (async () => {
+                },
+                onDisappear: async () => {
                   if (!this.showPassword) {
                     const lastWindow = await window.getLastWindow(this.context)
                     await lastWindow.setWindowPrivacyMode(false)
                   }
                   this.loading = true
-                }),
-                onWillDismiss: (async (DismissSheetAction) => {
+                },
+                onWillDismiss: async (DismissSheetAction) => {
                   const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showDialog({
                     title: '提示',
@@ -374,7 +374,7 @@ export default struct PasswordPage {
                   if (data.index === 1) {
                     DismissSheetAction.dismiss()
                   }
-                })
+                }
               })
 
               Blank()
@@ -437,7 +437,7 @@ export default struct PasswordPage {
                 title: {
                   title: '筛选密码'
                 },
-                onAppear: (async () => {
+                onAppear: async () => {
                   const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
                     name: 'commonSetting'
                   })
@@ -446,14 +446,14 @@ export default struct PasswordPage {
                     const lastWindow = await window.getLastWindow(this.context)
                     await lastWindow.setWindowPrivacyMode(true)
                   }
-                }),
-                onDisappear: (async () => {
+                },
+                onDisappear: async () => {
                   if (!this.showPassword) {
                     const lastWindow = await window.getLastWindow(this.context)
                     await lastWindow.setWindowPrivacyMode(false)
                   }
-                }),
-                onWillDismiss: (async (DismissSheetAction) => {
+                },
+                onWillDismiss: async (DismissSheetAction) => {
                   const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showDialog({
                     title: '提示',
@@ -472,7 +472,7 @@ export default struct PasswordPage {
                   if (data.index === 1) {
                     DismissSheetAction.dismiss()
                   }
-                })
+                }
               })
             }
             .width('100%')
@@ -674,7 +674,7 @@ export default struct PasswordPage {
             title: {
               title: '密码详情'
             },
-            onAppear: (async () => {
+            onAppear: async () => {
               const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
                 name: 'commonSetting'
               })
@@ -683,19 +683,18 @@ export default struct PasswordPage {
                 const lastWindow = await window.getLastWindow(this.context)
                 await lastWindow.setWindowPrivacyMode(true)
               }
-            }),
-            onDisappear: (async () => {
+            },
+            onDisappear: async () => {
               if (!this.showPassword) {
                 const lastWindow = await window.getLastWindow(this.context)
                 await lastWindow.setWindowPrivacyMode(false)
               }
               this.loading = true
-            })
+            }
           })
       }
       .height('100%')
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_max_padding_start'),
         right: $r('sys.float.ohos_id_max_padding_end')
       })
@@ -768,7 +767,7 @@ export default struct PasswordPage {
         title: {
           title: '修改密码'
         },
-        onAppear: (async () => {
+        onAppear: async () => {
           const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
             name: 'commonSetting'
           })
@@ -777,15 +776,15 @@ export default struct PasswordPage {
             const lastWindow = await window.getLastWindow(this.context)
             await lastWindow.setWindowPrivacyMode(true)
           }
-        }),
-        onDisappear: (async () => {
+        },
+        onDisappear: async () => {
           if (!this.showPassword) {
             const lastWindow = await window.getLastWindow(this.context)
             await lastWindow.setWindowPrivacyMode(false)
           }
           this.loading = true
-        }),
-        onWillDismiss: (async (DismissSheetAction) => {
+        },
+        onWillDismiss: async (DismissSheetAction) => {
           const promptAction = this.getUIContext().getPromptAction()
           const data = await promptAction.showDialog({
             title: '提示',
@@ -804,7 +803,7 @@ export default struct PasswordPage {
           if (data.index === 1) {
             DismissSheetAction.dismiss()
           }
-        })
+        }
       })
     }
     .onRefreshing(async () => {
