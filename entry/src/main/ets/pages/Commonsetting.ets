@@ -57,8 +57,19 @@ struct Commonsetting {
               })
             Column() {
               Row() {
-                Text('图标模式')
-                  .fontWeight(FontWeight.Medium)
+                Column() {
+                  Text('图标模式')
+                    .fontWeight(FontWeight.Medium)
+                  Text('仅在使用未个性化定制应用图标的主题时生效')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      top: $r('sys.float.ohos_id_text_margin_vertical')
+                    })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .width('70%')
+
                 Blank()
                 Select([
                   { value: '自动' },
@@ -93,7 +104,7 @@ struct Commonsetting {
                         await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
                       }
                     } catch (err) {
-                      if (err.code !== 1006800012) {
+                      if (err.code !== 1006800012 && err.code !== 1006800013) {
                         promptAction.openToast({
                           message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                         })

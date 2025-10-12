@@ -437,7 +437,7 @@ struct DataInOut {
                     const documentViewPicker = new picker.DocumentViewPicker(this.context)
                     const uris = await documentViewPicker.save(documentSaveOptions)
                     const filePath = uris[0]
-                    const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                    const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
                     fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
                     fileIo.closeSync(file)
                     promptAction.openToast({
@@ -484,7 +484,7 @@ struct DataInOut {
                     const documentViewPicker = new picker.DocumentViewPicker(this.context)
                     const uris = await documentViewPicker.save(documentSaveOptions)
                     const filePath = uris[0]
-                    const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                    const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
                     fileIo.writeSync(file.fd, filestring)
                     fileIo.closeSync(file)
                     promptAction.openToast({
@@ -533,7 +533,7 @@ struct DataInOut {
                   const documentViewPicker = new picker.DocumentViewPicker(this.context)
                   const uris = await documentViewPicker.save(documentSaveOptions)
                   const filePath = uris[0]
-                  const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                  const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
                   const array = await getInfoList()
                   const arrayOut = array.map((item): InfoOutItem => {
                     let cloudBackupTime = JSON.stringify([])
@@ -595,7 +595,7 @@ struct DataInOut {
                   const documentViewPicker = new picker.DocumentViewPicker(this.context)
                   const uris = await documentViewPicker.save(documentSaveOptions)
                   const filePath = uris[0]
-                  const file = fileIo.openSync(filePath, fileIo.OpenMode.READ_WRITE)
+                  const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
                   const array = await getTagList()
                   const arrayOut = array.map((item): TagOutItem => {
                     let cloudBackupTime = JSON.stringify([])

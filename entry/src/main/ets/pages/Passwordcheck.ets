@@ -193,7 +193,7 @@ export default struct Passwordcheck {
       title: {
         title: '修改密码'
       },
-      onWillDismiss: (async (DismissSheetAction) => {
+      onWillDismiss: async (DismissSheetAction) => {
         const promptAction = this.getUIContext().getPromptAction()
         const data = await promptAction.showDialog({
           title: '提示',
@@ -212,7 +212,7 @@ export default struct Passwordcheck {
         if (data.index === 1) {
           DismissSheetAction.dismiss()
         }
-      })
+      }
     })
   }
 }
