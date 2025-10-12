@@ -84,52 +84,36 @@ export default class EntryAbility extends UIAbility {
     })
     const iconMode = commonSettingDataPreferences.getSync('iconMode', 1)
     const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
-    if (iconMode === 0) {
-      if (colorMode === 0) {
-        const systemColorMode = uiAppearance.getDarkMode()
-        if (systemColorMode === 0) {
+    try {
+      if (iconMode === 0) {
+        if (colorMode === 0) {
+          const systemColorMode = uiAppearance.getDarkMode()
+          if (systemColorMode === 0) {
+            await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+          }
+          if (systemColorMode === 1) {
+            await appInfoManager.disableDynamicIcon()
+          }
+        }
+        if (colorMode === 1) {
+          await appInfoManager.disableDynamicIcon()
+        }
+        if (colorMode === 2) {
           await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
         }
-        if (systemColorMode === 1) {
-          try {
-            await appInfoManager.disableDynamicIcon()
-          } catch (err) {
-            if (err.code !== 1006800012) {
-              promptAction.openToast({
-                message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-              })
-            }
-          }
-        }
       }
-      if (colorMode === 1) {
-        try {
-          await appInfoManager.disableDynamicIcon()
-        } catch (err) {
-          if (err.code !== 1006800012) {
-            promptAction.openToast({
-              message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-            })
-          }
-        }
+      if (iconMode === 1) {
+        await appInfoManager.disableDynamicIcon()
       }
-      if (colorMode === 2) {
+      if (iconMode === 2) {
         await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
       }
-    }
-    if (iconMode === 1) {
-      try {
-        await appInfoManager.disableDynamicIcon()
-      } catch (err) {
-        if (err.code !== 1006800012) {
-          promptAction.openToast({
-            message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-          })
-        }
+    } catch (err) {
+      if (err.code !== 1006800012 && err.code !== 1006800013) {
+        promptAction.openToast({
+          message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+        })
       }
-    }
-    if (iconMode === 2) {
-      await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
     }
     await notificationManager.setBadgeNumber(0)
     if (want.parameters?.noticeUrl) {
@@ -307,6 +291,7 @@ export default class EntryAbility extends UIAbility {
     })
     const processCache = debugSettingDataPreferences.getSync('processCache', true) as boolean
     applicationContext.setSupportedProcessCache(processCache)
+    const filesDir = this.context.filesDir
     errorManager.on('error', {
       onUnhandledException(errMsg) {
         if (debugSettingDataPreferences.getSync('globalErrorShowType', 0) === 0) {
@@ -341,11 +326,11 @@ export default class EntryAbility extends UIAbility {
           }
         }
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
-          const errorLogDir = this.context.filesDir + '/log/error'
+          const errorLogDir = filesDir + '/log/error'
           if (!fileIo.accessSync(errorLogDir)) {
             fileIo.mkdirSync(errorLogDir, true)
           }
-          const file = fileIo.openSync(this.context.filesDir + '/log/error/' + Date.now() + '.txt',
+          const file = fileIo.openSync(filesDir + '/log/error/' + Date.now() + '.txt',
             fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
           fileIo.writeSync(file.fd, JSON.stringify(object))
           fileIo.closeSync(file)
@@ -412,11 +397,11 @@ export default class EntryAbility extends UIAbility {
           }
         }
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
-          const errorLogDir = this.context.filesDir + '/log/error'
+          const errorLogDir = filesDir + '/log/error'
           if (!fileIo.accessSync(errorLogDir)) {
             fileIo.mkdirSync(errorLogDir, true)
           }
-          const file = fileIo.openSync(this.context.filesDir + '/log/error/' + Date.now() + '.txt',
+          const file = fileIo.openSync(filesDir + '/log/error/' + Date.now() + '.txt',
             fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
           fileIo.writeSync(file.fd, JSON.stringify(object))
           fileIo.closeSync(file)
@@ -461,12 +446,12 @@ export default class EntryAbility extends UIAbility {
       ],
       onReceive: (domain, appEventGroups) => {
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
-          const errorLogDir = this.context.filesDir + '/log/error'
+          const errorLogDir = filesDir + '/log/error'
           if (!fileIo.accessSync(errorLogDir)) {
             fileIo.mkdirSync(errorLogDir, true)
           }
           appEventGroups.forEach((item) => {
-            const file = fileIo.openSync(this.context.filesDir + '/log/error/' + Date.now() + '.txt',
+            const file = fileIo.openSync(filesDir + '/log/error/' + Date.now() + '.txt',
               fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
             fileIo.writeSync(file.fd, JSON.stringify(item))
             fileIo.closeSync(file)
@@ -719,7 +704,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 26) {
+    if (wantParam.version !== 27) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

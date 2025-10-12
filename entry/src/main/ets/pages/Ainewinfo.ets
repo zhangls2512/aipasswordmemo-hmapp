@@ -206,7 +206,7 @@ export default struct Ainewinfo {
           if (this.showCard) {
             CardRecognition({
               cardSide: CardSide.FRONT,
-              onResult: ((res) => {
+              onResult: (res) => {
                 this.showCard = false
                 if (res.code === 200) {
                   if (res.cardType === CardType.CARD_ID && res.cardInfo?.front) {
@@ -244,7 +244,7 @@ export default struct Ainewinfo {
                     })
                   }
                 }
-              })
+              }
             })
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')

@@ -89,7 +89,7 @@ struct Index {
         }
         .tabBar(this.tabBuilder(3, $r('app.media.me'), '我的'))
       }
-      .barOverlap(deviceInfo.deviceType === 'phone' ? true : false)
+      .barBackgroundBlurStyle(BlurStyle.Regular)
       .barPosition(deviceInfo.deviceType === 'phone' ? BarPosition.End : BarPosition.Start)
       .scrollable(false)
       .vertical(deviceInfo.deviceType === 'phone' ? false : true)

@@ -338,10 +338,10 @@ export default struct InfoPage {
                 title: {
                   title: '新增常用信息'
                 },
-                onDisappear: (() => {
+                onDisappear: () => {
                   this.loading = true
-                }),
-                onWillDismiss: (async (DismissSheetAction) => {
+                },
+                onWillDismiss: async (DismissSheetAction) => {
                   const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showDialog({
                     title: '提示',
@@ -360,7 +360,7 @@ export default struct InfoPage {
                   if (data.index === 1) {
                     DismissSheetAction.dismiss()
                   }
-                })
+                }
               })
 
               Button('AI 识别新增')
@@ -398,9 +398,9 @@ export default struct InfoPage {
                   title: {
                     title: 'AI 识别新增常用信息'
                   },
-                  onDisappear: (() => {
+                  onDisappear: () => {
                     this.loading = true
-                  })
+                  }
                 })
             }
           }
@@ -555,7 +555,6 @@ export default struct InfoPage {
       }
       .height('100%')
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_max_padding_start'),
         right: $r('sys.float.ohos_id_max_padding_end')
       })
@@ -586,10 +585,10 @@ export default struct InfoPage {
         title: {
           title: '修改常用信息'
         },
-        onDisappear: (() => {
+        onDisappear: () => {
           this.loading = true
-        }),
-        onWillDismiss: (async (DismissSheetAction) => {
+        },
+        onWillDismiss: async (DismissSheetAction) => {
           const promptAction = this.getUIContext().getPromptAction()
           const data = await promptAction.showDialog({
             title: '提示',
@@ -608,7 +607,7 @@ export default struct InfoPage {
           if (data.index === 1) {
             DismissSheetAction.dismiss()
           }
-        })
+        }
       })
     }
     .onRefreshing(async () => {
