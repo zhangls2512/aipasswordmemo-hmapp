@@ -624,26 +624,27 @@ export default class EntryAbility extends UIAbility {
       }
     })
     await check()
-    const checkVersionUpdate = commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
-    try {
-      if (checkVersionUpdate === 1) {
-        if (wifiManager.isConnected()) {
+    let netConnected = false
+    let currentNetworkBearerType = -1
+    const netHandle = connection.getDefaultNetSync()
+    if (netHandle.netId !== 0) {
+      netConnected = true
+      currentNetworkBearerType = connection.getNetCapabilitiesSync(netHandle).bearerTypes[0]
+    }
+    if (netConnected) {
+      const checkVersionUpdate = commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
+      try {
+        if (checkVersionUpdate === 2 || (checkVersionUpdate === 1 && currentNetworkBearerType !== 0)) {
           const res = await updateManager.checkAppUpdate(this.context)
           if (res.updateAvailable === 1) {
             updateManager.showUpdateDialog(this.context)
           }
         }
+      } catch (err) {
+        promptAction.openToast({
+          message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+        })
       }
-      if (checkVersionUpdate === 2) {
-        const res = await updateManager.checkAppUpdate(this.context)
-        if (res.updateAvailable === 1) {
-          updateManager.showUpdateDialog(this.context)
-        }
-      }
-    } catch (err) {
-      promptAction.openToast({
-        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-      })
     }
     const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'cloudbackupSetting'
@@ -704,7 +705,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 27) {
+    if (wantParam.version !== 28) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

@@ -485,16 +485,12 @@ export default struct PasswordPage {
             })
               .searchButton('搜索')
               .onChange((value) => {
-                this.nameKeyword = value
                 this.filterPasswordDataPreferences.putSync('nameKeyword', value)
               })
               .onSubmit(() => {
                 this.loading = true
               })
           }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
 
           ListItem() {
             Scroll() {
@@ -550,8 +546,7 @@ export default struct PasswordPage {
             .scrollBar(BarState.Off)
           }
           .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         }
         ForEach(this.passwordArray, (item: Password) => {
