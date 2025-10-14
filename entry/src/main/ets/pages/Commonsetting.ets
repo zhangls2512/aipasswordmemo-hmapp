@@ -33,7 +33,7 @@ struct Commonsetting {
   @Local mfaSecondsRemainingStyleValue: string = 'progress'
   @Local pushItemWhenBlur: boolean = false
   @Local checkVersionUpdateIndex: number = 1
-  @Local checkVersionUpdateValue: string = '仅 WLAN 下'
+  @Local checkVersionUpdateValue: string = '非流量下'
   @Local openLinkTypeIndex: number = 0
   @Local openLinkTypeValue: string = '系统默认'
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
@@ -814,7 +814,7 @@ struct Commonsetting {
                 Blank()
                 Select([
                   { value: '从不' },
-                  { value: '仅 WLAN 下' },
+                  { value: '非流量下' },
                   { value: '始终' }
                 ])
                   .selected(this.checkVersionUpdateIndex!!)
@@ -923,7 +923,7 @@ struct Commonsetting {
         this.checkVersionUpdateValue = '从不'
       }
       if (checkVersionUpdate === 1) {
-        this.checkVersionUpdateValue = '仅 WLAN 下'
+        this.checkVersionUpdateValue = '非流量下'
       }
       if (checkVersionUpdate === 2) {
         this.checkVersionUpdateValue = '始终'
