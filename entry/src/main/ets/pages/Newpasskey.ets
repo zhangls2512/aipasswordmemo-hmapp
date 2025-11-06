@@ -32,56 +32,60 @@ struct Newpasskey {
               Row() {
                 Text('方式')
                   .fontWeight(FontWeight.Medium)
-                  .width('20%')
-                Row() {
-                  Radio({
-                    value: 'mfa',
-                    group: 'type'
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                    .checked(this.type === 'mfa' ? true : false)
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                Column() {
+                  Row() {
+                    Radio({
+                      value: 'mfa',
+                      group: 'type'
                     })
-                    .onChange((isChecked) => {
-                      if (isChecked) {
-                        this.type = 'mfa'
-                      }
+                      .checked(this.type === 'mfa' ? true : false)
+                      .onChange((isChecked) => {
+                        if (isChecked) {
+                          this.type = 'mfa'
+                        }
+                      })
+                    Text('MFA')
+                  }
+
+                  Row() {
+                    Radio({
+                      value: 'emailcode',
+                      group: 'type'
                     })
-                  Text('MFA')
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                  Radio({
-                    value: 'emailcode',
-                    group: 'type'
+                      .checked(this.type === 'emailcode' ? true : false)
+                      .onChange((isChecked) => {
+                        if (isChecked) {
+                          this.type = 'emailcode'
+                        }
+                      })
+                    Text('邮箱验证码')
+                  }
+                  .margin({
+                    top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                   })
-                    .checked(this.type === 'emailcode' ? true : false)
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                    .onChange((isChecked) => {
-                      if (isChecked) {
-                        this.type = 'emailcode'
-                      }
-                    })
-                  Text('邮箱验证码')
                 }
-                .width('75%')
+                .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
               }
 
               if (this.type === 'mfa') {
                 Row() {
                   Text('MFA')
                     .fontWeight(FontWeight.Medium)
-                    .width('20%')
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   TextInput({
                     placeholder: '请输入MFA',
                     text: this.mfa!!
                   })
                     .enableAutoSpacing(true)
+                    .layoutWeight(1)
                     .maxLength(6)
                     .type(InputType.ONE_TIME_CODE)
-                    .width('75%')
                 }
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -91,15 +95,17 @@ struct Newpasskey {
                 Row() {
                   Text('验证码')
                     .fontWeight(FontWeight.Medium)
-                    .width('20%')
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   TextInput({
                     placeholder: '请输入邮箱验证码',
                     text: this.emailcode!!
                   })
                     .enableAutoSpacing(true)
+                    .layoutWeight(1)
                     .maxLength(8)
                     .type(InputType.ONE_TIME_CODE)
-                    .width('75%')
                 }
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')

@@ -24,6 +24,7 @@ export default struct Ainewinfo {
   @Local list: Item[] = []
   @Local text: string = ''
   @Local showCard: boolean = false
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext()
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
@@ -190,14 +191,14 @@ export default struct Ainewinfo {
           })
           Row() {
             Button('图片识别')
-              .width('48%')
+              .layoutWeight(1)
               .bindMenu(this.ChooseImageMenu, {
                 hapticFeedbackMode: HapticFeedbackMode.AUTO
               })
             Blank()
-              .width('4%')
+              .width($r('sys.float.ohos_id_elements_margin_horizontal_m'))
             Button('卡证识别')
-              .width('48%')
+              .layoutWeight(1)
               .onClick(() => {
                 this.showCard = true
               })
@@ -271,23 +272,24 @@ export default struct Ainewinfo {
           .fontWeight(FontWeight.Medium)
       }
       .margin({
+        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
 
-      ForEach(this.list, (item: Item) => {
+      ForEach(this.list, (item: Item, index) => {
         ListItem() {
           Column() {
             Row() {
               Text('类型')
                 .fontWeight(FontWeight.Medium)
-                .width('45%')
-              Blank()
-                .width('5%')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Text(item.type)
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .layoutWeight(1)
                 .textAlign(TextAlign.End)
-                .width('50%')
             }
             .borderRadius(12)
             .padding(12)
@@ -301,14 +303,14 @@ export default struct Ainewinfo {
             Row() {
               Text('内容')
                 .fontWeight(FontWeight.Medium)
-                .width('45%')
-              Blank()
-                .width('5%')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Text(item.value)
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .layoutWeight(1)
                 .textAlign(TextAlign.End)
-                .width('50%')
             }
             .borderRadius(12)
             .padding(12)
@@ -323,7 +325,10 @@ export default struct Ainewinfo {
               Text('新增')
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -333,13 +338,22 @@ export default struct Ainewinfo {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = index
+              }
+            })
             .onClick(() => {
               newInfo({
                 type: item.type,
@@ -353,7 +367,7 @@ export default struct Ainewinfo {
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       })
       if (this.list.length === 0) {
@@ -361,7 +375,7 @@ export default struct Ainewinfo {
           Text('无数据')
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
         .width('100%')
       }

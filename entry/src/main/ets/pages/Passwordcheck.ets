@@ -9,6 +9,7 @@ export default struct Passwordcheck {
   @Local selectedIndex: number = 0
   @Local repeatArray: RepeatItem[] = []
   @Local oldArray: ListItem[] = []
+  @Local hoverId: number | string = -1
   context = this.getUIContext().getHostContext()
   preferType = 1
   passwordId = 0
@@ -46,7 +47,7 @@ export default struct Passwordcheck {
           })
           .width('100%')
         }
-        ForEach(this.repeatArray, (item: RepeatItem) => {
+        ForEach(this.repeatArray, (item: RepeatItem, index) => {
           ListItem() {
             Column() {
               Text('使用 ' + item.password + ' 的 ' + item.count + ' 账号')
@@ -59,7 +60,7 @@ export default struct Passwordcheck {
                   right: 12
                 })
               Column() {
-                ForEach(item.list, (item: ListItem, index) => {
+                ForEach(item.list, (item: ListItem, itemIndex) => {
                   if (index !== 0) {
                     Divider()
                       .padding({
@@ -71,7 +72,10 @@ export default struct Passwordcheck {
                     Text(item.name)
                       .enableAutoSpacing(true)
                       .fontWeight(FontWeight.Medium)
-                    Blank()
+                      .layoutWeight(1)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
                       .height(12)
@@ -81,13 +85,22 @@ export default struct Passwordcheck {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor(this.hoverId === index + ',' + itemIndex ? $r('sys.color.interactive_hover') :
+                        $r('sys.color.ohos_id_color_card_bg'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
                   .width('100%')
+                  .onHover((isHover) => {
+                    if (!isHover) {
+                      this.hoverId = -1
+                    }
+                    if (isHover) {
+                      this.hoverId = index + ',' + itemIndex
+                    }
+                  })
                   .onClick(() => {
                     this.passwordId = item.id
                     this.isShowUpdateSheet = true
@@ -115,14 +128,17 @@ export default struct Passwordcheck {
           })
           .width('100%')
         }
-        ForEach(this.oldArray, (item: ListItem) => {
+        ForEach(this.oldArray, (item: ListItem, index) => {
           ListItem() {
             Column() {
               Row() {
                 Text(item.name)
                   .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -132,13 +148,22 @@ export default struct Passwordcheck {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = index
+                }
+              })
               .onClick(() => {
                 this.passwordId = item.id
                 this.isShowUpdateSheet = true

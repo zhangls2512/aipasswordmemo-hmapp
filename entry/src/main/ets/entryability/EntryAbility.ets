@@ -221,7 +221,7 @@ export default class EntryAbility extends UIAbility {
       await windowStage.setWindowRectAutoSave(windowRectAutoSave)
     }
     await windowStage.loadContent('pages/Index')
-    if (deviceInfo.deviceType !== 'phone') {
+    if (deviceInfo.deviceType === '2in1') {
       const lastWindow = await window.getLastWindow(this.context)
       const windowTopmost = commonSettingDataPreferences.getSync('windowTopmost', false) as boolean
       await lastWindow.setWindowTopmost(windowTopmost)
@@ -489,7 +489,7 @@ export default class EntryAbility extends UIAbility {
         }
       }
     })
-    const netConnection: connection.NetConnection = connection.createNetConnection()
+    const netConnection = connection.createNetConnection()
     netConnection.register(() => {
     })
     netConnection.on('netAvailable', (data) => {
@@ -704,7 +704,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 28) {
+    if (wantParam.version !== 29) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

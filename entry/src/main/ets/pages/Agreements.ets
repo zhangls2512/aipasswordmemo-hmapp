@@ -9,6 +9,8 @@ export function AgreementsBuilder() {
 
 @ComponentV2
 struct Agreements {
+  @Local hoverId: number = -1
+
   build() {
     NavDestination() {
       List() {
@@ -17,7 +19,10 @@ struct Agreements {
             Row() {
               Text('用户服务条款与条件')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -27,13 +32,22 @@ struct Agreements {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 0
+              }
+            })
             .onClick(() => {
               try {
                 const appPrivacyLink = privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 2)

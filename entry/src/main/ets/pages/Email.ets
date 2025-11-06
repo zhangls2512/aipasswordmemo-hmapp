@@ -78,15 +78,17 @@ struct Email {
             Row() {
               Text('邮箱')
                 .fontWeight(FontWeight.Medium)
-                .width('20%')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               TextInput({
                 placeholder: '请输入邮箱',
                 text: this.email!!
               })
                 .contentType(ContentType.EMAIL_ADDRESS)
                 .enableAutoSpacing(true)
+                .layoutWeight(1)
                 .type(InputType.Email)
-                .width('75%')
             }
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -95,15 +97,17 @@ struct Email {
             Row() {
               Text('验证码')
                 .fontWeight(FontWeight.Medium)
-                .width('20%')
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               TextInput({
                 placeholder: '请输入邮箱验证码',
                 text: this.emailcode!!
               })
                 .enableAutoSpacing(true)
+                .layoutWeight(1)
                 .maxLength(8)
                 .type(InputType.ONE_TIME_CODE)
-                .width('75%')
             }
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')

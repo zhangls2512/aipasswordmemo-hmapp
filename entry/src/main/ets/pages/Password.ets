@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
-import { deviceInfo } from '@kit.BasicServicesKit'
+import { display, LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -32,6 +31,7 @@ export default struct PasswordPage {
   @Provider() isShowInfoSheet: boolean = false
   @Provider() isShowUpdateSheet: boolean = false
   @Provider() isShowFilterSheet: boolean = false
+  @Local preferType: number = 1
   @Local passwordArray: Password[] = []
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
@@ -43,8 +43,8 @@ export default struct PasswordPage {
   @Local showPassword: boolean = false
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Password[] = []
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  preferType = 1
   orderColumn = 'updateTime'
   passwordId = 0
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
@@ -203,45 +203,90 @@ export default struct PasswordPage {
   }
 
   build() {
-    Refresh({
-      refreshing: $$this.loading
-    }) {
-      List() {
+    Scroll() {
+      Column() {
         if (this.multipleSelect) {
-          ListItem() {
-            Row() {
+          Row() {
+            Column() {
+              Image($r('app.media.cancel'))
+            }
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .margin({
+              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+            })
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .onClick(() => {
+              this.multipleSelect = false
+              this.multipleSelectArray = []
+            })
+
+            Text('已选择 ' + this.multipleSelectArray.length + ' 项')
+              .fontSize(20)
+              .fontWeight(FontWeight.Bold)
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
+            Column() {
+              Image($r('app.media.delete'))
+            }
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .onClick(async () => {
+              const promptAction = this.getUIContext().getPromptAction()
+              const data = await promptAction.showDialog({
+                title: '提示',
+                message: '删除成功后无法恢复，确定删除？',
+                buttons: [
+                  {
+                    text: '取消',
+                    color: $r('sys.color.font_primary')
+                  },
+                  {
+                    text: '删除',
+                    color: $r('sys.color.warning')
+                  }
+                ]
+              })
+              if (data.index === 1) {
+                const promises = this.multipleSelectArray.map(async (item) => {
+                  await deleteData('password', item.id)
+                })
+                await Promise.all(promises)
+                this.multipleSelect = false
+                this.multipleSelectArray = []
+                this.loading = true
+              }
+            })
+
+            if (this.enableCloudBackup) {
               Column() {
-                Image($r('app.media.cancel'))
+                Image($r('app.media.cloud'))
               }
               .backgroundColor($r('sys.color.interactive_hover'))
               .borderRadius(20)
               .height(40)
               .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
-              .padding(11)
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
-              .width(40)
-              .onClick(() => {
-                this.multipleSelect = false
-                this.multipleSelectArray = []
-              })
-
-              Text('已选择 ' + this.multipleSelectArray.length + ' 项')
-                .fontSize(20)
-                .fontWeight(FontWeight.Bold)
-              Blank()
-              Column() {
-                Image($r('app.media.delete'))
-              }
-              .backgroundColor($r('sys.color.interactive_hover'))
-              .borderRadius(20)
-              .height(40)
               .padding(11)
               .visualEffect(new hdsEffect.HdsEffectBuilder()
                 .pointLight({
@@ -251,560 +296,541 @@ export default struct PasswordPage {
                 .buildEffect())
               .width(40)
               .onClick(async () => {
+                for (let i = 0; i < this.multipleSelectArray.length; i++) {
+                  const dialogControllerProgress = new CustomDialogController({
+                    builder: LoadingDialog({
+                      content: '批量云备份中，进度：' + i + '/' + this.multipleSelectArray.length
+                    })
+                  })
+                  dialogControllerProgress.open()
+                  await this.cloudBackup(this.multipleSelectArray[i])
+                  dialogControllerProgress.close()
+                }
+                this.multipleSelect = false
+                this.multipleSelectArray = []
+                this.loading = true
+              })
+            }
+          }
+          .margin({
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+          .width('100%')
+        }
+        if (!this.multipleSelect) {
+          Row() {
+            Column() {
+              Image($r('app.media.new_white'))
+            }
+            .backgroundColor($r('sys.color.background_emphasize'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .width(40)
+            .onClick(() => {
+              this.isShowNewSheet = true
+            })
+            .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
+              height: SheetSize.FIT_CONTENT,
+              preferType: this.preferType,
+              title: {
+                title: '新增密码'
+              },
+              onAppear: async () => {
+                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: 'commonSetting'
+                })
+                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                if (disallowScreenshot) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  await lastWindow.setWindowPrivacyMode(true)
+                }
+              },
+              onDisappear: async () => {
+                if (!this.showPassword) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  await lastWindow.setWindowPrivacyMode(false)
+                }
+                this.loading = true
+              },
+              onWillDismiss: async (DismissSheetAction) => {
                 const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
-                  message: '删除成功后无法恢复，确定删除？',
+                  message: '数据尚未保存，确定退出？',
                   buttons: [
                     {
                       text: '取消',
                       color: $r('sys.color.font_primary')
                     },
                     {
-                      text: '删除',
-                      color: $r('sys.color.warning')
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
                     }
                   ]
                 })
                 if (data.index === 1) {
-                  const promises = this.multipleSelectArray.map(async (item) => {
-                    await deleteData('password', item.id)
-                  })
-                  await Promise.all(promises)
-                  this.multipleSelect = false
-                  this.multipleSelectArray = []
-                  this.loading = true
+                  DismissSheetAction.dismiss()
                 }
-              })
-
-              if (this.enableCloudBackup) {
-                Column() {
-                  Image($r('app.media.cloud'))
-                }
-                .backgroundColor($r('sys.color.interactive_hover'))
-                .borderRadius(20)
-                .height(40)
-                .margin({
-                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .padding(11)
-                .visualEffect(new hdsEffect.HdsEffectBuilder()
-                  .pointLight({
-                    sourceType: hdsEffect.PointLightSourceType.SOFT,
-                    illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                  })
-                  .buildEffect())
-                .width(40)
-                .onClick(async () => {
-                  for (let i = 0; i < this.multipleSelectArray.length; i++) {
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '批量云备份中，进度：' + i + '/' + this.multipleSelectArray.length
-                      })
-                    })
-                    dialogControllerProgress.open()
-                    await this.cloudBackup(this.multipleSelectArray[i])
-                    dialogControllerProgress.close()
-                  }
-                  this.multipleSelect = false
-                  this.multipleSelectArray = []
-                  this.loading = true
-                })
               }
-            }
-            .width('100%')
-          }
-          .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-        }
-        if (!this.multipleSelect) {
-          ListItem() {
-            Row() {
-              Column() {
-                Image($r('app.media.new_white'))
-              }
-              .backgroundColor($r('sys.color.background_emphasize'))
-              .borderRadius(20)
-              .height(40)
-              .padding(11)
-              .width(40)
-              .onClick(() => {
-                this.isShowNewSheet = true
-              })
-              .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
-                height: SheetSize.FIT_CONTENT,
-                preferType: this.preferType,
-                title: {
-                  title: '新增密码'
-                },
-                onAppear: async () => {
-                  const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                    name: 'commonSetting'
-                  })
-                  const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-                  if (disallowScreenshot) {
-                    const lastWindow = await window.getLastWindow(this.context)
-                    await lastWindow.setWindowPrivacyMode(true)
-                  }
-                },
-                onDisappear: async () => {
-                  if (!this.showPassword) {
-                    const lastWindow = await window.getLastWindow(this.context)
-                    await lastWindow.setWindowPrivacyMode(false)
-                  }
-                  this.loading = true
-                },
-                onWillDismiss: async (DismissSheetAction) => {
-                  const promptAction = this.getUIContext().getPromptAction()
-                  const data = await promptAction.showDialog({
-                    title: '提示',
-                    message: '数据尚未保存，确定退出？',
-                    buttons: [
-                      {
-                        text: '取消',
-                        color: $r('sys.color.font_primary')
-                      },
-                      {
-                        text: '确定',
-                        color: $r('sys.color.font_emphasize')
-                      }
-                    ]
-                  })
-                  if (data.index === 1) {
-                    DismissSheetAction.dismiss()
-                  }
-                }
-              })
-
-              Blank()
-              Column() {
-                Image($r('app.media.sort'))
-              }
-              .backgroundColor($r('sys.color.interactive_hover'))
-              .borderRadius(20)
-              .height(40)
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
-              .padding(11)
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
-              .width(40)
-              .bindMenu([
-                {
-                  value: '按修改时间排序',
-                  action: () => {
-                    this.orderColumn = 'updateTime'
-                    this.loading = true
-                  }
-                },
-                {
-                  value: '按名称排序',
-                  action: () => {
-                    this.orderColumn = 'name'
-                    this.loading = true
-                  }
-                }
-              ], {
-                hapticFeedbackMode: HapticFeedbackMode.AUTO
-              })
-
-              Column() {
-                Image($r('app.media.search_icon'))
-              }
-              .backgroundColor($r('sys.color.interactive_hover'))
-              .borderRadius(20)
-              .height(40)
-              .padding(11)
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
-              .width(40)
-              .onClick(() => {
-                this.isShowFilterSheet = true
-              })
-              .bindSheet(this.isShowFilterSheet!!, this.FilterSheetBuilder(), {
-                height: SheetSize.FIT_CONTENT,
-                preferType: this.preferType,
-                title: {
-                  title: '筛选密码'
-                },
-                onAppear: async () => {
-                  const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                    name: 'commonSetting'
-                  })
-                  const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-                  if (disallowScreenshot) {
-                    const lastWindow = await window.getLastWindow(this.context)
-                    await lastWindow.setWindowPrivacyMode(true)
-                  }
-                },
-                onDisappear: async () => {
-                  if (!this.showPassword) {
-                    const lastWindow = await window.getLastWindow(this.context)
-                    await lastWindow.setWindowPrivacyMode(false)
-                  }
-                },
-                onWillDismiss: async (DismissSheetAction) => {
-                  const promptAction = this.getUIContext().getPromptAction()
-                  const data = await promptAction.showDialog({
-                    title: '提示',
-                    message: '数据尚未保存，确定退出？',
-                    buttons: [
-                      {
-                        text: '取消',
-                        color: $r('sys.color.font_primary')
-                      },
-                      {
-                        text: '确定',
-                        color: $r('sys.color.font_emphasize')
-                      }
-                    ]
-                  })
-                  if (data.index === 1) {
-                    DismissSheetAction.dismiss()
-                  }
-                }
-              })
-            }
-            .width('100%')
-          }
-
-          ListItem() {
-            Search({
-              placeholder: '请输入名称关键词',
-              value: this.nameKeyword!!
             })
-              .searchButton('搜索')
-              .onChange((value) => {
-                this.filterPasswordDataPreferences.putSync('nameKeyword', value)
-              })
-              .onSubmit(() => {
-                this.loading = true
-              })
-          }
 
-          ListItem() {
-            Scroll() {
-              Row() {
-                ForEach(this.tags, (item: PasswordTagItem, index) => {
-                  if (!this.tag.includes(item.value)) {
-                    Column() {
-                      Row() {
-                        Text(item.value)
-                          .enableAutoSpacing(true)
-                          .fontColor(item.color)
-                          .fontWeight(FontWeight.Medium)
-                      }
-                      .padding(12)
-                      .onClick(() => {
-                        this.tag.push(item.value)
-                        this.filterPasswordDataPreferences.putSync('tag', this.tag)
-                        this.loading = true
-                      })
-                    }
-                    .backgroundColor($r('sys.color.comp_background_primary'))
-                    .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-                    .margin({
-                      right: index === this.tags.length - 1 ? 0 : $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                  }
-                  if (this.tag.includes(item.value)) {
-                    Column() {
-                      Row() {
-                        Text(item.value)
-                          .enableAutoSpacing(true)
-                          .fontColor(Color.White)
-                          .fontWeight(FontWeight.Medium)
-                      }
-                      .padding(12)
-                      .onClick(() => {
-                        this.tag.splice(this.tag.indexOf(item.value), 1)
-                        this.filterPasswordDataPreferences.putSync('tag', this.tag)
-                        this.loading = true
-                      })
-                    }
-                    .backgroundColor($r('sys.color.background_emphasize'))
-                    .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-                    .margin({
-                      right: index === this.tags.length - 1 ? 0 : $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                  }
-                })
-              }
+            Blank()
+            Column() {
+              Image($r('app.media.sort'))
             }
-            .edgeEffect(EdgeEffect.Spring)
-            .scrollable(ScrollDirection.Horizontal)
-            .scrollBar(BarState.Off)
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .margin({
+              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+            })
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .bindMenu([
+              {
+                value: '按修改时间排序',
+                action: () => {
+                  this.orderColumn = 'updateTime'
+                  this.loading = true
+                }
+              },
+              {
+                value: '按名称排序',
+                action: () => {
+                  this.orderColumn = 'name'
+                  this.loading = true
+                }
+              }
+            ], {
+              hapticFeedbackMode: HapticFeedbackMode.AUTO
+            })
+
+            Column() {
+              Image($r('app.media.search_icon'))
+            }
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .onClick(() => {
+              this.isShowFilterSheet = true
+            })
+            .bindSheet(this.isShowFilterSheet!!, this.FilterSheetBuilder(), {
+              height: SheetSize.FIT_CONTENT,
+              preferType: this.preferType,
+              title: {
+                title: '筛选密码'
+              },
+              onAppear: async () => {
+                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: 'commonSetting'
+                })
+                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                if (disallowScreenshot) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  await lastWindow.setWindowPrivacyMode(true)
+                }
+              },
+              onDisappear: async () => {
+                if (!this.showPassword) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  await lastWindow.setWindowPrivacyMode(false)
+                }
+              },
+              onWillDismiss: async (DismissSheetAction) => {
+                const promptAction = this.getUIContext().getPromptAction()
+                const data = await promptAction.showDialog({
+                  title: '提示',
+                  message: '数据尚未保存，确定退出？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
+                })
+                if (data.index === 1) {
+                  DismissSheetAction.dismiss()
+                }
+              }
+            })
           }
+          .width('100%')
+
+          Search({
+            placeholder: '请输入名称关键词',
+            value: this.nameKeyword!!
+          })
+            .searchButton('搜索')
+            .onChange((value) => {
+              this.filterPasswordDataPreferences.putSync('nameKeyword', value)
+            })
+            .onSubmit(() => {
+              this.loading = true
+            })
+          Scroll() {
+            Row() {
+              ForEach(this.tags, (item: PasswordTagItem, index) => {
+                if (!this.tag.includes(item.value)) {
+                  Column() {
+                    Row() {
+                      Text(item.value)
+                        .enableAutoSpacing(true)
+                        .fontColor(item.color)
+                        .fontWeight(FontWeight.Medium)
+                    }
+                    .padding(12)
+                    .onClick(() => {
+                      this.tag.push(item.value)
+                      this.filterPasswordDataPreferences.putSync('tag', this.tag)
+                      this.loading = true
+                    })
+                  }
+                  .backgroundColor($r('sys.color.comp_background_primary'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .margin({
+                    right: index === this.tags.length - 1 ? 0 : $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                }
+                if (this.tag.includes(item.value)) {
+                  Column() {
+                    Row() {
+                      Text(item.value)
+                        .enableAutoSpacing(true)
+                        .fontColor(Color.White)
+                        .fontWeight(FontWeight.Medium)
+                    }
+                    .padding(12)
+                    .onClick(() => {
+                      this.tag.splice(this.tag.indexOf(item.value), 1)
+                      this.filterPasswordDataPreferences.putSync('tag', this.tag)
+                      this.loading = true
+                    })
+                  }
+                  .backgroundColor($r('sys.color.background_emphasize'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .margin({
+                    right: index === this.tags.length - 1 ? 0 : $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                }
+              })
+            }
+          }
+          .edgeEffect(EdgeEffect.Spring)
           .margin({
             bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
+          .scrollable(ScrollDirection.Horizontal)
+          .scrollBar(BarState.Off)
         }
-        ForEach(this.passwordArray, (item: Password) => {
-          ListItem() {
-            Column() {
-              Row() {
-                if (this.multipleSelect) {
-                  Toggle({
-                    type: ToggleType.Checkbox,
-                    isOn: this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
-                  })
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                    .onChange((isOn) => {
-                      if (!isOn) {
-                        this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                        item.id), 1)
-                      }
-                      if (isOn) {
-                        this.multipleSelectArray.push(item)
-                      }
-                    })
-                }
-                if (item.isCloudBackup) {
-                  Image($r('app.media.cloud'))
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                    .width('5%')
-                }
-                if (item.info.some(itema => itema.type === '图标')) {
-                  Image(item.info[item.info.findIndex(itema => itema.type === '图标')].value)
-                    .copyOption(CopyOptions.LocalDevice)
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
-                    .width('10%')
-                    .onError((err) => {
-                      promptAction.openToast({
-                        message: '发生错误，错误信息：' + err.message
-                      })
-                    })
-                }
+        Refresh({
+          refreshing: $$this.loading
+        }) {
+          List() {
+            ForEach(this.passwordArray, (item: Password, index) => {
+              ListItem() {
                 Column() {
-                  Text(item.name)
-                    .enableAutoSpacing(true)
-                    .fontWeight(FontWeight.Bold)
-                  if (this.showPassword && item.info.findIndex(infoItem => infoItem.type === '密码') !== -1) {
-                    Row() {
-                      Text('密码')
-                        .fontWeight(FontWeight.Medium)
+                  Row() {
+                    if (this.multipleSelect) {
+                      Toggle({
+                        type: ToggleType.Checkbox,
+                        isOn: this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+                      })
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                      Text(item.info[item.info.findIndex(infoItem => infoItem.type === '密码')].value)
+                        .onChange((isOn) => {
+                          if (!isOn) {
+                            this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                            item.id), 1)
+                          }
+                          if (isOn) {
+                            this.multipleSelectArray.push(item)
+                          }
+                        })
+                    }
+                    if (item.isCloudBackup) {
+                      Image($r('app.media.cloud'))
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                        .width('5%')
+                    }
+                    if (item.info.some(itema => itema.type === '图标')) {
+                      Image(item.info[item.info.findIndex(itema => itema.type === '图标')].value)
                         .copyOption(CopyOptions.LocalDevice)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                        .width('10%')
+                        .onError((err) => {
+                          promptAction.openToast({
+                            message: '发生错误，错误信息：' + err.message
+                          })
+                        })
                     }
-                    .margin({
-                      top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                    })
-                  }
-                  if (item.tag.length > 0) {
-                    Flex({
-                      wrap: FlexWrap.Wrap,
-                      space: {
-                        main: LengthMetrics.vp(8),
-                        cross: LengthMetrics.vp(8)
+                    Column() {
+                      Text(item.name)
+                        .enableAutoSpacing(true)
+                        .fontWeight(FontWeight.Bold)
+                      if (this.showPassword && item.info.findIndex(infoItem => infoItem.type === '密码') !== -1) {
+                        Row() {
+                          Text('密码')
+                            .fontWeight(FontWeight.Medium)
+                            .margin({
+                              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                            })
+                          Text(item.info[item.info.findIndex(infoItem => infoItem.type === '密码')].value)
+                            .copyOption(CopyOptions.LocalDevice)
+                        }
+                        .margin({
+                          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                        })
                       }
-                    }) {
-                      ForEach(item.tag, (item: PasswordTagItem) => {
-                        Text(item.value)
-                          .enableAutoSpacing(true)
-                          .fontColor(item.color)
-                          .fontWeight(FontWeight.Medium)
-                      })
+                      if (item.tag.length > 0) {
+                        Flex({
+                          wrap: FlexWrap.Wrap,
+                          space: {
+                            main: LengthMetrics.vp(8),
+                            cross: LengthMetrics.vp(8)
+                          }
+                        }) {
+                          ForEach(item.tag, (item: PasswordTagItem) => {
+                            Text(item.value)
+                              .enableAutoSpacing(true)
+                              .fontColor(item.color)
+                              .fontWeight(FontWeight.Medium)
+                          })
+                        }
+                        .margin({
+                          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                        })
+                      }
                     }
-                    .margin({
-                      top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                    })
+                    .alignItems(HorizontalAlign.Start)
+                    .layoutWeight(1)
                   }
+                  .borderRadius(12)
+                  .padding(12)
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
+                        $r('sys.color.comp_background_primary'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.comp_background_secondary'))
+                    }
+                  })
+                  .width('100%')
+                  .onHover((isHover) => {
+                    if (!isHover) {
+                      this.hoverId = -1
+                    }
+                    if (isHover) {
+                      this.hoverId = index
+                    }
+                  })
+                  .onClick(() => {
+                    if (this.multipleSelect) {
+                      return
+                    }
+                    this.passwordId = item.id
+                    this.isShowInfoSheet = true
+                  })
+                  .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
+                    hapticFeedbackMode: HapticFeedbackMode.AUTO
+                  })
+                  .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick)
                 }
-                .alignItems(HorizontalAlign.Start)
-                .width('90%')
+                .backgroundColor($r('sys.color.comp_background_primary'))
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                .padding($r('sys.float.ohos_id_corner_radius_mark'))
               }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor($r('sys.color.comp_background_primary'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.comp_background_secondary'))
-                }
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .width('100%')
-              .onClick(() => {
-                if (this.multipleSelect) {
-                  return
-                }
-                this.passwordId = item.id
-                this.isShowInfoSheet = true
-              })
-              .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress | ResponseType.RightClick, {
-                hapticFeedbackMode: HapticFeedbackMode.AUTO
-              })
-            }
-            .backgroundColor($r('sys.color.comp_background_primary'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+            })
           }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
+        }
+        .layoutWeight(1)
+        .onRefreshing(async () => {
+          this.passwordArray = await getFilterPasswordList(this.nameKeyword, this.info, this.tag, this.orderColumn)
+          this.tags = await getTagList('value')
+          this.loading = false
         })
-        ListItem()
-          .bindSheet(this.isShowInfoSheet!!, this.InfoSheetBuilder(this.passwordId), {
-            height: SheetSize.FIT_CONTENT,
-            preferType: this.preferType,
-            title: {
-              title: '密码详情'
-            },
-            onAppear: async () => {
-              const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                name: 'commonSetting'
-              })
-              const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-              if (disallowScreenshot) {
-                const lastWindow = await window.getLastWindow(this.context)
-                await lastWindow.setWindowPrivacyMode(true)
-              }
-            },
-            onDisappear: async () => {
-              if (!this.showPassword) {
-                const lastWindow = await window.getLastWindow(this.context)
-                await lastWindow.setWindowPrivacyMode(false)
-              }
-              this.loading = true
+        .bindSheet(this.isShowInfoSheet!!, this.InfoSheetBuilder(this.passwordId), {
+          height: SheetSize.FIT_CONTENT,
+          preferType: this.preferType,
+          title: {
+            title: '密码详情'
+          },
+          onAppear: async () => {
+            const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+              name: 'commonSetting'
+            })
+            const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+            if (disallowScreenshot) {
+              const lastWindow = await window.getLastWindow(this.context)
+              await lastWindow.setWindowPrivacyMode(true)
             }
-          })
+          },
+          onDisappear: async () => {
+            if (!this.showPassword) {
+              const lastWindow = await window.getLastWindow(this.context)
+              await lastWindow.setWindowPrivacyMode(false)
+            }
+            this.loading = true
+          }
+        })
       }
+      .alignItems(HorizontalAlign.Start)
       .height('100%')
-      .padding({
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
-      })
-      .onAppear(async () => {
-        if (deviceInfo.deviceType === 'phone') {
+    }
+    .padding({
+      left: $r('sys.float.ohos_id_max_padding_start'),
+      right: $r('sys.float.ohos_id_max_padding_end'),
+      top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
+    })
+    .onAppear(async () => {
+      const currentOrientation = display.getDefaultDisplaySync().orientation
+      if (currentOrientation === display.Orientation.PORTRAIT ||
+        currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
+        this.preferType = 0
+      }
+      if (currentOrientation === display.Orientation.LANDSCAPE ||
+        currentOrientation === display.Orientation.LANDSCAPE_INVERTED) {
+        this.preferType = 1
+      }
+      display.on('change', (displayId) => {
+        const orientation = display.getDisplayByIdSync(displayId).orientation
+        if (orientation === display.Orientation.PORTRAIT || orientation === display.Orientation.PORTRAIT_INVERTED) {
           this.preferType = 0
         }
+        if (orientation === display.Orientation.LANDSCAPE || orientation === display.Orientation.LANDSCAPE_INVERTED) {
+          this.preferType = 1
+        }
+      })
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      this.showPassword = commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
+      const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+      const lastWindow = await window.getLastWindow(this.context)
+      if (disallowScreenshot) {
+        await lastWindow.setWindowPrivacyMode(this.showPassword)
+      }
+      this.context.eventHub.on('newPassword', () => {
+        if (!this.isShowNewSheet && !this.isShowInfoSheet && !this.isShowUpdateSheet && !this.isShowFilterSheet) {
+          this.isShowNewSheet = true
+        }
+      })
+      this.context.eventHub.on('searchPassword', () => {
+        if (!this.isShowNewSheet && !this.isShowInfoSheet && !this.isShowUpdateSheet && !this.isShowFilterSheet) {
+          this.isShowFilterSheet = true
+        }
+      })
+      this.context.eventHub.on('refreshPassword', async () => {
+        this.enableCloudBackup = false
         const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
           name: 'commonSetting'
         })
         this.showPassword = commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
         const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-        const lastWindow = await window.getLastWindow(this.context)
         if (disallowScreenshot) {
+          const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(this.showPassword)
         }
-        this.context.eventHub.on('newPassword', () => {
-          if (!this.isShowNewSheet && !this.isShowInfoSheet && !this.isShowUpdateSheet && !this.isShowFilterSheet) {
-            this.isShowNewSheet = true
-          }
-        })
-        this.context.eventHub.on('searchPassword', () => {
-          if (!this.isShowNewSheet && !this.isShowInfoSheet && !this.isShowUpdateSheet && !this.isShowFilterSheet) {
-            this.isShowFilterSheet = true
-          }
-        })
-        this.context.eventHub.on('refreshPassword', async () => {
-          this.enableCloudBackup = false
-          const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-            name: 'commonSetting'
-          })
-          this.showPassword = commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
-          const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-          if (disallowScreenshot) {
-            const lastWindow = await window.getLastWindow(this.context)
-            await lastWindow.setWindowPrivacyMode(this.showPassword)
-          }
-          this.loading = true
-          const cloudServiceStatus = await getCloudServiceStatus()
-          if (cloudServiceStatus && getKey()) {
-            this.enableCloudBackup = true
-          }
-        })
-        this.context.eventHub.on('refreshFilterPassword', () => {
-          const data: Data = {
-            nameKeyword: this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string,
-            info: this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[],
-            tag: this.filterPasswordDataPreferences.getSync('tag', []) as string[]
-          }
-          this.nameKeyword = data.nameKeyword
-          this.info = data.info
-          this.tag = data.tag
-          this.loading = true
-        })
         this.loading = true
         const cloudServiceStatus = await getCloudServiceStatus()
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
       })
-      .onDisAppear(() => {
-        this.context.eventHub.off('newPassword')
-        this.context.eventHub.off('searchPassword')
-        this.context.eventHub.off('refreshPassword')
-        this.context.eventHub.off('refreshFilterPassword')
-      })
-      .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
-        height: SheetSize.FIT_CONTENT,
-        preferType: this.preferType,
-        title: {
-          title: '修改密码'
-        },
-        onAppear: async () => {
-          const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-            name: 'commonSetting'
-          })
-          const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-          if (disallowScreenshot) {
-            const lastWindow = await window.getLastWindow(this.context)
-            await lastWindow.setWindowPrivacyMode(true)
-          }
-        },
-        onDisappear: async () => {
-          if (!this.showPassword) {
-            const lastWindow = await window.getLastWindow(this.context)
-            await lastWindow.setWindowPrivacyMode(false)
-          }
-          this.loading = true
-        },
-        onWillDismiss: async (DismissSheetAction) => {
-          const promptAction = this.getUIContext().getPromptAction()
-          const data = await promptAction.showDialog({
-            title: '提示',
-            message: '数据尚未保存，确定退出？',
-            buttons: [
-              {
-                text: '取消',
-                color: $r('sys.color.font_primary')
-              },
-              {
-                text: '确定',
-                color: $r('sys.color.font_emphasize')
-              }
-            ]
-          })
-          if (data.index === 1) {
-            DismissSheetAction.dismiss()
-          }
+      this.context.eventHub.on('refreshFilterPassword', () => {
+        const data: Data = {
+          nameKeyword: this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string,
+          info: this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[],
+          tag: this.filterPasswordDataPreferences.getSync('tag', []) as string[]
         }
+        this.nameKeyword = data.nameKeyword
+        this.info = data.info
+        this.tag = data.tag
+        this.loading = true
       })
-    }
-    .onRefreshing(async () => {
-      this.passwordArray = await getFilterPasswordList(this.nameKeyword, this.info, this.tag, this.orderColumn)
-      this.tags = await getTagList('value')
-      this.loading = false
+      this.loading = true
+      const cloudServiceStatus = await getCloudServiceStatus()
+      if (cloudServiceStatus && getKey()) {
+        this.enableCloudBackup = true
+      }
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.off('newPassword')
+      this.context.eventHub.off('searchPassword')
+      this.context.eventHub.off('refreshPassword')
+      this.context.eventHub.off('refreshFilterPassword')
+      display.off('change')
+    })
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
+      height: SheetSize.FIT_CONTENT,
+      preferType: this.preferType,
+      title: {
+        title: '修改密码'
+      },
+      onAppear: async () => {
+        const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+          name: 'commonSetting'
+        })
+        const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+        if (disallowScreenshot) {
+          const lastWindow = await window.getLastWindow(this.context)
+          await lastWindow.setWindowPrivacyMode(true)
+        }
+      },
+      onDisappear: async () => {
+        if (!this.showPassword) {
+          const lastWindow = await window.getLastWindow(this.context)
+          await lastWindow.setWindowPrivacyMode(false)
+        }
+        this.loading = true
+      },
+      onWillDismiss: async (DismissSheetAction) => {
+        const promptAction = this.getUIContext().getPromptAction()
+        const data = await promptAction.showDialog({
+          title: '提示',
+          message: '数据尚未保存，确定退出？',
+          buttons: [
+            {
+              text: '取消',
+              color: $r('sys.color.font_primary')
+            },
+            {
+              text: '确定',
+              color: $r('sys.color.font_emphasize')
+            }
+          ]
+        })
+        if (data.index === 1) {
+          DismissSheetAction.dismiss()
+        }
+      }
     })
   }
 }

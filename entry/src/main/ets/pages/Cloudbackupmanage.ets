@@ -66,16 +66,16 @@ struct Cloudbackupmanage {
                     group: 'type'
                   })
                     .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
                     .selectAll(this.allSelected!!)
                     .onChange((itemName) => {
                       this.types = itemName.name
                     })
                   Text('全部')
                     .fontWeight(FontWeight.Bold)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Text(this.total)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -94,14 +94,14 @@ struct Cloudbackupmanage {
                     name: 'password',
                     group: 'type'
                   })
+                    .select(this.passwordSelected!!)
                     .shape(CheckBoxShape.ROUNDED_SQUARE)
+                  Text('密码')
+                    .fontWeight(FontWeight.Medium)
+                    .layoutWeight(1)
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .select(this.passwordSelected!!)
-                  Text('密码')
-                    .fontWeight(FontWeight.Medium)
-                  Blank()
                   Text(this.password)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -120,14 +120,14 @@ struct Cloudbackupmanage {
                     name: 'info',
                     group: 'type'
                   })
+                    .select(this.infoSelected!!)
                     .shape(CheckBoxShape.ROUNDED_SQUARE)
+                  Text('常用信息')
+                    .fontWeight(FontWeight.Medium)
+                    .layoutWeight(1)
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .select(this.infoSelected!!)
-                  Text('常用信息')
-                    .fontWeight(FontWeight.Medium)
-                  Blank()
                   Text(this.info)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -146,14 +146,14 @@ struct Cloudbackupmanage {
                     name: 'tag',
                     group: 'type'
                   })
+                    .select(this.tagSelected!!)
                     .shape(CheckBoxShape.ROUNDED_SQUARE)
+                  Text('标签')
+                    .fontWeight(FontWeight.Medium)
+                    .layoutWeight(1)
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .select(this.tagSelected!!)
-                  Text('标签')
-                    .fontWeight(FontWeight.Medium)
-                  Blank()
                   Text(this.tag)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))

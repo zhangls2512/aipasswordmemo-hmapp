@@ -18,6 +18,7 @@ struct Cloudbackupimport {
   @Local index: number = 0
   @Local value: string = '保留'
   @Local autoImport: string[] = []
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext()
   cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'cloudbackupSetting'
@@ -54,7 +55,10 @@ struct Cloudbackupimport {
             Row() {
               Text('冲突解决模式')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Select([
                 { value: '保留' },
                 { value: '覆盖' }
@@ -82,7 +86,8 @@ struct Cloudbackupimport {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               ForEach(this.typeArray, (item: Type, index) => {
@@ -96,7 +101,10 @@ struct Cloudbackupimport {
                 Row() {
                   Text(item.name)
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.autoImport.includes(item.value)
@@ -140,13 +148,17 @@ struct Cloudbackupimport {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('密码')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -156,13 +168,22 @@ struct Cloudbackupimport {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 0
+                }
+              })
               .onClick(async () => {
                 if (!getKey()) {
                   const promptAction = this.getUIContext().getPromptAction()
@@ -201,7 +222,10 @@ struct Cloudbackupimport {
               Row() {
                 Text('常用信息')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -211,13 +235,22 @@ struct Cloudbackupimport {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 1
+                }
+              })
               .onClick(async () => {
                 if (!getKey()) {
                   const promptAction = this.getUIContext().getPromptAction()
@@ -256,7 +289,10 @@ struct Cloudbackupimport {
               Row() {
                 Text('标签')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -266,13 +302,22 @@ struct Cloudbackupimport {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 2
+                }
+              })
               .onClick(async () => {
                 if (!getKey()) {
                   const promptAction = this.getUIContext().getPromptAction()

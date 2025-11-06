@@ -19,6 +19,7 @@ export function ViplogBuilder() {
 struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
+  @Local hoverId: number = -1
   accessToken: string = ''
   empty: boolean | undefined = undefined
 
@@ -34,21 +35,21 @@ struct Viplog {
           })
           .width('100%')
         }
-        ForEach(this.viplogArray, (item: Item) => {
+        ForEach(this.viplogArray, (item: Item, index) => {
           ListItem() {
             Column() {
               Row() {
                 Text('时长')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.duration === 0 ? '终身' : String(item.duration) + '天')
                   .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -62,9 +63,9 @@ struct Viplog {
               Row() {
                 Text('类型')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.type === 'pay' ? '付费' :
                   item.type === 'vipcode' ? '兑换码' :
                     item.type === 'invitationcode' ? '邀请码' :
@@ -72,8 +73,8 @@ struct Viplog {
                         'undefined')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -87,14 +88,14 @@ struct Viplog {
               Row() {
                 Text('详情')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.info)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -108,14 +109,14 @@ struct Viplog {
               Row() {
                 Text('时间')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(String(new Date(item.date)))
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -130,7 +131,10 @@ struct Viplog {
                 Row() {
                   Text('申请退款')
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
                     .height(12)
@@ -140,13 +144,22 @@ struct Viplog {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
+                      $r('sys.color.ohos_id_color_card_bg'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
                 .width('100%')
+                .onHover((isHover) => {
+                  if (!isHover) {
+                    this.hoverId = -1
+                  }
+                  if (isHover) {
+                    this.hoverId = index
+                  }
+                })
                 .onClick(async () => {
                   try {
                     await iap.createRefundRequest(this.getUIContext().getHostContext(), item.info)

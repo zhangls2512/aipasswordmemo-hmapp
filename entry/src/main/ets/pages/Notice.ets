@@ -32,7 +32,10 @@ struct Notice {
               Row() {
                 Text('允许接收')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: notificationManager.isNotificationEnabledSync()
@@ -91,7 +94,8 @@ struct Notice {
                 .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
-                  left: 12
+                  left: 12,
+                  right: 12
                 })
               Column() {
                 ForEach(this.noticeArray, (item: NoticeItem, index) => {
@@ -114,8 +118,11 @@ struct Notice {
                         })
                     }
                     .alignItems(HorizontalAlign.Start)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
 
-                    Blank()
                     Toggle({
                       type: ToggleType.Switch,
                       isOn: item.status

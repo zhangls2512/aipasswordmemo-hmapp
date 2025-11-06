@@ -183,6 +183,7 @@ export default struct Newinfo {
               placeholder: '请输入类型',
               text: this.infoType!!
             })
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -240,6 +241,7 @@ export default struct Newinfo {
               text: this.infoValue!!
             })
               .contentType(ContentType.NICKNAME)
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -251,6 +253,7 @@ export default struct Newinfo {
               text: this.infoValue!!
             })
               .contentType(ContentType.USER_NAME)
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -262,6 +265,7 @@ export default struct Newinfo {
               placeholder: '请输入内容',
               text: this.infoValue!!
             })
+              .defaultFocus(true)
               .enableAutoFill(false)
               .enableAutoSpacing(true)
               .margin({
@@ -275,6 +279,7 @@ export default struct Newinfo {
               text: this.infoValue!!
             })
               .contentType(ContentType.PERSON_FULL_NAME)
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -286,6 +291,7 @@ export default struct Newinfo {
               text: this.infoValue!!
             })
               .contentType(ContentType.PHONE_NUMBER)
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -298,6 +304,7 @@ export default struct Newinfo {
               text: this.infoValue!!
             })
               .contentType(ContentType.EMAIL_ADDRESS)
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -310,6 +317,7 @@ export default struct Newinfo {
               text: this.infoValue!!
             })
               .contentType(ContentType.BANK_CARD_NUMBER)
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -322,6 +330,7 @@ export default struct Newinfo {
               text: this.infoValue!!
             })
               .contentType(ContentType.ID_CARD_NUMBER)
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -332,6 +341,7 @@ export default struct Newinfo {
               placeholder: '请输入内容',
               text: this.infoValue!!
             })
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -343,6 +353,7 @@ export default struct Newinfo {
               placeholder: '请输入内容',
               text: this.infoValue!!
             })
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -358,7 +369,10 @@ export default struct Newinfo {
             Row() {
               Text('云备份')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Toggle({
                 type: ToggleType.Switch,
                 isOn: this.cloudBackup!!

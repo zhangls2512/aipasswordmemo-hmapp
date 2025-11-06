@@ -70,6 +70,7 @@ struct Invite {
               Row() {
                 Text('邀请二维码')
                   .fontWeight(FontWeight.Bold)
+                  .layoutWeight(1)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
@@ -174,18 +175,11 @@ struct Invite {
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                 })
-              Row() {
-                Text('已邀请新用户数')
-                  .fontWeight(FontWeight.Bold)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Text(String(this.inviteusercount))
-                  .fontWeight(FontWeight.Medium)
-              }
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-              })
+              Text('已邀请新用户数：' + this.inviteusercount)
+                .fontWeight(FontWeight.Bold)
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                })
             }
             if (this.loading) {
               LoadingProgress()

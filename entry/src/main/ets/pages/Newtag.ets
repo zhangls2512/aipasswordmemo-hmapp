@@ -73,7 +73,7 @@ export default struct Newtag {
               text: this.tagColor!!
             })
               .enableAutoSpacing(true)
-              .width('90%')
+              .layoutWeight(1)
           }
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -140,7 +140,10 @@ export default struct Newtag {
             Row() {
               Text('云备份')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Toggle({
                 type: ToggleType.Switch,
                 isOn: this.cloudBackup!!

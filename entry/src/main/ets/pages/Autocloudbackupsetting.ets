@@ -52,7 +52,10 @@ struct Autocloudbackupsetting {
               Row() {
                 Text(item.name)
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.autoOn.includes(item.value)

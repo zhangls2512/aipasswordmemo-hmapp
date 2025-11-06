@@ -23,6 +23,7 @@ export default struct Passwordinfo {
   @Local mfaSecondsRemainingColor: Color = Color.Transparent
   @Local mfaSecondsRemainingStyle: string = ''
   @Local passwordTag: PasswordTagItem[] = []
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext()
 
   build() {
@@ -50,9 +51,9 @@ export default struct Passwordinfo {
                 Text(item.type)
                   .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
-                  .width('34%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 if (!this.hidePasswordInfoType.includes(item.type)) {
                   Text(item.value)
                     .copyOption(CopyOptions.LocalDevice)
@@ -60,13 +61,14 @@ export default struct Passwordinfo {
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .enableDataDetector(this.passwordInfoValueDataDetector)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                     .textAlign(TextAlign.End)
-                    .width('50%')
                     .onClick(() => {
                       copy(item.value)
                     })
-                  Blank()
-                    .width('3%')
                   Image($r('app.media.hide'))
                     .fillColor($r('sys.color.icon_secondary'))
                     .width('8%')
@@ -78,13 +80,14 @@ export default struct Passwordinfo {
                   Text('***')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                     .textAlign(TextAlign.End)
-                    .width('50%')
                     .onClick(() => {
                       copy(item.value)
                     })
-                  Blank()
-                    .width('3%')
                   Image($r('app.media.show'))
                     .fillColor($r('sys.color.icon_secondary'))
                     .width('8%')
@@ -111,7 +114,10 @@ export default struct Passwordinfo {
               Row() {
                 Text(item.type)
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image(item.value)
                   .copyOption(CopyOptions.LocalDevice)
                   .width('10%')
@@ -125,13 +131,22 @@ export default struct Passwordinfo {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 0
+                }
+              })
               .onClick(async () => {
                 const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
                 try {
@@ -179,8 +194,11 @@ export default struct Passwordinfo {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 if (this.mfaSecondsRemainingStyle === 'progress') {
                   Progress({
                     value: this.mfaSecondsRemaining,
@@ -199,13 +217,22 @@ export default struct Passwordinfo {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 1
+                }
+              })
               .onClick(() => {
                 copy(this.mfaValue)
               })
@@ -230,27 +257,36 @@ export default struct Passwordinfo {
               Row() {
                 Text(item.type)
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.value)
                   .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 2
+                }
+              })
               .bindMenu([
                 {
                   value: '打开',
@@ -283,7 +319,6 @@ export default struct Passwordinfo {
             .fontWeight(FontWeight.Medium)
         }
         .margin({
-          bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
       }
@@ -304,7 +339,7 @@ export default struct Passwordinfo {
         }
       }
       .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
     }
     .padding({

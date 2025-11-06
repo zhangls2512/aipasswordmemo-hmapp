@@ -357,6 +357,14 @@ export default struct Updatepassword {
                 preferType: this.preferType,
                 title: {
                   title: '密码随机生成'
+                },
+                onAppear: () => {
+                  this.context.eventHub.on('inputPassword', (password: string) => {
+                    this.infoValue = password
+                  })
+                },
+                onDisappear: () => {
+                  this.context.eventHub.off('inputPassword')
                 }
               })
             TextInput({
@@ -567,24 +575,25 @@ export default struct Updatepassword {
                 if (this.getCurrentInfoType() !== '图标') {
                   Text(item)
                     .enableAutoSpacing(true)
-                    .width('87%')
-                  Blank()
-                    .width('5%')
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                 }
                 if (this.getCurrentInfoType() === '图标') {
                   Image(item)
                     .copyOption(CopyOptions.LocalDevice)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                     .width('10%')
                     .onError((err) => {
                       promptAction.openToast({
                         message: '发生错误，错误信息：' + err.message
                       })
                     })
-                  Blank()
-                    .width('82%')
                 }
-                Blank()
-                  .width('5%')
                 Image($r('app.media.add'))
                   .width('8%')
                   .onClick(() => {
@@ -821,39 +830,34 @@ export default struct Updatepassword {
                   })
               }
               .alignItems(HorizontalAlign.Start)
-              .width('65%')
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
 
-              Blank()
-                .width('5%')
-              if (index === 0) {
-                Blank()
-                  .width('11%')
-              }
-              if (index === this.passwordInfoArray.length - 1) {
-                Blank()
-                  .width('11%')
-              }
               if (index !== 0) {
                 Image($r('app.media.up'))
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                   .width('8%')
                   .onClick(() => {
                     const temp = this.passwordInfoArray[index]
                     this.passwordInfoArray[index] = this.passwordInfoArray[index - 1]
                     this.passwordInfoArray[index - 1] = temp
                   })
-                Blank()
-                  .width('3%')
               }
               if (index !== this.passwordInfoArray.length - 1) {
                 Image($r('app.media.down'))
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                   .width('8%')
                   .onClick(() => {
                     const temp = this.passwordInfoArray[index]
                     this.passwordInfoArray[index] = this.passwordInfoArray[index + 1]
                     this.passwordInfoArray[index + 1] = temp
                   })
-                Blank()
-                  .width('3%')
               }
               Image($r('app.media.delete'))
                 .width('8%')
@@ -907,9 +911,10 @@ export default struct Updatepassword {
                 Text(item.value)
                   .enableAutoSpacing(true)
                   .fontColor(item.color)
-                  .width('87%')
-                Blank()
-                  .width('5%')
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.add'))
                   .width('8%')
                   .onClick(() => {
@@ -965,38 +970,33 @@ export default struct Updatepassword {
             Row() {
               Text(item)
                 .enableAutoSpacing(true)
-                .width('65%')
-              Blank()
-                .width('5%')
-              if (index === 0) {
-                Blank()
-                  .width('11%')
-              }
-              if (index === this.passwordTagArray.length - 1) {
-                Blank()
-                  .width('11%')
-              }
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               if (index !== 0) {
                 Image($r('app.media.up'))
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                   .width('8%')
                   .onClick(() => {
                     const temp = this.passwordTagArray[index]
                     this.passwordTagArray[index] = this.passwordTagArray[index - 1]
                     this.passwordTagArray[index - 1] = temp
                   })
-                Blank()
-                  .width('3%')
               }
               if (index !== this.passwordTagArray.length - 1) {
                 Image($r('app.media.down'))
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                   .width('8%')
                   .onClick(() => {
                     const temp = this.passwordTagArray[index]
                     this.passwordTagArray[index] = this.passwordTagArray[index + 1]
                     this.passwordTagArray[index + 1] = temp
                   })
-                Blank()
-                  .width('3%')
               }
               Image($r('app.media.delete'))
                 .width('8%')
@@ -1024,13 +1024,17 @@ export default struct Updatepassword {
             .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
-              left: 12
+              left: 12,
+              right: 12
             })
           Column() {
             Row() {
               Text('常用信息')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Toggle({
                 type: ToggleType.Switch,
                 isOn: this.autoNewInfo!!
@@ -1048,7 +1052,10 @@ export default struct Updatepassword {
             Row() {
               Text('标签')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Toggle({
                 type: ToggleType.Switch,
                 isOn: this.autoNewTag!!
@@ -1074,7 +1081,10 @@ export default struct Updatepassword {
             Row() {
               Text('云备份')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Toggle({
                 type: ToggleType.Switch,
                 isOn: this.cloudBackup!!
@@ -1192,9 +1202,6 @@ export default struct Updatepassword {
       this.passwordName = passwordInfo.name
       this.passwordInfoArray = passwordInfo.info
       this.passwordTagArray = passwordInfo.tag.map(item => item.value)
-      this.context.eventHub.on('inputPassword', (password: string) => {
-        this.infoValue = password
-      })
       const res = await getCloudServiceStatus()
       const key = getKey()
       if (!res) {

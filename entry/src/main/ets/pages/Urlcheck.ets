@@ -56,9 +56,10 @@ export default struct Urlcheck {
           Column() {
             Row() {
               Text(item)
-                .width('87%')
-              Blank()
-                .width('5%')
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.delete'))
                 .width('8%')
                 .onClick(() => {
@@ -117,32 +118,29 @@ export default struct Urlcheck {
           Column() {
             Row() {
               Text(item.url)
-                .width('80%')
-              Blank()
-                .width('5%')
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               if (item.threat === safetyDetect.UrlThreatType.NORMAL) {
                 Text('安全')
                   .fontColor(Color.Green)
                   .textAlign(TextAlign.End)
-                  .width('15%')
               }
               if (item.threat === safetyDetect.UrlThreatType.MALWARE) {
                 Text('恶意')
                   .fontColor(Color.Red)
                   .textAlign(TextAlign.End)
-                  .width('15%')
               }
               if (item.threat === safetyDetect.UrlThreatType.PHISHING) {
                 Text('钓鱼')
                   .fontColor(Color.Orange)
                   .textAlign(TextAlign.End)
-                  .width('15%')
               }
               if (item.threat === safetyDetect.UrlThreatType.OTHERS) {
                 Text('其他')
                   .fontColor(Color.Grey)
                   .textAlign(TextAlign.End)
-                  .width('15%')
               }
             }
             .borderRadius(12)

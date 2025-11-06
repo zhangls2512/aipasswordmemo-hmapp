@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { window } from '@kit.ArkUI'
-import { deviceInfo } from '@kit.BasicServicesKit'
+import { display, window } from '@kit.ArkUI'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { get, getAccountInfo, remove } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -19,6 +18,7 @@ import Vip from './Vip'
 export default struct Me {
   @Provider() isShowLoginSheet: boolean = false
   @Provider() isShowCloudserviceSheet: boolean = false
+  @Local preferType: number = 1
   @Local isShowVipSheet: boolean = false
   @Local isShowPasswordcheckSheet: boolean = false
   @Local isShowPasswordgenerateSheet: boolean = false
@@ -29,8 +29,8 @@ export default struct Me {
   @Local endDate: string = ''
   @Local cloudService: boolean = false
   @Local cloudServiceLoading: boolean = false
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  preferType = 1
 
   async get() {
     const accountInfo = await getAccountInfo()
@@ -95,17 +95,20 @@ export default struct Me {
               Text('登录')
                 .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                 .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
             }
             if (this.uid) {
               if (!this.email) {
                 Text('未绑定邮箱')
                   .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                   .fontWeight(FontWeight.Bold)
+                  .layoutWeight(1)
               }
               if (this.email) {
                 Text(this.email)
                   .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                   .fontWeight(FontWeight.Bold)
+                  .layoutWeight(1)
               }
             }
           }
@@ -113,13 +116,22 @@ export default struct Me {
           .padding(12)
           .stateStyles({
             normal: {
-              .backgroundColor($r('sys.color.comp_background_primary'))
+              .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                $r('sys.color.comp_background_primary'))
             },
             pressed: {
               .backgroundColor($r('sys.color.comp_background_secondary'))
             }
           })
           .width('100%')
+          .onHover((isHover) => {
+            if (!isHover) {
+              this.hoverId = -1
+            }
+            if (isHover) {
+              this.hoverId = 0
+            }
+          })
           .onClick(() => {
             if (!this.uid) {
               this.isShowLoginSheet = true
@@ -157,22 +169,34 @@ export default struct Me {
             Row() {
               Text('UID')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Text(this.uid)
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_primary'))
+                .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.comp_background_primary'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 1
+              }
+            })
             .onClick(() => {
               copy(this.uid)
             })
@@ -185,13 +209,15 @@ export default struct Me {
             Row() {
               Text('登录到期时间：' + this.endDate)
                 .fontWeight(FontWeight.Medium)
-                .width('75%')
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Text('去修改')
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
                 .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                 })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -202,13 +228,22 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_primary'))
+                .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.comp_background_primary'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 2
+              }
+            })
             .onClick(() => {
               openLink('https://www.zhangls2512.cn/product/account/info')
             })
@@ -222,14 +257,17 @@ export default struct Me {
               Text('云服务')
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               if (!this.cloudServiceLoading) {
                 if (!this.cloudService) {
                   Text('未开通')
                     .fontColor($r('sys.color.warning'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                     })
                 }
                 if (this.cloudService) {
@@ -237,7 +275,7 @@ export default struct Me {
                     .fontColor($r('sys.color.font_emphasize'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                     })
                 }
               }
@@ -245,7 +283,7 @@ export default struct Me {
                 LoadingProgress()
                   .height(14)
                   .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                   })
                   .width(14)
               }
@@ -258,13 +296,22 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_primary'))
+                .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.comp_background_primary'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 3
+              }
+            })
             .onClick(() => {
               this.isShowCloudserviceSheet = true
             })
@@ -285,7 +332,10 @@ export default struct Me {
                 Text('会员中心')
                   .fontColor('#FFD700')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -295,13 +345,22 @@ export default struct Me {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.comp_background_primary'))
+                  .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.comp_background_primary'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.comp_background_secondary'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 4
+                }
+              })
               .onClick(() => {
                 this.isShowVipSheet = true
               })
@@ -324,7 +383,8 @@ export default struct Me {
             .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
-              left: 12
+              left: 12,
+              right: 12
             })
           Column() {
             Row() {
@@ -336,7 +396,10 @@ export default struct Me {
                 .width(24)
               Text('安全检查')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -346,13 +409,22 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_primary'))
+                .backgroundColor(this.hoverId === 5 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.comp_background_primary'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 5
+              }
+            })
             .onClick(() => {
               this.isShowPasswordcheckSheet = true
             })
@@ -392,7 +464,10 @@ export default struct Me {
                 .width(24)
               Text('随机生成')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -402,13 +477,22 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_primary'))
+                .backgroundColor(this.hoverId === 6 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.comp_background_primary'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 6
+              }
+            })
             .onClick(() => {
               this.isShowPasswordgenerateSheet = true
             })
@@ -451,7 +535,8 @@ export default struct Me {
             .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
-              left: 12
+              left: 12,
+              right: 12
             })
           Column() {
             Row() {
@@ -464,7 +549,10 @@ export default struct Me {
               Text('恶意URL检测')
                 .enableAutoSpacing(true)
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -474,13 +562,22 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.comp_background_primary'))
+                .backgroundColor(this.hoverId === 7 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.comp_background_primary'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 7
+              }
+            })
             .onClick(() => {
               this.isShowUrlcheckSheet = true
             })
@@ -513,7 +610,10 @@ export default struct Me {
               .width(24)
             Text('设置')
               .fontWeight(FontWeight.Medium)
-            Blank()
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
             Image($r('app.media.right'))
               .fillColor($r('sys.color.icon_fourth'))
               .height(12)
@@ -523,13 +623,22 @@ export default struct Me {
           .padding(12)
           .stateStyles({
             normal: {
-              .backgroundColor($r('sys.color.comp_background_primary'))
+              .backgroundColor(this.hoverId === 8 ? $r('sys.color.interactive_hover') :
+                $r('sys.color.comp_background_primary'))
             },
             pressed: {
               .backgroundColor($r('sys.color.comp_background_secondary'))
             }
           })
           .width('100%')
+          .onHover((isHover) => {
+            if (!isHover) {
+              this.hoverId = -1
+            }
+            if (isHover) {
+              this.hoverId = 8
+            }
+          })
           .onClick(() => {
             this.isShowSettingSheet = true
           })
@@ -592,12 +701,28 @@ export default struct Me {
     }
     .padding({
       left: $r('sys.float.ohos_id_max_padding_start'),
-      right: $r('sys.float.ohos_id_max_padding_end')
+      right: $r('sys.float.ohos_id_max_padding_end'),
+      top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(() => {
-      if (deviceInfo.deviceType === 'phone') {
+      const currentOrientation = display.getDefaultDisplaySync().orientation
+      if (currentOrientation === display.Orientation.PORTRAIT ||
+        currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
         this.preferType = 0
       }
+      if (currentOrientation === display.Orientation.LANDSCAPE ||
+        currentOrientation === display.Orientation.LANDSCAPE_INVERTED) {
+        this.preferType = 1
+      }
+      display.on('change', (displayId) => {
+        const orientation = display.getDisplayByIdSync(displayId).orientation
+        if (orientation === display.Orientation.PORTRAIT || orientation === display.Orientation.PORTRAIT_INVERTED) {
+          this.preferType = 0
+        }
+        if (orientation === display.Orientation.LANDSCAPE || orientation === display.Orientation.LANDSCAPE_INVERTED) {
+          this.preferType = 1
+        }
+      })
       this.context.eventHub.on('refreshMe', () => {
         this.get()
       })
@@ -605,6 +730,7 @@ export default struct Me {
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshMe')
+      display.off('change')
     })
   }
 }

@@ -268,21 +268,24 @@ export default struct Filterpassword {
                 if (this.getCurrentInfoType() !== '图标') {
                   Text(item)
                     .enableAutoSpacing(true)
-                    .width('87%')
-                  Blank()
-                    .width('5%')
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                 }
                 if (this.getCurrentInfoType() === '图标') {
                   Image(item)
                     .copyOption(CopyOptions.LocalDevice)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                     .width('10%')
                     .onError((err) => {
                       promptAction.openToast({
                         message: '发生错误，错误信息：' + err.message
                       })
                     })
-                  Blank()
-                    .width('82%')
                 }
                 Image($r('app.media.add'))
                   .width('8%')
@@ -370,10 +373,11 @@ export default struct Filterpassword {
                   })
               }
               .alignItems(HorizontalAlign.Start)
-              .width('87%')
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
 
-              Blank()
-                .width('5%')
               Image($r('app.media.delete'))
                 .width('8%')
                 .onClick(() => {
@@ -426,9 +430,10 @@ export default struct Filterpassword {
                 Text(item.value)
                   .enableAutoSpacing(true)
                   .fontColor(item.color)
-                  .width('87%')
-                Blank()
-                  .width('5%')
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.add'))
                   .width('8%')
                   .onClick(() => {
@@ -484,9 +489,10 @@ export default struct Filterpassword {
             Row() {
               Text(item)
                 .enableAutoSpacing(true)
-                .width('87%')
-              Blank()
-                .width('5%')
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.delete'))
                 .width('8%')
                 .onClick(() => {
