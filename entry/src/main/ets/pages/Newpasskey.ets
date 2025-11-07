@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { util } from '@kit.ArkTS'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -35,7 +35,13 @@ struct Newpasskey {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                Column() {
+                Flex({
+                  wrap: FlexWrap.Wrap,
+                  space: {
+                    main: LengthMetrics.vp(8),
+                    cross: LengthMetrics.vp(8)
+                  }
+                }) {
                   Row() {
                     Radio({
                       value: 'mfa',
@@ -63,11 +69,7 @@ struct Newpasskey {
                       })
                     Text('邮箱验证码')
                   }
-                  .margin({
-                    top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                  })
                 }
-                .alignItems(HorizontalAlign.Start)
                 .layoutWeight(1)
               }
 

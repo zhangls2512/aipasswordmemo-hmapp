@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { get, getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -101,7 +101,13 @@ struct Huaweiaccount {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                Column() {
+                Flex({
+                  wrap: FlexWrap.Wrap,
+                  space: {
+                    main: LengthMetrics.vp(8),
+                    cross: LengthMetrics.vp(8)
+                  }
+                }) {
                   Row() {
                     Radio({
                       value: 'mfa',
@@ -129,11 +135,7 @@ struct Huaweiaccount {
                       })
                     Text('邮箱验证码')
                   }
-                  .margin({
-                    top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                  })
                 }
-                .alignItems(HorizontalAlign.Start)
                 .layoutWeight(1)
               }
 

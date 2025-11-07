@@ -1,7 +1,7 @@
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { util } from '@kit.ArkTS'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { netBoost } from '@kit.NetworkBoostKit'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
 import { set } from '../common/Accesstoken'
@@ -76,7 +76,13 @@ export default struct Login {
               .margin({
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
-            Column() {
+            Flex({
+              wrap: FlexWrap.Wrap,
+              space: {
+                main: LengthMetrics.vp(8),
+                cross: LengthMetrics.vp(8)
+              }
+            }) {
               Row() {
                 Radio({
                   value: 'password',
@@ -89,9 +95,9 @@ export default struct Login {
                     }
                   })
                 Text('密码')
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
-                  })
+              }
+
+              Row() {
                 Radio({
                   value: 'mfa',
                   group: 'type'
@@ -118,11 +124,7 @@ export default struct Login {
                   })
                 Text('邮箱验证码')
               }
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-              })
             }
-            .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
           }
 
