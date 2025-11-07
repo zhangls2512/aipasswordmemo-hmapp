@@ -261,6 +261,74 @@ export default class EntryAbility extends UIAbility {
       allowRebuild: true
     })
     tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag (id INTEGER PRIMARY KEY AUTOINCREMENT, value, color, updateTime, cloudBackupTime)')
+    passwordRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
+      for (let i = 0; i < deviceIds.length; i++) {
+        const tableName = await passwordRdbStore.obtainDistributedTableName(deviceIds[i], 'password')
+        const predicates = new relationalStore.RdbPredicates(tableName)
+        const resultSet = await passwordRdbStore.query(predicates)
+        const idIndex = resultSet.getColumnIndex('id')
+        const nameIndex = resultSet.getColumnIndex('name')
+        const infoIndex = resultSet.getColumnIndex('info')
+        const tagIndex = resultSet.getColumnIndex('tag')
+        const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+        const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+        while (resultSet.goToNextRow()) {
+          passwordRdbStore.insertSync('password', {
+            id: resultSet.getValue(idIndex),
+            name: String(resultSet.getValue(nameIndex)),
+            info: resultSet.getValue(infoIndex),
+            tag: resultSet.getValue(tagIndex),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+        }
+        resultSet.close()
+      }
+    })
+    infoRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
+      for (let i = 0; i < deviceIds.length; i++) {
+        const tableName = await passwordRdbStore.obtainDistributedTableName(deviceIds[i], 'info')
+        const predicates = new relationalStore.RdbPredicates(tableName)
+        const resultSet = await passwordRdbStore.query(predicates)
+        const idIndex = resultSet.getColumnIndex('id')
+        const typeIndex = resultSet.getColumnIndex('type')
+        const valueIndex = resultSet.getColumnIndex('value')
+        const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+        const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+        while (resultSet.goToNextRow()) {
+          passwordRdbStore.insertSync('info', {
+            id: resultSet.getValue(idIndex),
+            type: String(resultSet.getValue(typeIndex)),
+            value: String(resultSet.getValue(valueIndex)),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+        }
+        resultSet.close()
+      }
+    })
+    tagRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
+      for (let i = 0; i < deviceIds.length; i++) {
+        const tableName = await passwordRdbStore.obtainDistributedTableName(deviceIds[i], 'tag')
+        const predicates = new relationalStore.RdbPredicates(tableName)
+        const resultSet = await passwordRdbStore.query(predicates)
+        const idIndex = resultSet.getColumnIndex('id')
+        const valueIndex = resultSet.getColumnIndex('value')
+        const colorIndex = resultSet.getColumnIndex('color')
+        const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+        const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+        while (resultSet.goToNextRow()) {
+          passwordRdbStore.insertSync('tag', {
+            id: resultSet.getValue(idIndex),
+            value: String(resultSet.getValue(valueIndex)),
+            color: String(resultSet.getValue(colorIndex)),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+        }
+        resultSet.close()
+      }
+    })
     appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
