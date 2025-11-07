@@ -11,6 +11,7 @@ export default struct Passwordgenerate {
   @Local uppercaseLetter: boolean = true
   @Local specialCharacter: boolean = false
   @Local password: string = ''
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   build() {
@@ -20,7 +21,10 @@ export default struct Passwordgenerate {
           Row() {
             Text('长度')
               .fontWeight(FontWeight.Medium)
-            Blank()
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
             Counter() {
               Text(String(this.length))
             }
@@ -45,7 +49,10 @@ export default struct Passwordgenerate {
           Row() {
             Text('数字')
               .fontWeight(FontWeight.Medium)
-            Blank()
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
             Toggle({
               type: ToggleType.Switch,
               isOn: this.digit!!
@@ -63,7 +70,10 @@ export default struct Passwordgenerate {
           Row() {
             Text('小写字母')
               .fontWeight(FontWeight.Medium)
-            Blank()
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
             Toggle({
               type: ToggleType.Switch,
               isOn: this.lowercaseLetter!!
@@ -81,7 +91,10 @@ export default struct Passwordgenerate {
           Row() {
             Text('大写字母')
               .fontWeight(FontWeight.Medium)
-            Blank()
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
             Toggle({
               type: ToggleType.Switch,
               isOn: this.uppercaseLetter!!
@@ -99,7 +112,10 @@ export default struct Passwordgenerate {
           Row() {
             Text('特殊符号')
               .fontWeight(FontWeight.Medium)
-            Blank()
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
             Toggle({
               type: ToggleType.Switch,
               isOn: this.specialCharacter!!
@@ -170,13 +186,22 @@ export default struct Passwordgenerate {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 0
+              }
+            })
             .onClick(() => {
               copy(this.password)
             })

@@ -23,6 +23,7 @@ struct Importkey {
               placeholder: '请输入Base64编码、长度44的AES256密钥',
               text: this.keyValue!!
             })
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .maxLength(44)
               .showCounter(true)

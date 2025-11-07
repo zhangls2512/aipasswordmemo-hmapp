@@ -20,6 +20,7 @@ export function ErrorlogBuilder() {
 @ComponentV2
 struct Errorlog {
   @Local errorLogArray: Item[] = []
+  @Local hoverId: number | string = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   get() {
@@ -163,20 +164,20 @@ struct Errorlog {
           })
           .width('100%')
         }
-        ForEach(this.errorLogArray, (item: Item) => {
+        ForEach(this.errorLogArray, (item: Item, index) => {
           ListItem() {
             Column() {
               Row() {
                 Text('类型')
                   .fontWeight(FontWeight.Medium)
-                  .width('15%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.type)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('80%')
               }
               .borderRadius(12)
               .padding(12)
@@ -190,26 +191,35 @@ struct Errorlog {
               Row() {
                 Text('内容')
                   .fontWeight(FontWeight.Medium)
-                  .width('15%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.content)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('80%')
               }
               .borderRadius(12)
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = index
+                }
+              })
               .onClick(() => {
                 copy(item.content)
               })
@@ -222,20 +232,20 @@ struct Errorlog {
               Row() {
                 Text('时间')
                   .fontWeight(FontWeight.Medium)
-                  .width('15%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.time)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('80%')
               }
               .borderRadius(12)
               .padding(12)
               .width('100%')
 
-              ForEach(item.externalLog, (externalLogItem: string) => {
+              ForEach(item.externalLog, (externalLogItem: string, logIndex) => {
                 Divider()
                   .padding({
                     left: 12,
@@ -244,8 +254,10 @@ struct Errorlog {
                 Row() {
                   Text(externalLogItem)
                     .fontWeight(FontWeight.Medium)
-                    .width('90%')
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
                     .height(12)
@@ -255,13 +267,22 @@ struct Errorlog {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor(this.hoverId === index + ',' + logIndex ? $r('sys.color.interactive_hover') :
+                      $r('sys.color.ohos_id_color_card_bg'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
                 .width('100%')
+                .onHover((isHover) => {
+                  if (!isHover) {
+                    this.hoverId = -1
+                  }
+                  if (isHover) {
+                    this.hoverId = index + ',' + logIndex
+                  }
+                })
                 .onClick(async () => {
                   const filestring = read(externalLogItem)
                   if (filestring !== 'fail') {

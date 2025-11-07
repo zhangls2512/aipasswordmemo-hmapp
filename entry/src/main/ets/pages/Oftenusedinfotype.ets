@@ -67,38 +67,33 @@ struct Oftenusedinfotype {
               Row() {
                 Text(item)
                   .enableAutoSpacing(true)
-                  .width('65%')
-                Blank()
-                  .width('5%')
-                if (index === 0) {
-                  Blank()
-                    .width('11%')
-                }
-                if (index === this.oftenUsedInfoTypeArray.length - 1) {
-                  Blank()
-                    .width('11%')
-                }
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 if (index !== 0) {
                   Image($r('app.media.up'))
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                     .width('8%')
                     .onClick(() => {
                       const temp = this.oftenUsedInfoTypeArray[index]
                       this.oftenUsedInfoTypeArray[index] = this.oftenUsedInfoTypeArray[index - 1]
                       this.oftenUsedInfoTypeArray[index - 1] = temp
                     })
-                  Blank()
-                    .width('3%')
                 }
                 if (index !== this.oftenUsedInfoTypeArray.length - 1) {
                   Image($r('app.media.down'))
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                     .width('8%')
                     .onClick(() => {
                       const temp = this.oftenUsedInfoTypeArray[index]
                       this.oftenUsedInfoTypeArray[index] = this.oftenUsedInfoTypeArray[index + 1]
                       this.oftenUsedInfoTypeArray[index + 1] = temp
                     })
-                  Blank()
-                    .width('3%')
                 }
                 Image($r('app.media.delete'))
                   .width('8%')
@@ -132,9 +127,10 @@ struct Oftenusedinfotype {
             Column() {
               Row() {
                 Text(item)
-                  .width('87%')
-                Blank()
-                  .width('5%')
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.add'))
                   .width('8%')
                   .onClick(() => {

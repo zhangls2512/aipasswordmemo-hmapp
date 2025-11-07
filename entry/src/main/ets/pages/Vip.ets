@@ -22,6 +22,7 @@ export default struct Vip {
   @Local iapStatus: boolean = false
   @Local iapStatusLoading: boolean = false
   @Local agree: boolean = false
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   accessToken = ''
@@ -200,7 +201,8 @@ export default struct Vip {
                 .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
-                  left: 12
+                  left: 12,
+                  right: 12
                 })
               Column() {
                 Column() {
@@ -216,12 +218,15 @@ export default struct Vip {
                       Text(item.name)
                         .enableAutoSpacing(true)
                         .fontWeight(FontWeight.Medium)
-                      Blank()
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
                       Text(item.price)
                         .fontColor($r('sys.color.font_secondary'))
                         .fontSize($r('sys.float.ohos_id_text_size_body2'))
                         .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                         })
                       Image($r('app.media.right'))
                         .fillColor($r('sys.color.icon_fourth'))
@@ -232,13 +237,22 @@ export default struct Vip {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor(this.hoverId === index + 4 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
                       }
                     })
                     .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = index + 4
+                      }
+                    })
                     .onClick(() => {
                       this.buyVip(item.id, item.type)
                     })
@@ -249,17 +263,13 @@ export default struct Vip {
                 .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
                 Row() {
-                  Column() {
-                    Toggle({
-                      type: ToggleType.Checkbox,
-                      isOn: this.agree!!
-                    })
-                  }
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  Toggle({
+                    type: ToggleType.Checkbox,
+                    isOn: this.agree!!
                   })
-                  .width('10%')
-
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Text() {
                     Span('已阅读并同意')
                     Span('《轩铭密码智能备忘录会员服务协议》')
@@ -276,7 +286,7 @@ export default struct Vip {
                     Span('。')
                   }
                   .fontSize($r('sys.float.ohos_id_text_size_body3'))
-                  .width('85%')
+                  .layoutWeight(1)
                 }
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -314,14 +324,18 @@ export default struct Vip {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               if (this.iapStatus) {
                 Row() {
                   Text('订阅管理')
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
                     .height(12)
@@ -331,13 +345,22 @@ export default struct Vip {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                      $r('sys.color.ohos_id_color_card_bg'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
                 .width('100%')
+                .onHover((isHover) => {
+                  if (!isHover) {
+                    this.hoverId = -1
+                  }
+                  if (isHover) {
+                    this.hoverId = 0
+                  }
+                })
                 .onClick(() => {
                   const uiWindowParameter: iap.UIWindowParameter = {
                     windowScreenMode: iap.WindowScreenMode.DIALOG_BOX
@@ -355,7 +378,10 @@ export default struct Vip {
                 Text('邀请新用户，免费得会员')
                   .fontColor($r('sys.color.font_emphasize'))
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -365,13 +391,22 @@ export default struct Vip {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 1
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Invite'
@@ -387,7 +422,10 @@ export default struct Vip {
                 Text('兑换码')
                   .fontColor(Color.Red)
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -397,13 +435,22 @@ export default struct Vip {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 2
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Vipcode'
@@ -418,7 +465,10 @@ export default struct Vip {
               Row() {
                 Text('开通记录')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -428,13 +478,22 @@ export default struct Vip {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 3
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Viplog'
