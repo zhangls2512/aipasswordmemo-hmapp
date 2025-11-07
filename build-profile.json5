@@ -5,12 +5,12 @@
         "name": "release",
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "D:/harmonyproject/轩铭密码智能备忘录应用/内部文件/签名材料/keystore.p12",
+          "storeFile": "D:/harmonyproject/内部文件/发布签名材料/keystore.p12",
           "storePassword": "000000195C12DD78581766951C4A14A8EF547FA599ED4F3FADCD2A726A6754A39C4C94E2BE42310E9F",
           "keyAlias": "release",
           "keyPassword": "0000001984A06F2DD1122ECB427C9217BA8AB41E9F05DD1E930B56A57A794CDCDDE59C83C4D9B71366",
-          "certpath": "D:/harmonyproject/轩铭密码智能备忘录应用/内部文件/签名材料/release.cer",
-          "profile": "D:/harmonyproject/轩铭密码智能备忘录应用/内部文件/签名材料/release.p7b",
+          "certpath": "D:/harmonyproject/内部文件/发布签名材料/zhangxm.cer",
+          "profile": "D:/harmonyproject/内部文件/发布签名材料/aipasswordmemo.p7b",
           "signAlg": "SHA256withECDSA"
         }
       },

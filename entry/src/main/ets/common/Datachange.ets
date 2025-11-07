@@ -151,7 +151,7 @@ export async function newInfo(data: InfoInput) {
   if (resultSet.goToNextRow()) {
     resultSet.close()
     promptAction.openToast({
-      message: '新增失败：已存在'
+      message: '新增失败，原因：已存在'
     })
     return 'fail'
   }
@@ -191,7 +191,7 @@ export async function newInfo(data: InfoInput) {
 export async function updateInfo(id: number, data: InfoInput) {
   if (data.type === '图标') {
     promptAction.openToast({
-      message: '修改失败：图标类型不支持'
+      message: '修改失败，原因：图标类型不支持'
     })
     return 'fail'
   }
@@ -209,7 +209,7 @@ export async function updateInfo(id: number, data: InfoInput) {
   if (resultSeta.goToNextRow()) {
     resultSeta.close()
     promptAction.openToast({
-      message: '修改失败：已存在'
+      message: '修改失败，原因：已存在'
     })
     return 'fail'
   }
@@ -278,7 +278,7 @@ export async function newTag(data: TagInput) {
   if (resultSet.goToNextRow()) {
     resultSet.close()
     promptAction.openToast({
-      message: '新增失败：已存在'
+      message: '新增失败，原因：已存在'
     })
     return 'fail'
   }
@@ -330,7 +330,7 @@ export async function updateTag(id: number, data: TagInput) {
   if (resultSeta.goToNextRow() && resultSeta.getValue(colorIndex) as string === data.color) {
     resultSeta.close()
     promptAction.openToast({
-      message: '修改失败：已存在'
+      message: '修改失败，原因：已存在'
     })
     return 'fail'
   }

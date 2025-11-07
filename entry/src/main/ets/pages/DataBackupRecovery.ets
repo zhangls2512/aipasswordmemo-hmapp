@@ -17,6 +17,7 @@ struct DataBackupRecovery {
   @Local pauseAutoBackupWhenLowBatteryCapacityLevel: boolean = false
   @Local pauseAutoBackupWhenPowerSave: boolean = false
   @Local isBackupTables: string[] = []
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext()
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
@@ -56,7 +57,8 @@ struct DataBackupRecovery {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               ForEach(this.typeArray, (item: Type, index) => {
@@ -70,7 +72,10 @@ struct DataBackupRecovery {
                 Row() {
                   Text(item.name)
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.autoBackupTables.includes(item.value)
@@ -111,13 +116,17 @@ struct DataBackupRecovery {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('电池电量低')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.pauseAutoBackupWhenLowBatteryCapacityLevel!!
@@ -139,7 +148,10 @@ struct DataBackupRecovery {
               Row() {
                 Text('系统开启 (超级) 省电模式')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.pauseAutoBackupWhenPowerSave!!
@@ -171,13 +183,17 @@ struct DataBackupRecovery {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('密码')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -187,13 +203,22 @@ struct DataBackupRecovery {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 0
+                }
+              })
               .onClick(async () => {
                 await backupTable('password')
                 this.getSetting()
@@ -207,7 +232,10 @@ struct DataBackupRecovery {
               Row() {
                 Text('常用信息')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -217,13 +245,22 @@ struct DataBackupRecovery {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 1
+                }
+              })
               .onClick(async () => {
                 await backupTable('info')
                 this.getSetting()
@@ -237,7 +274,10 @@ struct DataBackupRecovery {
               Row() {
                 Text('标签')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -247,13 +287,22 @@ struct DataBackupRecovery {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 2
+                }
+              })
               .onClick(async () => {
                 await backupTable('tag')
                 this.getSetting()
@@ -278,7 +327,8 @@ struct DataBackupRecovery {
                 .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
-                  left: 12
+                  left: 12,
+                  right: 12
                 })
               Column() {
                 ForEach(this.isBackupTables, (item: string, index) => {
@@ -295,7 +345,10 @@ struct DataBackupRecovery {
                         item === 'tag' ? '标签' :
                           'undefined')
                       .fontWeight(FontWeight.Medium)
-                    Blank()
+                      .layoutWeight(1)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
                       .height(12)
@@ -305,13 +358,22 @@ struct DataBackupRecovery {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                        $r('sys.color.ohos_id_color_card_bg'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
                   .width('100%')
+                  .onHover((isHover) => {
+                    if (!isHover) {
+                      this.hoverId = -1
+                    }
+                    if (isHover) {
+                      this.hoverId = 3
+                    }
+                  })
                   .onClick(() => {
                     recoveryTable(item)
                   })

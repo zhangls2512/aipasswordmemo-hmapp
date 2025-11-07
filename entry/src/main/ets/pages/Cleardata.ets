@@ -41,7 +41,8 @@ export default struct Cleardata {
             .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
-              left: 12
+              left: 12,
+              right: 12
             })
           Column() {
             Row() {
@@ -49,15 +50,13 @@ export default struct Cleardata {
                 group: 'setting'
               })
                 .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .selectAll(this.allSetting!!)
                 .onChange((itemName) => {
                   this.setting = itemName.name
                 })
               Text('全部')
                 .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -73,23 +72,11 @@ export default struct Cleardata {
                 name: 'cloudbackupSetting',
                 group: 'setting'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.cloudbackupSetting!!)
-              Column() {
-                Text('云备份')
-                  .fontWeight(FontWeight.Medium)
-                Text('自动同步等')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('云备份')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -105,23 +92,11 @@ export default struct Cleardata {
                 name: 'dataSetting',
                 group: 'setting'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.dataSetting!!)
-              Column() {
-                Text('数据')
-                  .fontWeight(FontWeight.Medium)
-                Text('设备间自动同步等')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('数据')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -137,23 +112,11 @@ export default struct Cleardata {
                 name: 'commonSetting',
                 group: 'setting'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.commonSetting!!)
-              Column() {
-                Text('通用')
-                  .fontWeight(FontWeight.Medium)
-                Text('应用等')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('通用')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -169,23 +132,11 @@ export default struct Cleardata {
                 name: 'permissionSetting',
                 group: 'setting'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.permissionSetting!!)
-              Column() {
-                Text('权限')
-                  .fontWeight(FontWeight.Medium)
-                Text('写入剪贴板')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('权限')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -201,23 +152,11 @@ export default struct Cleardata {
                 name: 'debugSetting',
                 group: 'setting'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.debugSetting!!)
-              Column() {
-                Text('调试')
-                  .fontWeight(FontWeight.Medium)
-                Text('自动上传故障日志等')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('调试')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -295,7 +234,8 @@ export default struct Cleardata {
             .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
-              left: 12
+              left: 12,
+              right: 12
             })
           Column() {
             Row() {
@@ -303,15 +243,13 @@ export default struct Cleardata {
                 group: 'cache'
               })
                 .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .selectAll(this.allCache!!)
                 .onChange((itemName) => {
                   this.cache = itemName.name
                 })
               Text('全部')
                 .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -327,23 +265,11 @@ export default struct Cleardata {
                 name: 'appCache',
                 group: 'cache'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.appCache!!)
-              Column() {
-                Text('应用')
-                  .fontWeight(FontWeight.Medium)
-                Text('应用缓存')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('应用')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -359,24 +285,11 @@ export default struct Cleardata {
                 name: 'webviewCache',
                 group: 'cache'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.webviewCache!!)
-              Column() {
-                Text('Webview')
-                  .fontWeight(FontWeight.Medium)
-                Text('Webview缓存')
-                  .enableAutoSpacing(true)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('Webview')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -392,23 +305,11 @@ export default struct Cleardata {
                 name: 'invitationQrcodeCache',
                 group: 'cache'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.invitationQrcodeCache!!)
-              Column() {
-                Text('邀请二维码图片')
-                  .fontWeight(FontWeight.Medium)
-                Text('邀请二维码图片缓存')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('邀请二维码图片')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -519,7 +420,8 @@ export default struct Cleardata {
             .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
-              left: 12
+              left: 12,
+              right: 12
             })
           Column() {
             Row() {
@@ -527,15 +429,13 @@ export default struct Cleardata {
                 group: 'log'
               })
                 .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .selectAll(this.allLog!!)
                 .onChange((itemName) => {
                   this.log = itemName.name
                 })
               Text('全部')
                 .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -551,23 +451,11 @@ export default struct Cleardata {
                 name: 'errorLog',
                 group: 'log'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.errorLog!!)
-              Column() {
-                Text('故障')
-                  .fontWeight(FontWeight.Medium)
-                Text('故障日志')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('故障')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -640,7 +528,8 @@ export default struct Cleardata {
             .fontWeight(FontWeight.Medium)
             .margin({
               bottom: 6,
-              left: 12
+              left: 12,
+              right: 12
             })
           Column() {
             Row() {
@@ -648,15 +537,13 @@ export default struct Cleardata {
                 group: 'nouse'
               })
                 .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .selectAll(this.allNouse!!)
                 .onChange((itemName) => {
                   this.nouse = itemName.name
                 })
               Text('全部')
                 .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -672,24 +559,12 @@ export default struct Cleardata {
                 name: 'speakSettingNouse',
                 group: 'nouse'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.speakSettingNouse!!)
-              Column() {
-                Text('AI助手设置数据')
-                  .enableAutoSpacing(true)
-                  .fontWeight(FontWeight.Medium)
-                Text('语音播报、连续对话')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('AI助手设置数据')
+                .enableAutoSpacing(true)
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -705,23 +580,11 @@ export default struct Cleardata {
                 name: 'oldaccountNouse',
                 group: 'nouse'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.oldaccountNouse!!)
-              Column() {
-                Text('旧账号数据')
-                  .fontWeight(FontWeight.Medium)
-                Text('accessToken、登录到期时间')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('旧账号数据')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -737,23 +600,11 @@ export default struct Cleardata {
                 name: 'passwordIconNouse',
                 group: 'nouse'
               })
-                .shape(CheckBoxShape.ROUNDED_SQUARE)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
                 .select(this.passwordIconNouse!!)
-              Column() {
-                Text('无用密码图标图片')
-                  .fontWeight(FontWeight.Medium)
-                Text('无用密码图标图片文件')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    top: $r('sys.float.ohos_id_text_margin_vertical')
-                  })
-                  .width('90%')
-              }
-              .alignItems(HorizontalAlign.Start)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+              Text('无用密码图标图片')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)

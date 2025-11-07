@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { FunctionComponent, FunctionController } from '@kit.AgentFrameworkKit'
 import { updateManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
 import { call } from '@kit.TelephonyKit'
@@ -15,10 +14,9 @@ export function AboutBuilder() {
 struct About {
   @Local hasUpdate: number = -1
   @Local updateLoading: boolean = false
-  @Local isAgentSupport: boolean = false
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-  controller: FunctionController = new FunctionController()
 
   build() {
     NavDestination() {
@@ -84,15 +82,18 @@ struct About {
                   })
               }
               .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
 
-              Blank()
               if (!this.updateLoading) {
                 if (this.hasUpdate === -1) {
                   Text('检查更新')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                     })
                 }
                 if (this.hasUpdate === 0) {
@@ -100,7 +101,7 @@ struct About {
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                     })
                 }
                 if (this.hasUpdate === 1) {
@@ -108,7 +109,7 @@ struct About {
                     .fontColor($r('sys.color.font_emphasize'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
                     .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                     })
                 }
                 Image($r('app.media.right'))
@@ -126,13 +127,22 @@ struct About {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 0
+              }
+            })
             .onClick(async () => {
               try {
                 if (this.hasUpdate !== 1) {
@@ -165,7 +175,7 @@ struct About {
               Column() {
                 Text('更新日志')
                   .fontWeight(FontWeight.Medium)
-                Text('https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp')
+                Text('https://www.zhangls2512.cn/product/updatelog/aipasswordmemo')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -173,8 +183,11 @@ struct About {
                   })
               }
               .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
 
-              Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -184,17 +197,26 @@ struct About {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 1
+              }
+            })
             .onClick(() => {
               this.pageInfos.pushPath({
                 name: 'Webview',
-                param: 'https://www.zhangls2512.cn/product/updatelog/aipasswordmemohmapp'
+                param: 'https://www.zhangls2512.cn/product/updatelog/aipasswordmemo'
               })
             })
 
@@ -215,8 +237,11 @@ struct About {
                   })
               }
               .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
 
-              Blank()
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -226,13 +251,22 @@ struct About {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 2
+              }
+            })
             .onClick(() => {
               openLink('https://docs.qq.com/doc/p/ad13731bb5a5562d7e7b11ee738928c6f1974b51')
             })
@@ -245,7 +279,10 @@ struct About {
             Row() {
               Text('应用详情')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -255,13 +292,22 @@ struct About {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 3
+              }
+            })
             .onClick(() => {
               this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo')
             })
@@ -274,7 +320,10 @@ struct About {
             Row() {
               Text('评论应用')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -284,13 +333,22 @@ struct About {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 4
+              }
+            })
             .onClick(() => {
               this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
             })
@@ -303,7 +361,10 @@ struct About {
             Row() {
               Text('意见反馈')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -313,13 +374,22 @@ struct About {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 5 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 5
+              }
+            })
             .onClick(() => {
               this.pageInfos.pushPath({
                 name: 'Feedback'
@@ -334,26 +404,6 @@ struct About {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
-        if (this.isAgentSupport) {
-          ListItem() {
-            FunctionComponent({
-              agentId: 'agentdf468e04a1474579bbf0653f19c929ee',
-              options: {
-                title: '智能客服'
-              },
-              controller: this.controller,
-              onError: (err) => {
-                promptAction.openToast({
-                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                })
-              }
-            })
-          }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-          })
-          .width('100%')
-        }
         ListItem() {
           Column() {
             Text('人工客服')
@@ -362,7 +412,8 @@ struct About {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
@@ -377,8 +428,11 @@ struct About {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -388,13 +442,22 @@ struct About {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 6 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 6
+                }
+              })
               .onClick(() => {
                 call.makeCall('18846496985')
               })
@@ -416,8 +479,11 @@ struct About {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -427,13 +493,22 @@ struct About {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 7 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 7
+                }
+              })
               .onClick(() => {
                 this.context.startAbilityByType('mail', {
                   email: ['2300990296@qq.com']
@@ -460,8 +535,11 @@ struct About {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -471,13 +549,22 @@ struct About {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 8 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 8
+                }
+              })
               .onClick(() => {
                 copy('gerenyinsi_z07x17m')
               })
@@ -500,8 +587,11 @@ struct About {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -511,13 +601,22 @@ struct About {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 9 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 9
+                }
+              })
               .onClick(() => {
                 openLink('https://qm.qq.com/q/8Ugei32784')
               })
@@ -540,8 +639,11 @@ struct About {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -551,13 +653,22 @@ struct About {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 10 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 10
+                }
+              })
               .onClick(() => {
                 this.context.openLink('https://www.chuckfang.com/MeoW/appLinking?channelId=e734229e5e9141ba83682e72ecd9df41')
               })
@@ -580,7 +691,8 @@ struct About {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
@@ -595,8 +707,11 @@ struct About {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -606,13 +721,22 @@ struct About {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 11 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 11
+                }
+              })
               .onClick(() => {
                 openLink('https://www.zhangls2512.cn/index')
               })
@@ -634,8 +758,11 @@ struct About {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -645,13 +772,22 @@ struct About {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 12 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 12
+                }
+              })
               .onClick(() => {
                 openLink('https://space.bilibili.com/448824492')
               })
@@ -673,8 +809,11 @@ struct About {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -684,13 +823,22 @@ struct About {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 13 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 13
+                }
+              })
               .onClick(() => {
                 openLink('https://gitcode.com/zhangls2512/aipasswordmemo-hmapp')
               })
@@ -737,16 +885,8 @@ struct About {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('关于')
-    .onReady(async (context) => {
+    .onReady((context) => {
       this.pageInfos = context.pathStack
-      try {
-        this.isAgentSupport =
-          await this.controller.isAgentSupport(this.context, 'agentdf468e04a1474579bbf0653f19c929ee')
-      } catch (err) {
-        promptAction.openToast({
-          message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-        })
-      }
     })
   }
 }

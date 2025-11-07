@@ -1,6 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LengthMetrics, LoadingDialog } from '@kit.ArkUI'
-import { deviceInfo } from '@kit.BasicServicesKit'
+import { display, LengthMetrics, LoadingDialog } from '@kit.ArkUI'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -14,14 +13,15 @@ import UpdateTag from './Updatetag'
 export default struct TagPage {
   @Provider() isShowNewSheet: boolean = false
   @Provider() isShowUpdateSheet: boolean = false
+  @Local preferType: number = 1
   @Local tagArray: Tag[] = []
   @Local loading: boolean = false
   @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Tag[] = []
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  preferType = 1
   orderColumn = 'updateTime'
   updateId = 0
 
@@ -155,45 +155,90 @@ export default struct TagPage {
   }
 
   build() {
-    Refresh({
-      refreshing: $$this.loading
-    }) {
-      List() {
+    Scroll() {
+      Column() {
         if (this.multipleSelect) {
-          ListItem() {
-            Row() {
+          Row() {
+            Column() {
+              Image($r('app.media.cancel'))
+            }
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .margin({
+              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+            })
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .onClick(() => {
+              this.multipleSelect = false
+              this.multipleSelectArray = []
+            })
+
+            Text('已选择 ' + this.multipleSelectArray.length + ' 项')
+              .fontSize(20)
+              .fontWeight(FontWeight.Bold)
+              .layoutWeight(1)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
+            Column() {
+              Image($r('app.media.delete'))
+            }
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .onClick(async () => {
+              const promptAction = this.getUIContext().getPromptAction()
+              const data = await promptAction.showDialog({
+                title: '提示',
+                message: '删除成功后无法恢复，确定删除？',
+                buttons: [
+                  {
+                    text: '取消',
+                    color: $r('sys.color.font_primary')
+                  },
+                  {
+                    text: '删除',
+                    color: $r('sys.color.warning')
+                  }
+                ]
+              })
+              if (data.index === 1) {
+                const promises = this.multipleSelectArray.map(async (item) => {
+                  await deleteData('tag', item.id)
+                })
+                await Promise.all(promises)
+                this.multipleSelect = false
+                this.multipleSelectArray = []
+                this.loading = true
+              }
+            })
+
+            if (this.enableCloudBackup) {
               Column() {
-                Image($r('app.media.cancel'))
+                Image($r('app.media.cloud'))
               }
               .backgroundColor($r('sys.color.interactive_hover'))
               .borderRadius(20)
               .height(40)
               .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
-              .padding(11)
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
-              .width(40)
-              .onClick(() => {
-                this.multipleSelect = false
-                this.multipleSelectArray = []
-              })
-
-              Text('已选择 ' + this.multipleSelectArray.length + ' 项')
-                .fontSize(20)
-                .fontWeight(FontWeight.Bold)
-              Blank()
-              Column() {
-                Image($r('app.media.delete'))
-              }
-              .backgroundColor($r('sys.color.interactive_hover'))
-              .borderRadius(20)
-              .height(40)
               .padding(11)
               .visualEffect(new hdsEffect.HdsEffectBuilder()
                 .pointLight({
@@ -203,291 +248,278 @@ export default struct TagPage {
                 .buildEffect())
               .width(40)
               .onClick(async () => {
+                for (let i = 0; i < this.multipleSelectArray.length; i++) {
+                  const dialogControllerProgress = new CustomDialogController({
+                    builder: LoadingDialog({
+                      content: '批量云备份中，进度：' + i + '/' + this.multipleSelectArray.length
+                    })
+                  })
+                  dialogControllerProgress.open()
+                  await this.cloudBackup(this.multipleSelectArray[i])
+                  dialogControllerProgress.close()
+                }
+                this.multipleSelect = false
+                this.multipleSelectArray = []
+                this.loading = true
+              })
+            }
+          }
+          .margin({
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+          .width('100%')
+        }
+        if (!this.multipleSelect) {
+          Row() {
+            Column() {
+              Image($r('app.media.new_white'))
+            }
+            .backgroundColor($r('sys.color.background_emphasize'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .width(40)
+            .onClick(() => {
+              this.isShowNewSheet = true
+            })
+            .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
+              height: SheetSize.FIT_CONTENT,
+              preferType: this.preferType,
+              title: {
+                title: '新增标签'
+              },
+              onDisappear: () => {
+                this.loading = true
+              },
+              onWillDismiss: async (DismissSheetAction) => {
                 const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
-                  message: '删除成功后无法恢复，确定删除？',
+                  message: '数据尚未保存，确定退出？',
                   buttons: [
                     {
                       text: '取消',
                       color: $r('sys.color.font_primary')
                     },
                     {
-                      text: '删除',
-                      color: $r('sys.color.warning')
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
                     }
                   ]
                 })
                 if (data.index === 1) {
-                  const promises = this.multipleSelectArray.map(async (item) => {
-                    await deleteData('tag', item.id)
-                  })
-                  await Promise.all(promises)
-                  this.multipleSelect = false
-                  this.multipleSelectArray = []
-                  this.loading = true
+                  DismissSheetAction.dismiss()
                 }
-              })
+              }
+            })
 
-              if (this.enableCloudBackup) {
-                Column() {
-                  Image($r('app.media.cloud'))
-                }
-                .backgroundColor($r('sys.color.interactive_hover'))
-                .borderRadius(20)
-                .height(40)
-                .margin({
-                  left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .padding(11)
-                .visualEffect(new hdsEffect.HdsEffectBuilder()
-                  .pointLight({
-                    sourceType: hdsEffect.PointLightSourceType.SOFT,
-                    illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                  })
-                  .buildEffect())
-                .width(40)
-                .onClick(async () => {
-                  for (let i = 0; i < this.multipleSelectArray.length; i++) {
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '批量云备份中，进度：' + i + '/' + this.multipleSelectArray.length
-                      })
-                    })
-                    dialogControllerProgress.open()
-                    await this.cloudBackup(this.multipleSelectArray[i])
-                    dialogControllerProgress.close()
-                  }
-                  this.multipleSelect = false
-                  this.multipleSelectArray = []
+            Blank()
+            Column() {
+              Image($r('app.media.sort'))
+            }
+            .backgroundColor($r('sys.color.interactive_hover'))
+            .borderRadius(20)
+            .height(40)
+            .padding(11)
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
+            .width(40)
+            .bindMenu([
+              {
+                value: '按修改时间排序',
+                action: () => {
+                  this.orderColumn = 'updateTime'
                   this.loading = true
-                })
-              }
-            }
-            .width('100%')
-          }
-          .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-        }
-        if (!this.multipleSelect) {
-          ListItem() {
-            Row() {
-              Column() {
-                Image($r('app.media.new_white'))
-              }
-              .backgroundColor($r('sys.color.background_emphasize'))
-              .borderRadius(20)
-              .height(40)
-              .padding(11)
-              .width(40)
-              .onClick(() => {
-                this.isShowNewSheet = true
-              })
-              .bindSheet(this.isShowNewSheet!!, this.NewSheetBuilder(), {
-                height: SheetSize.FIT_CONTENT,
-                preferType: this.preferType,
-                title: {
-                  title: '新增标签'
-                },
-                onDisappear: () => {
+                }
+              },
+              {
+                value: '按内容排序',
+                action: () => {
+                  this.orderColumn = 'value'
                   this.loading = true
-                },
-                onWillDismiss: async (DismissSheetAction) => {
-                  const promptAction = this.getUIContext().getPromptAction()
-                  const data = await promptAction.showDialog({
-                    title: '提示',
-                    message: '数据尚未保存，确定退出？',
-                    buttons: [
-                      {
-                        text: '取消',
-                        color: $r('sys.color.font_primary')
-                      },
-                      {
-                        text: '确定',
-                        color: $r('sys.color.font_emphasize')
-                      }
-                    ]
-                  })
-                  if (data.index === 1) {
-                    DismissSheetAction.dismiss()
-                  }
                 }
-              })
-
-              Blank()
-              Column() {
-                Image($r('app.media.sort'))
               }
-              .backgroundColor($r('sys.color.interactive_hover'))
-              .borderRadius(20)
-              .height(40)
-              .padding(11)
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
-              .width(40)
-              .bindMenu([
-                {
-                  value: '按修改时间排序',
-                  action: () => {
-                    this.orderColumn = 'updateTime'
-                    this.loading = true
-                  }
-                },
-                {
-                  value: '按内容排序',
-                  action: () => {
-                    this.orderColumn = 'value'
-                    this.loading = true
-                  }
-                }
-              ], {
-                hapticFeedbackMode: HapticFeedbackMode.AUTO
-              })
-            }
-            .width('100%')
-          }
-          .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-        }
-        ListItem() {
-          Flex({
-            wrap: FlexWrap.Wrap,
-            space: {
-              main: LengthMetrics.vp(8),
-              cross: LengthMetrics.vp(8)
-            }
-          }) {
-            ForEach(this.tagArray, (item: Tag) => {
-              Column() {
-                Row() {
-                  if (this.multipleSelect) {
-                    Toggle({
-                      type: ToggleType.Checkbox,
-                      isOn: this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
-                    })
-                      .margin({
-                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                      })
-                      .onChange((isOn) => {
-                        if (!isOn) {
-                          this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                          item.id), 1)
-                        }
-                        if (isOn) {
-                          this.multipleSelectArray.push(item)
-                        }
-                      })
-                  }
-                  if (item.isCloudBackup) {
-                    Image($r('app.media.cloud'))
-                      .height(16)
-                      .margin({
-                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                      })
-                      .width(16)
-                  }
-                  Text(item.value)
-                    .enableAutoSpacing(true)
-                    .fontColor(item.color)
-                    .fontWeight(FontWeight.Medium)
-                }
-                .borderRadius(12)
-                .padding(12)
-                .stateStyles({
-                  normal: {
-                    .backgroundColor($r('sys.color.comp_background_primary'))
-                  },
-                  pressed: {
-                    .backgroundColor($r('sys.color.comp_background_secondary'))
-                  }
-                })
-                .onClick(() => {
-                  if (this.multipleSelect) {
-                    return
-                  }
-                  this.updateId = item.id
-                  this.isShowUpdateSheet = true
-                })
-                .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress | ResponseType.RightClick, {
-                  hapticFeedbackMode: HapticFeedbackMode.AUTO
-                })
-              }
-              .backgroundColor($r('sys.color.comp_background_primary'))
-              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-              .padding($r('sys.float.ohos_id_corner_radius_mark'))
+            ], {
+              hapticFeedbackMode: HapticFeedbackMode.AUTO
             })
           }
+          .margin({
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+          .width('100%')
         }
+        Refresh({
+          refreshing: $$this.loading
+        }) {
+          List() {
+            ListItem() {
+              Flex({
+                wrap: FlexWrap.Wrap,
+                space: {
+                  main: LengthMetrics.vp(8),
+                  cross: LengthMetrics.vp(8)
+                }
+              }) {
+                ForEach(this.tagArray, (item: Tag, index) => {
+                  Column() {
+                    Row() {
+                      if (this.multipleSelect) {
+                        Toggle({
+                          type: ToggleType.Checkbox,
+                          isOn: this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+                        })
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                          .onChange((isOn) => {
+                            if (!isOn) {
+                              this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                              item.id), 1)
+                            }
+                            if (isOn) {
+                              this.multipleSelectArray.push(item)
+                            }
+                          })
+                      }
+                      if (item.isCloudBackup) {
+                        Image($r('app.media.cloud'))
+                          .height(16)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                          .width(16)
+                      }
+                      Text(item.value)
+                        .enableAutoSpacing(true)
+                        .fontColor(item.color)
+                        .fontWeight(FontWeight.Medium)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.comp_background_primary'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.comp_background_secondary'))
+                      }
+                    })
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = index
+                      }
+                    })
+                    .onClick(() => {
+                      if (this.multipleSelect) {
+                        return
+                      }
+                      this.updateId = item.id
+                      this.isShowUpdateSheet = true
+                    })
+                    .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
+                      hapticFeedbackMode: HapticFeedbackMode.AUTO
+                    })
+                    .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick)
+                  }
+                  .backgroundColor($r('sys.color.comp_background_primary'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
+                })
+              }
+            }
+          }
+        }
+        .layoutWeight(1)
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
+        .onRefreshing(async () => {
+          this.tagArray = await getTagList(this.orderColumn)
+          this.loading = false
+        })
       }
+      .alignItems(HorizontalAlign.Start)
       .height('100%')
-      .padding({
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
-      })
-      .onAppear(async () => {
-        if (deviceInfo.deviceType === 'phone') {
+    }
+    .padding({
+      left: $r('sys.float.ohos_id_max_padding_start'),
+      right: $r('sys.float.ohos_id_max_padding_end'),
+      top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
+    })
+    .onAppear(async () => {
+      const currentOrientation = display.getDefaultDisplaySync().orientation
+      if (currentOrientation === display.Orientation.PORTRAIT ||
+        currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
+        this.preferType = 0
+      }
+      if (currentOrientation === display.Orientation.LANDSCAPE ||
+        currentOrientation === display.Orientation.LANDSCAPE_INVERTED) {
+        this.preferType = 1
+      }
+      display.on('change', (displayId) => {
+        const orientation = display.getDisplayByIdSync(displayId).orientation
+        if (orientation === display.Orientation.PORTRAIT || orientation === display.Orientation.PORTRAIT_INVERTED) {
           this.preferType = 0
         }
-        this.context.eventHub.on('refreshTag', async () => {
-          this.enableCloudBackup = false
-          this.loading = true
-          const cloudServiceStatus = await getCloudServiceStatus()
-          if (cloudServiceStatus && getKey()) {
-            this.enableCloudBackup = true
-          }
-        })
+        if (orientation === display.Orientation.LANDSCAPE || orientation === display.Orientation.LANDSCAPE_INVERTED) {
+          this.preferType = 1
+        }
+      })
+      this.context.eventHub.on('refreshTag', async () => {
+        this.enableCloudBackup = false
         this.loading = true
         const cloudServiceStatus = await getCloudServiceStatus()
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
       })
-      .onDisAppear(() => {
-        this.context.eventHub.off('refreshTag')
-      })
-      .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
-        height: SheetSize.FIT_CONTENT,
-        preferType: this.preferType,
-        title: {
-          title: '修改标签'
-        },
-        onDisappear: () => {
-          this.loading = true
-        },
-        onWillDismiss: async (DismissSheetAction) => {
-          const promptAction = this.getUIContext().getPromptAction()
-          const data = await promptAction.showDialog({
-            title: '提示',
-            message: '数据尚未保存，确定退出？',
-            buttons: [
-              {
-                text: '取消',
-                color: $r('sys.color.font_primary')
-              },
-              {
-                text: '确定',
-                color: $r('sys.color.font_emphasize')
-              }
-            ]
-          })
-          if (data.index === 1) {
-            DismissSheetAction.dismiss()
-          }
+      this.loading = true
+      const cloudServiceStatus = await getCloudServiceStatus()
+      if (cloudServiceStatus && getKey()) {
+        this.enableCloudBackup = true
+      }
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.off('refreshTag')
+      display.off('change')
+    })
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
+      height: SheetSize.FIT_CONTENT,
+      preferType: this.preferType,
+      title: {
+        title: '修改标签'
+      },
+      onDisappear: () => {
+        this.loading = true
+      },
+      onWillDismiss: async (DismissSheetAction) => {
+        const promptAction = this.getUIContext().getPromptAction()
+        const data = await promptAction.showDialog({
+          title: '提示',
+          message: '数据尚未保存，确定退出？',
+          buttons: [
+            {
+              text: '取消',
+              color: $r('sys.color.font_primary')
+            },
+            {
+              text: '确定',
+              color: $r('sys.color.font_emphasize')
+            }
+          ]
+        })
+        if (data.index === 1) {
+          DismissSheetAction.dismiss()
         }
-      })
-    }
-    .onRefreshing(async () => {
-      this.tagArray = await getTagList(this.orderColumn)
-      this.loading = false
+      }
     })
   }
 }

@@ -30,6 +30,7 @@ struct Tablesync {
   @Local pauseAutoSyncWhenPowerSave: boolean = false
   @Local autoSyncDevices: Item[] = []
   @Local availableDeviceArray: Item[] = []
+  @Local hoverId: number | string = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
@@ -70,7 +71,8 @@ struct Tablesync {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               ForEach(this.typeArray, (item: Type, index) => {
@@ -84,7 +86,10 @@ struct Tablesync {
                 Row() {
                   Text(item.name)
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.onTables.includes(item.value)
@@ -139,7 +144,8 @@ struct Tablesync {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               ForEach(this.typeArray, (item: Type, index) => {
@@ -153,7 +159,10 @@ struct Tablesync {
                 Row() {
                   Text(item.name)
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.autoSyncTables.includes(item.value)
@@ -195,20 +204,20 @@ struct Tablesync {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
-        ForEach(this.autoSyncDevices, (item: Item) => {
+        ForEach(this.autoSyncDevices, (item: Item, index) => {
           ListItem() {
             Column() {
               Row() {
                 Text('标识符')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.deviceId)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -222,14 +231,14 @@ struct Tablesync {
               Row() {
                 Text('名称')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.deviceName)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -243,17 +252,17 @@ struct Tablesync {
               Row() {
                 Text('类型')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(item.deviceType === 'phone' ? '手机' :
-                  item.deviceType === 'tablet' ? '平板' :
-                    item.deviceType === '2in1' ? '电脑' :
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Text(item.deviceType === 'PHONE' ? '手机' :
+                  item.deviceType === 'TABLET' ? '平板' :
+                    item.deviceType === '2IN1' ? '电脑' :
                       'undefined')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -267,14 +276,14 @@ struct Tablesync {
               Row() {
                 Text('网络标识')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.networkId)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -289,7 +298,10 @@ struct Tablesync {
                 Text('关闭自动同步')
                   .fontColor($r('sys.color.warning'))
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -299,13 +311,22 @@ struct Tablesync {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === '0,' + index ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = '0,' + index
+                }
+              })
               .onClick(() => {
                 const autoSyncDevices = this.autoSyncDevices.filter(device => device.deviceId !== item.deviceId)
                 this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
@@ -341,13 +362,17 @@ struct Tablesync {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('电池电量低')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.pauseAutoSyncWhenLowBatteryCapacityLevel!!
@@ -369,7 +394,10 @@ struct Tablesync {
               Row() {
                 Text('系统开启 (超级) 省电模式')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.pauseAutoSyncWhenPowerSave!!
@@ -415,20 +443,20 @@ struct Tablesync {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
-        ForEach(this.availableDeviceArray, (item: Item) => {
+        ForEach(this.availableDeviceArray, (item: Item, index) => {
           ListItem() {
             Column() {
               Row() {
                 Text('标识符')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.deviceId)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -442,14 +470,14 @@ struct Tablesync {
               Row() {
                 Text('名称')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.deviceName)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -463,17 +491,17 @@ struct Tablesync {
               Row() {
                 Text('类型')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
-                Text(item.deviceType === 'phone' ? '手机' :
-                  item.deviceType === 'tablet' ? '平板' :
-                    item.deviceType === '2in1' ? '电脑' :
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Text(item.deviceType === 'PHONE' ? '手机' :
+                  item.deviceType === 'TABLET' ? '平板' :
+                    item.deviceType === '2IN1' ? '电脑' :
                       'undefined')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -487,14 +515,14 @@ struct Tablesync {
               Row() {
                 Text('网络标识')
                   .fontWeight(FontWeight.Medium)
-                  .width('45%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(item.networkId)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('50%')
               }
               .borderRadius(12)
               .padding(12)
@@ -510,7 +538,10 @@ struct Tablesync {
                   Text('开启自动同步')
                     .fontColor($r('sys.color.font_emphasize'))
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
                     .height(12)
@@ -520,13 +551,22 @@ struct Tablesync {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor(this.hoverId === '1,' + index ? $r('sys.color.interactive_hover') :
+                      $r('sys.color.ohos_id_color_card_bg'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
                 .width('100%')
+                .onHover((isHover) => {
+                  if (!isHover) {
+                    this.hoverId = -1
+                  }
+                  if (isHover) {
+                    this.hoverId = '1,' + index
+                  }
+                })
                 .onClick(() => {
                   const autoSyncDevices = [...this.autoSyncDevices, item]
                   this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
@@ -545,7 +585,10 @@ struct Tablesync {
               Row() {
                 Text('推送')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -555,13 +598,22 @@ struct Tablesync {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === '2,' + index ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = '2,' + index
+                }
+              })
               .onClick(async () => {
                 const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showActionMenu({
@@ -600,7 +652,10 @@ struct Tablesync {
               Row() {
                 Text('拉取')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -610,13 +665,22 @@ struct Tablesync {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === '3,' + index ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = '3,' + index
+                }
+              })
               .onClick(async () => {
                 const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showActionMenu({

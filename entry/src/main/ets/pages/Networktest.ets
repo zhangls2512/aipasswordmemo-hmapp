@@ -73,14 +73,14 @@ struct Networktest {
               Row() {
                 Text('请求地址')
                   .fontWeight(FontWeight.Medium)
-                  .width('30%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text('https://api.zhangls2512.cn/test')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -94,14 +94,14 @@ struct Networktest {
               Row() {
                 Text('错误码')
                   .fontWeight(FontWeight.Medium)
-                  .width('30%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(String(this.errCode))
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -115,14 +115,14 @@ struct Networktest {
               Row() {
                 Text('错误信息')
                   .fontWeight(FontWeight.Medium)
-                  .width('30%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(this.errMsg)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -137,14 +137,14 @@ struct Networktest {
                 Text('请求IP')
                   .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
-                  .width('30%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(this.requestIp)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -158,14 +158,14 @@ struct Networktest {
               Row() {
                 Text('请求时间戳')
                   .fontWeight(FontWeight.Medium)
-                  .width('30%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(String(this.timeStamp))
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -180,14 +180,14 @@ struct Networktest {
                 Text('HTTP版本')
                   .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
-                  .width('30%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(this.httpVersion)
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)
@@ -201,14 +201,14 @@ struct Networktest {
               Row() {
                 Text('请求总耗时')
                   .fontWeight(FontWeight.Medium)
-                  .width('30%')
-                Blank()
-                  .width('5%')
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(String(this.totalTimeMs) + ' ms')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                  .layoutWeight(1)
                   .textAlign(TextAlign.End)
-                  .width('65%')
               }
               .borderRadius(12)
               .padding(12)

@@ -36,6 +36,7 @@ struct Commonsetting {
   @Local checkVersionUpdateValue: string = '非流量下'
   @Local openLinkTypeIndex: number = 0
   @Local openLinkTypeValue: string = '系统默认'
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
@@ -53,7 +54,8 @@ struct Commonsetting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
@@ -68,9 +70,11 @@ struct Commonsetting {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
-                .width('70%')
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Select([
                   { value: '自动' },
                   { value: '浅色' },
@@ -126,7 +130,10 @@ struct Commonsetting {
               Row() {
                 Text('接续')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.allowContinue!!
@@ -170,7 +177,10 @@ struct Commonsetting {
               Row() {
                 Text('接续成功后退出')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.exitAfterContinue!!
@@ -192,7 +202,10 @@ struct Commonsetting {
               Row() {
                 Text('备份恢复')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.allowRestore!!
@@ -236,7 +249,10 @@ struct Commonsetting {
               Row() {
                 Text('接受协同')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.acceptCollaborate!!
@@ -258,7 +274,10 @@ struct Commonsetting {
               Row() {
                 Text('侧滑返回时退出')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.destroyWhenBackPressed!!
@@ -280,12 +299,15 @@ struct Commonsetting {
               Row() {
                 Text('防窥保护')
                   .fontWeight('medium')
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text('去设置')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                   })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -296,13 +318,22 @@ struct Commonsetting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 0
+                }
+              })
               .onClick(() => {
                 this.context.startAbility({
                   bundleName: 'com.huawei.hmos.settings',
@@ -332,7 +363,8 @@ struct Commonsetting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
@@ -347,8 +379,11 @@ struct Commonsetting {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Select([
                   { value: '跟随系统' },
                   { value: '浅色模式' },
@@ -384,7 +419,10 @@ struct Commonsetting {
                 Row() {
                   Text('记忆主窗口尺寸')
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.windowRectAutoSave!!
@@ -419,8 +457,7 @@ struct Commonsetting {
                 .borderRadius(12)
                 .padding(12)
                 .width('100%')
-              }
-              if (deviceInfo.deviceType !== 'phone') {
+
                 Divider()
                   .padding({
                     left: 12,
@@ -429,7 +466,10 @@ struct Commonsetting {
                 Row() {
                   Text('窗口置顶')
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.windowTopmost!!
@@ -462,8 +502,11 @@ struct Commonsetting {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.keepScreenOn!!
@@ -485,7 +528,10 @@ struct Commonsetting {
               Row() {
                 Text('敏感页面禁止截、录屏')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.disallowScreenshot!!
@@ -507,7 +553,10 @@ struct Commonsetting {
               Row() {
                 Text('背景图')
                   .fontWeight('medium')
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -517,13 +566,22 @@ struct Commonsetting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 1
+                }
+              })
               .onClick(async () => {
                 const backgroundImagePath = this.context.filesDir + '/media/backgroundimage.png'
                 const res = fileIo.accessSync(backgroundImagePath)
@@ -619,7 +677,10 @@ struct Commonsetting {
               Row() {
                 Text('首页显示密码')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.showPasswordInIndex!!
@@ -641,7 +702,10 @@ struct Commonsetting {
               Row() {
                 Text('常用信息类型')
                   .fontWeight('medium')
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -651,13 +715,22 @@ struct Commonsetting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 2
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Oftenusedinfotype'
@@ -672,7 +745,10 @@ struct Commonsetting {
               Row() {
                 Text('默认隐藏内容密码信息类型')
                   .fontWeight('medium')
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -682,13 +758,22 @@ struct Commonsetting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 3
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Defaulthidepasswordinfotype'
@@ -713,8 +798,11 @@ struct Commonsetting {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.passwordInfoValueDataDetector!!
@@ -737,7 +825,10 @@ struct Commonsetting {
                 Text('MFA倒计时样式')
                   .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Select([
                   { value: '进度条' },
                   { value: '数字' }
@@ -771,9 +862,11 @@ struct Commonsetting {
                     })
                 }
                 .alignItems(HorizontalAlign.Start)
-                .width('85%')
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
 
-                Blank()
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.pushItemWhenBlur!!
@@ -805,13 +898,17 @@ struct Commonsetting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('启动时检查更新')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Select([
                   { value: '从不' },
                   { value: '非流量下' },
@@ -836,7 +933,10 @@ struct Commonsetting {
               Row() {
                 Text('链接打开方式')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Select([
                   { value: '系统默认' },
                   { value: '自行选择' }

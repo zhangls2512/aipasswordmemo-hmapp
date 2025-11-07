@@ -24,6 +24,7 @@ export default struct Setting {
   @Local autoLoginByHuaweiAccount: boolean = false
   @Local autoLoginByPasskey: boolean = false
   @Local accessToken: string = ''
+  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
@@ -78,7 +79,8 @@ export default struct Setting {
                 .fontWeight(FontWeight.Medium)
                 .margin({
                   bottom: 6,
-                  left: 12
+                  left: 12,
+                  right: 12
                 })
               Column() {
                 if (!this.email) {
@@ -86,7 +88,10 @@ export default struct Setting {
                     Text('绑定邮箱')
                       .fontColor($r('sys.color.font_emphasize'))
                       .fontWeight(FontWeight.Medium)
-                    Blank()
+                      .layoutWeight(1)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
                       .height(12)
@@ -96,13 +101,22 @@ export default struct Setting {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
+                        $r('sys.color.ohos_id_color_card_bg'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
                   .width('100%')
+                  .onHover((isHover) => {
+                    if (!isHover) {
+                      this.hoverId = -1
+                    }
+                    if (isHover) {
+                      this.hoverId = 0
+                    }
+                  })
                   .onClick(() => {
                     this.pageInfos.pushPath({
                       name: 'Email'
@@ -120,13 +134,20 @@ export default struct Setting {
                     Text('绑定华为账号')
                       .fontColor($r('sys.color.font_emphasize'))
                       .fontWeight(FontWeight.Medium)
+                      .layoutWeight(1)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
                   }
                   if (this.isBindHuaweiAccount) {
                     Text('解绑华为账号')
                       .fontColor($r('sys.color.warning'))
                       .fontWeight(FontWeight.Medium)
+                      .layoutWeight(1)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
                   }
-                  Blank()
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
                     .height(12)
@@ -136,13 +157,22 @@ export default struct Setting {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
+                      $r('sys.color.ohos_id_color_card_bg'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
                 .width('100%')
+                .onHover((isHover) => {
+                  if (!isHover) {
+                    this.hoverId = -1
+                  }
+                  if (isHover) {
+                    this.hoverId = 1
+                  }
+                })
                 .onClick(() => {
                   if (!this.email) {
                     promptAction.openToast({
@@ -172,8 +202,11 @@ export default struct Setting {
                       })
                   }
                   .alignItems(HorizontalAlign.Start)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
 
-                  Blank()
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.autoLoginByHuaweiAccount!!
@@ -200,7 +233,10 @@ export default struct Setting {
                   Text('新增通行密钥')
                     .fontColor($r('sys.color.font_emphasize'))
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
                     .height(12)
@@ -210,13 +246,22 @@ export default struct Setting {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                      $r('sys.color.ohos_id_color_card_bg'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
                 .width('100%')
+                .onHover((isHover) => {
+                  if (!isHover) {
+                    this.hoverId = -1
+                  }
+                  if (isHover) {
+                    this.hoverId = 2
+                  }
+                })
                 .onClick(() => {
                   if (!this.email) {
                     promptAction.openToast({
@@ -252,8 +297,11 @@ export default struct Setting {
                       })
                   }
                   .alignItems(HorizontalAlign.Start)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
 
-                  Blank()
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.autoLoginByPasskey!!
@@ -280,7 +328,10 @@ export default struct Setting {
                 Row() {
                   Text('设备间同步')
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.accountDataSync!!
@@ -345,13 +396,17 @@ export default struct Setting {
                   .fontWeight(FontWeight.Medium)
                   .margin({
                     bottom: 6,
-                    left: 12
+                    left: 12,
+                    right: 12
                   })
                 Column() {
                   Row() {
                     Text('自动开启')
                       .fontWeight(FontWeight.Medium)
-                    Blank()
+                      .layoutWeight(1)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
                       .height(12)
@@ -361,13 +416,22 @@ export default struct Setting {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                        $r('sys.color.ohos_id_color_card_bg'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
                   .width('100%')
+                  .onHover((isHover) => {
+                    if (!isHover) {
+                      this.hoverId = -1
+                    }
+                    if (isHover) {
+                      this.hoverId = 3
+                    }
+                  })
                   .onClick(() => {
                     this.pageInfos.pushPath({
                       name: 'Autocloudbackupsetting'
@@ -382,7 +446,10 @@ export default struct Setting {
                   Row() {
                     Text('管理')
                       .fontWeight(FontWeight.Medium)
-                    Blank()
+                      .layoutWeight(1)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
                       .height(12)
@@ -392,13 +459,22 @@ export default struct Setting {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
+                        $r('sys.color.ohos_id_color_card_bg'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
                   .width('100%')
+                  .onHover((isHover) => {
+                    if (!isHover) {
+                      this.hoverId = -1
+                    }
+                    if (isHover) {
+                      this.hoverId = 4
+                    }
+                  })
                   .onClick(() => {
                     this.pageInfos.pushPath({
                       name: 'Cloudbackupmanage'
@@ -413,7 +489,10 @@ export default struct Setting {
                   Row() {
                     Text('导入')
                       .fontWeight(FontWeight.Medium)
-                    Blank()
+                      .layoutWeight(1)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
                       .height(12)
@@ -423,13 +502,22 @@ export default struct Setting {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor(this.hoverId === 5 ? $r('sys.color.interactive_hover') :
+                        $r('sys.color.ohos_id_color_card_bg'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
                   .width('100%')
+                  .onHover((isHover) => {
+                    if (!isHover) {
+                      this.hoverId = -1
+                    }
+                    if (isHover) {
+                      this.hoverId = 5
+                    }
+                  })
                   .onClick(() => {
                     this.pageInfos.pushPath({
                       name: 'Cloudbackupimport'
@@ -444,7 +532,10 @@ export default struct Setting {
                   Row() {
                     Text('密钥')
                       .fontWeight(FontWeight.Medium)
-                    Blank()
+                      .layoutWeight(1)
+                      .margin({
+                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      })
                     Image($r('app.media.right'))
                       .fillColor($r('sys.color.icon_fourth'))
                       .height(12)
@@ -454,13 +545,22 @@ export default struct Setting {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor(this.hoverId === 6 ? $r('sys.color.interactive_hover') :
+                        $r('sys.color.ohos_id_color_card_bg'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
                   .width('100%')
+                  .onHover((isHover) => {
+                    if (!isHover) {
+                      this.hoverId = -1
+                    }
+                    if (isHover) {
+                      this.hoverId = 6
+                    }
+                  })
                   .onClick(() => {
                     this.pageInfos.pushPath({
                       name: 'Key'
@@ -500,13 +600,17 @@ export default struct Setting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('设备间同步')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -516,13 +620,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 7 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 7
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Tablesync'
@@ -537,7 +650,10 @@ export default struct Setting {
               Row() {
                 Text('导入与导出')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -547,13 +663,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 8 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 8
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'DataInOut'
@@ -568,7 +693,10 @@ export default struct Setting {
               Row() {
                 Text('备份与恢复')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -578,13 +706,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 9 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 9
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'DataBackupRecovery'
@@ -609,13 +746,17 @@ export default struct Setting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('通用')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -625,13 +766,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 10 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 10
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Commonsetting'
@@ -646,7 +796,10 @@ export default struct Setting {
               Row() {
                 Text('卡片')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -656,13 +809,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 11 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 11
+                }
+              })
               .onClick(() => {
                 formProvider.openFormManager({
                   bundleName: 'com.zhangxm.aipasswordmemo'
@@ -684,7 +846,10 @@ export default struct Setting {
             Row() {
               Text('消息通知')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -694,13 +859,22 @@ export default struct Setting {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 12 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 12
+              }
+            })
             .onClick(() => {
               this.pageInfos.pushPath({
                 name: 'Notice'
@@ -723,13 +897,17 @@ export default struct Setting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('权限管理')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -739,13 +917,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 13 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 13
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Permissionsetting'
@@ -761,12 +948,13 @@ export default struct Setting {
               }
               if (this.agreedPrivacyAgreement === 0 || this.agreedPrivacyAgreement === 2) {
                 Row() {
-                  if (this.agreedPrivacyAgreement === 0 || this.agreedPrivacyAgreement === 2) {
-                    Text('阅读并签署隐私协议')
-                      .fontColor($r('sys.color.font_emphasize'))
-                      .fontWeight(FontWeight.Medium)
-                  }
-                  Blank()
+                  Text('阅读并签署隐私协议')
+                    .fontColor($r('sys.color.font_emphasize'))
+                    .fontWeight(FontWeight.Medium)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
                     .height(12)
@@ -776,13 +964,22 @@ export default struct Setting {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor(this.hoverId === 14 ? $r('sys.color.interactive_hover') :
+                      $r('sys.color.ohos_id_color_card_bg'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
                 .width('100%')
+                .onHover((isHover) => {
+                  if (!isHover) {
+                    this.hoverId = -1
+                  }
+                  if (isHover) {
+                    this.hoverId = 14
+                  }
+                })
                 .onClick(async () => {
                   await privacyManager.requestAppPrivacyConsent(this.context)
                   this.getSetting()
@@ -793,7 +990,10 @@ export default struct Setting {
                   Text('撤回同意隐私协议')
                     .fontColor($r('sys.color.warning'))
                     .fontWeight(FontWeight.Medium)
-                  Blank()
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
                   Image($r('app.media.right'))
                     .fillColor($r('sys.color.icon_fourth'))
                     .height(12)
@@ -803,13 +1003,22 @@ export default struct Setting {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor(this.hoverId === 15 ? $r('sys.color.interactive_hover') :
+                      $r('sys.color.ohos_id_color_card_bg'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
                 .width('100%')
+                .onHover((isHover) => {
+                  if (!isHover) {
+                    this.hoverId = -1
+                  }
+                  if (isHover) {
+                    this.hoverId = 15
+                  }
+                })
                 .onClick(() => {
                   privacyManager.disableService()
                   this.context.terminateSelf()
@@ -834,13 +1043,17 @@ export default struct Setting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('业务与隐私的声明')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -850,13 +1063,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 16 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 16
+                }
+              })
               .onClick(() => {
                 try {
                   const appPrivacyLink =
@@ -881,7 +1103,10 @@ export default struct Setting {
                 Text('第三方SDK列表')
                   .enableAutoSpacing(true)
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -891,13 +1116,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 17 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 17
+                }
+              })
               .onClick(() => {
                 openLink('https://docs.qq.com/doc/p/2bde62f6c2aaea97fbcca04c929c284005326d37')
               })
@@ -910,7 +1144,10 @@ export default struct Setting {
               Row() {
                 Text('已收集个人信息清单')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -920,13 +1157,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 18 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 18
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Infolist'
@@ -941,7 +1187,10 @@ export default struct Setting {
               Row() {
                 Text('隐私声明摘要')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -951,13 +1200,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 19 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 19
+                }
+              })
               .onClick(() => {
                 openLink('https://docs.qq.com/doc/p/bdc2799638a46746599c68d82697b10a2becb2e4')
               })
@@ -980,18 +1238,22 @@ export default struct Setting {
               .fontWeight(FontWeight.Medium)
               .margin({
                 bottom: 6,
-                left: 12
+                left: 12,
+                right: 12
               })
             Column() {
               Row() {
                 Text('应用服务模式')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Text(this.allService ? '全量模式' : '基本模式')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                   })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
@@ -1002,13 +1264,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 20 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 20
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Servicemode'
@@ -1023,7 +1294,10 @@ export default struct Setting {
               Row() {
                 Text('其他')
                   .fontWeight(FontWeight.Medium)
-                Blank()
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Image($r('app.media.right'))
                   .fillColor($r('sys.color.icon_fourth'))
                   .height(12)
@@ -1033,13 +1307,22 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor(this.hoverId === 21 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
               .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 21
+                }
+              })
               .onClick(() => {
                 this.pageInfos.pushPath({
                   name: 'Moresetting'
@@ -1061,7 +1344,10 @@ export default struct Setting {
             Row() {
               Text('关于')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Text('版本 ')
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -1069,7 +1355,7 @@ export default struct Setting {
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
                 .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                 })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
@@ -1080,13 +1366,22 @@ export default struct Setting {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 22 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 22
+              }
+            })
             .onClick(() => {
               this.pageInfos.pushPath({
                 name: 'About'
@@ -1101,7 +1396,10 @@ export default struct Setting {
             Row() {
               Text('服务协议与规则')
                 .fontWeight(FontWeight.Medium)
-              Blank()
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Image($r('app.media.right'))
                 .fillColor($r('sys.color.icon_fourth'))
                 .height(12)
@@ -1111,13 +1409,22 @@ export default struct Setting {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor(this.hoverId === 23 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 23
+              }
+            })
             .onClick(() => {
               this.pageInfos.pushPath({
                 name: 'Agreements'
