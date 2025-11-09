@@ -25,6 +25,7 @@ import getDeviceToken from '../common/Devicetoken'
 import { read } from '../common/File'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
+import { autoBackupTable } from '../common/Table'
 
 interface JsErrorObject {
   name: string,
@@ -284,19 +285,21 @@ export default class EntryAbility extends UIAbility {
         }
         resultSet.close()
       }
+      this.context.eventHub.emit('refreshPassword')
+      autoBackupTable('password')
     })
     infoRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await passwordRdbStore.obtainDistributedTableName(deviceIds[i], 'info')
+        const tableName = await infoRdbStore.obtainDistributedTableName(deviceIds[i], 'info')
         const predicates = new relationalStore.RdbPredicates(tableName)
-        const resultSet = await passwordRdbStore.query(predicates)
+        const resultSet = await infoRdbStore.query(predicates)
         const idIndex = resultSet.getColumnIndex('id')
         const typeIndex = resultSet.getColumnIndex('type')
         const valueIndex = resultSet.getColumnIndex('value')
         const updateTimeIndex = resultSet.getColumnIndex('updateTime')
         const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
         while (resultSet.goToNextRow()) {
-          passwordRdbStore.insertSync('info', {
+          infoRdbStore.insertSync('info', {
             id: resultSet.getValue(idIndex),
             type: String(resultSet.getValue(typeIndex)),
             value: String(resultSet.getValue(valueIndex)),
@@ -306,19 +309,21 @@ export default class EntryAbility extends UIAbility {
         }
         resultSet.close()
       }
+      this.context.eventHub.emit('refreshInfo')
+      autoBackupTable('info')
     })
     tagRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await passwordRdbStore.obtainDistributedTableName(deviceIds[i], 'tag')
+        const tableName = await tagRdbStore.obtainDistributedTableName(deviceIds[i], 'tag')
         const predicates = new relationalStore.RdbPredicates(tableName)
-        const resultSet = await passwordRdbStore.query(predicates)
+        const resultSet = await tagRdbStore.query(predicates)
         const idIndex = resultSet.getColumnIndex('id')
         const valueIndex = resultSet.getColumnIndex('value')
         const colorIndex = resultSet.getColumnIndex('color')
         const updateTimeIndex = resultSet.getColumnIndex('updateTime')
         const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
         while (resultSet.goToNextRow()) {
-          passwordRdbStore.insertSync('tag', {
+          tagRdbStore.insertSync('tag', {
             id: resultSet.getValue(idIndex),
             value: String(resultSet.getValue(valueIndex)),
             color: String(resultSet.getValue(colorIndex)),
@@ -328,6 +333,8 @@ export default class EntryAbility extends UIAbility {
         }
         resultSet.close()
       }
+      this.context.eventHub.emit('refreshTag')
+      autoBackupTable('tag')
     })
     appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
@@ -772,7 +779,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 29) {
+    if (wantParam.version !== 30) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

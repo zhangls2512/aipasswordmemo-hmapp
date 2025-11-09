@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { checkPermission } from '../common/Permission'
 import { syncTable } from '../common/Table'
@@ -34,6 +34,16 @@ struct Tablesync {
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
+  })
+  pushDialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '推送中...'
+    })
+  })
+  pullDialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '拉取中...'
+    })
   })
   typeArray: Type[] = [
     {
@@ -634,13 +644,19 @@ struct Tablesync {
                   ]
                 })
                 if (data.index === 0) {
-                  syncTable('password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  this.pushDialogControllerProgress.open()
+                  await syncTable('password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  this.pushDialogControllerProgress.close()
                 }
                 if (data.index === 1) {
-                  syncTable('info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  this.pushDialogControllerProgress.open()
+                  await syncTable('info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  this.pushDialogControllerProgress.close()
                 }
                 if (data.index === 2) {
-                  syncTable('tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  this.pushDialogControllerProgress.open()
+                  await syncTable('tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  this.pushDialogControllerProgress.close()
                 }
               })
 
@@ -701,13 +717,19 @@ struct Tablesync {
                   ]
                 })
                 if (data.index === 0) {
-                  syncTable('password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  this.pullDialogControllerProgress.open()
+                  await syncTable('password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  this.pullDialogControllerProgress.close()
                 }
                 if (data.index === 1) {
-                  syncTable('info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  this.pullDialogControllerProgress.open()
+                  await syncTable('info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  this.pullDialogControllerProgress.close()
                 }
                 if (data.index === 2) {
-                  syncTable('tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  this.pullDialogControllerProgress.open()
+                  await syncTable('tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  this.pullDialogControllerProgress.close()
                 }
               })
             }
