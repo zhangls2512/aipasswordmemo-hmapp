@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
-import { promptAction } from '@kit.ArkUI'
+import { display, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
@@ -27,6 +27,7 @@ export interface SelectItem {
 export default struct Newpassword {
   @Consumer() isShowNewSheet: boolean = false
   @Provider() isShowPasswordgenerateSheet: boolean = false
+  @Local preferType: number = 1
   @Local passwordName: string = ''
   @Local passwordInfoArray: PasswordInfoItem[] = []
   @Local infoType: string = ''
@@ -46,7 +47,6 @@ export default struct Newpassword {
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  preferType = 1
   pushItemWhenBlur = false
   oftenUsedInfoTypes = ['自定义']
   specialInfoTypes = ['图标', '昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
@@ -133,10 +133,12 @@ export default struct Newpassword {
             }
           }
         })
-      MenuItem({
-        content: '其他设备',
-        builder: this.SubMenu()
-      })
+      if (deviceInfo.deviceType !== 'phone') {
+        MenuItem({
+          content: '其他设备',
+          builder: this.SubMenu()
+        })
+      }
     }
   }
 
@@ -1186,9 +1188,24 @@ export default struct Newpassword {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      if (deviceInfo.deviceType === 'phone') {
+      const currentOrientation = display.getDefaultDisplaySync().orientation
+      if (currentOrientation === display.Orientation.PORTRAIT ||
+        currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
         this.preferType = 0
       }
+      if (currentOrientation === display.Orientation.LANDSCAPE ||
+        currentOrientation === display.Orientation.LANDSCAPE_INVERTED) {
+        this.preferType = 1
+      }
+      display.on('change', (displayId) => {
+        const orientation = display.getDisplayByIdSync(displayId).orientation
+        if (orientation === display.Orientation.PORTRAIT || orientation === display.Orientation.PORTRAIT_INVERTED) {
+          this.preferType = 0
+        }
+        if (orientation === display.Orientation.LANDSCAPE || orientation === display.Orientation.LANDSCAPE_INVERTED) {
+          this.preferType = 1
+        }
+      })
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
         name: 'commonSetting'
       })
@@ -1222,6 +1239,9 @@ export default struct Newpassword {
           }
         }
       }
+    })
+    .onDisAppear(() => {
+      display.off('change')
     })
   }
 }

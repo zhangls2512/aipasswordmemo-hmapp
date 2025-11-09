@@ -1,4 +1,5 @@
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import { camera, cameraPicker as picker } from '@kit.CameraKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { textRecognition } from '@kit.CoreVisionKit'
@@ -117,6 +118,7 @@ export default struct Ainewinfo {
             const pickerres = await photoPicker.select({
               MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
               maxSelectNumber: 1,
+              isPhotoTakingSupported: false,
               isOriginalSupported: false
             })
             const fileSource = await fileIo.open(pickerres.photoUris[0])
@@ -141,10 +143,12 @@ export default struct Ainewinfo {
             }
           }
         })
-      MenuItem({
-        content: '从其他设备导入',
-        builder: this.SubMenu()
-      })
+      if (deviceInfo.deviceType !== 'phone') {
+        MenuItem({
+          content: '从其他设备导入',
+          builder: this.SubMenu()
+        })
+      }
     }
   }
 
