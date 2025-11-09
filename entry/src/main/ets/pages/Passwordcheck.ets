@@ -1,5 +1,4 @@
-import { SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
-import { deviceInfo } from '@kit.BasicServicesKit'
+import { display, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
 import {
   getOldPasswordList,
   getPasswordStrengthList,
@@ -12,6 +11,7 @@ import UpdatePassword from './Updatepassword'
 @ComponentV2
 export default struct Passwordcheck {
   @Provider() isShowUpdateSheet: boolean = false
+  @Local preferType: number = 1
   @Local selectedIndex: number = 0
   @Local lowStrengthPasswordArray: ListItem[] = []
   @Local mediumStrengthPasswordArray: ListItem[] = []
@@ -20,7 +20,6 @@ export default struct Passwordcheck {
   @Local oldArray: ListItem[] = []
   @Local hoverId: number | string = -1
   context = this.getUIContext().getHostContext()
-  preferType = 1
   passwordId = 0
 
   @Builder
@@ -426,15 +425,33 @@ export default struct Passwordcheck {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      if (deviceInfo.deviceType === 'phone') {
+      const currentOrientation = display.getDefaultDisplaySync().orientation
+      if (currentOrientation === display.Orientation.PORTRAIT ||
+        currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
         this.preferType = 0
       }
+      if (currentOrientation === display.Orientation.LANDSCAPE ||
+        currentOrientation === display.Orientation.LANDSCAPE_INVERTED) {
+        this.preferType = 1
+      }
+      display.on('change', (displayId) => {
+        const orientation = display.getDisplayByIdSync(displayId).orientation
+        if (orientation === display.Orientation.PORTRAIT || orientation === display.Orientation.PORTRAIT_INVERTED) {
+          this.preferType = 0
+        }
+        if (orientation === display.Orientation.LANDSCAPE || orientation === display.Orientation.LANDSCAPE_INVERTED) {
+          this.preferType = 1
+        }
+      })
       const passwordStrengthArray = await getPasswordStrengthList()
       this.lowStrengthPasswordArray = passwordStrengthArray[0]
       this.mediumStrengthPasswordArray = passwordStrengthArray[1]
       this.highStrengthPasswordArray = passwordStrengthArray[2]
       this.repeatArray = await getRepeatPasswordList()
       this.oldArray = await getOldPasswordList()
+    })
+    .onDisAppear(() => {
+      display.off('change')
     })
     .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
       preferType: this.preferType,

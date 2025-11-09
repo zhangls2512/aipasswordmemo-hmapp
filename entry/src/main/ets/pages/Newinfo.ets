@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
@@ -90,10 +91,12 @@ export default struct Newinfo {
             }
           }
         })
-      MenuItem({
-        content: '其他设备',
-        builder: this.SubMenu()
-      })
+      if (deviceInfo.deviceType !== 'phone') {
+        MenuItem({
+          content: '其他设备',
+          builder: this.SubMenu()
+        })
+      }
     }
   }
 
