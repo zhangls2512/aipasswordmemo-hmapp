@@ -298,7 +298,7 @@ struct Commonsetting {
                 })
               Row() {
                 Text('防窥保护')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -552,7 +552,7 @@ struct Commonsetting {
                 })
               Row() {
                 Text('背景图')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -701,7 +701,7 @@ struct Commonsetting {
                 })
               Row() {
                 Text('常用信息类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -744,7 +744,7 @@ struct Commonsetting {
                 })
               Row() {
                 Text('默认隐藏内容密码信息类型')
-                  .fontWeight('medium')
+                  .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')

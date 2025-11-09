@@ -138,6 +138,12 @@ export default struct Vip {
       if (errCode === 1001860000) {
         return
       }
+      if (errCode === 1001860050) {
+        promptAction.openToast({
+          message: '系统未登录华为账号，无法购买'
+        })
+        return
+      }
       if (errCode === 1001860051) {
         promptAction.openToast({
           message: '已购买，无需重复购买'
