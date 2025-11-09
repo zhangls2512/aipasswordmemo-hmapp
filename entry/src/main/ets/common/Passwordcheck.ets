@@ -91,8 +91,7 @@ export async function getRepeatPasswordList() {
             name: name
           }]
         })
-      }
-      if (arrayMap.has(password)) {
+      } else {
         const item = arrayMap.get(password)!
         item.count++
         item.list.push({
