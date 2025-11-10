@@ -23,6 +23,7 @@ struct Defaulthidepasswordinfotype {
             placeholder: '请输入内容',
             text: this.type!!
           })
+            .defaultFocus(this.defaultHidePasswordInfoTypeArray.length === 0 ? true : false)
             .enableAutoSpacing(true)
         }
         .margin({

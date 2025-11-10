@@ -1,3 +1,4 @@
+import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { camera, cameraPicker as picker } from '@kit.CameraKit'
@@ -12,6 +13,8 @@ import {
   createCollaborationServiceMenuItems
 } from '@kit.ServiceCollaborationKit'
 import { CardRecognition, CardSide, CardType } from '@kit.VisionKit'
+import getCloudServiceStatus from '../common/Cloudservice'
+import { getKey } from '../common/Crypto'
 import { newInfo } from '../common/Datachange'
 
 interface Item {
@@ -27,6 +30,7 @@ export default struct Ainewinfo {
   @Local showCard: boolean = false
   @Local hoverId: number = -1
   context = this.getUIContext().getHostContext()
+  cloudBackup = false
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '识别中...'
@@ -362,7 +366,7 @@ export default struct Ainewinfo {
               newInfo({
                 type: item.type,
                 value: item.value,
-                cloudBackup: false
+                cloudBackup: this.cloudBackup
               })
             })
           }
@@ -389,8 +393,19 @@ export default struct Ainewinfo {
       left: $r('sys.float.ohos_id_max_padding_start'),
       right: $r('sys.float.ohos_id_max_padding_end')
     })
-    .onAppear(() => {
-      textProcessing.init()
+    .onAppear(async () => {
+      await textProcessing.init()
+      const res = await getCloudServiceStatus()
+      const key = getKey()
+      if (res && key) {
+        const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+          name: 'cloudbackupSetting'
+        })
+        const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+        if (autoOn.includes('info')) {
+          this.cloudBackup = true
+        }
+      }
     })
   }
 }

@@ -462,11 +462,10 @@ export default struct Newinfo {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const abilityContext = this.getUIContext().getHostContext()
-          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(abilityContext, {
+          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
             name: 'cloudbackupSetting'
           })
-          const autoOn: string[] = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
           if (autoOn.includes('info') && this.infoTypeValue !== '图标') {
             this.cloudBackup = true
           }

@@ -119,6 +119,7 @@ export async function check() {
           promptAction.openToast({
             message: '华为账号静默登录成功'
           })
+          context.eventHub.emit('refreshMe')
         }
       } catch (err) {
         promptAction.openToast({
