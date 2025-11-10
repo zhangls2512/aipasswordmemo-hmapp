@@ -16,6 +16,7 @@ export default struct Newtag {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
+  context = this.getUIContext().getHostContext()
   colorArray: string[] = [
     '#000000',
     '#0000FF',
@@ -217,11 +218,10 @@ export default struct Newtag {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const abilityContext = this.getUIContext().getHostContext()
-          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(abilityContext, {
+          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
             name: 'cloudbackupSetting'
           })
-          const autoOn: string[] = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
           if (autoOn.includes('tag')) {
             this.cloudBackup = true
           }

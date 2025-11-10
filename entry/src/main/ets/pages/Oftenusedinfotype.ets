@@ -123,37 +123,39 @@ struct Oftenusedinfotype {
         })
 
         ForEach(this.defaultInfoTypeArray, (item: string) => {
-          ListItem() {
-            Column() {
-              Row() {
-                Text(item)
-                  .layoutWeight(1)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Image($r('app.media.add'))
-                  .width('8%')
-                  .onClick(() => {
-                    if (this.oftenUsedInfoTypeArray.some(typeItem => typeItem === item)) {
-                      promptAction.openToast({
-                        message: '已添加此类型'
-                      })
-                      return
-                    }
-                    this.oftenUsedInfoTypeArray.push(item)
-                  })
+          if (!this.oftenUsedInfoTypeArray.includes(item)) {
+            ListItem() {
+              Column() {
+                Row() {
+                  Text(item)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+                  Image($r('app.media.add'))
+                    .width('8%')
+                    .onClick(() => {
+                      if (this.oftenUsedInfoTypeArray.some(typeItem => typeItem === item)) {
+                        promptAction.openToast({
+                          message: '已添加此类型'
+                        })
+                        return
+                      }
+                      this.oftenUsedInfoTypeArray.push(item)
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
               }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
+              .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .padding($r('sys.float.ohos_id_corner_radius_mark'))
             }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
           }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
         })
       }
       .padding({
