@@ -1147,7 +1147,7 @@ export default struct Newpassword {
             const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
               name: 'cloudbackupSetting'
             })
-            const autoOn: string[] = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+            const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
             if (this.allowCloudBackup && autoOn.includes('info')) {
               infoCloudBackup = true
             }
@@ -1233,7 +1233,7 @@ export default struct Newpassword {
           const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
             name: 'cloudbackupSetting'
           })
-          const autoOn: string[] = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
           if (autoOn.includes('password')) {
             this.cloudBackup = true
           }

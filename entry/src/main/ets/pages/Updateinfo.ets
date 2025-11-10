@@ -14,6 +14,7 @@ export default struct Updateinfo {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
+  context = this.getUIContext().getHostContext()
   specialInfoTypes = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   build() {
@@ -239,11 +240,10 @@ export default struct Updateinfo {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const abilityContext = this.getUIContext().getHostContext()
-          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(abilityContext, {
+          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
             name: 'cloudbackupSetting'
           })
-          const autoOn: string[] = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
           if (autoOn.includes('info')) {
             this.cloudBackup = true
           }
