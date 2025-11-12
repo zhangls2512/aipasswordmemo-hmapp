@@ -50,8 +50,7 @@
             "noExternalImportByPath": true,
             "useNormalizedOHMUrl": true,
             "caseSensitiveCheck": true,
-            "harLocalDependencyCheck": true,
-            "enableStrictCheckOHModule": true
+            "harLocalDependencyCheck": true
           },
           "preloadSystemSo": true
         },
