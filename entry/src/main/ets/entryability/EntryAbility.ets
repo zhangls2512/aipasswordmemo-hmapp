@@ -12,13 +12,13 @@ import { appInfoManager, updateManager } from '@kit.AppGalleryKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
-import { fileIo } from '@kit.CoreFileKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
 import { check } from '../common/Accesstoken'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
+import { write } from '../common/File'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 import { autoBackupTable } from '../common/Table'
@@ -156,14 +156,7 @@ export default class EntryAbility extends UIAbility {
           }
         }
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
-          const errorLogDir = filesDir + '/log/error'
-          if (!fileIo.accessSync(errorLogDir)) {
-            fileIo.mkdirSync(errorLogDir, true)
-          }
-          const file = fileIo.openSync(filesDir + '/log/error/' + Date.now() + '.txt',
-            fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-          fileIo.writeSync(file.fd, JSON.stringify(object))
-          fileIo.closeSync(file)
+          write(filesDir + '/log/error/' + Date.now() + '.txt', JSON.stringify(object))
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
@@ -227,14 +220,7 @@ export default class EntryAbility extends UIAbility {
           }
         }
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
-          const errorLogDir = filesDir + '/log/error'
-          if (!fileIo.accessSync(errorLogDir)) {
-            fileIo.mkdirSync(errorLogDir, true)
-          }
-          const file = fileIo.openSync(filesDir + '/log/error/' + Date.now() + '.txt',
-            fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-          fileIo.writeSync(file.fd, JSON.stringify(object))
-          fileIo.closeSync(file)
+          write(filesDir + '/log/error/' + Date.now() + '.txt', JSON.stringify(object))
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
@@ -276,15 +262,8 @@ export default class EntryAbility extends UIAbility {
       ],
       onReceive: (domain, appEventGroups) => {
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
-          const errorLogDir = filesDir + '/log/error'
-          if (!fileIo.accessSync(errorLogDir)) {
-            fileIo.mkdirSync(errorLogDir, true)
-          }
           appEventGroups.forEach((item) => {
-            const file = fileIo.openSync(filesDir + '/log/error/' + Date.now() + '.txt',
-              fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-            fileIo.writeSync(file.fd, JSON.stringify(item))
-            fileIo.closeSync(file)
+            write(filesDir + '/log/error/' + Date.now() + '.txt', JSON.stringify(item))
           })
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&

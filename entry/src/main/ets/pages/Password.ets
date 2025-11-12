@@ -41,6 +41,7 @@ export default struct PasswordPage {
   @Local tag: string[] = []
   @Local tags: PasswordTagItem[] = []
   @Local showPassword: boolean = false
+  @Local hideTag: boolean = false
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Password[] = []
   @Local hoverId: number = -1
@@ -605,7 +606,7 @@ export default struct PasswordPage {
                           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                         })
                       }
-                      if (item.tag.length > 0) {
+                      if (item.tag.length > 0 && !this.hideTag) {
                         Flex({
                           wrap: FlexWrap.Wrap,
                           space: {
@@ -727,9 +728,10 @@ export default struct PasswordPage {
         }
       })
       this.showPassword = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
+      this.hideTag = this.commonSettingDataPreferences.getSync('hideTagInIndex', false) as boolean
       const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-      const lastWindow = await window.getLastWindow(this.context)
       if (disallowScreenshot) {
+        const lastWindow = await window.getLastWindow(this.context)
         await lastWindow.setWindowPrivacyMode(this.showPassword)
       }
       this.context.eventHub.on('newPassword', () => {
@@ -745,6 +747,7 @@ export default struct PasswordPage {
       this.context.eventHub.on('refreshPassword', async () => {
         this.enableCloudBackup = false
         this.showPassword = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
+        this.hideTag = this.commonSettingDataPreferences.getSync('hideTagInIndex', false) as boolean
         const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
         if (disallowScreenshot) {
           const lastWindow = await window.getLastWindow(this.context)

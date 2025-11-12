@@ -28,6 +28,7 @@ struct Commonsetting {
   @Local keepScreenOn: boolean = false
   @Local disallowScreenshot: boolean = true
   @Local showPasswordInIndex: boolean = false
+  @Local hideTagInIndex: boolean = false
   @Local passwordInfoValueDataDetector: boolean = true
   @Local mfaSecondsRemainingStyleIndex: number = 0
   @Local mfaSecondsRemainingStyleValue: string = 'progress'
@@ -700,6 +701,31 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
+                Text('首页隐藏标签')
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.hideTagInIndex!!
+                })
+                  .onChange((isOn) => {
+                    this.commonSettingDataPreferences.putSync('hideTagInIndex', isOn)
+                    this.commonSettingDataPreferences.flushSync()
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
                 Text('常用信息类型')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
@@ -1006,6 +1032,7 @@ struct Commonsetting {
       this.keepScreenOn = lastWindow.getWindowProperties().isKeepScreenOn
       this.disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
       this.showPasswordInIndex = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
+      this.hideTagInIndex = this.commonSettingDataPreferences.getSync('hideTagInIndex', false) as boolean
       this.passwordInfoValueDataDetector =
         this.commonSettingDataPreferences.getSync('passwordInfoValueDataDetector', true) as boolean
       const mfaSecondsRemainingStyle = this.commonSettingDataPreferences.getSync('mfaSecondsRemainingStyle', 0)
