@@ -1,6 +1,7 @@
 import { appRecovery, common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 
 @Builder
 export function DebugsettingBuilder() {
@@ -302,52 +303,54 @@ struct Debugsetting {
               .padding(12)
               .width('100%')
 
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('进程缓存后快速启动')
-                  .fontWeight(FontWeight.Medium)
-                  .layoutWeight(1)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              if (deviceInfo.deviceType !== 'tablet') {
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
                   })
-                Toggle({
-                  type: ToggleType.Switch,
-                  isOn: this.processCache!!
-                })
-                  .onChange(async (isOn) => {
-                    this.debugSettingDataPreferences.putSync('processCache', isOn)
-                    this.debugSettingDataPreferences.flushSync()
-                    const promptAction = this.getUIContext().getPromptAction()
-                    const data = await promptAction.showDialog({
-                      title: '提示',
-                      message: '设置成功，需重启应用生效，是否重启？',
-                      buttons: [
-                        {
-                          text: '取消',
-                          color: $r('sys.color.font_primary')
-                        },
-                        {
-                          text: '重启',
-                          color: $r('sys.color.font_emphasize')
-                        }
-                      ]
+                Row() {
+                  Text('进程缓存后快速启动')
+                    .fontWeight(FontWeight.Medium)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    if (data.index === 1) {
-                      const applicationContext = this.context.getApplicationContext()
-                      applicationContext.restartApp({
-                        bundleName: 'com.zhangxm.aipasswordmemo',
-                        abilityName: 'EntryAbility'
-                      })
-                    }
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.processCache!!
                   })
+                    .onChange(async (isOn) => {
+                      this.debugSettingDataPreferences.putSync('processCache', isOn)
+                      this.debugSettingDataPreferences.flushSync()
+                      const promptAction = this.getUIContext().getPromptAction()
+                      const data = await promptAction.showDialog({
+                        title: '提示',
+                        message: '设置成功，需重启应用生效，是否重启？',
+                        buttons: [
+                          {
+                            text: '取消',
+                            color: $r('sys.color.font_primary')
+                          },
+                          {
+                            text: '重启',
+                            color: $r('sys.color.font_emphasize')
+                          }
+                        ]
+                      })
+                      if (data.index === 1) {
+                        const applicationContext = this.context.getApplicationContext()
+                        applicationContext.restartApp({
+                          bundleName: 'com.zhangxm.aipasswordmemo',
+                          abilityName: 'EntryAbility'
+                        })
+                      }
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
               }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
 
               Divider()
                 .padding({
