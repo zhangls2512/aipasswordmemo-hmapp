@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
@@ -29,7 +30,8 @@ export default struct Ainewinfo {
   @Local text: string = ''
   @Local showCard: boolean = false
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext()
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   cloudBackup = false
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
@@ -363,7 +365,7 @@ export default struct Ainewinfo {
               }
             })
             .onClick(() => {
-              newInfo({
+              newInfo(this.context, this.UIContext, {
                 type: item.type,
                 value: item.value,
                 cloudBackup: this.cloudBackup
@@ -395,7 +397,7 @@ export default struct Ainewinfo {
     })
     .onAppear(async () => {
       await textProcessing.init()
-      const res = await getCloudServiceStatus()
+      const res = await getCloudServiceStatus(this.context, this.UIContext)
       const key = getKey()
       if (res && key) {
         const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {

@@ -1,5 +1,4 @@
 import { preferences } from '@kit.ArkData'
-import { promptAction } from '@kit.ArkUI'
 import { rcp } from '@kit.RemoteCommunicationKit'
 
 interface ErrorResponse {
@@ -8,8 +7,8 @@ interface ErrorResponse {
   errFix: string
 }
 
-export default async function request(path: string, body: rcp.RequestContent) {
-  const context = getContext()
+export default async function request(context: Context, UIContext: UIContext, path: string, body: rcp.RequestContent) {
+  const promptAction = UIContext.getPromptAction()
   const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'commonSetting'
   })

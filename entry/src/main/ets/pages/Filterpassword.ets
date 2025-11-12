@@ -46,7 +46,7 @@ export default struct Filterpassword {
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
       this.infoValue = ''
       if (this.infoTypeValue !== '自定义') {
-        this.infoArray = await getTypeInfoList(this.infoTypeValue)
+        this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
       }
     }
   }
@@ -80,7 +80,7 @@ export default struct Filterpassword {
             .value(this.infoTypeValue!!)
             .onSelect(async (index, value) => {
               if (value !== '自定义') {
-                this.infoArray = await getTypeInfoList(value)
+                this.infoArray = await getTypeInfoList(this.context, value)
               }
               if (value === '自定义') {
                 this.infoArray = []
@@ -102,7 +102,7 @@ export default struct Filterpassword {
                   this.infoType = ''
                 }
                 if (value !== '自定义') {
-                  this.infoArray = await getTypeInfoList(value)
+                  this.infoArray = await getTypeInfoList(this.context, value)
                 }
                 if (value === '自定义') {
                   this.infoArray = []
@@ -347,7 +347,7 @@ export default struct Filterpassword {
               this.infoTypeValue = this.oftenUsedInfoTypes[0]
               this.infoValue = ''
               if (this.infoTypeValue !== '自定义') {
-                this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
               }
             })
         }
@@ -540,9 +540,9 @@ export default struct Filterpassword {
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
       if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-        this.infoArray = await getTypeInfoList(this.infoTypeValue)
+        this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
       }
-      this.tagArray = await getTagList()
+      this.tagArray = await getTagList(this.context)
       this.passwordNameKeyword = this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string
       this.passwordInfoArray = this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[]
       this.passwordTagArray = this.filterPasswordDataPreferences.getSync('tag', []) as string[]

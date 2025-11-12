@@ -1,6 +1,7 @@
 import {
   AbilityConstant,
   appRecovery,
+  common,
   ConfigurationConstant,
   errorManager,
   UIAbility,
@@ -9,7 +10,6 @@ import {
 } from '@kit.AbilityKit'
 import { appInfoManager, updateManager } from '@kit.AppGalleryKit'
 import { preferences, relationalStore } from '@kit.ArkData'
-import { uri } from '@kit.ArkTS'
 import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
@@ -17,12 +17,8 @@ import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
-import { check, get } from '../common/Accesstoken'
+import { check } from '../common/Accesstoken'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
-import { importCsvPassword } from '../common/Csv'
-import { importInfo, importPassword, importTag } from '../common/Dataimport'
-import getDeviceToken from '../common/Devicetoken'
-import { read } from '../common/File'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 import { autoBackupTable } from '../common/Table'
@@ -33,51 +29,6 @@ interface JsErrorObject {
 }
 
 export default class EntryAbility extends UIAbility {
-  async importData(fileUri: string) {
-    if (!fileUri.endsWith('.txt') && !fileUri.endsWith('.csv')) {
-      return
-    }
-    const filestring = read(fileUri)
-    if (fileUri.endsWith('.txt')) {
-      const data = await promptAction.showActionMenu({
-        title: '选择导入类型',
-        buttons: [
-          {
-            text: '密码',
-            color: $r('sys.color.font_primary')
-          },
-          {
-            text: '常用信息',
-            color: $r('sys.color.font_primary')
-          },
-          {
-            text: '标签',
-            color: $r('sys.color.font_primary')
-          }
-        ]
-      })
-      if (data.index === 0) {
-        await importPassword(filestring, 0)
-        this.context.eventHub.emit('refreshPassword')
-      }
-      if (data.index === 1) {
-        await importInfo(filestring, 0)
-        this.context.eventHub.emit('refreshInfo')
-      }
-      if (data.index === 2) {
-        await importTag(filestring, 0)
-        this.context.eventHub.emit('refreshTag')
-      }
-      promptAction.openToast({
-        message: '导入成功'
-      })
-    }
-    if (fileUri.endsWith('.csv')) {
-      await importCsvPassword(filestring)
-      this.context.eventHub.emit('refreshPassword')
-    }
-  }
-
   async appInit(want: Want) {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
@@ -117,7 +68,7 @@ export default class EntryAbility extends UIAbility {
     }
     await notificationManager.setBadgeNumber(0)
     if (want.parameters?.noticeUrl) {
-      openLink(want.parameters.noticeUrl as string)
+      openLink(this.context, want.parameters.noticeUrl as string)
     }
     if (want.parameters?.shortcutId === 'newPassword') {
       this.context.eventHub.emit('newPassword')
@@ -128,101 +79,30 @@ export default class EntryAbility extends UIAbility {
     if (want.parameters?.menuHandler === 'clickMenu') {
       const uriList = want.parameters.uriList as string[]
       const fileUri = uriList[0] as string
-      await this.importData(fileUri)
+      this.context.eventHub.emit('wantUri', fileUri)
     }
     if (want.uri) {
       if (want.uri === 'storage:///clearcache') {
         this.context.eventHub.emit('clearData')
       }
-      await this.importData(want.uri)
-      if (want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
-        const urires = new uri.URI(want.uri)
-        const invitationCode = urires.getQueryValue('invitationcode')
-        const vipCode = urires.getQueryValue('vipcode')
-        const accessToken = await get()
-        if (invitationCode) {
-          if (!accessToken) {
-            promptAction.showDialog({
-              title: '提示',
-              message: '邀请码使用失败，原因：未登录账号',
-              buttons: [
-                {
-                  text: '确定',
-                  color: $r('sys.color.font_emphasize')
-                }
-              ]
-            })
-          }
-          if (accessToken) {
-            const deviceToken = await getDeviceToken()
-            if (deviceToken) {
-              const res = await request('/product/useInvitationcode', {
-                accessToken: accessToken,
-                deviceToken: deviceToken,
-                product: 'password',
-                invitationcode: invitationCode
-              })
-              if (res !== 'fail') {
-                promptAction.showDialog({
-                  title: '提示',
-                  message: '邀请码使用成功',
-                  buttons: [
-                    {
-                      text: '确定',
-                      color: $r('sys.color.font_emphasize')
-                    }
-                  ]
-                })
-              }
-            }
-          }
-        }
-        if (vipCode) {
-          if (!accessToken) {
-            promptAction.showDialog({
-              title: '提示',
-              message: '兑换码使用失败，原因：未登录账号',
-              buttons: [
-                {
-                  text: '确定',
-                  color: $r('sys.color.font_emphasize')
-                }
-              ]
-            })
-          }
-          if (accessToken) {
-            const res = await request('/product/useVipcode', {
-              accessToken: accessToken,
-              vipcode: vipCode
-            })
-            if (res !== 'fail') {
-              promptAction.showDialog({
-                title: '提示',
-                message: '兑换码使用成功',
-                buttons: [
-                  {
-                    text: '确定',
-                    color: $r('sys.color.font_emphasize')
-                  }
-                ]
-              })
-            }
-          }
-        }
+      if (want.uri.startsWith('https://www.zhangls2512.cn/product/password') || want.uri.endsWith('.txt') ||
+      want.uri.endsWith('.csv')) {
+        this.context.eventHub.emit('wantUri', want.uri)
       }
     }
   }
 
   async windowInit(windowStage: window.WindowStage) {
+    await windowStage.loadContent('pages/Index')
+    const UIContext = windowStage.getMainWindowSync().getUIContext()
+    const context = UIContext.getHostContext() as common.UIAbilityContext
+    const promptAction = UIContext.getPromptAction()
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
     })
     if (deviceInfo.deviceType === '2in1') {
       const windowRectAutoSave = commonSettingDataPreferences.getSync('windowRectAutoSave', false) as boolean
       await windowStage.setWindowRectAutoSave(windowRectAutoSave)
-    }
-    await windowStage.loadContent('pages/Index')
-    if (deviceInfo.deviceType === '2in1') {
       const lastWindow = await window.getLastWindow(this.context)
       const windowTopmost = commonSettingDataPreferences.getSync('windowTopmost', false) as boolean
       await lastWindow.setWindowTopmost(windowTopmost)
@@ -238,133 +118,9 @@ export default class EntryAbility extends UIAbility {
         }
       }
     }
-  }
-
-  async onCreate(want: Want) {
-    const passwordRdbStore = await relationalStore.getRdbStore(this.context, {
-      name: 'password',
-      securityLevel: 4,
-      encrypt: true,
-      allowRebuild: true
-    })
-    passwordRdbStore.executeSql('CREATE TABLE IF NOT EXISTS password (id INTEGER PRIMARY KEY AUTOINCREMENT, name, info, tag, updateTime, cloudBackupTime)')
-    const infoRdbStore = await relationalStore.getRdbStore(this.context, {
-      name: 'info',
-      securityLevel: 4,
-      encrypt: true,
-      allowRebuild: true
-    })
-    infoRdbStore.executeSql('CREATE TABLE IF NOT EXISTS info (id INTEGER PRIMARY KEY AUTOINCREMENT, type, value, updateTime, cloudBackupTime)')
-    const tagRdbStore = await relationalStore.getRdbStore(this.context, {
-      name: 'tag',
-      securityLevel: 1,
-      encrypt: true,
-      allowRebuild: true
-    })
-    tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag (id INTEGER PRIMARY KEY AUTOINCREMENT, value, color, updateTime, cloudBackupTime)')
-    passwordRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
-      for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await passwordRdbStore.obtainDistributedTableName(deviceIds[i], 'password')
-        const predicates = new relationalStore.RdbPredicates(tableName)
-        const resultSet = await passwordRdbStore.query(predicates)
-        const idIndex = resultSet.getColumnIndex('id')
-        const nameIndex = resultSet.getColumnIndex('name')
-        const infoIndex = resultSet.getColumnIndex('info')
-        const tagIndex = resultSet.getColumnIndex('tag')
-        const updateTimeIndex = resultSet.getColumnIndex('updateTime')
-        const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
-        while (resultSet.goToNextRow()) {
-          passwordRdbStore.insertSync('password', {
-            id: resultSet.getValue(idIndex),
-            name: String(resultSet.getValue(nameIndex)),
-            info: resultSet.getValue(infoIndex),
-            tag: resultSet.getValue(tagIndex),
-            updateTime: resultSet.getValue(updateTimeIndex),
-            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
-          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
-        }
-        resultSet.close()
-      }
-      this.context.eventHub.emit('refreshPassword')
-      autoBackupTable('password')
-    })
-    infoRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
-      for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await infoRdbStore.obtainDistributedTableName(deviceIds[i], 'info')
-        const predicates = new relationalStore.RdbPredicates(tableName)
-        const resultSet = await infoRdbStore.query(predicates)
-        const idIndex = resultSet.getColumnIndex('id')
-        const typeIndex = resultSet.getColumnIndex('type')
-        const valueIndex = resultSet.getColumnIndex('value')
-        const updateTimeIndex = resultSet.getColumnIndex('updateTime')
-        const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
-        while (resultSet.goToNextRow()) {
-          infoRdbStore.insertSync('info', {
-            id: resultSet.getValue(idIndex),
-            type: String(resultSet.getValue(typeIndex)),
-            value: String(resultSet.getValue(valueIndex)),
-            updateTime: resultSet.getValue(updateTimeIndex),
-            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
-          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
-        }
-        resultSet.close()
-      }
-      this.context.eventHub.emit('refreshInfo')
-      autoBackupTable('info')
-    })
-    tagRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
-      for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await tagRdbStore.obtainDistributedTableName(deviceIds[i], 'tag')
-        const predicates = new relationalStore.RdbPredicates(tableName)
-        const resultSet = await tagRdbStore.query(predicates)
-        const idIndex = resultSet.getColumnIndex('id')
-        const valueIndex = resultSet.getColumnIndex('value')
-        const colorIndex = resultSet.getColumnIndex('color')
-        const updateTimeIndex = resultSet.getColumnIndex('updateTime')
-        const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
-        while (resultSet.goToNextRow()) {
-          tagRdbStore.insertSync('tag', {
-            id: resultSet.getValue(idIndex),
-            value: String(resultSet.getValue(valueIndex)),
-            color: String(resultSet.getValue(colorIndex)),
-            updateTime: resultSet.getValue(updateTimeIndex),
-            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
-          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
-        }
-        resultSet.close()
-      }
-      this.context.eventHub.emit('refreshTag')
-      autoBackupTable('tag')
-    })
-    appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
-    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-      name: 'commonSetting'
-    })
-    const allowContinue = commonSettingDataPreferences.getSync('allowContinue', true)
-    if (!allowContinue) {
-      await this.context.setMissionContinueState(AbilityConstant.ContinueState.INACTIVE)
-    }
-    if (allowContinue) {
-      await this.context.setMissionContinueState(AbilityConstant.ContinueState.ACTIVE)
-    }
-    const allowRestore = commonSettingDataPreferences.getSync('allowRestore', true) as boolean
-    this.context.setRestoreEnabled(allowRestore)
-    const applicationContext = this.context.getApplicationContext()
-    const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
-    if (colorMode === 0) {
-      applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
-    }
-    if (colorMode === 1) {
-      applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
-    }
-    if (colorMode === 2) {
-      applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
-    }
     const debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'debugSetting'
     })
-    const processCache = debugSettingDataPreferences.getSync('processCache', true) as boolean
-    applicationContext.setSupportedProcessCache(processCache)
     const filesDir = this.context.filesDir
     errorManager.on('error', {
       onUnhandledException(errMsg) {
@@ -419,7 +175,7 @@ export default class EntryAbility extends UIAbility {
             'RESOURCE_OVERLIMIT',
             'ADDRESS_SANITIZER'
           ]) as string[]).includes('JS_ERROR')) {
-            const res = await request('/debug/newErrorLog', {
+            const res = await request(context, UIContext, '/debug/newErrorLog', {
               product: 'password',
               object: object
             })
@@ -490,7 +246,7 @@ export default class EntryAbility extends UIAbility {
             'RESOURCE_OVERLIMIT',
             'ADDRESS_SANITIZER'
           ]) as string[]).includes('JS_ERROR')) {
-            const res = await request('/debug/newErrorLog', {
+            const res = await request(context, UIContext, '/debug/newErrorLog', {
               product: 'password',
               object: object
             })
@@ -542,7 +298,7 @@ export default class EntryAbility extends UIAbility {
               'RESOURCE_OVERLIMIT',
               'ADDRESS_SANITIZER'
             ]) as string[]).includes(item.name)) {
-              const res = await request('/debug/newErrorLog', {
+              const res = await request(context, UIContext, '/debug/newErrorLog', {
                 product: 'password',
                 object: item
               })
@@ -697,7 +453,165 @@ export default class EntryAbility extends UIAbility {
         }
       }
     })
-    await check()
+    await check(context, UIContext)
+    const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'cloudbackupSetting'
+    })
+    const autoImportTables = cloudbackupSettingDataPreferences.getSync('autoImport', []) as string[]
+    if (autoImportTables.includes('password')) {
+      const res = await importCloudBackupPassword(context, UIContext)
+      if (res === 'success') {
+        this.context.eventHub.emit('refreshPassword')
+        promptAction.openToast({
+          message: '自动导入密码云备份成功'
+        })
+      }
+    }
+    if (autoImportTables.includes('info')) {
+      const res = await importCloudBackupInfo(context, UIContext)
+      if (res === 'success') {
+        this.context.eventHub.emit('refreshInfo')
+        promptAction.openToast({
+          message: '自动导入常用信息云备份成功'
+        })
+      }
+    }
+    if (autoImportTables.includes('tag')) {
+      const res = await importCloudBackupTag(context, UIContext)
+      if (res === 'success') {
+        this.context.eventHub.emit('refreshTag')
+        promptAction.openToast({
+          message: '自动导入标签云备份成功'
+        })
+      }
+    }
+  }
+
+  async onCreate(want: Want) {
+    const passwordRdbStore = await relationalStore.getRdbStore(this.context, {
+      name: 'password',
+      securityLevel: 4,
+      encrypt: true,
+      allowRebuild: true
+    })
+    passwordRdbStore.executeSql('CREATE TABLE IF NOT EXISTS password (id INTEGER PRIMARY KEY AUTOINCREMENT, name, info, tag, updateTime, cloudBackupTime)')
+    const infoRdbStore = await relationalStore.getRdbStore(this.context, {
+      name: 'info',
+      securityLevel: 4,
+      encrypt: true,
+      allowRebuild: true
+    })
+    infoRdbStore.executeSql('CREATE TABLE IF NOT EXISTS info (id INTEGER PRIMARY KEY AUTOINCREMENT, type, value, updateTime, cloudBackupTime)')
+    const tagRdbStore = await relationalStore.getRdbStore(this.context, {
+      name: 'tag',
+      securityLevel: 1,
+      encrypt: true,
+      allowRebuild: true
+    })
+    tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag (id INTEGER PRIMARY KEY AUTOINCREMENT, value, color, updateTime, cloudBackupTime)')
+    passwordRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
+      for (let i = 0; i < deviceIds.length; i++) {
+        const tableName = await passwordRdbStore.obtainDistributedTableName(deviceIds[i], 'password')
+        const predicates = new relationalStore.RdbPredicates(tableName)
+        const resultSet = await passwordRdbStore.query(predicates)
+        const idIndex = resultSet.getColumnIndex('id')
+        const nameIndex = resultSet.getColumnIndex('name')
+        const infoIndex = resultSet.getColumnIndex('info')
+        const tagIndex = resultSet.getColumnIndex('tag')
+        const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+        const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+        while (resultSet.goToNextRow()) {
+          passwordRdbStore.insertSync('password', {
+            id: resultSet.getValue(idIndex),
+            name: String(resultSet.getValue(nameIndex)),
+            info: resultSet.getValue(infoIndex),
+            tag: resultSet.getValue(tagIndex),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+        }
+        resultSet.close()
+      }
+      this.context.eventHub.emit('refreshPassword')
+      autoBackupTable(this.context, 'password')
+    })
+    infoRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
+      for (let i = 0; i < deviceIds.length; i++) {
+        const tableName = await infoRdbStore.obtainDistributedTableName(deviceIds[i], 'info')
+        const predicates = new relationalStore.RdbPredicates(tableName)
+        const resultSet = await infoRdbStore.query(predicates)
+        const idIndex = resultSet.getColumnIndex('id')
+        const typeIndex = resultSet.getColumnIndex('type')
+        const valueIndex = resultSet.getColumnIndex('value')
+        const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+        const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+        while (resultSet.goToNextRow()) {
+          infoRdbStore.insertSync('info', {
+            id: resultSet.getValue(idIndex),
+            type: String(resultSet.getValue(typeIndex)),
+            value: String(resultSet.getValue(valueIndex)),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+        }
+        resultSet.close()
+      }
+      this.context.eventHub.emit('refreshInfo')
+      autoBackupTable(this.context, 'info')
+    })
+    tagRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
+      for (let i = 0; i < deviceIds.length; i++) {
+        const tableName = await tagRdbStore.obtainDistributedTableName(deviceIds[i], 'tag')
+        const predicates = new relationalStore.RdbPredicates(tableName)
+        const resultSet = await tagRdbStore.query(predicates)
+        const idIndex = resultSet.getColumnIndex('id')
+        const valueIndex = resultSet.getColumnIndex('value')
+        const colorIndex = resultSet.getColumnIndex('color')
+        const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+        const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+        while (resultSet.goToNextRow()) {
+          tagRdbStore.insertSync('tag', {
+            id: resultSet.getValue(idIndex),
+            value: String(resultSet.getValue(valueIndex)),
+            color: String(resultSet.getValue(colorIndex)),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+        }
+        resultSet.close()
+      }
+      this.context.eventHub.emit('refreshTag')
+      autoBackupTable(this.context, 'tag')
+    })
+    appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    const allowContinue = commonSettingDataPreferences.getSync('allowContinue', true)
+    if (!allowContinue) {
+      await this.context.setMissionContinueState(AbilityConstant.ContinueState.INACTIVE)
+    }
+    if (allowContinue) {
+      await this.context.setMissionContinueState(AbilityConstant.ContinueState.ACTIVE)
+    }
+    const allowRestore = commonSettingDataPreferences.getSync('allowRestore', true) as boolean
+    this.context.setRestoreEnabled(allowRestore)
+    const applicationContext = this.context.getApplicationContext()
+    const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
+    if (colorMode === 0) {
+      applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
+    }
+    if (colorMode === 1) {
+      applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
+    }
+    if (colorMode === 2) {
+      applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
+    }
+    const debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'debugSetting'
+    })
+    const processCache = debugSettingDataPreferences.getSync('processCache', true) as boolean
+    applicationContext.setSupportedProcessCache(processCache)
     let netConnected = false
     let currentNetworkBearerType = -1
     const netHandle = connection.getDefaultNetSync()
@@ -717,37 +631,6 @@ export default class EntryAbility extends UIAbility {
       } catch (err) {
         promptAction.openToast({
           message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-        })
-      }
-    }
-    const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-      name: 'cloudbackupSetting'
-    })
-    const autoImportTables = cloudbackupSettingDataPreferences.getSync('autoImport', []) as string[]
-    if (autoImportTables.includes('password')) {
-      const res = await importCloudBackupPassword()
-      if (res === 'success') {
-        this.context.eventHub.emit('refreshPassword')
-        promptAction.openToast({
-          message: '自动导入密码云备份成功'
-        })
-      }
-    }
-    if (autoImportTables.includes('info')) {
-      const res = await importCloudBackupInfo()
-      if (res === 'success') {
-        this.context.eventHub.emit('refreshInfo')
-        promptAction.openToast({
-          message: '自动导入常用信息云备份成功'
-        })
-      }
-    }
-    if (autoImportTables.includes('tag')) {
-      const res = await importCloudBackupTag()
-      if (res === 'success') {
-        this.context.eventHub.emit('refreshTag')
-        promptAction.openToast({
-          message: '自动导入标签云备份成功'
         })
       }
     }
@@ -779,7 +662,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 32) {
+    if (wantParam.version !== 33) {
       promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

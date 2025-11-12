@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { get } from '../common/Accesstoken'
@@ -20,6 +21,8 @@ struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
   @Local hoverId: number = -1
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   accessToken: string = ''
   empty: boolean | undefined = undefined
 
@@ -200,7 +203,7 @@ struct Viplog {
       .onReachEnd(async () => {
         if (this.accessToken && this.empty === false) {
           this.loading = true
-          const res = await request('/product/getViplogList', {
+          const res = await request(this.context, this.UIContext, '/product/getViplogList', {
             accessToken: this.accessToken,
             product: 'password',
             skip: this.viplogArray.length
@@ -222,7 +225,7 @@ struct Viplog {
       this.accessToken = await get()
       if (this.accessToken) {
         this.loading = true
-        const res = await request('/product/getViplogList', {
+        const res = await request(this.context, this.UIContext, '/product/getViplogList', {
           accessToken: this.accessToken,
           product: 'password'
         })

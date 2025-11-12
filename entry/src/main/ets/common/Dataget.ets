@@ -45,8 +45,7 @@ export interface Tag {
   isCloudBackup: boolean
 }
 
-export async function getPasswordInfo(id: number) {
-  const context = getContext()
+export async function getPasswordInfo(context: Context, id: number) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
     securityLevel: 4,
@@ -67,7 +66,7 @@ export async function getPasswordInfo(id: number) {
     const promises = tag.map(async (item): Promise<PasswordTagItem> => {
       return {
         value: item,
-        color: await getTagColor(item)
+        color: await getTagColor(context, item)
       }
     })
     const info: Password = {
@@ -99,9 +98,8 @@ export async function getPasswordInfo(id: number) {
   return 'fail'
 }
 
-export async function getPasswordList() {
+export async function getPasswordList(context: Context) {
   try {
-    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'password',
       securityLevel: 4,
@@ -122,7 +120,7 @@ export async function getPasswordList() {
       const promises = tag.map(async (item): Promise<PasswordTagItem> => {
         return {
           value: item,
-          color: await getTagColor(item)
+          color: await getTagColor(context, item)
         }
       })
       const info: Password = {
@@ -159,10 +157,10 @@ export async function getPasswordList() {
   }
 }
 
-export async function getFilterPasswordList(nameKeyword: string, info: PasswordInfoItem[], tag: string[],
+export async function getFilterPasswordList(context: Context, nameKeyword: string, info: PasswordInfoItem[],
+  tag: string[],
   orderColumn: string = 'updateTime') {
   try {
-    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'password',
       securityLevel: 4,
@@ -203,7 +201,7 @@ export async function getFilterPasswordList(nameKeyword: string, info: PasswordI
         const promises = tag.map(async (item): Promise<PasswordTagItem> => {
           return {
             value: item,
-            color: await getTagColor(item)
+            color: await getTagColor(context, item)
           }
         })
         const info: Password = {
@@ -241,8 +239,7 @@ export async function getFilterPasswordList(nameKeyword: string, info: PasswordI
   }
 }
 
-export async function getPasswordMaxId() {
-  const context = getContext()
+export async function getPasswordMaxId(context: Context) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
     securityLevel: 4,
@@ -261,8 +258,7 @@ export async function getPasswordMaxId() {
   return maxId
 }
 
-export async function getInfoInfo(id: number) {
-  const context = getContext()
+export async function getInfoInfo(context: Context, id: number) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
     securityLevel: 4,
@@ -306,9 +302,8 @@ export async function getInfoInfo(id: number) {
   return 'fail'
 }
 
-export async function getInfoList() {
+export async function getInfoList(context: Context) {
   try {
-    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
       securityLevel: 4,
@@ -358,9 +353,8 @@ export async function getInfoList() {
   }
 }
 
-export async function getInfoTypeList() {
+export async function getInfoTypeList(context: Context) {
   try {
-    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
       securityLevel: 4,
@@ -388,9 +382,8 @@ export async function getInfoTypeList() {
   }
 }
 
-export async function getTypeInfoList(type: string) {
+export async function getTypeInfoList(context: Context, type: string) {
   try {
-    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
       securityLevel: 4,
@@ -415,8 +408,7 @@ export async function getTypeInfoList(type: string) {
   }
 }
 
-async function getTagColor(value: string) {
-  const context = getContext()
+async function getTagColor(context: Context, value: string) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: 1,
@@ -436,8 +428,7 @@ async function getTagColor(value: string) {
   return ''
 }
 
-export async function getTagInfo(id: number) {
-  const context = getContext()
+export async function getTagInfo(context: Context, id: number) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: 1,
@@ -481,9 +472,8 @@ export async function getTagInfo(id: number) {
   return 'fail'
 }
 
-export async function getTagList(orderColumn: string = 'updateTime') {
+export async function getTagList(context: Context, orderColumn: string = 'updateTime') {
   try {
-    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'tag',
       securityLevel: 1,

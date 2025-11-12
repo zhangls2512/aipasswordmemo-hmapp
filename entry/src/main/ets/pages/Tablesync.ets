@@ -31,7 +31,8 @@ struct Tablesync {
   @Local autoSyncDevices: Item[] = []
   @Local availableDeviceArray: Item[] = []
   @Local hoverId: number | string = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
@@ -107,7 +108,8 @@ struct Tablesync {
                     .enabled(!this.onTables.includes(item.value))
                     .onChange(async (isOn) => {
                       if (isOn) {
-                        const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+                        const res =
+                          await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
                         if (!res) {
                           this.onTables = this.onTables.filter(itema => itema !== item.value)
                         }
@@ -645,17 +647,17 @@ struct Tablesync {
                 })
                 if (data.index === 0) {
                   this.pushDialogControllerProgress.open()
-                  await syncTable('password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  await syncTable(this.context, 'password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
                   this.pushDialogControllerProgress.close()
                 }
                 if (data.index === 1) {
                   this.pushDialogControllerProgress.open()
-                  await syncTable('info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  await syncTable(this.context, 'info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
                   this.pushDialogControllerProgress.close()
                 }
                 if (data.index === 2) {
                   this.pushDialogControllerProgress.open()
-                  await syncTable('tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+                  await syncTable(this.context, 'tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
                   this.pushDialogControllerProgress.close()
                 }
               })
@@ -718,17 +720,17 @@ struct Tablesync {
                 })
                 if (data.index === 0) {
                   this.pullDialogControllerProgress.open()
-                  await syncTable('password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  await syncTable(this.context, 'password', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
                   this.pullDialogControllerProgress.close()
                 }
                 if (data.index === 1) {
                   this.pullDialogControllerProgress.open()
-                  await syncTable('info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  await syncTable(this.context, 'info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
                   this.pullDialogControllerProgress.close()
                 }
                 if (data.index === 2) {
                   this.pullDialogControllerProgress.open()
-                  await syncTable('tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
+                  await syncTable(this.context, 'tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
                   this.pullDialogControllerProgress.close()
                 }
               })
@@ -761,7 +763,7 @@ struct Tablesync {
     .title('设备间数据同步')
     .onAppear(async () => {
       this.getSetting()
-      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+      const res = await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
       if (res) {
         this.availableDeviceArray = distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo')
           .getAvailableDeviceListSync() as Item[]

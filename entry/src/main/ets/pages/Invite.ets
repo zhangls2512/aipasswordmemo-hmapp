@@ -25,7 +25,8 @@ struct Invite {
   @Local loading: boolean = false
   @Local inputInvitationcode: string = ''
   @Local accessToken: string = ''
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -43,7 +44,7 @@ struct Invite {
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                 })
                 .onClick(() => {
-                  copy(this.invitationcode)
+                  copy(this.context, this.UIContext, this.invitationcode)
                 })
               Text('邀请链接')
                 .fontWeight(FontWeight.Bold)
@@ -214,7 +215,7 @@ struct Invite {
                   })
                 })
                 dialogControllerProgress.open()
-                const res = await request('/product/useInvitationcode', {
+                const res = await request(this.context, this.UIContext, '/product/useInvitationcode', {
                   accessToken: this.accessToken,
                   deviceToken: this.deviceToken,
                   product: 'password',
@@ -322,7 +323,7 @@ struct Invite {
       if (this.accessToken) {
         this.loading = true
         this.deviceToken = await getDeviceToken()
-        const userres = await request('/product/getUserInfo', {
+        const userres = await request(this.context, this.UIContext, '/product/getUserInfo', {
           accessToken: this.accessToken,
           product: 'password'
         })
@@ -342,7 +343,7 @@ struct Invite {
             sharableTarget.share(shareData)
           })
         }
-        const countres = await request('/product/getInviteUserCount', {
+        const countres = await request(this.context, this.UIContext, '/product/getInviteUserCount', {
           accessToken: this.accessToken,
           product: 'password'
         })

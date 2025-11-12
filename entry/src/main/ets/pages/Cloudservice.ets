@@ -9,7 +9,8 @@ export default struct Cloudservice {
   @Consumer() isShowCloudserviceSheet: boolean = false
   @Local cloudService: boolean = false
   @Local loading: boolean = false
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   accessToken: string = ''
 
   build() {
@@ -69,7 +70,7 @@ export default struct Cloudservice {
                     })
                   })
                   dialogControllerProgress.open()
-                  const res = await request('/account/openService', {
+                  const res = await request(this.context, this.UIContext, '/account/openService', {
                     accessToken: this.accessToken,
                     service: 'password'
                   })
@@ -95,7 +96,7 @@ export default struct Cloudservice {
                     })
                   })
                   dialogControllerProgress.open()
-                  const res = await request('/account/closeService', {
+                  const res = await request(this.context, this.UIContext, '/account/closeService', {
                     accessToken: this.accessToken,
                     service: 'password'
                   })
@@ -127,7 +128,7 @@ export default struct Cloudservice {
       this.accessToken = await get()
       if (this.accessToken) {
         this.loading = true
-        this.cloudService = await getCloudServiceStatus()
+        this.cloudService = await getCloudServiceStatus(this.context, this.UIContext)
         this.loading = false
       }
     })

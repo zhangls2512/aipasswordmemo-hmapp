@@ -28,10 +28,9 @@ export interface TagInItem {
   cloudBackupTime: string | number
 }
 
-export async function importPassword(data: string, conflict: relationalStore.ConflictResolution) {
+export async function importPassword(context: Context, data: string, conflict: relationalStore.ConflictResolution) {
   try {
     const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as PasswordInItem[]
-    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'password',
       securityLevel: 4,
@@ -52,8 +51,8 @@ export async function importPassword(data: string, conflict: relationalStore.Con
         cloudBackupTime: cloudBackupTime
       }, conflict)
     })
-    autoSyncTable('password')
-    autoBackupTable('password')
+    autoSyncTable(context, 'password')
+    autoBackupTable(context, 'password')
   } catch (err) {
     promptAction.openToast({
       message: '发生错误，错误码：' + err.code
@@ -61,10 +60,9 @@ export async function importPassword(data: string, conflict: relationalStore.Con
   }
 }
 
-export async function importInfo(data: string, conflict: relationalStore.ConflictResolution) {
+export async function importInfo(context: Context, data: string, conflict: relationalStore.ConflictResolution) {
   try {
     const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as InfoInItem[]
-    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
       securityLevel: 4,
@@ -86,8 +84,8 @@ export async function importInfo(data: string, conflict: relationalStore.Conflic
         }, conflict)
       }
     })
-    autoSyncTable('info')
-    autoBackupTable('info')
+    autoSyncTable(context, 'info')
+    autoBackupTable(context, 'info')
   } catch (err) {
     promptAction.openToast({
       message: '发生错误，错误码：' + err.code
@@ -95,10 +93,9 @@ export async function importInfo(data: string, conflict: relationalStore.Conflic
   }
 }
 
-export async function importTag(data: string, conflict: relationalStore.ConflictResolution) {
+export async function importTag(context: Context, data: string, conflict: relationalStore.ConflictResolution) {
   try {
     const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as TagInItem[]
-    const context = getContext()
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'tag',
       securityLevel: 1,
@@ -118,8 +115,8 @@ export async function importTag(data: string, conflict: relationalStore.Conflict
         cloudBackupTime: cloudBackupTime
       }, conflict)
     })
-    autoSyncTable('tag')
-    autoBackupTable('tag')
+    autoSyncTable(context, 'tag')
+    autoBackupTable(context, 'tag')
   } catch (err) {
     promptAction.openToast({
       message: '发生错误，错误码：' + err.code

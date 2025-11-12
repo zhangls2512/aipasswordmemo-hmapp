@@ -44,11 +44,15 @@ export default struct PasswordPage {
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Password[] = []
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
   passwordId = 0
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
+  })
+  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'commonSetting'
   })
 
   async cloudBackup(item: Password) {
@@ -68,7 +72,7 @@ export default struct PasswordPage {
         time: Date.now()
       })
     }
-    await setCloudBackup({
+    await setCloudBackup(this.context, this.UIContext, {
       type: 'password',
       id: item.id,
       content: JSON.stringify({
@@ -133,7 +137,7 @@ export default struct PasswordPage {
               ]
             })
             if (data.index === 1) {
-              await deleteData('password', item.id)
+              await deleteData(this.context, 'password', item.id)
               this.loading = true
             }
           })
@@ -166,7 +170,7 @@ export default struct PasswordPage {
                 })
               })
               dialogControllerProgress.open()
-              await deleteCloudBackup({
+              await deleteCloudBackup(this.context, this.UIContext, {
                 type: 'password',
                 id: item.id
               })
@@ -268,7 +272,7 @@ export default struct PasswordPage {
               })
               if (data.index === 1) {
                 const promises = this.multipleSelectArray.map(async (item) => {
-                  await deleteData('password', item.id)
+                  await deleteData(this.context, 'password', item.id)
                 })
                 await Promise.all(promises)
                 this.multipleSelect = false
@@ -337,10 +341,8 @@ export default struct PasswordPage {
                 title: '新增密码'
               },
               onAppear: async () => {
-                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                  name: 'commonSetting'
-                })
-                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                const disallowScreenshot =
+                  this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)
@@ -436,10 +438,8 @@ export default struct PasswordPage {
                 title: '筛选密码'
               },
               onAppear: async () => {
-                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                  name: 'commonSetting'
-                })
-                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                const disallowScreenshot =
+                  this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)
@@ -672,8 +672,9 @@ export default struct PasswordPage {
         }
         .layoutWeight(1)
         .onRefreshing(async () => {
-          this.passwordArray = await getFilterPasswordList(this.nameKeyword, this.info, this.tag, this.orderColumn)
-          this.tags = await getTagList('value')
+          this.passwordArray =
+            await getFilterPasswordList(this.context, this.nameKeyword, this.info, this.tag, this.orderColumn)
+          this.tags = await getTagList(this.context, 'value')
           this.loading = false
         })
         .bindSheet(this.isShowInfoSheet!!, this.InfoSheetBuilder(this.passwordId), {
@@ -683,10 +684,7 @@ export default struct PasswordPage {
             title: '密码详情'
           },
           onAppear: async () => {
-            const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-              name: 'commonSetting'
-            })
-            const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+            const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
             if (disallowScreenshot) {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(true)
@@ -728,11 +726,8 @@ export default struct PasswordPage {
           this.preferType = 1
         }
       })
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      this.showPassword = commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
-      const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+      this.showPassword = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
+      const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
       const lastWindow = await window.getLastWindow(this.context)
       if (disallowScreenshot) {
         await lastWindow.setWindowPrivacyMode(this.showPassword)
@@ -749,17 +744,14 @@ export default struct PasswordPage {
       })
       this.context.eventHub.on('refreshPassword', async () => {
         this.enableCloudBackup = false
-        const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-          name: 'commonSetting'
-        })
-        this.showPassword = commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
-        const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+        this.showPassword = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
+        const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
         if (disallowScreenshot) {
           const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(this.showPassword)
         }
         this.loading = true
-        const cloudServiceStatus = await getCloudServiceStatus()
+        const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
@@ -776,7 +768,7 @@ export default struct PasswordPage {
         this.loading = true
       })
       this.loading = true
-      const cloudServiceStatus = await getCloudServiceStatus()
+      const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
       if (cloudServiceStatus && getKey()) {
         this.enableCloudBackup = true
       }
@@ -795,10 +787,7 @@ export default struct PasswordPage {
         title: '修改密码'
       },
       onAppear: async () => {
-        const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-          name: 'commonSetting'
-        })
-        const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+        const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
         if (disallowScreenshot) {
           const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(true)

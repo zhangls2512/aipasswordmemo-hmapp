@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { backupTable, recoveryTable } from '../common/Table'
 
@@ -18,7 +19,7 @@ struct DataBackupRecovery {
   @Local pauseAutoBackupWhenPowerSave: boolean = false
   @Local isBackupTables: string[] = []
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext()
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
@@ -220,7 +221,7 @@ struct DataBackupRecovery {
                 }
               })
               .onClick(async () => {
-                await backupTable('password')
+                await backupTable(this.context, 'password')
                 this.getSetting()
               })
 
@@ -262,7 +263,7 @@ struct DataBackupRecovery {
                 }
               })
               .onClick(async () => {
-                await backupTable('info')
+                await backupTable(this.context, 'info')
                 this.getSetting()
               })
 
@@ -304,7 +305,7 @@ struct DataBackupRecovery {
                 }
               })
               .onClick(async () => {
-                await backupTable('tag')
+                await backupTable(this.context, 'tag')
                 this.getSetting()
               })
             }
@@ -375,7 +376,7 @@ struct DataBackupRecovery {
                     }
                   })
                   .onClick(() => {
-                    recoveryTable(item)
+                    recoveryTable(this.context, item)
                   })
                 })
               }

@@ -1,10 +1,10 @@
 import { get } from './Accesstoken'
 import request from './Request'
 
-export default async function getCloudServiceStatus() {
+export default async function getCloudServiceStatus(context: Context, UIContext: UIContext) {
   const accessToken = await get()
   if (accessToken) {
-    const infores = await request('/account/getAccountInfo', {
+    const infores = await request(context, UIContext, '/account/getAccountInfo', {
       accessToken: accessToken
     })
     if (infores !== 'fail') {
