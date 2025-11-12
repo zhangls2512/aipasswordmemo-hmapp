@@ -26,7 +26,8 @@ export default struct Newinfo {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   oftenUsedInfoTypes = ['自定义']
   specialInfoTypes = ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
@@ -423,7 +424,7 @@ export default struct Newinfo {
               })
               return
             }
-            const res = await newInfo({
+            const res = await newInfo(this.context, this.UIContext, {
               type: infoType,
               value: this.infoValue,
               cloudBackup: this.cloudBackup
@@ -450,7 +451,7 @@ export default struct Newinfo {
       const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码', '图标']) as string[]
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
-      const res = await getCloudServiceStatus()
+      const res = await getCloudServiceStatus(this.context, this.UIContext)
       const key = getKey()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'

@@ -142,13 +142,13 @@ struct DataInOut {
                     conflictResolution = 5
                   }
                   if (filePath.endsWith('.txt')) {
-                    await importPassword(filestring, conflictResolution)
+                    await importPassword(this.context, filestring, conflictResolution)
                     promptAction.openToast({
                       message: '导入成功'
                     })
                   }
                   if (filePath.endsWith('.csv')) {
-                    importCsvPassword(filestring)
+                    importCsvPassword(this.context, filestring)
                   }
                 }
               })
@@ -203,7 +203,7 @@ struct DataInOut {
                   if (this.index === 1) {
                     conflictResolution = 5
                   }
-                  await importInfo(filestring, conflictResolution)
+                  await importInfo(this.context, filestring, conflictResolution)
                   promptAction.openToast({
                     message: '导入成功'
                   })
@@ -260,7 +260,7 @@ struct DataInOut {
                   if (this.index === 1) {
                     conflictResolution = 5
                   }
-                  await importTag(filestring, conflictResolution)
+                  await importTag(this.context, filestring, conflictResolution)
                   promptAction.openToast({
                     message: '导入成功'
                   })
@@ -278,7 +278,7 @@ struct DataInOut {
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontWeight(FontWeight.Medium)
                 .onClick(() => {
-                  openLink('https://docs.qq.com/doc/p/a12dc0f6d9e9ab998d81ddd1ddc95b5445518209')
+                  openLink(this.context, 'https://docs.qq.com/doc/p/a12dc0f6d9e9ab998d81ddd1ddc95b5445518209')
                 })
               Span('中所述的标准格式。\n因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导入。')
                 .fontColor($r('sys.color.font_secondary'))
@@ -356,7 +356,7 @@ struct DataInOut {
                   }
                   const lines = filestring.split('\n').filter(line => line.trim() !== '')
                   const result: PasswordOutItem[] = []
-                  const maxId = await getPasswordMaxId()
+                  const maxId = await getPasswordMaxId(this.context)
                   let idCounter = maxId + 1
                   for (let i = 1; i < lines.length; i++) {
                     const line = lines[i]
@@ -384,7 +384,7 @@ struct DataInOut {
                       cloudBackupTime: JSON.stringify([])
                     })
                   }
-                  await importPassword(JSON.stringify(result), conflictResolution)
+                  await importPassword(this.context, JSON.stringify(result), conflictResolution)
                   promptAction.openToast({
                     message: '导入成功'
                   })
@@ -467,7 +467,7 @@ struct DataInOut {
                 }
               })
               .onClick(async () => {
-                const array = await getPasswordList()
+                const array = await getPasswordList(this.context)
                 const arrayOut = array.map((item): PasswordOutItem => {
                   let cloudBackupTime = JSON.stringify([])
                   if (typeof (item.cloudBackupTime) === 'string') {
@@ -613,7 +613,7 @@ struct DataInOut {
                   const uris = await documentViewPicker.save(documentSaveOptions)
                   const filePath = uris[0]
                   const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-                  const array = await getInfoList()
+                  const array = await getInfoList(this.context)
                   const arrayOut = array.map((item): InfoOutItem => {
                     let cloudBackupTime = JSON.stringify([])
                     if (typeof (item.cloudBackupTime) === 'string') {
@@ -687,7 +687,7 @@ struct DataInOut {
                   const uris = await documentViewPicker.save(documentSaveOptions)
                   const filePath = uris[0]
                   const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-                  const array = await getTagList()
+                  const array = await getTagList(this.context)
                   const arrayOut = array.map((item): TagOutItem => {
                     let cloudBackupTime = JSON.stringify([])
                     if (typeof (item.cloudBackupTime) === 'string') {

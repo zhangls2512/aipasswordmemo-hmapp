@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog } from '@kit.ArkUI'
 import { get } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -26,11 +27,13 @@ struct Cloudbackupmanage {
   @Local tagSelected: boolean = false
   @Local types: string[] = []
   @Local accessToken: string = ''
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
 
   async getCount() {
     if (this.accessToken) {
       this.loading = true
-      const countres = await request('/password/getBackupCount', {
+      const countres = await request(this.context, this.UIContext, '/password/getBackupCount', {
         accessToken: this.accessToken
       })
       this.loading = false
@@ -195,7 +198,7 @@ struct Cloudbackupmanage {
                       })
                     })
                     dialogControllerProgress.open()
-                    const res = await request('/password/clearBackup', {
+                    const res = await request(this.context, this.UIContext, '/password/clearBackup', {
                       accessToken: this.accessToken,
                       types: this.types
                     })

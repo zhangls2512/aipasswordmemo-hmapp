@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import request from '../common/Request'
 
@@ -12,6 +13,8 @@ struct Feedback {
   @Local contactType: string = '邮箱'
   @Local contactTypeIndex: number = 0
   @Local contactValue: string = ''
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -105,7 +108,7 @@ struct Feedback {
                   })
                 })
                 dialogControllerProgress.open()
-                const res = await request('/debug/sendFeedbackEmail', {
+                const res = await request(this.context, this.UIContext, '/debug/sendFeedbackEmail', {
                   product: 'password',
                   content: this.content,
                   contactType: this.contactType,

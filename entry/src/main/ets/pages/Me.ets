@@ -30,7 +30,11 @@ export default struct Me {
   @Local cloudService: boolean = false
   @Local cloudServiceLoading: boolean = false
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'commonSetting'
+  })
 
   async get() {
     const accountInfo = await getAccountInfo()
@@ -40,7 +44,7 @@ export default struct Me {
     const accessToken = await get()
     if (accessToken) {
       this.cloudServiceLoading = true
-      this.cloudService = await getCloudServiceStatus()
+      this.cloudService = await getCloudServiceStatus(this.context, this.UIContext)
       this.cloudServiceLoading = false
     }
   }
@@ -144,10 +148,8 @@ export default struct Me {
               title: '登录'
             },
             onAppear: async () => {
-              const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                name: 'commonSetting'
-              })
-              const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+              const disallowScreenshot =
+                this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
               if (disallowScreenshot) {
                 const lastWindow = await window.getLastWindow(this.context)
                 await lastWindow.setWindowPrivacyMode(true)
@@ -198,7 +200,7 @@ export default struct Me {
               }
             })
             .onClick(() => {
-              copy(this.uid)
+              copy(this.context, this.UIContext, this.uid)
             })
 
             Divider()
@@ -245,7 +247,7 @@ export default struct Me {
               }
             })
             .onClick(() => {
-              openLink('https://www.zhangls2512.cn/product/account/info')
+              openLink(this.context, 'https://www.zhangls2512.cn/product/account/info')
             })
 
             Divider()
@@ -434,10 +436,8 @@ export default struct Me {
                 title: '密码安全检查'
               },
               onAppear: async () => {
-                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                  name: 'commonSetting'
-                })
-                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                const disallowScreenshot =
+                  this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)
@@ -502,10 +502,8 @@ export default struct Me {
                 title: '密码随机生成'
               },
               onAppear: async () => {
-                const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                  name: 'commonSetting'
-                })
-                const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                const disallowScreenshot =
+                  this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)

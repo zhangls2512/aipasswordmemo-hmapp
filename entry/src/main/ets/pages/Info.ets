@@ -28,7 +28,8 @@ export default struct InfoPage {
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Info[] = []
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   updateId = 0
 
   async cloudBackup(item: Info) {
@@ -49,7 +50,7 @@ export default struct InfoPage {
           time: Date.now()
         })
       }
-      await setCloudBackup({
+      await setCloudBackup(this.context, this.UIContext, {
         type: 'info',
         id: item.id,
         content: JSON.stringify({
@@ -90,7 +91,7 @@ export default struct InfoPage {
         })
           .onClick(async () => {
             if (item.type !== '图标') {
-              copy(item.type + '：' + item.value, false)
+              copy(this.context, this.UIContext, item.type + '：' + item.value)
             }
             if (item.type === '图标') {
               const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
@@ -137,7 +138,7 @@ export default struct InfoPage {
               ]
             })
             if (data.index === 1) {
-              await deleteData('info', item.id)
+              await deleteData(this.context, 'info', item.id)
               this.loading = true
             }
           })
@@ -170,7 +171,7 @@ export default struct InfoPage {
                 })
               })
               dialogControllerProgress.open()
-              await deleteCloudBackup({
+              await deleteCloudBackup(this.context, this.UIContext, {
                 type: 'info',
                 id: item.id
               })
@@ -265,7 +266,7 @@ export default struct InfoPage {
               })
               if (data.index === 1) {
                 const promises = this.multipleSelectArray.map(async (item) => {
-                  await deleteData('info', item.id)
+                  await deleteData(this.context, 'info', item.id)
                 })
                 await Promise.all(promises)
                 this.multipleSelect = false
@@ -565,8 +566,8 @@ export default struct InfoPage {
         }
         .layoutWeight(1)
         .onRefreshing(async () => {
-          this.infoArray = await getInfoList()
-          this.types = await getInfoTypeList()
+          this.infoArray = await getInfoList(this.context)
+          this.types = await getInfoTypeList(this.context)
           this.loading = false
         })
       }
@@ -600,13 +601,13 @@ export default struct InfoPage {
       this.context.eventHub.on('refreshInfo', async () => {
         this.enableCloudBackup = false
         this.loading = true
-        const cloudServiceStatus = await getCloudServiceStatus()
+        const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
       })
       this.loading = true
-      const cloudServiceStatus = await getCloudServiceStatus()
+      const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
       if (cloudServiceStatus && getKey()) {
         this.enableCloudBackup = true
       }

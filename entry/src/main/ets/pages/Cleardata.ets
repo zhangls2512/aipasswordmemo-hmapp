@@ -650,7 +650,7 @@ export default struct Cleardata {
                   const passwordIconDir = this.context.filesDir + '/media/passwordicon'
                   const passwordIconFileArray =
                     fileIo.listFileSync(passwordIconDir).map(item => passwordIconDir + '/' + item)
-                  const passwordArray = await getPasswordList()
+                  const passwordArray = await getPasswordList(this.context)
                   const passwordIconPathArray: string[] = []
                   passwordArray.forEach((item) => {
                     const index = item.info.findIndex(infoItem => infoItem.type === '图标')
@@ -659,7 +659,7 @@ export default struct Cleardata {
                         ''))
                     }
                   })
-                  const infoArray = await getTypeInfoList('图标')
+                  const infoArray = await getTypeInfoList(this.context, '图标')
                   const infoIconPathArray = infoArray.map(item => item.replace('file://com.zhangxm.aipasswordmemo', ''))
                   const iconPathSet = new Set(passwordIconPathArray.concat(infoIconPathArray))
                   const nousePasswordIconFilePathArray = passwordIconFileArray.filter(item => !iconPathSet.has(item))

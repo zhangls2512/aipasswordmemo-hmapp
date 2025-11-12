@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
@@ -19,7 +20,8 @@ struct Cloudbackupimport {
   @Local value: string = '保留'
   @Local autoImport: string[] = []
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext()
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'cloudbackupSetting'
   })
@@ -117,11 +119,8 @@ struct Cloudbackupimport {
                       if (isOn) {
                         autoImport = [...this.autoImport, item.value]
                       }
-                      const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                        name: 'cloudbackupSetting'
-                      })
-                      cloudbackupSettingDataPreferences.putSync('autoImport', autoImport)
-                      cloudbackupSettingDataPreferences.flushSync()
+                      this.cloudbackupSettingDataPreferences.putSync('autoImport', autoImport)
+                      this.cloudbackupSettingDataPreferences.flushSync()
                       this.getSetting()
                     })
                 }
@@ -200,7 +199,7 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const res = await importCloudBackupPassword()
+                const res = await importCloudBackupPassword(this.context, this.UIContext)
                 this.dialogControllerProgress.close()
                 if (res === 'success') {
                   promptAction.openToast({
@@ -267,7 +266,7 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const res = await importCloudBackupInfo()
+                const res = await importCloudBackupInfo(this.context, this.UIContext)
                 this.dialogControllerProgress.close()
                 if (res === 'success') {
                   promptAction.openToast({
@@ -334,7 +333,7 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const res = await importCloudBackupTag()
+                const res = await importCloudBackupTag(this.context, this.UIContext)
                 this.dialogControllerProgress.close()
                 if (res === 'success') {
                   promptAction.openToast({

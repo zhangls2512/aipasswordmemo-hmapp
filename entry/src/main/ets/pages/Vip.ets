@@ -23,7 +23,8 @@ export default struct Vip {
   @Local iapStatusLoading: boolean = false
   @Local agree: boolean = false
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   accessToken = ''
   uid = ''
@@ -74,7 +75,7 @@ export default struct Vip {
 
   async getVipStatus() {
     this.vipStatusLoading = true
-    const userres = await request('/product/getUserInfo', {
+    const userres = await request(this.context, this.UIContext, '/product/getUserInfo', {
       accessToken: this.accessToken,
       product: 'password'
     })
@@ -281,13 +282,13 @@ export default struct Vip {
                     Span('《轩铭密码智能备忘录会员服务协议》')
                       .fontColor($r('sys.color.font_emphasize'))
                       .onClick(() => {
-                        openLink('https://docs.qq.com/doc/p/4e810651bda479462dc9a5e8677273e5e1b72383')
+                        openLink(this.context, 'https://docs.qq.com/doc/p/4e810651bda479462dc9a5e8677273e5e1b72383')
                       })
                     Span('。如果购买连续包月/季/年，已阅读并同意')
                     Span('《轩铭密码智能备忘录会员自动续订服务协议》')
                       .fontColor($r('sys.color.font_emphasize'))
                       .onClick(() => {
-                        openLink('https://docs.qq.com/doc/p/b205f991609f7a39a58b309a6d271bf160d65cc5')
+                        openLink(this.context, 'https://docs.qq.com/doc/p/b205f991609f7a39a58b309a6d271bf160d65cc5')
                       })
                     Span('。')
                   }

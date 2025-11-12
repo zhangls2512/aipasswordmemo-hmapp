@@ -21,7 +21,8 @@ export default struct TagPage {
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Tag[] = []
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
   updateId = 0
 
@@ -42,7 +43,7 @@ export default struct TagPage {
         time: Date.now()
       })
     }
-    await setCloudBackup({
+    await setCloudBackup(this.context, this.UIContext, {
       type: 'tag',
       id: item.id,
       content: JSON.stringify({
@@ -97,7 +98,7 @@ export default struct TagPage {
               ]
             })
             if (data.index === 1) {
-              await deleteData('tag', item.id)
+              await deleteData(this.context, 'tag', item.id)
               this.loading = true
             }
           })
@@ -130,7 +131,7 @@ export default struct TagPage {
                 })
               })
               dialogControllerProgress.open()
-              await deleteCloudBackup({
+              await deleteCloudBackup(this.context, this.UIContext, {
                 type: 'tag',
                 id: item.id
               })
@@ -220,7 +221,7 @@ export default struct TagPage {
               })
               if (data.index === 1) {
                 const promises = this.multipleSelectArray.map(async (item) => {
-                  await deleteData('tag', item.id)
+                  await deleteData(this.context, 'tag', item.id)
                 })
                 await Promise.all(promises)
                 this.multipleSelect = false
@@ -442,7 +443,7 @@ export default struct TagPage {
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
         .onRefreshing(async () => {
-          this.tagArray = await getTagList(this.orderColumn)
+          this.tagArray = await getTagList(this.context, this.orderColumn)
           this.loading = false
         })
       }
@@ -476,13 +477,13 @@ export default struct TagPage {
       this.context.eventHub.on('refreshTag', async () => {
         this.enableCloudBackup = false
         this.loading = true
-        const cloudServiceStatus = await getCloudServiceStatus()
+        const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
       })
       this.loading = true
-      const cloudServiceStatus = await getCloudServiceStatus()
+      const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
       if (cloudServiceStatus && getKey()) {
         this.enableCloudBackup = true
       }

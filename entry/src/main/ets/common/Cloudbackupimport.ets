@@ -32,17 +32,17 @@ interface TagCloudBackup {
   cloudBackupTime: string | number
 }
 
-export async function importCloudBackupPassword() {
+export async function importCloudBackupPassword(context: Context, UIContext: UIContext) {
   const accessToken = await get()
   const accountInfo = await getAccountInfo()
   if (accessToken && getKey()) {
-    const countres = await request('/password/getBackupCount', {
+    const countres = await request(context, UIContext, '/password/getBackupCount', {
       accessToken: accessToken
     })
     if (countres !== 'fail') {
       const total = JSON.parse(countres).count.password as number
       for (let i = 0; i < total; i += 50) {
-        const listres = await request('/password/getBackupList', {
+        const listres = await request(context, UIContext, '/password/getBackupList', {
           accessToken: accessToken,
           type: 'password',
           skip: i,
@@ -76,7 +76,7 @@ export async function importCloudBackupPassword() {
             }
           })
           await Promise.all(promises)
-          await importPassword(JSON.stringify(array), 0)
+          await importPassword(context, JSON.stringify(array), 0)
         }
       }
       return 'success'
@@ -85,17 +85,17 @@ export async function importCloudBackupPassword() {
   return 'fail'
 }
 
-export async function importCloudBackupInfo() {
+export async function importCloudBackupInfo(context: Context, UIContext: UIContext) {
   const accessToken = await get()
   const accountInfo = await getAccountInfo()
   if (accessToken && getKey()) {
-    const countres = await request('/password/getBackupCount', {
+    const countres = await request(context, UIContext, '/password/getBackupCount', {
       accessToken: accessToken
     })
     if (countres !== 'fail') {
       const total = JSON.parse(countres).count.info as number
       for (let i = 0; i < total; i += 50) {
-        const listres = await request('/password/getBackupList', {
+        const listres = await request(context, UIContext, '/password/getBackupList', {
           accessToken: accessToken,
           type: 'info',
           skip: i,
@@ -128,7 +128,7 @@ export async function importCloudBackupInfo() {
             }
           })
           await Promise.all(promises)
-          await importInfo(JSON.stringify(array), 0)
+          await importInfo(context, JSON.stringify(array), 0)
         }
       }
       return 'success'
@@ -137,17 +137,17 @@ export async function importCloudBackupInfo() {
   return 'fail'
 }
 
-export async function importCloudBackupTag() {
+export async function importCloudBackupTag(context: Context, UIContext: UIContext) {
   const accessToken = await get()
   const accountInfo = await getAccountInfo()
   if (accessToken && getKey()) {
-    const countres = await request('/password/getBackupCount', {
+    const countres = await request(context, UIContext, '/password/getBackupCount', {
       accessToken: accessToken
     })
     if (countres !== 'fail') {
       const total = JSON.parse(countres).count.tag as number
       for (let i = 0; i < total; i += 50) {
-        const listres = await request('/password/getBackupList', {
+        const listres = await request(context, UIContext, '/password/getBackupList', {
           accessToken: accessToken,
           type: 'tag',
           skip: i,
@@ -180,7 +180,7 @@ export async function importCloudBackupTag() {
             }
           })
           await Promise.all(promises)
-          await importTag(JSON.stringify(array), 0)
+          await importTag(context, JSON.stringify(array), 0)
         }
       }
       return 'success'

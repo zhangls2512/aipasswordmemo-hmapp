@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { updateManager } from '@kit.AppGalleryKit'
+import { commentManager, updateManager } from '@kit.AppGalleryKit'
 import { promptAction } from '@kit.ArkUI'
 import { call } from '@kit.TelephonyKit'
 import openLink from '../common/Openlink'
@@ -15,7 +15,8 @@ struct About {
   @Local hasUpdate: number = -1
   @Local updateLoading: boolean = false
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -268,7 +269,7 @@ struct About {
               }
             })
             .onClick(() => {
-              openLink('https://docs.qq.com/doc/p/ad13731bb5a5562d7e7b11ee738928c6f1974b51')
+              openLink(this.context, 'https://docs.qq.com/doc/p/ad13731bb5a5562d7e7b11ee738928c6f1974b51')
             })
 
             Divider()
@@ -566,7 +567,7 @@ struct About {
                 }
               })
               .onClick(() => {
-                copy('gerenyinsi_z07x17m')
+                copy(this.context, this.UIContext, 'gerenyinsi_z07x17m')
               })
 
               Divider()
@@ -618,7 +619,7 @@ struct About {
                 }
               })
               .onClick(() => {
-                openLink('https://qm.qq.com/q/8Ugei32784')
+                openLink(this.context, 'https://qm.qq.com/q/8Ugei32784')
               })
 
               Divider()
@@ -738,7 +739,7 @@ struct About {
                 }
               })
               .onClick(() => {
-                openLink('https://www.zhangls2512.cn/index')
+                openLink(this.context, 'https://www.zhangls2512.cn/index')
               })
 
               Divider()
@@ -789,7 +790,7 @@ struct About {
                 }
               })
               .onClick(() => {
-                openLink('https://space.bilibili.com/448824492')
+                openLink(this.context, 'https://space.bilibili.com/448824492')
               })
 
               Divider()
@@ -840,7 +841,7 @@ struct About {
                 }
               })
               .onClick(() => {
-                openLink('https://gitcode.com/zhangls2512/aipasswordmemo-hmapp')
+                openLink(this.context, 'https://gitcode.com/zhangls2512/aipasswordmemo-hmapp')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -885,8 +886,12 @@ struct About {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .title('关于')
-    .onReady((context) => {
+    .onReady(async (context) => {
       this.pageInfos = context.pathStack
+      try {
+        await commentManager.showCommentDialog(this.context)
+      } catch {
+      }
     })
   }
 }

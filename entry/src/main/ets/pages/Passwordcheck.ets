@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { display, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
 import {
   getOldPasswordList,
@@ -19,7 +20,7 @@ export default struct Passwordcheck {
   @Local repeatArray: RepeatItem[] = []
   @Local oldArray: ListItem[] = []
   @Local hoverId: number | string = -1
-  context = this.getUIContext().getHostContext()
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   passwordId = 0
 
   @Builder
@@ -443,12 +444,12 @@ export default struct Passwordcheck {
           this.preferType = 1
         }
       })
-      const passwordStrengthArray = await getPasswordStrengthList()
+      const passwordStrengthArray = await getPasswordStrengthList(this.context)
       this.lowStrengthPasswordArray = passwordStrengthArray[0]
       this.mediumStrengthPasswordArray = passwordStrengthArray[1]
       this.highStrengthPasswordArray = passwordStrengthArray[2]
-      this.repeatArray = await getRepeatPasswordList()
-      this.oldArray = await getOldPasswordList()
+      this.repeatArray = await getRepeatPasswordList(this.context)
+      this.oldArray = await getOldPasswordList(this.context)
     })
     .onDisAppear(() => {
       display.off('change')

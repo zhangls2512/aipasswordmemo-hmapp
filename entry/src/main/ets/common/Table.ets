@@ -9,8 +9,8 @@ interface Item {
   networkId: string
 }
 
-export async function syncTable(table: string, networkId: string, syncMode: relationalStore.SyncMode) {
-  const context = getContext()
+export async function syncTable(context: Context, table: string, networkId: string,
+  syncMode: relationalStore.SyncMode) {
   let securityLevel = 4
   if (table === 'tag') {
     securityLevel = 1
@@ -42,8 +42,7 @@ export async function syncTable(table: string, networkId: string, syncMode: rela
   }
 }
 
-export async function autoSyncTable(table: string) {
-  const context = getContext()
+export async function autoSyncTable(context: Context, table: string) {
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
   })
@@ -76,14 +75,13 @@ export async function autoSyncTable(table: string) {
   if (autoSyncTables.includes(table)) {
     const autoSyncDevices: Item[] = dataSettingDataPreferences.getSync('autoSyncDevices', []) as Item[]
     const promises = autoSyncDevices.map(async (item) => {
-      await syncTable(table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+      await syncTable(context, table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
     })
     await Promise.all(promises)
   }
 }
 
-export async function backupTable(table: string) {
-  const context = getContext()
+export async function backupTable(context: Context, table: string) {
   let securityLevel = 4
   if (table === 'tag') {
     securityLevel = 1
@@ -106,8 +104,7 @@ export async function backupTable(table: string) {
   })
 }
 
-export async function autoBackupTable(table: string) {
-  const context = getContext()
+export async function autoBackupTable(context: Context, table: string) {
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
   })
@@ -138,12 +135,11 @@ export async function autoBackupTable(table: string) {
   }
   const autoBackupTables: string[] = dataSettingDataPreferences.getSync('autoBackupTables', []) as string[]
   if (autoBackupTables.includes(table)) {
-    await backupTable(table)
+    await backupTable(context, table)
   }
 }
 
-export async function recoveryTable(table: string) {
-  const context = getContext()
+export async function recoveryTable(context: Context, table: string) {
   let securityLevel = 4
   if (table === 'tag') {
     securityLevel = 1

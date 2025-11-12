@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -14,7 +15,8 @@ export default struct Updateinfo {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  context = this.getUIContext().getHostContext()
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   specialInfoTypes = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   build() {
@@ -204,7 +206,7 @@ export default struct Updateinfo {
               })
               return
             }
-            const res = await updateInfo(this.infoId, {
+            const res = await updateInfo(this.context, this.UIContext, this.infoId, {
               type: this.infoType,
               value: this.infoValue,
               cloudBackup: this.cloudBackup
@@ -225,10 +227,10 @@ export default struct Updateinfo {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      const infoInfo = await getInfoInfo(this.infoId) as Info
+      const infoInfo = await getInfoInfo(this.context, this.infoId) as Info
       this.infoType = infoInfo.type
       this.infoValue = infoInfo.value
-      const res = await getCloudServiceStatus()
+      const res = await getCloudServiceStatus(this.context, this.UIContext)
       const key = getKey()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'

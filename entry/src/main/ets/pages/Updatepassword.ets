@@ -44,10 +44,14 @@ export default struct Updatepassword {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pushItemWhenBlur = false
   oftenUsedInfoTypes = ['自定义']
   specialInfoTypes = ['图标', '昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
+  cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'cloudbackupSetting'
+  })
 
   getCurrentInfoType() {
     let infoType = this.infoType
@@ -73,7 +77,7 @@ export default struct Updatepassword {
       this.mfaStep = '30'
       this.mfaDigits = '6'
       if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-        this.infoArray = await getTypeInfoList(this.infoTypeValue)
+        this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
       }
     }
   }
@@ -233,7 +237,7 @@ export default struct Updatepassword {
                 this.infoValue = ''
               }
               if (value !== 'MFA') {
-                this.infoArray = await getTypeInfoList(value)
+                this.infoArray = await getTypeInfoList(this.context, value)
               }
               if (value === 'MFA' || value === '自定义') {
                 this.infoArray = []
@@ -268,7 +272,7 @@ export default struct Updatepassword {
                   this.infoValue = ''
                 }
                 if (value !== 'MFA') {
-                  this.infoArray = await getTypeInfoList(value)
+                  this.infoArray = await getTypeInfoList(this.context, value)
                 }
                 if (value === 'MFA' || value === '自定义') {
                   this.infoArray = []
@@ -427,7 +431,7 @@ export default struct Updatepassword {
                   this.mfaStep = '30'
                   this.mfaDigits = '6'
                   if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                    this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                    this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
                   }
                 }
               })
@@ -720,7 +724,7 @@ export default struct Updatepassword {
                 this.mfaStep = '30'
                 this.mfaDigits = '6'
                 if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                  this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                  this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
                 }
               })
             if (this.getCurrentInfoType() === 'MFA') {
@@ -779,7 +783,7 @@ export default struct Updatepassword {
                     this.mfaStep = '30'
                     this.mfaDigits = '6'
                     if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                      this.infoArray = await getTypeInfoList(this.infoTypeValue)
+                      this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
                     }
                   } catch (err) {
                     if (err.code !== 1000500002) {
@@ -1133,7 +1137,7 @@ export default struct Updatepassword {
               })
               return
             }
-            await updatePassword(this.passwordId, {
+            await updatePassword(this.context, this.UIContext, this.passwordId, {
               name: this.passwordName,
               info: this.passwordInfoArray,
               tag: this.passwordTagArray,
@@ -1141,10 +1145,7 @@ export default struct Updatepassword {
             })
             let infoCloudBackup = false
             let tagCloudBackup = false
-            const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-              name: 'cloudbackupSetting'
-            })
-            const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+            const autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
             if (this.allowCloudBackup && autoOn.includes('info')) {
               infoCloudBackup = true
             }
@@ -1154,7 +1155,7 @@ export default struct Updatepassword {
             if (this.autoNewInfo) {
               this.passwordInfoArray.forEach(item => {
                 if (item.type !== 'MFA') {
-                  newInfo({
+                  newInfo(this.context, this.UIContext, {
                     type: item.type,
                     value: item.value,
                     cloudBackup: infoCloudBackup
@@ -1164,7 +1165,7 @@ export default struct Updatepassword {
             }
             if (this.autoNewTag) {
               this.passwordTagArray.forEach(item => {
-                newTag({
+                newTag(this.context, this.UIContext, {
                   value: item,
                   color: '',
                   cloudBackup: tagCloudBackup
@@ -1212,14 +1213,14 @@ export default struct Updatepassword {
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
       if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-        this.infoArray = await getTypeInfoList(this.infoTypeValue)
+        this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
       }
-      this.tagArray = await getTagList()
-      const passwordInfo = await getPasswordInfo(this.passwordId) as Password
+      this.tagArray = await getTagList(this.context)
+      const passwordInfo = await getPasswordInfo(this.context, this.passwordId) as Password
       this.passwordName = passwordInfo.name
       this.passwordInfoArray = passwordInfo.info
       this.passwordTagArray = passwordInfo.tag.map(item => item.value)
-      const res = await getCloudServiceStatus()
+      const res = await getCloudServiceStatus(this.context, this.UIContext)
       const key = getKey()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'
@@ -1231,10 +1232,7 @@ export default struct Updatepassword {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-            name: 'cloudbackupSetting'
-          })
-          const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
           if (autoOn.includes('password')) {
             this.cloudBackup = true
           }

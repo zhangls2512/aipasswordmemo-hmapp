@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
@@ -24,7 +25,8 @@ export default struct Passwordinfo {
   @Local mfaSecondsRemainingStyle: string = ''
   @Local passwordTag: PasswordTagItem[] = []
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext()
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
 
   build() {
     List() {
@@ -67,7 +69,7 @@ export default struct Passwordinfo {
                     })
                     .textAlign(TextAlign.End)
                     .onClick(() => {
-                      copy(item.value)
+                      copy(this.context, this.UIContext, item.value)
                     })
                   Image($r('app.media.hide'))
                     .fillColor($r('sys.color.icon_secondary'))
@@ -86,7 +88,7 @@ export default struct Passwordinfo {
                     })
                     .textAlign(TextAlign.End)
                     .onClick(() => {
-                      copy(item.value)
+                      copy(this.context, this.UIContext, item.value)
                     })
                   Image($r('app.media.show'))
                     .fillColor($r('sys.color.icon_secondary'))
@@ -234,12 +236,12 @@ export default struct Passwordinfo {
                 }
               })
               .onClick(() => {
-                copy(this.mfaValue)
+                copy(this.context, this.UIContext, this.mfaValue)
               })
               .gesture(
                 LongPressGesture()
                   .onAction(() => {
-                    copy(this.mfaOtpauthUri)
+                    copy(this.context, this.UIContext, this.mfaOtpauthUri)
                   })
               )
             }
@@ -291,13 +293,13 @@ export default struct Passwordinfo {
                 {
                   value: '打开',
                   action: () => {
-                    openLink(item.value)
+                    openLink(this.context, item.value)
                   }
                 },
                 {
                   value: '复制',
                   action: () => {
-                    copy(item.value)
+                    copy(this.context, this.UIContext, item.value)
                   }
                 }
               ], {
@@ -361,7 +363,7 @@ export default struct Passwordinfo {
       if (mfaSecondsRemainingStyleIndex === 1) {
         this.mfaSecondsRemainingStyle = 'number'
       }
-      const passwordInfo = await getPasswordInfo(this.passwordId) as Password
+      const passwordInfo = await getPasswordInfo(this.context, this.passwordId) as Password
       this.passwordName = passwordInfo.name
       this.passwordInfo = passwordInfo.info
       this.passwordTag = passwordInfo.tag
