@@ -3,7 +3,6 @@
     "signingConfigs": [
       {
         "name": "release",
-        "type": "HarmonyOS",
         "material": {
           "storeFile": "D:/harmonyproject/内部文件/发布签名材料/keystore.p12",
           "storePassword": "000000195C12DD78581766951C4A14A8EF547FA599ED4F3FADCD2A726A6754A39C4C94E2BE42310E9F",
@@ -16,7 +15,6 @@
       },
       {
         "name": "debug",
-        "type": "HarmonyOS",
         "material": {
           "storeFile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
           "storePassword": "0000001B33014B925957FCB6C07BE40FE428B2730EC2AE942DC2816298D18F08914C05D937B6D8763BB90E",
@@ -32,7 +30,11 @@
       {
         "name": "default",
         "signingConfig": "debug",
+        "compatibleSdkVersion": "6.0.0(20)",
         "buildOption": {
+          "packOptions": {
+            "fastBuildApp": true
+          },
           "resOptions": {
             "resCompileThreads": 32
           },
@@ -48,12 +50,12 @@
             "noExternalImportByPath": true,
             "useNormalizedOHMUrl": true,
             "caseSensitiveCheck": true,
-            "harLocalDependencyCheck": true
-          }
+            "harLocalDependencyCheck": true,
+            "enableStrictCheckOHModule": true
+          },
+          "preloadSystemSo": true
         },
-        "runtimeOS": "HarmonyOS",
-        "compatibleSdkVersion": "6.0.0(20)",
-        "targetSdkVersion": "6.0.0(20)"
+        "runtimeOS": "HarmonyOS"
       }
     ]
   },
