@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { util } from '@kit.ArkTS'
@@ -19,7 +20,8 @@ export default struct Login {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  context = this.getUIContext().getHostContext()
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '登录中...'
@@ -34,7 +36,7 @@ export default struct Login {
             scene: 'login',
             sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
           })
-          const res = await request('/account/getAccessToken', {
+          const res = await request(this.context, this.UIContext, '/account/getAccessToken', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode
           })
@@ -228,7 +230,7 @@ export default struct Login {
                   })
                 })
                 dialogControllerProgress.open()
-                const res = await request('/account/sendEmailCode', {
+                const res = await request(this.context, this.UIContext, '/account/sendEmailCode', {
                   email: this.email
                 })
                 dialogControllerProgress.close()
@@ -297,7 +299,7 @@ export default struct Login {
                 scene: 'login',
                 sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
               })
-              const res = await request('/account/getAccessToken', {
+              const res = await request(this.context, this.UIContext, '/account/getAccessToken', {
                 verifyType: this.type,
                 verifyCode: code,
                 email: this.email
@@ -358,7 +360,7 @@ export default struct Login {
                   scene: 'login',
                   sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
                 })
-                const resb = await request('/account/getAccessToken', {
+                const resb = await request(this.context, this.UIContext, '/account/getAccessToken', {
                   verifyType: 'passkey',
                   rawId: new util.Base64Helper().encodeToStringSync(resa.rawId, util.Type.BASIC_URL_SAFE),
                   authenticatorData: new util.Base64Helper().encodeToStringSync(resa.response.authenticatorData,
@@ -401,7 +403,7 @@ export default struct Login {
               top: $r('sys.float.ohos_id_elements_margin_vertical_l')
             })
             .onClick(() => {
-              openLink('https://www.zhangls2512.cn/product/account/register')
+              openLink(this.context, 'https://www.zhangls2512.cn/product/account/register')
             })
           Row() {
             Toggle({
@@ -422,7 +424,7 @@ export default struct Login {
                   try {
                     const appPrivacyLink =
                       privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 2)
-                    openLink(appPrivacyLink?.url as string)
+                    openLink(this.context, appPrivacyLink?.url as string)
                   } catch (err) {
                     promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
@@ -435,7 +437,7 @@ export default struct Login {
                   try {
                     const appPrivacyLink =
                       privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
-                    openLink(appPrivacyLink?.url as string)
+                    openLink(this.context, appPrivacyLink?.url as string)
                   } catch (err) {
                     promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
@@ -446,12 +448,14 @@ export default struct Login {
               Span('《华为账号用户认证协议》')
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(() => {
-                  openLink('https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN')
+                  openLink(this.context,
+                    'https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN')
                 })
               Span('《关于华为账号与隐私的声明》')
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(() => {
-                  openLink('https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN')
+                  openLink(this.context,
+                    'https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN')
                 })
               Span('。')
             }

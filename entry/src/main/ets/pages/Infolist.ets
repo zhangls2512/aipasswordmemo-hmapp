@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { pushService } from '@kit.PushKit'
 import { get } from '../common/Accesstoken'
@@ -13,6 +14,7 @@ export function InfolistBuilder() {
 struct Infolist {
   @Local accessToken: string = ''
   @Local hoverId: number = -1
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -170,7 +172,7 @@ struct Infolist {
                 }
               })
               .onClick(() => {
-                openLink('https://www.zhangls2512.cn/product/account/loginlog')
+                openLink(this.context, 'https://www.zhangls2512.cn/product/account/loginlog')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -320,7 +322,7 @@ struct Infolist {
                 }
               })
               .onClick(() => {
-                openLink('https://www.zhangls2512.cn/product/account/info')
+                openLink(this.context, 'https://www.zhangls2512.cn/product/account/info')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

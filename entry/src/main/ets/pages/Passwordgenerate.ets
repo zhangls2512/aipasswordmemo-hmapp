@@ -12,7 +12,8 @@ export default struct Passwordgenerate {
   @Local specialCharacter: boolean = false
   @Local password: string = ''
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
 
   build() {
     List() {
@@ -203,7 +204,7 @@ export default struct Passwordgenerate {
               }
             })
             .onClick(() => {
-              copy(this.password)
+              copy(this.context, this.UIContext, this.password)
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

@@ -27,7 +27,7 @@ export function parseCsvLine(line: string) {
   return result
 }
 
-export async function importCsvPassword(content: string) {
+export async function importCsvPassword(context: Context, content: string) {
   if (!content) {
     promptAction.openToast({
       message: '导入失败，原因：文件为空'
@@ -36,7 +36,7 @@ export async function importCsvPassword(content: string) {
   }
   const lines = content.split('\n').filter(line => line.trim() !== '')
   const result: PasswordOutItem[] = []
-  const maxId = await getPasswordMaxId()
+  const maxId = await getPasswordMaxId(context)
   let idCounter = maxId + 1
   const firstLine = parseCsvLine(lines[0])
   const columnCount = firstLine.length
@@ -69,7 +69,7 @@ export async function importCsvPassword(content: string) {
         })
       }
     }
-    await importPassword(JSON.stringify(result), 0)
+    await importPassword(context, JSON.stringify(result), 0)
     promptAction.openToast({
       message: '导入成功'
     })

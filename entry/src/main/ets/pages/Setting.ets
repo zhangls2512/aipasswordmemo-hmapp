@@ -25,14 +25,15 @@ export default struct Setting {
   @Local autoLoginByPasskey: boolean = false
   @Local accessToken: string = ''
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'commonSetting'
+  })
 
   async getSetting() {
-    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-      name: 'commonSetting'
-    })
-    this.allService = commonSettingDataPreferences.getSync('allService', true) as boolean
+    this.allService = this.commonSettingDataPreferences.getSync('allService', true) as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
       this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
@@ -45,23 +46,24 @@ export default struct Setting {
     this.email = accountInfo.email
     this.accessToken = await get()
     if (this.accessToken) {
-      const res = await checkPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+      const res = await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
       this.accountDataSyncEnabled = res
       if (res) {
         const appAccountManager = appAccount.createAppAccountManager()
         this.accountDataSync = await appAccountManager.checkDataSyncEnabled('default')
       }
-      this.autoLoginByHuaweiAccount = commonSettingDataPreferences.getSync('autoLoginByHuaweiAccount', false) as boolean
+      this.autoLoginByHuaweiAccount =
+        this.commonSettingDataPreferences.getSync('autoLoginByHuaweiAccount', false) as boolean
       if (this.allService) {
         this.accountLoading = true
-        const accountres = await request('/account/getExternalAccount', {
+        const accountres = await request(this.context, this.UIContext, '/account/getExternalAccount', {
           accessToken: this.accessToken
         })
         if (accountres !== 'fail') {
           const account = JSON.parse(accountres).data as Account[]
           this.isBindHuaweiAccount = account.some(item => item.platform === 'huawei')
         }
-        this.cloudService = await getCloudServiceStatus()
+        this.cloudService = await getCloudServiceStatus(this.context, this.UIContext)
         this.accountLoading = false
       }
     }
@@ -213,11 +215,8 @@ export default struct Setting {
                   })
                     .enabled(!this.autoLoginByPasskey)
                     .onChange((isOn) => {
-                      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                        name: 'commonSetting'
-                      })
-                      commonSettingDataPreferences.putSync('autoLoginByHuaweiAccount', isOn)
-                      commonSettingDataPreferences.flushSync()
+                      this.commonSettingDataPreferences.putSync('autoLoginByHuaweiAccount', isOn)
+                      this.commonSettingDataPreferences.flushSync()
                     })
                 }
                 .borderRadius(12)
@@ -309,11 +308,8 @@ export default struct Setting {
                   //.enabled(!this.autoLoginByHuaweiAccount)
                     .enabled(false)
                     .onChange((isOn) => {
-                      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-                        name: 'commonSetting'
-                      })
-                      commonSettingDataPreferences.putSync('autoLoginByPasskey', isOn)
-                      commonSettingDataPreferences.flushSync()
+                      this.commonSettingDataPreferences.putSync('autoLoginByPasskey', isOn)
+                      this.commonSettingDataPreferences.flushSync()
                     })
                 }
                 .borderRadius(12)
@@ -367,7 +363,7 @@ export default struct Setting {
                   right: 12
                 })
                 .onClick(() => {
-                  openLink('https://www.zhangls2512.cn/product/account/panel')
+                  openLink(this.context, 'https://www.zhangls2512.cn/product/account/panel')
                 })
             }
             .alignItems(HorizontalAlign.Start)
@@ -581,7 +577,7 @@ export default struct Setting {
                     right: 12
                   })
                   .onClick(() => {
-                    openLink('https://docs.qq.com/doc/p/2fc9d7d60e5b79dcc09dec8251cb049fb29c7705')
+                    openLink(this.context, 'https://docs.qq.com/doc/p/2fc9d7d60e5b79dcc09dec8251cb049fb29c7705')
                   })
               }
               .alignItems(HorizontalAlign.Start)
@@ -1133,7 +1129,7 @@ export default struct Setting {
                 }
               })
               .onClick(() => {
-                openLink('https://docs.qq.com/doc/p/2bde62f6c2aaea97fbcca04c929c284005326d37')
+                openLink(this.context, 'https://docs.qq.com/doc/p/2bde62f6c2aaea97fbcca04c929c284005326d37')
               })
 
               Divider()
@@ -1217,7 +1213,7 @@ export default struct Setting {
                 }
               })
               .onClick(() => {
-                openLink('https://docs.qq.com/doc/p/bdc2799638a46746599c68d82697b10a2becb2e4')
+                openLink(this.context, 'https://docs.qq.com/doc/p/bdc2799638a46746599c68d82697b10a2becb2e4')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

@@ -20,7 +20,8 @@ struct Newpasskey {
   @Local emailcode: string = ''
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -127,7 +128,7 @@ struct Newpasskey {
                       })
                     })
                     dialogControllerProgress.open()
-                    const res = await request('/account/sendEmailCode', {
+                    const res = await request(this.context, this.UIContext, '/account/sendEmailCode', {
                       email: this.email
                     })
                     dialogControllerProgress.close()
@@ -181,7 +182,7 @@ struct Newpasskey {
                     })
                   })
                   dialogControllerProgress.open()
-                  const res = await request('/account/bindExternalAccount', {
+                  const res = await request(this.context, this.UIContext, '/account/bindExternalAccount', {
                     email: this.email,
                     verifyType: this.type,
                     verifyCode: code,

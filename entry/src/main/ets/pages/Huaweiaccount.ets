@@ -25,7 +25,8 @@ struct Huaweiaccount {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
@@ -56,7 +57,7 @@ struct Huaweiaccount {
             })
           })
           dialogControllerProgress.open()
-          const res = await request('/account/bindExternalAccount', {
+          const res = await request(this.context, this.UIContext, '/account/bindExternalAccount', {
             verifyType: this.type,
             verifyCode: code,
             email: this.email,
@@ -193,7 +194,7 @@ struct Huaweiaccount {
                       })
                     })
                     dialogControllerProgress.open()
-                    const res = await request('/account/sendEmailCode', {
+                    const res = await request(this.context, this.UIContext, '/account/sendEmailCode', {
                       email: this.email
                     })
                     dialogControllerProgress.close()
@@ -267,7 +268,7 @@ struct Huaweiaccount {
                       })
                     })
                     dialogControllerProgress.open()
-                    const res = await request('/account/unbindExternalAccount', {
+                    const res = await request(this.context, this.UIContext, '/account/unbindExternalAccount', {
                       verifyType: this.type,
                       verifyCode: code,
                       email: this.email,
@@ -346,7 +347,7 @@ struct Huaweiaccount {
       const accessToken = await get()
       if (accessToken) {
         this.loading = true
-        const res = await request('/account/getExternalAccount', {
+        const res = await request(this.context, this.UIContext, '/account/getExternalAccount', {
           accessToken: accessToken
         })
         this.loading = false

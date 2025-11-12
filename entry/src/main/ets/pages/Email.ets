@@ -15,7 +15,8 @@ struct Email {
   @Local emailcode: string = ''
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
@@ -39,7 +40,7 @@ struct Email {
             })
           })
           dialogControllerProgress.open()
-          const res = await request('/account/updateEmail', {
+          const res = await request(this.context, this.UIContext, '/account/updateEmail', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode,
             newEmail: this.email,
@@ -133,7 +134,7 @@ struct Email {
                   })
                 })
                 dialogControllerProgress.open()
-                const res = await request('/account/sendEmailCode', {
+                const res = await request(this.context, this.UIContext, '/account/sendEmailCode', {
                   email: this.email
                 })
                 dialogControllerProgress.close()

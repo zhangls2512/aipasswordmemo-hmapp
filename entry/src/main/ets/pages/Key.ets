@@ -13,7 +13,8 @@ export function KeyBuilder() {
 struct Keypage {
   @Local keyValue: string = ''
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -56,7 +57,7 @@ struct Keypage {
                   }
                 })
                 .onClick(() => {
-                  copy(this.keyValue)
+                  copy(this.context, this.UIContext, this.keyValue)
                 })
               }
               .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

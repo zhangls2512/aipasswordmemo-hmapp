@@ -11,7 +11,8 @@ export function VipcodeBuilder() {
 @ComponentV2
 struct Vipcode {
   @Local vipCode: string = ''
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -40,7 +41,7 @@ struct Vipcode {
                     })
                   })
                   dialogControllerProgress.open()
-                  const res = await request('/product/useVipcode', {
+                  const res = await request(this.context, this.UIContext, '/product/useVipcode', {
                     accessToken: accessToken,
                     vipcode: this.vipCode
                   })

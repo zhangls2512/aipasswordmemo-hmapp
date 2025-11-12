@@ -1,8 +1,15 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
+import { uri } from '@kit.ArkTS'
 import { display, window } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
+import { get } from '../common/Accesstoken'
+import { importCsvPassword } from '../common/Csv'
+import { importInfo, importPassword, importTag } from '../common/Dataimport'
+import getDeviceToken from '../common/Devicetoken'
+import { read } from '../common/File'
+import request from '../common/Request'
 import Password from './Password'
 import Info from './Info'
 import Tag from './Tag'
@@ -17,7 +24,8 @@ struct Index {
   @Local index: number = 0
   @Local title: string = '密码'
   @Local isShowCleardataSheet: boolean = false
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
 
   getBackgroundImage() {
     const backgroundImagePath = this.context.filesDir + '/media/backgroundimage.png'
@@ -133,6 +141,131 @@ struct Index {
       top: this.preferType === 0 ? 12 : 0
     })
     .onAppear(() => {
+      this.context.eventHub.on('clearData', () => {
+        if (!this.isShowCleardataSheet) {
+          this.isShowCleardataSheet = true
+        }
+      })
+      this.context.eventHub.on('wantUri', async (wantUri: string) => {
+        if (wantUri.endsWith('.txt') || wantUri.endsWith('.csv')) {
+          const filestring = read(wantUri)
+          if (wantUri.endsWith('.txt')) {
+            const promptAction = this.UIContext.getPromptAction()
+            const data = await promptAction.showActionMenu({
+              title: '选择导入类型',
+              buttons: [
+                {
+                  text: '密码',
+                  color: $r('sys.color.font_primary')
+                },
+                {
+                  text: '常用信息',
+                  color: $r('sys.color.font_primary')
+                },
+                {
+                  text: '标签',
+                  color: $r('sys.color.font_primary')
+                }
+              ]
+            })
+            if (data.index === 0) {
+              await importPassword(this.context, filestring, 0)
+              this.context.eventHub.emit('refreshPassword')
+            }
+            if (data.index === 1) {
+              await importInfo(this.context, filestring, 0)
+              this.context.eventHub.emit('refreshInfo')
+            }
+            if (data.index === 2) {
+              await importTag(this.context, filestring, 0)
+              this.context.eventHub.emit('refreshTag')
+            }
+            promptAction.openToast({
+              message: '导入成功'
+            })
+          }
+          if (wantUri.endsWith('.csv')) {
+            await importCsvPassword(this.context, filestring)
+            this.context.eventHub.emit('refreshPassword')
+          }
+        }
+        if (wantUri.startsWith('https://www.zhangls2512.cn/product/password')) {
+          const promptAction = this.UIContext.getPromptAction()
+          const urires = new uri.URI(wantUri)
+          const invitationCode = urires.getQueryValue('invitationcode')
+          const vipCode = urires.getQueryValue('vipcode')
+          const accessToken = await get()
+          if (invitationCode) {
+            if (!accessToken) {
+              promptAction.showDialog({
+                title: '提示',
+                message: '邀请码使用失败，原因：未登录账号',
+                buttons: [
+                  {
+                    text: '确定',
+                    color: $r('sys.color.font_emphasize')
+                  }
+                ]
+              })
+            }
+            if (accessToken) {
+              const deviceToken = await getDeviceToken()
+              if (deviceToken) {
+                const res = await request(this.context, this.UIContext, '/product/useInvitationcode', {
+                  accessToken: accessToken,
+                  deviceToken: deviceToken,
+                  product: 'password',
+                  invitationcode: invitationCode
+                })
+                if (res !== 'fail') {
+                  promptAction.showDialog({
+                    title: '提示',
+                    message: '邀请码使用成功',
+                    buttons: [
+                      {
+                        text: '确定',
+                        color: $r('sys.color.font_emphasize')
+                      }
+                    ]
+                  })
+                }
+              }
+            }
+          }
+          if (vipCode) {
+            if (!accessToken) {
+              promptAction.showDialog({
+                title: '提示',
+                message: '兑换码使用失败，原因：未登录账号',
+                buttons: [
+                  {
+                    text: '确定',
+                    color: $r('sys.color.font_emphasize')
+                  }
+                ]
+              })
+            }
+            if (accessToken) {
+              const res = await request(this.context, this.UIContext, '/product/useVipcode', {
+                accessToken: accessToken,
+                vipcode: vipCode
+              })
+              if (res !== 'fail') {
+                promptAction.showDialog({
+                  title: '提示',
+                  message: '兑换码使用成功',
+                  buttons: [
+                    {
+                      text: '确定',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
+                })
+              }
+            }
+          }
+        }
+      })
       const currentOrientation = display.getDefaultDisplaySync().orientation
       if (currentOrientation === display.Orientation.PORTRAIT ||
         currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
@@ -163,11 +296,6 @@ struct Index {
           this.index = currentIndex
         }
       })
-      this.context.eventHub.on('clearData', () => {
-        if (!this.isShowCleardataSheet) {
-          this.isShowCleardataSheet = true
-        }
-      })
       this.context.eventHub.on('refreshIndex', () => {
         this.backgroundImagePixelMap = this.getBackgroundImage()
       })
@@ -175,6 +303,7 @@ struct Index {
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshIndex')
+      this.context.eventHub.off('wantUri')
       this.context.eventHub.off('clearData')
       display.off('change')
     })

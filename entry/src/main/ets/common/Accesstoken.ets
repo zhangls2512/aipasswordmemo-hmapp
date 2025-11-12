@@ -1,4 +1,3 @@
-import { common } from '@kit.AbilityKit'
 import { authentication } from '@kit.AccountKit'
 import { preferences } from '@kit.ArkData'
 import { util } from '@kit.ArkTS'
@@ -79,8 +78,7 @@ export async function getAccountInfo(): Promise<AccountInfo> {
   }
 }
 
-export async function check() {
-  const context = getContext() as common.UIAbilityContext
+export async function check(context: Context, UIContext: UIContext) {
   const accessToken = await get()
   if (!accessToken) {
     const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
@@ -98,7 +96,7 @@ export async function check() {
           scene: 'login',
           sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
         })
-        const res = await request('/account/getAccessToken', {
+        const res = await request(context, UIContext, '/account/getAccessToken', {
           verifyType: 'huaweiaipasswordmemoapp',
           verifyCode: resa.data?.authorizationCode
         })
@@ -144,7 +142,7 @@ export async function check() {
           scene: 'login',
           sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
         })
-        const resb = await request('/account/getAccessToken', {
+        const resb = await request(context, UIContext, '/account/getAccessToken', {
           verifyType: 'passkey',
           rawId: new util.Base64Helper().encodeToStringSync(resa.rawId, util.Type.BASIC_URL_SAFE),
           authenticatorData: new util.Base64Helper().encodeToStringSync(resa.response.authenticatorData,

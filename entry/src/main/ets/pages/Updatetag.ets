@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -18,7 +19,8 @@ export default struct Updatetag {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  context = this.getUIContext().getHostContext()
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   colorArray: string[] = [
     '#000000',
     '#0000FF',
@@ -186,7 +188,7 @@ export default struct Updatetag {
               })
               return
             }
-            const res = await updateTag(this.tagId, {
+            const res = await updateTag(this.context, this.UIContext, this.tagId, {
               value: this.tagValue,
               color: this.tagColor,
               cloudBackup: this.cloudBackup
@@ -207,10 +209,10 @@ export default struct Updatetag {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      const tagInfo = await getTagInfo(this.tagId) as Tag
+      const tagInfo = await getTagInfo(this.context, this.tagId) as Tag
       this.tagValue = tagInfo.value
       this.tagColor = tagInfo.color
-      const res = await getCloudServiceStatus()
+      const res = await getCloudServiceStatus(this.context, this.UIContext)
       const key = getKey()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'
