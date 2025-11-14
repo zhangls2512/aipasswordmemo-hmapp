@@ -10,7 +10,6 @@ import {
   CollaborationServiceStateDialog,
   createCollaborationServiceMenuItems
 } from '@kit.ServiceCollaborationKit'
-import { hdsEffect } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { newInfo } from '../common/Datachange'
@@ -220,12 +219,7 @@ export default struct Newinfo {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .width('100%')
               .bindMenu(this.ChooseImageMenu, {
                 hapticFeedbackMode: HapticFeedbackMode.AUTO
               })
@@ -410,6 +404,7 @@ export default struct Newinfo {
 
       ListItem() {
         Button('新增')
+          .width('100%')
           .onClick(async () => {
             const infoType = this.getCurrentInfoType()
             if (!infoType) {
@@ -437,7 +432,6 @@ export default struct Newinfo {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
-      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

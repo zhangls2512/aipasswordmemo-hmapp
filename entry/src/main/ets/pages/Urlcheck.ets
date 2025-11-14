@@ -23,6 +23,7 @@ export default struct Urlcheck {
 
       ListItem() {
         Button('添加')
+          .width('100%')
           .onClick(() => {
             if (this.urlArray.length >= 10) {
               promptAction.openToast({
@@ -49,7 +50,6 @@ export default struct Urlcheck {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
-      .width('100%')
 
       ForEach(this.urlArray, (item: string, index) => {
         ListItem() {
@@ -80,6 +80,7 @@ export default struct Urlcheck {
       })
       ListItem() {
         Button('检测')
+          .width('100%')
           .onClick(async () => {
             if (this.urlArray.length === 0) {
               promptAction.openToast({
@@ -111,7 +112,6 @@ export default struct Urlcheck {
         bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
-      .width('100%')
 
       ForEach(this.resultArray, (item: safetyDetect.UrlCheckResult) => {
         ListItem() {

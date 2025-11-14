@@ -101,6 +101,7 @@ struct Feedback {
           Column() {
             Button('提交')
               .enabled(this.content !== '')
+              .width('100%')
               .onClick(async () => {
                 const dialogControllerProgress = new CustomDialogController({
                   builder: LoadingDialog({
@@ -123,7 +124,6 @@ struct Feedback {
                 }
               })
           }
-          .width('100%')
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')

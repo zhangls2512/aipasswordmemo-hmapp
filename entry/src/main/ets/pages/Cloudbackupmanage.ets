@@ -175,6 +175,7 @@ struct Cloudbackupmanage {
                   top: $r('sys.float.ohos_id_elements_margin_vertical_l')
                 })
                 .role(ButtonRole.ERROR)
+                .width('100%')
                 .onClick(async () => {
                   const promptAction = this.getUIContext().getPromptAction()
                   const data = await promptAction.showDialog({

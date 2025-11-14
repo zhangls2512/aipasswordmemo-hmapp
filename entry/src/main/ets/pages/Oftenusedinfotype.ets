@@ -33,6 +33,7 @@ struct Oftenusedinfotype {
 
         ListItem() {
           Button('添加')
+            .width('100%')
             .onClick(() => {
               if (!this.type) {
                 promptAction.openToast({
@@ -59,7 +60,6 @@ struct Oftenusedinfotype {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
-        .width('100%')
 
         ForEach(this.oftenUsedInfoTypeArray, (item: string, index) => {
           ListItem() {

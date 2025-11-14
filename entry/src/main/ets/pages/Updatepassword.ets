@@ -12,11 +12,11 @@ import {
   CollaborationServiceStateDialog,
   createCollaborationServiceMenuItems
 } from '@kit.ServiceCollaborationKit'
-import { hdsEffect } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { newInfo, newTag, updatePassword } from '../common/Datachange'
 import { getPasswordInfo, getTagList, getTypeInfoList, Password, PasswordInfoItem, Tag } from '../common/Dataget'
+import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
 import { SelectItem } from './Newpassword'
 import Passwordgenerate from './Passwordgenerate'
 
@@ -295,12 +295,7 @@ export default struct Updatepassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .width('100%')
               .bindMenu(this.ChooseImageMenu, {
                 hapticFeedbackMode: HapticFeedbackMode.AUTO
               })
@@ -349,12 +344,7 @@ export default struct Updatepassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .width('100%')
               .onClick(() => {
                 this.isShowPasswordgenerateSheet = true
               })
@@ -730,12 +720,6 @@ export default struct Updatepassword {
             if (this.getCurrentInfoType() === 'MFA') {
               Button('扫码添加')
                 .buttonStyle(ButtonStyleMode.NORMAL)
-                .visualEffect(new hdsEffect.HdsEffectBuilder()
-                  .pointLight({
-                    sourceType: hdsEffect.PointLightSourceType.SOFT,
-                    illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                  })
-                  .buildEffect())
                 .onClick(async () => {
                   if (this.passwordInfoArray.some(item => item.type === 'MFA')) {
                     promptAction.openToast({
@@ -948,6 +932,7 @@ export default struct Updatepassword {
       })
       ListItem() {
         Button('添加')
+          .width('100%')
           .onClick(() => {
             if (!this.passwordTag) {
               promptAction.openToast({
@@ -968,7 +953,6 @@ export default struct Updatepassword {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
-      .width('100%')
 
       ForEach(this.passwordTagArray, (item: string, index) => {
         ListItem() {
@@ -1124,6 +1108,7 @@ export default struct Updatepassword {
 
       ListItem() {
         Button('修改')
+          .width('100%')
           .onClick(async () => {
             if (!this.passwordName) {
               promptAction.openToast({
@@ -1178,7 +1163,6 @@ export default struct Updatepassword {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
-      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
@@ -1186,23 +1170,9 @@ export default struct Updatepassword {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      const currentOrientation = display.getDefaultDisplaySync().orientation
-      if (currentOrientation === display.Orientation.PORTRAIT ||
-        currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
-        this.preferType = 0
-      }
-      if (currentOrientation === display.Orientation.LANDSCAPE ||
-        currentOrientation === display.Orientation.LANDSCAPE_INVERTED) {
-        this.preferType = 1
-      }
+      this.preferType = getPreferType()
       display.on('change', (displayId) => {
-        const orientation = display.getDisplayByIdSync(displayId).orientation
-        if (orientation === display.Orientation.PORTRAIT || orientation === display.Orientation.PORTRAIT_INVERTED) {
-          this.preferType = 0
-        }
-        if (orientation === display.Orientation.LANDSCAPE || orientation === display.Orientation.LANDSCAPE_INVERTED) {
-          this.preferType = 1
-        }
+        this.preferType = getPreferTypeByDisplayId(displayId)
       })
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
         name: 'commonSetting'

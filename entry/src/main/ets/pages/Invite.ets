@@ -172,10 +172,14 @@ struct Invite {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
 
-              QRCode('https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode)
-                .margin({
-                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                })
+              Column() {
+                QRCode('https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode)
+              }
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .width('100%')
+
               Text('已邀请新用户数：' + this.inviteusercount)
                 .fontWeight(FontWeight.Bold)
                 .margin({
@@ -208,6 +212,7 @@ struct Invite {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
+              .width('100%')
               .onClick(async () => {
                 const dialogControllerProgress = new CustomDialogController({
                   builder: LoadingDialog({
