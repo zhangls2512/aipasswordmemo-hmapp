@@ -176,6 +176,7 @@ export default struct Cleardata {
         Button('清理设置')
           .enabled(this.setting.length > 0)
           .role(ButtonRole.ERROR)
+          .width('100%')
           .onClick(async () => {
             const promptAction = this.getUIContext().getPromptAction()
             const data = await promptAction.showDialog({
@@ -224,7 +225,6 @@ export default struct Cleardata {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
-      .width('100%')
 
       ListItem() {
         Column() {
@@ -352,6 +352,7 @@ export default struct Cleardata {
         Button('清理缓存')
           .enabled(this.cache.length > 0)
           .role(ButtonRole.ERROR)
+          .width('100%')
           .onClick(async () => {
             const promptAction = this.getUIContext().getPromptAction()
             const data = await promptAction.showDialog({
@@ -410,7 +411,6 @@ export default struct Cleardata {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
-      .width('100%')
 
       ListItem() {
         Column() {
@@ -475,6 +475,7 @@ export default struct Cleardata {
         Button('清理日志')
           .enabled(this.log.length > 0)
           .role(ButtonRole.ERROR)
+          .width('100%')
           .onClick(async () => {
             const promptAction = this.getUIContext().getPromptAction()
             const data = await promptAction.showDialog({
@@ -518,7 +519,6 @@ export default struct Cleardata {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
-      .width('100%')
 
       ListItem() {
         Column() {
@@ -624,6 +624,7 @@ export default struct Cleardata {
         Button('清理无用数据')
           .enabled(this.nouse.length > 0)
           .role(ButtonRole.ERROR)
+          .width('100%')
           .onClick(() => {
             this.nouse.forEach(async (item) => {
               if (item === 'oldaccountNouse') {
@@ -683,7 +684,6 @@ export default struct Cleardata {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
-      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

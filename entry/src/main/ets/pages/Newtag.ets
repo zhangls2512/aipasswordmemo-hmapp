@@ -180,6 +180,7 @@ export default struct Newtag {
 
       ListItem() {
         Button('新增')
+          .width('100%')
           .onClick(async () => {
             if (!this.tagValue) {
               promptAction.openToast({
@@ -200,7 +201,6 @@ export default struct Newtag {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
-      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

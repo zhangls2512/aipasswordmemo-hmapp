@@ -63,6 +63,7 @@ export default struct Cloudservice {
             if (!this.cloudService) {
               Button('开通')
                 .enabled(this.accessToken !== '')
+                .width('100%')
                 .onClick(async () => {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
@@ -89,6 +90,7 @@ export default struct Cloudservice {
               Button('取消开通')
                 .enabled(this.accessToken !== '')
                 .role(ButtonRole.ERROR)
+                .width('100%')
                 .onClick(async () => {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({

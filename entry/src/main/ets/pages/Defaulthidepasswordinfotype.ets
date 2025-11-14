@@ -32,6 +32,7 @@ struct Defaulthidepasswordinfotype {
 
         ListItem() {
           Button('添加')
+            .width('100%')
             .onClick(() => {
               if (!this.type) {
                 promptAction.openToast({
@@ -58,7 +59,6 @@ struct Defaulthidepasswordinfotype {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
-        .width('100%')
 
         ForEach(this.defaultHidePasswordInfoTypeArray, (item: string, index) => {
           ListItem() {

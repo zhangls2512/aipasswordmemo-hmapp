@@ -7,6 +7,7 @@ import {
   ListItem,
   RepeatItem
 } from '../common/Passwordcheck'
+import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
 import UpdatePassword from './Updatepassword'
 
 @ComponentV2
@@ -426,23 +427,9 @@ export default struct Passwordcheck {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      const currentOrientation = display.getDefaultDisplaySync().orientation
-      if (currentOrientation === display.Orientation.PORTRAIT ||
-        currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
-        this.preferType = 0
-      }
-      if (currentOrientation === display.Orientation.LANDSCAPE ||
-        currentOrientation === display.Orientation.LANDSCAPE_INVERTED) {
-        this.preferType = 1
-      }
+      this.preferType = getPreferType()
       display.on('change', (displayId) => {
-        const orientation = display.getDisplayByIdSync(displayId).orientation
-        if (orientation === display.Orientation.PORTRAIT || orientation === display.Orientation.PORTRAIT_INVERTED) {
-          this.preferType = 0
-        }
-        if (orientation === display.Orientation.LANDSCAPE || orientation === display.Orientation.LANDSCAPE_INVERTED) {
-          this.preferType = 1
-        }
+        this.preferType = getPreferTypeByDisplayId(displayId)
       })
       const passwordStrengthArray = await getPasswordStrengthList(this.context)
       this.lowStrengthPasswordArray = passwordStrengthArray[0]

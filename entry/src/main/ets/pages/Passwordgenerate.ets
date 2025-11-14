@@ -137,6 +137,7 @@ export default struct Passwordgenerate {
       ListItem() {
         Button('生成')
           .enabled(this.digit || this.lowercaseLetter || this.uppercaseLetter || this.specialCharacter)
+          .width('100%')
           .onClick(() => {
             const allowCharacters: string[] = []
             if (this.digit) {
@@ -175,7 +176,6 @@ export default struct Passwordgenerate {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
-      .width('100%')
 
       if (this.password) {
         ListItem() {
@@ -218,6 +218,7 @@ export default struct Passwordgenerate {
       if (this.inputPassword && this.password) {
         ListItem() {
           Button('填入')
+            .width('100%')
             .onClick(() => {
               this.context.eventHub.emit('inputPassword', this.password)
               this.isShowPasswordgenerateSheet = false
@@ -226,7 +227,6 @@ export default struct Passwordgenerate {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
-        .width('100%')
       }
     }
     .padding({

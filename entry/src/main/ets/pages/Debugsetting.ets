@@ -159,7 +159,6 @@ struct Debugsetting {
                   type: ToggleType.Switch,
                   isOn: this.saveErrorLog!!
                 })
-                  .enabled(this.allService)
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('saveErrorLog', isOn)
                     this.debugSettingDataPreferences.flushSync()
@@ -185,7 +184,6 @@ struct Debugsetting {
                   type: ToggleType.Switch,
                   isOn: this.deleteErrorLogBeforeUpdateTimeWhenAppLaunch!!
                 })
-                  .enabled(this.allService)
                   .onChange((isOn) => {
                     this.debugSettingDataPreferences.putSync('deleteErrorLogBeforeUpdateTimeWhenAppLaunch', isOn)
                     this.debugSettingDataPreferences.flushSync()
@@ -1143,6 +1141,7 @@ struct Debugsetting {
         ListItem() {
           Button('恢复默认设置')
             .align(Alignment.Center)
+            .width('100%')
             .onClick(async () => {
               const promptAction = this.getUIContext().getPromptAction()
               const data = await promptAction.showDialog({
@@ -1172,7 +1171,6 @@ struct Debugsetting {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
-        .width('100%')
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

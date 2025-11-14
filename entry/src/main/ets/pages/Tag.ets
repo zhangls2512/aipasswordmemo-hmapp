@@ -6,6 +6,7 @@ import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { CloudBackupTimeItem, getTagList, Tag } from '../common/Dataget'
+import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
 import NewTag from './Newtag'
 import UpdateTag from './Updatetag'
 
@@ -21,6 +22,7 @@ export default struct TagPage {
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Tag[] = []
   @Local hoverId: number = -1
+  @Local buttonHoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
@@ -163,13 +165,20 @@ export default struct TagPage {
             Column() {
               Image($r('app.media.cancel'))
             }
-            .backgroundColor($r('sys.color.interactive_hover'))
             .borderRadius(20)
             .height(40)
             .margin({
               right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
             })
             .padding(11)
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.interactive_hover'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
             .visualEffect(new hdsEffect.HdsEffectBuilder()
               .pointLight({
                 sourceType: hdsEffect.PointLightSourceType.SOFT,
@@ -192,10 +201,17 @@ export default struct TagPage {
             Column() {
               Image($r('app.media.delete'))
             }
-            .backgroundColor($r('sys.color.interactive_hover'))
             .borderRadius(20)
             .height(40)
             .padding(11)
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.interactive_hover'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
             .visualEffect(new hdsEffect.HdsEffectBuilder()
               .pointLight({
                 sourceType: hdsEffect.PointLightSourceType.SOFT,
@@ -234,13 +250,20 @@ export default struct TagPage {
               Column() {
                 Image($r('app.media.cloud'))
               }
-              .backgroundColor($r('sys.color.interactive_hover'))
               .borderRadius(20)
               .height(40)
               .margin({
                 left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
               .padding(11)
+              .stateStyles({
+                normal: {
+                  .backgroundColor($r('sys.color.interactive_hover'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
               .visualEffect(new hdsEffect.HdsEffectBuilder()
                 .pointLight({
                   sourceType: hdsEffect.PointLightSourceType.SOFT,
@@ -275,11 +298,26 @@ export default struct TagPage {
             Column() {
               Image($r('app.media.new_white'))
             }
-            .backgroundColor($r('sys.color.background_emphasize'))
             .borderRadius(20)
             .height(40)
             .padding(11)
+            .stateStyles({
+              normal: {
+                .backgroundColor(this.buttonHoverId === 0 ? '#0754EB' : $r('sys.color.background_emphasize'))
+              },
+              pressed: {
+                .backgroundColor('#0A50DE')
+              }
+            })
             .width(40)
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.buttonHoverId = -1
+              }
+              if (isHover) {
+                this.buttonHoverId = 0
+              }
+            })
             .onClick(() => {
               this.isShowNewSheet = true
             })
@@ -318,10 +356,17 @@ export default struct TagPage {
             Column() {
               Image($r('app.media.sort'))
             }
-            .backgroundColor($r('sys.color.interactive_hover'))
             .borderRadius(20)
             .height(40)
             .padding(11)
+            .stateStyles({
+              normal: {
+                .backgroundColor($r('sys.color.interactive_hover'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
             .visualEffect(new hdsEffect.HdsEffectBuilder()
               .pointLight({
                 sourceType: hdsEffect.PointLightSourceType.SOFT,
@@ -456,23 +501,9 @@ export default struct TagPage {
       top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
-      const currentOrientation = display.getDefaultDisplaySync().orientation
-      if (currentOrientation === display.Orientation.PORTRAIT ||
-        currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
-        this.preferType = 0
-      }
-      if (currentOrientation === display.Orientation.LANDSCAPE ||
-        currentOrientation === display.Orientation.LANDSCAPE_INVERTED) {
-        this.preferType = 1
-      }
+      this.preferType = getPreferType()
       display.on('change', (displayId) => {
-        const orientation = display.getDisplayByIdSync(displayId).orientation
-        if (orientation === display.Orientation.PORTRAIT || orientation === display.Orientation.PORTRAIT_INVERTED) {
-          this.preferType = 0
-        }
-        if (orientation === display.Orientation.LANDSCAPE || orientation === display.Orientation.LANDSCAPE_INVERTED) {
-          this.preferType = 1
-        }
+        this.preferType = getPreferTypeByDisplayId(displayId)
       })
       this.context.eventHub.on('refreshTag', async () => {
         this.enableCloudBackup = false
