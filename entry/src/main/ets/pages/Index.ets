@@ -9,6 +9,7 @@ import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import getDeviceToken from '../common/Devicetoken'
 import { read } from '../common/File'
+import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
 import request from '../common/Request'
 import Password from './Password'
 import Info from './Info'
@@ -266,36 +267,13 @@ struct Index {
           }
         }
       })
-      const currentOrientation = display.getDefaultDisplaySync().orientation
-      if (currentOrientation === display.Orientation.PORTRAIT ||
-        currentOrientation === display.Orientation.PORTRAIT_INVERTED) {
-        this.preferType = 0
-        const currentIndex = this.index
-        this.index = -1
-        this.index = currentIndex
-      }
-      if (currentOrientation === display.Orientation.LANDSCAPE ||
-        currentOrientation === display.Orientation.LANDSCAPE_INVERTED) {
-        this.preferType = 1
-        const currentIndex = this.index
-        this.index = -1
-        this.index = currentIndex
-      }
+      this.preferType = getPreferType()
       display.on('change', (displayId) => {
-        const orientation = display.getDisplayByIdSync(displayId).orientation
-        if (orientation === display.Orientation.PORTRAIT || orientation === display.Orientation.PORTRAIT_INVERTED) {
-          this.preferType = 0
-          const currentIndex = this.index
-          this.index = -1
-          this.index = currentIndex
-        }
-        if (orientation === display.Orientation.LANDSCAPE || orientation === display.Orientation.LANDSCAPE_INVERTED) {
-          this.preferType = 1
-          const currentIndex = this.index
-          this.index = -1
-          this.index = currentIndex
-        }
+        this.preferType = getPreferTypeByDisplayId(displayId)
       })
+      const currentIndex = this.index
+      this.index = -1
+      this.index = currentIndex
       this.context.eventHub.on('refreshIndex', () => {
         this.backgroundImagePixelMap = this.getBackgroundImage()
       })

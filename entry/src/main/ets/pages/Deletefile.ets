@@ -29,6 +29,7 @@ struct Deletefile {
             Button('删除')
               .enabled(this.fileUri !== '')
               .role(ButtonRole.ERROR)
+              .width('100%')
               .onClick(async () => {
                 const promptAction = this.getUIContext().getPromptAction()
                 const data = await promptAction.showDialog({
@@ -60,7 +61,6 @@ struct Deletefile {
                 }
               })
           }
-          .width('100%')
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')

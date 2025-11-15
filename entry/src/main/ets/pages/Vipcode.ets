@@ -32,6 +32,7 @@ struct Vipcode {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
+              .width('100%')
               .onClick(async () => {
                 const accessToken = await get()
                 if (accessToken) {

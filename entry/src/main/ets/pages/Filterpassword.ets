@@ -318,6 +318,7 @@ export default struct Filterpassword {
       if (this.getCurrentInfoType() !== '图标') {
         ListItem() {
           Button('添加')
+            .width('100%')
             .onClick(async () => {
               const infoType = this.getCurrentInfoType()
               if (!infoType) {
@@ -354,7 +355,6 @@ export default struct Filterpassword {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
-        .width('100%')
       }
       ForEach(this.passwordInfoArray, (item: PasswordInfoItem, index) => {
         ListItem() {
@@ -461,6 +461,7 @@ export default struct Filterpassword {
       })
       ListItem() {
         Button('添加')
+          .width('100%')
           .onClick(() => {
             if (!this.passwordTag) {
               promptAction.openToast({
@@ -481,7 +482,6 @@ export default struct Filterpassword {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
-      .width('100%')
 
       ForEach(this.passwordTagArray, (item: string, index) => {
         ListItem() {
@@ -513,6 +513,7 @@ export default struct Filterpassword {
       })
       ListItem() {
         Button('确定')
+          .width('100%')
           .onClick(() => {
             this.isShowFilterSheet = false
             this.filterPasswordDataPreferences.putSync('nameKeyword', this.passwordNameKeyword)
@@ -524,7 +525,6 @@ export default struct Filterpassword {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
-      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

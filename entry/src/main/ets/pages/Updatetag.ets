@@ -181,6 +181,7 @@ export default struct Updatetag {
 
       ListItem() {
         Button('修改')
+          .width('100%')
           .onClick(async () => {
             if (!this.tagValue) {
               promptAction.openToast({
@@ -201,7 +202,6 @@ export default struct Updatetag {
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
-      .width('100%')
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

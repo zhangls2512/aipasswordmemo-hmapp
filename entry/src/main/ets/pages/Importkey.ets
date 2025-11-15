@@ -32,6 +32,7 @@ struct Importkey {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
+              .width('100%')
               .onClick(async () => {
                 await setCustomKey(this.keyValue)
                 this.pageInfos.pop()
