@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { window } from '@kit.ArkUI'
+import { promptAction, window } from '@kit.ArkUI'
 import { setCustomKey } from '../common/Crypto'
 
 @Builder
@@ -34,9 +34,15 @@ struct Importkey {
               })
               .width('100%')
               .onClick(async () => {
-                await setCustomKey(this.keyValue)
-                this.pageInfos.pop()
-                this.context.eventHub.emit('refreshKey')
+                try {
+                  await setCustomKey(this.keyValue)
+                  this.pageInfos.pop()
+                  this.context.eventHub.emit('refreshKey')
+                } catch (err) {
+                  await promptAction.openToast({
+                    message: '导入失败，原因：密钥格式不正确（错误码：' + err.code + '，错误信息：' + err.message + '）'
+                  })
+                }
               })
           }
           .width('100%')
