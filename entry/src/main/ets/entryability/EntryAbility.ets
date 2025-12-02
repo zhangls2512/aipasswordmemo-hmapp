@@ -155,7 +155,7 @@ export default class EntryAbility extends UIAbility {
               object: object
             })
             if (res !== 'fail') {
-              this.context.eventHub.emit('dialog', '提示',
+              context.eventHub.emit('dialog', '提示',
                 '故障日志自动上传成功，故障类型：JS_ERROR。建议您依次进入“我的”>“设置”>“关于”，附带联系方式提交意见反馈或联系人工客服，便于开发者排查、处理问题。')
             }
           }

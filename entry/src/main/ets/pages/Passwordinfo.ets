@@ -369,7 +369,7 @@ export default struct Passwordinfo {
       this.passwordTag = passwordInfo.tag
       const mfaInfo = this.passwordInfo.find(item => item.type === 'MFA')
       if (mfaInfo) {
-        setInterval(() => {
+        const interval = setInterval(async () => {
           const mfaInfoArray = mfaInfo.value.split('\0')
           let mfaOthauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
           mfaOthauthUri = mfaOthauthUri.addQueryValue('secret', mfaInfoArray[0])
@@ -377,21 +377,26 @@ export default struct Passwordinfo {
           mfaOthauthUri = mfaOthauthUri.addQueryValue('digits', mfaInfoArray[2])
           this.mfaOtpauthUri = mfaOthauthUri.toString()
           this.mfaStep = Number(mfaInfoArray[1])
-          const res = getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
-          this.mfaValue = res.value
-          this.mfaSecondsRemaining = res.secondsRemaining
-          const mfaSecondsRemainingPercent = Number((this.mfaSecondsRemaining / this.mfaStep).toFixed(2))
-          if (mfaSecondsRemainingPercent >= 0.5) {
-            this.mfaSecondsRemainingColor = Color.Green
+          const res = await getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
+          if (res.value !== 'fail') {
+            this.mfaValue = res.value
+            this.mfaSecondsRemaining = res.secondsRemaining
+            const mfaSecondsRemainingPercent = Number((this.mfaSecondsRemaining / this.mfaStep).toFixed(2))
+            if (mfaSecondsRemainingPercent >= 0.5) {
+              this.mfaSecondsRemainingColor = Color.Green
+            }
+            if (mfaSecondsRemainingPercent < 0.5 && mfaSecondsRemainingPercent >= 0.3) {
+              this.mfaSecondsRemainingColor = Color.Yellow
+            }
+            if (mfaSecondsRemainingPercent < 0.3 && mfaSecondsRemainingPercent >= 0.1) {
+              this.mfaSecondsRemainingColor = Color.Orange
+            }
+            if (mfaSecondsRemainingPercent <= 0.1) {
+              this.mfaSecondsRemainingColor = Color.Red
+            }
           }
-          if (mfaSecondsRemainingPercent < 0.5 && mfaSecondsRemainingPercent >= 0.3) {
-            this.mfaSecondsRemainingColor = Color.Yellow
-          }
-          if (mfaSecondsRemainingPercent < 0.3 && mfaSecondsRemainingPercent >= 0.1) {
-            this.mfaSecondsRemainingColor = Color.Orange
-          }
-          if (mfaSecondsRemainingPercent <= 0.1) {
-            this.mfaSecondsRemainingColor = Color.Red
+          if (res.value === 'fail') {
+            clearInterval(interval)
           }
         }, 500)
       }
