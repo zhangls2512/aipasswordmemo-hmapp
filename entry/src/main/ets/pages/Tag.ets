@@ -45,7 +45,7 @@ export default struct TagPage {
         time: Date.now()
       })
     }
-    await setCloudBackup(this.context, this.UIContext, {
+    await setCloudBackup(this.context, {
       type: 'tag',
       id: item.id,
       content: JSON.stringify({
@@ -133,7 +133,7 @@ export default struct TagPage {
                 })
               })
               dialogControllerProgress.open()
-              await deleteCloudBackup(this.context, this.UIContext, {
+              await deleteCloudBackup(this.context, {
                 type: 'tag',
                 id: item.id
               })
@@ -501,20 +501,20 @@ export default struct TagPage {
       top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
-      this.preferType = getPreferType()
+      this.preferType = getPreferType(this.UIContext)
       display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId)
+        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
       })
       this.context.eventHub.on('refreshTag', async () => {
         this.enableCloudBackup = false
         this.loading = true
-        const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
+        const cloudServiceStatus = await getCloudServiceStatus(this.context)
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
       })
       this.loading = true
-      const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
+      const cloudServiceStatus = await getCloudServiceStatus(this.context)
       if (cloudServiceStatus && getKey()) {
         this.enableCloudBackup = true
       }

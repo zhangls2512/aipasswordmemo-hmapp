@@ -34,21 +34,21 @@ struct Oftenusedinfotype {
         ListItem() {
           Button('添加')
             .width('100%')
-            .onClick(() => {
+            .onClick(async () => {
               if (!this.type) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请输入内容'
                 })
                 return
               }
               if (this.type === '自定义') {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '不支持添加此类型'
                 })
                 return
               }
               if (this.oftenUsedInfoTypeArray.some(item => item === this.type)) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '已添加此类型'
                 })
                 return
@@ -134,9 +134,9 @@ struct Oftenusedinfotype {
                     })
                   Image($r('app.media.add'))
                     .width('8%')
-                    .onClick(() => {
+                    .onClick(async () => {
                       if (this.oftenUsedInfoTypeArray.some(typeItem => typeItem === item)) {
-                        promptAction.openToast({
+                        await promptAction.openToast({
                           message: '已添加此类型'
                         })
                         return

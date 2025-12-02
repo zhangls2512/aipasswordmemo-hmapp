@@ -33,21 +33,21 @@ struct Defaulthidepasswordinfotype {
         ListItem() {
           Button('添加')
             .width('100%')
-            .onClick(() => {
+            .onClick(async () => {
               if (!this.type) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请输入内容'
                 })
                 return
               }
               if (this.type === '图标' || this.type === 'MFA') {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '不支持添加此类型'
                 })
                 return
               }
               if (this.defaultHidePasswordInfoTypeArray.some(item => item === this.type)) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '已添加此类型'
                 })
                 return

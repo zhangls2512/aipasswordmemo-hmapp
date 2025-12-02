@@ -68,8 +68,8 @@ export default struct Passwordinfo {
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
                     .textAlign(TextAlign.End)
-                    .onClick(() => {
-                      copy(this.context, this.UIContext, item.value)
+                    .onClick(async () => {
+                      await copy(this.context, this.UIContext, item.value)
                     })
                   Image($r('app.media.hide'))
                     .fillColor($r('sys.color.icon_secondary'))
@@ -87,8 +87,8 @@ export default struct Passwordinfo {
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
                     .textAlign(TextAlign.End)
-                    .onClick(() => {
-                      copy(this.context, this.UIContext, item.value)
+                    .onClick(async () => {
+                      await copy(this.context, this.UIContext, item.value)
                     })
                   Image($r('app.media.show'))
                     .fillColor($r('sys.color.icon_secondary'))
@@ -123,8 +123,8 @@ export default struct Passwordinfo {
                 Image(item.value)
                   .copyOption(CopyOptions.LocalDevice)
                   .width('10%')
-                  .onError((err) => {
-                    promptAction.openToast({
+                  .onError(async (err) => {
+                    await promptAction.openToast({
                       message: '发生错误，错误信息：' + err.message
                     })
                   })
@@ -158,15 +158,15 @@ export default struct Passwordinfo {
                   }])
                   const srcFile = fileIo.openSync(item.value)
                   const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
-                  fileIo.copyFileSync(srcFile.fd, destFile.fd)
+                  await fileIo.copyFile(srcFile.fd, destFile.fd)
                   fileIo.closeSync(srcFile)
                   fileIo.closeSync(destFile)
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '保存成功'
                   })
                 } catch (err) {
                   if (err.code !== 13900020) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code
                     })
                   }
@@ -235,13 +235,13 @@ export default struct Passwordinfo {
                   this.hoverId = 1
                 }
               })
-              .onClick(() => {
-                copy(this.context, this.UIContext, this.mfaValue)
+              .onClick(async () => {
+                await copy(this.context, this.UIContext, this.mfaValue)
               })
               .gesture(
                 LongPressGesture()
-                  .onAction(() => {
-                    copy(this.context, this.UIContext, this.mfaOtpauthUri)
+                  .onAction(async () => {
+                    await copy(this.context, this.UIContext, this.mfaOtpauthUri)
                   })
               )
             }
@@ -292,14 +292,14 @@ export default struct Passwordinfo {
               .bindMenu([
                 {
                   value: '打开',
-                  action: () => {
-                    openLink(this.context, item.value)
+                  action: async () => {
+                    await openLink(this.context, item.value)
                   }
                 },
                 {
                   value: '复制',
-                  action: () => {
-                    copy(this.context, this.UIContext, item.value)
+                  action: async () => {
+                    await copy(this.context, this.UIContext, item.value)
                   }
                 }
               ], {

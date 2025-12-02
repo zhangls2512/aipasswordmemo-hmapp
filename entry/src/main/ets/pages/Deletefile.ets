@@ -48,13 +48,13 @@ struct Deletefile {
                 })
                 if (data.index === 1) {
                   try {
-                    fileIo.unlinkSync(this.fileUri.replace('file://com.zhangxm.aipasswordmemo', ''))
-                    promptAction.openToast({
+                    await fileIo.unlink(this.fileUri.replace('file://com.zhangxm.aipasswordmemo', ''))
+                    await promptAction.openToast({
                       message: '删除成功'
                     })
                     this.fileUri = ''
                   } catch (err) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code
                     })
                   }

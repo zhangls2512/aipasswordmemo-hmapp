@@ -15,8 +15,7 @@ export default struct Updateinfo {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   specialInfoTypes = ['昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
   build() {
@@ -196,18 +195,18 @@ export default struct Updateinfo {
           .width('100%')
           .onClick(async () => {
             if (!this.infoType) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请输入类型'
               })
               return
             }
             if (!this.infoValue) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请输入内容'
               })
               return
             }
-            const res = await updateInfo(this.context, this.UIContext, this.infoId, {
+            const res = await updateInfo(this.context, this.infoId, {
               type: this.infoType,
               value: this.infoValue,
               cloudBackup: this.cloudBackup
@@ -230,7 +229,7 @@ export default struct Updateinfo {
       const infoInfo = await getInfoInfo(this.context, this.infoId) as Info
       this.infoType = infoInfo.type
       this.infoValue = infoInfo.value
-      const res = await getCloudServiceStatus(this.context, this.UIContext)
+      const res = await getCloudServiceStatus(this.context)
       const key = getKey()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'

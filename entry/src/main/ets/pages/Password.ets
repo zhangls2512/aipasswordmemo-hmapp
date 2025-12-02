@@ -75,7 +75,7 @@ export default struct PasswordPage {
         time: Date.now()
       })
     }
-    await setCloudBackup(this.context, this.UIContext, {
+    await setCloudBackup(this.context, {
       type: 'password',
       id: item.id,
       content: JSON.stringify({
@@ -173,7 +173,7 @@ export default struct PasswordPage {
                 })
               })
               dialogControllerProgress.open()
-              await deleteCloudBackup(this.context, this.UIContext, {
+              await deleteCloudBackup(this.context, {
                 type: 'password',
                 id: item.id
               })
@@ -634,8 +634,8 @@ export default struct PasswordPage {
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
                         .width('10%')
-                        .onError((err) => {
-                          promptAction.openToast({
+                        .onError(async (err) => {
+                          await promptAction.openToast({
                             message: '发生错误，错误信息：' + err.message
                           })
                         })
@@ -761,9 +761,9 @@ export default struct PasswordPage {
       top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
-      this.preferType = getPreferType()
+      this.preferType = getPreferType(this.UIContext)
       display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId)
+        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
       })
       this.showPassword = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
       this.hideTag = this.commonSettingDataPreferences.getSync('hideTagInIndex', false) as boolean
@@ -792,7 +792,7 @@ export default struct PasswordPage {
           await lastWindow.setWindowPrivacyMode(this.showPassword)
         }
         this.loading = true
-        const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
+        const cloudServiceStatus = await getCloudServiceStatus(this.context)
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
@@ -809,7 +809,7 @@ export default struct PasswordPage {
         this.loading = true
       })
       this.loading = true
-      const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
+      const cloudServiceStatus = await getCloudServiceStatus(this.context)
       if (cloudServiceStatus && getKey()) {
         this.enableCloudBackup = true
       }

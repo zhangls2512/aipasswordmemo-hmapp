@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { get, getAccountInfo, remove, set } from '../common/Accesstoken'
+import { getAccountAccessToken, getAccountInfo, removeAccount, setAccount } from '../common/Accesstoken'
 import request from '../common/Request'
 
 @Builder
@@ -15,20 +15,19 @@ struct Email {
   @Local emailcode: string = ''
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err, response) => {
         if (!this.email) {
-          promptAction.openToast({
+          await promptAction.openToast({
             message: '请输入邮箱'
           })
           return
         }
         if (this.emailcode.length !== 8) {
-          promptAction.openToast({
+          await promptAction.openToast({
             message: '请输入正确的邮箱验证码'
           })
           return
@@ -40,7 +39,7 @@ struct Email {
             })
           })
           dialogControllerProgress.open()
-          const res = await request(this.context, this.UIContext, '/account/updateEmail', {
+          const res = await request(this.context, '/account/updateEmail', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode,
             newEmail: this.email,
@@ -48,13 +47,13 @@ struct Email {
           })
           dialogControllerProgress.close()
           if (res !== 'fail') {
-            promptAction.openToast({
+            await promptAction.openToast({
               message: '绑定成功'
             })
-            const accessToken = await get()
+            const accessToken = await getAccountAccessToken()
             const accountInfo = await getAccountInfo()
-            await remove()
-            await set(accessToken, {
+            await removeAccount()
+            await setAccount(accessToken, {
               uid: accountInfo.uid,
               email: this.email,
               endDate: accountInfo.endDate
@@ -65,7 +64,7 @@ struct Email {
           }
         }
         if (err) {
-          promptAction.openToast({
+          await promptAction.openToast({
             message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
           })
         }
@@ -123,7 +122,7 @@ struct Email {
               .width('100%')
               .onClick(async () => {
                 if (!this.email) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '请输入邮箱'
                   })
                   return
@@ -134,12 +133,12 @@ struct Email {
                   })
                 })
                 dialogControllerProgress.open()
-                const res = await request(this.context, this.UIContext, '/account/sendEmailCode', {
+                const res = await request(this.context, '/account/sendEmailCode', {
                   email: this.email
                 })
                 dialogControllerProgress.close()
                 if (res !== 'fail') {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '验证码已成功发送到邮箱：' + this.email
                   })
                   this.buttonEnabled = false

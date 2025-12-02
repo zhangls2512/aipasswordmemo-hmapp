@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { display, window } from '@kit.ArkUI'
-import { get, getAccountInfo, remove } from '../common/Accesstoken'
+import { getAccountAccessToken, getAccountInfo, removeAccount } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
@@ -41,10 +41,10 @@ export default struct Me {
     this.uid = accountInfo.uid
     this.email = accountInfo.email
     this.endDate = String(new Date(accountInfo.endDate))
-    const accessToken = await get()
+    const accessToken = await getAccountAccessToken()
     if (accessToken) {
       this.cloudServiceLoading = true
-      this.cloudService = await getCloudServiceStatus(this.context, this.UIContext)
+      this.cloudService = await getCloudServiceStatus(this.context)
       this.cloudServiceLoading = false
     }
   }
@@ -158,7 +158,7 @@ export default struct Me {
             onDisappear: async () => {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(false)
-              this.get()
+              await this.get()
             }
           })
 
@@ -199,8 +199,8 @@ export default struct Me {
                 this.hoverId = 1
               }
             })
-            .onClick(() => {
-              copy(this.context, this.UIContext, this.uid)
+            .onClick(async () => {
+              await copy(this.context, this.UIContext, this.uid)
             })
 
             Divider()
@@ -246,8 +246,8 @@ export default struct Me {
                 this.hoverId = 2
               }
             })
-            .onClick(() => {
-              openLink(this.context, 'https://www.zhangls2512.cn/product/account/info')
+            .onClick(async () => {
+              await openLink(this.context, 'https://www.zhangls2512.cn/product/account/info')
             })
 
             Divider()
@@ -674,8 +674,8 @@ export default struct Me {
                 ]
               })
               if (data.index === 1) {
-                await remove()
-                promptAction.openToast({
+                await removeAccount()
+                await promptAction.openToast({
                   message: '退出成功'
                 })
                 this.uid = ''
@@ -695,15 +695,15 @@ export default struct Me {
       right: $r('sys.float.ohos_id_max_padding_end'),
       top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
-    .onAppear(() => {
-      this.preferType = getPreferType()
+    .onAppear(async () => {
+      this.preferType = getPreferType(this.UIContext)
       display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId)
+        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
       })
-      this.context.eventHub.on('refreshMe', () => {
-        this.get()
+      this.context.eventHub.on('refreshMe', async () => {
+        await this.get()
       })
-      this.get()
+      await this.get()
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshMe')

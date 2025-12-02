@@ -7,7 +7,7 @@ import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { generateBarcode, scanCore } from '@kit.ScanKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { hdsEffect } from '@kit.UIDesignKit'
-import { get } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
 import copy from '../common/Pasteboard'
 import request from '../common/Request'
@@ -43,8 +43,8 @@ struct Invite {
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                 })
-                .onClick(() => {
-                  copy(this.context, this.UIContext, this.invitationcode)
+                .onClick(async () => {
+                  await copy(this.context, this.UIContext, this.invitationcode)
                 })
               Text('邀请链接')
                 .fontWeight(FontWeight.Bold)
@@ -57,7 +57,7 @@ struct Invite {
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                 })
-                .onClick(() => {
+                .onClick(async () => {
                   const shareData = new systemShare.SharedData({
                     utd: uniformTypeDescriptor.UniformDataType.HYPERLINK,
                     title: '邀请您使用轩铭密码智能备忘录',
@@ -66,7 +66,7 @@ struct Invite {
                     content: 'https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode
                   })
                   const shareController = new systemShare.ShareController(shareData)
-                  shareController.show(this.context, {})
+                  await shareController.show(this.context, {})
                 })
               Row() {
                 Text('邀请二维码')
@@ -80,8 +80,8 @@ struct Invite {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                   .onClick(async () => {
-                    const qrcodeDir = this.context.filesDir + '/media/invitationqrcode'
-                    const qrcodePath = qrcodeDir + '/' + this.invitationcode + '.png'
+                    const qrcodeDir = this.context.filesDir + '/media/invitationqrcode/'
+                    const qrcodePath = qrcodeDir + this.invitationcode + '.png'
                     if (!fileIo.accessSync(qrcodePath)) {
                       const qrcodePixelMap =
                         await generateBarcode.createBarcode('https://www.zhangls2512.cn/product/password?invitationcode=' +
@@ -91,7 +91,7 @@ struct Invite {
                           height: 200
                         })
                       if (!fileIo.accessSync(qrcodeDir)) {
-                        fileIo.mkdirSync(qrcodeDir, true)
+                        await fileIo.mkdir(qrcodeDir, true)
                       }
                       const qrcodeFile =
                         fileIo.openSync(qrcodePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
@@ -111,7 +111,7 @@ struct Invite {
                       uri: qrcodeUri
                     })
                     const shareController = new systemShare.ShareController(shareData)
-                    shareController.show(this.context, {})
+                    await shareController.show(this.context, {})
                   })
                 Button('保存')
                   .buttonStyle(ButtonStyleMode.NORMAL)
@@ -122,8 +122,8 @@ struct Invite {
                     })
                     .buildEffect())
                   .onClick(async () => {
-                    const qrcodeDir = this.context.filesDir + '/media/invitationqrcode'
-                    const qrcodePath = qrcodeDir + '/' + this.invitationcode + '.png'
+                    const qrcodeDir = this.context.filesDir + '/media/invitationqrcode/'
+                    const qrcodePath = qrcodeDir + this.invitationcode + '.png'
                     if (!fileIo.accessSync(qrcodePath)) {
                       const qrcodePixelMap =
                         await generateBarcode.createBarcode('https://www.zhangls2512.cn/product/password?invitationcode=' +
@@ -133,7 +133,7 @@ struct Invite {
                           height: 200
                         })
                       if (!fileIo.accessSync(qrcodeDir)) {
-                        fileIo.mkdirSync(qrcodeDir, true)
+                        await fileIo.mkdir(qrcodeDir, true)
                       }
                       const qrcodeFile =
                         fileIo.openSync(qrcodePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
@@ -153,15 +153,15 @@ struct Invite {
                       }])
                       const srcFile = fileIo.openSync(qrcodeUri)
                       const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
-                      fileIo.copyFileSync(srcFile.fd, destFile.fd)
+                      await fileIo.copyFile(srcFile.fd, destFile.fd)
                       fileIo.closeSync(srcFile)
                       fileIo.closeSync(destFile)
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '保存成功'
                       })
                     } catch (err) {
                       if (err.code !== 13900020) {
-                        promptAction.openToast({
+                        await promptAction.openToast({
                           message: '发生错误，错误码：' + err.code
                         })
                       }
@@ -220,7 +220,7 @@ struct Invite {
                   })
                 })
                 dialogControllerProgress.open()
-                const res = await request(this.context, this.UIContext, '/product/useInvitationcode', {
+                const res = await request(this.context, '/product/useInvitationcode', {
                   accessToken: this.accessToken,
                   deviceToken: this.deviceToken,
                   product: 'password',
@@ -228,7 +228,7 @@ struct Invite {
                 })
                 dialogControllerProgress.close()
                 if (res !== 'fail') {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '验证通过，已获得 30 天会员'
                   })
                   this.pageInfos.pop()
@@ -324,11 +324,11 @@ struct Invite {
     .title('邀请新用户，免费得会员')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
-      this.accessToken = await get()
+      this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {
         this.loading = true
         this.deviceToken = await getDeviceToken()
-        const userres = await request(this.context, this.UIContext, '/product/getUserInfo', {
+        const userres = await request(this.context, '/product/getUserInfo', {
           accessToken: this.accessToken,
           product: 'password'
         })
@@ -341,14 +341,14 @@ struct Invite {
             thumbnail: this.context.resourceManager.getMediaByNameSync('icon'),
             content: 'https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode
           })
-          harmonyShare.on('knockShare', (sharableTarget) => {
-            sharableTarget.share(shareData)
+          harmonyShare.on('knockShare', async (sharableTarget) => {
+            await sharableTarget.share(shareData)
           })
-          harmonyShare.on('gesturesShare', (sharableTarget) => {
-            sharableTarget.share(shareData)
+          harmonyShare.on('gesturesShare', async (sharableTarget) => {
+            await sharableTarget.share(shareData)
           })
         }
-        const countres = await request(this.context, this.UIContext, '/product/getInviteUserCount', {
+        const countres = await request(this.context, '/product/getInviteUserCount', {
           accessToken: this.accessToken,
           product: 'password'
         })

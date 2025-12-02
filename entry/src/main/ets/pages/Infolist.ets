@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { pushService } from '@kit.PushKit'
-import { get } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
 import openLink from '../common/Openlink'
 
@@ -171,8 +171,8 @@ struct Infolist {
                   this.hoverId = 0
                 }
               })
-              .onClick(() => {
-                openLink(this.context, 'https://www.zhangls2512.cn/product/account/loginlog')
+              .onClick(async () => {
+                await openLink(this.context, 'https://www.zhangls2512.cn/product/account/loginlog')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -321,8 +321,8 @@ struct Infolist {
                   this.hoverId = 1
                 }
               })
-              .onClick(() => {
-                openLink(this.context, 'https://www.zhangls2512.cn/product/account/info')
+              .onClick(async () => {
+                await openLink(this.context, 'https://www.zhangls2512.cn/product/account/info')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -613,7 +613,7 @@ struct Infolist {
                 dialogControllerProgress.close()
                 if (deviceToken) {
                   const promptAction = this.getUIContext().getPromptAction()
-                  promptAction.showDialog({
+                  await promptAction.showDialog({
                     title: 'DeviceToken',
                     message: deviceToken,
                     buttons: [
@@ -882,7 +882,7 @@ struct Infolist {
                 try {
                   const pushToken = await pushService.getToken()
                   const promptAction = this.getUIContext().getPromptAction()
-                  promptAction.showDialog({
+                  await promptAction.showDialog({
                     title: 'PushToken',
                     message: pushToken,
                     buttons: [
@@ -893,7 +893,7 @@ struct Infolist {
                     ]
                   })
                 } catch (err) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
                 }
@@ -1176,7 +1176,7 @@ struct Infolist {
     .title('已收集个人信息清单')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
-      this.accessToken = await get()
+      this.accessToken = await getAccountAccessToken()
     })
   }
 }

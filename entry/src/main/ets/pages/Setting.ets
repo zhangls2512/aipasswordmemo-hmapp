@@ -4,7 +4,7 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { formProvider } from '@kit.FormKit'
-import { get, getAccountInfo } from '../common/Accesstoken'
+import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import { checkPermission } from '../common/Permission'
@@ -38,13 +38,13 @@ export default struct Setting {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
       this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
     } catch (err) {
-      promptAction.openToast({
+      await promptAction.openToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
     const accountInfo = await getAccountInfo()
     this.email = accountInfo.email
-    this.accessToken = await get()
+    this.accessToken = await getAccountAccessToken()
     if (this.accessToken) {
       const res = await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
       this.accountDataSyncEnabled = res
@@ -56,14 +56,14 @@ export default struct Setting {
         this.commonSettingDataPreferences.getSync('autoLoginByHuaweiAccount', false) as boolean
       if (this.allService) {
         this.accountLoading = true
-        const accountres = await request(this.context, this.UIContext, '/account/getExternalAccount', {
+        const accountres = await request(this.context, '/account/getExternalAccount', {
           accessToken: this.accessToken
         })
         if (accountres !== 'fail') {
           const account = JSON.parse(accountres).data as Account[]
           this.isBindHuaweiAccount = account.some(item => item.platform === 'huawei')
         }
-        this.cloudService = await getCloudServiceStatus(this.context, this.UIContext)
+        this.cloudService = await getCloudServiceStatus(this.context)
         this.accountLoading = false
       }
     }
@@ -175,9 +175,9 @@ export default struct Setting {
                     this.hoverId = 1
                   }
                 })
-                .onClick(() => {
+                .onClick(async () => {
                   if (!this.email) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '轩铭 2512 统一账号未绑定邮箱，无法使用此功能'
                     })
                     return
@@ -261,15 +261,15 @@ export default struct Setting {
                     this.hoverId = 2
                   }
                 })
-                .onClick(() => {
+                .onClick(async () => {
                   if (!this.email) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '轩铭 2512 统一账号未绑定邮箱，无法使用此功能'
                     })
                     return
                   }
                   if (1 === 1) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '暂未上线，敬请期待'
                     })
                     return
@@ -339,7 +339,7 @@ export default struct Setting {
                         await appAccountManager.setDataSyncEnabled('default', isOn)
                       } catch (err) {
                         this.accountDataSync = false
-                        promptAction.openToast({
+                        await promptAction.openToast({
                           message: '发生错误，错误码：' + err.code
                         })
                       }
@@ -362,8 +362,8 @@ export default struct Setting {
                   left: 12,
                   right: 12
                 })
-                .onClick(() => {
-                  openLink(this.context, 'https://www.zhangls2512.cn/product/account/panel')
+                .onClick(async () => {
+                  await openLink(this.context, 'https://www.zhangls2512.cn/product/account/panel')
                 })
             }
             .alignItems(HorizontalAlign.Start)
@@ -576,8 +576,8 @@ export default struct Setting {
                     left: 12,
                     right: 12
                   })
-                  .onClick(() => {
-                    openLink(this.context, 'https://docs.qq.com/doc/p/2fc9d7d60e5b79dcc09dec8251cb049fb29c7705')
+                  .onClick(async () => {
+                    await openLink(this.context, 'https://docs.qq.com/doc/p/2fc9d7d60e5b79dcc09dec8251cb049fb29c7705')
                   })
               }
               .alignItems(HorizontalAlign.Start)
@@ -978,7 +978,7 @@ export default struct Setting {
                 })
                 .onClick(async () => {
                   await privacyManager.requestAppPrivacyConsent(this.context)
-                  this.getSetting()
+                  await this.getSetting()
                 })
               }
               if (this.agreedPrivacyAgreement === 1) {
@@ -1015,9 +1015,9 @@ export default struct Setting {
                     this.hoverId = 15
                   }
                 })
-                .onClick(() => {
+                .onClick(async () => {
                   privacyManager.disableService()
-                  this.context.terminateSelf()
+                  await this.context.terminateSelf()
                 })
               }
             }
@@ -1075,7 +1075,7 @@ export default struct Setting {
                   this.hoverId = 16
                 }
               })
-              .onClick(() => {
+              .onClick(async () => {
                 try {
                   const appPrivacyLink =
                     privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
@@ -1084,7 +1084,7 @@ export default struct Setting {
                     param: appPrivacyLink?.url
                   })
                 } catch (err) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                   })
                 }
@@ -1128,8 +1128,8 @@ export default struct Setting {
                   this.hoverId = 17
                 }
               })
-              .onClick(() => {
-                openLink(this.context, 'https://docs.qq.com/doc/p/2bde62f6c2aaea97fbcca04c929c284005326d37')
+              .onClick(async () => {
+                await openLink(this.context, 'https://docs.qq.com/doc/p/2bde62f6c2aaea97fbcca04c929c284005326d37')
               })
 
               Divider()
@@ -1212,8 +1212,8 @@ export default struct Setting {
                   this.hoverId = 19
                 }
               })
-              .onClick(() => {
-                openLink(this.context, 'https://docs.qq.com/doc/p/bdc2799638a46746599c68d82697b10a2becb2e4')
+              .onClick(async () => {
+                await openLink(this.context, 'https://docs.qq.com/doc/p/bdc2799638a46746599c68d82697b10a2becb2e4')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1452,11 +1452,11 @@ export default struct Setting {
     })
     .title('设置')
     .titleMode(NavigationTitleMode.Mini)
-    .onAppear(() => {
-      this.getSetting()
-      this.context.eventHub.on('refreshSetting', () => {
-        this.getSetting()
+    .onAppear(async () => {
+      this.context.eventHub.on('refreshSetting', async () => {
+        await this.getSetting()
       })
+      await this.getSetting()
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshSetting')

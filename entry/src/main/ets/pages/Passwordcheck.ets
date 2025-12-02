@@ -21,7 +21,8 @@ export default struct Passwordcheck {
   @Local repeatArray: RepeatItem[] = []
   @Local oldArray: ListItem[] = []
   @Local hoverId: number | string = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   passwordId = 0
 
   @Builder
@@ -401,9 +402,9 @@ export default struct Passwordcheck {
           Text('数据不准确说明')
             .fontColor($r('sys.color.font_emphasize'))
             .fontSize($r('sys.float.ohos_id_text_size_body3'))
-            .onClick(() => {
+            .onClick(async () => {
               const promptAction = this.getUIContext().getPromptAction()
-              promptAction.showDialog({
+              await promptAction.showDialog({
                 title: '数据不准确说明',
                 message: '因为目前存储密码的底层数据结构不支持记录“密码”类型信息的修改时间，只支持记录“密码”类型信息所在数据行整体的修改时间，所以此列表列出的为“密码”类型信息所在数据行整体修改时间早于近一年的密码，未列出“密码”类型信息所在数据行整体修改时间在近一年但“密码”类型信息未修改的密码，请知悉。此问题计划在未来修改存储密码的底层数据结构时解决。',
                 buttons: [
@@ -427,9 +428,9 @@ export default struct Passwordcheck {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      this.preferType = getPreferType()
+      this.preferType = getPreferType(this.UIContext)
       display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId)
+        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
       })
       const passwordStrengthArray = await getPasswordStrengthList(this.context)
       this.lowStrengthPasswordArray = passwordStrengthArray[0]

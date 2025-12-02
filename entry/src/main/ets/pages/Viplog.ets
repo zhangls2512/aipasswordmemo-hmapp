@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
-import { get } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
 interface Item {
@@ -21,9 +21,8 @@ struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
   @Local hoverId: number = -1
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
-  accessToken: string = ''
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  accessToken = ''
   empty: boolean | undefined = undefined
 
   build() {
@@ -168,7 +167,7 @@ struct Viplog {
                     await iap.createRefundRequest(this.getUIContext().getHostContext(), item.info)
                   } catch (err) {
                     if (err.code !== 1001860000) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                       })
                     }
@@ -203,7 +202,7 @@ struct Viplog {
       .onReachEnd(async () => {
         if (this.accessToken && this.empty === false) {
           this.loading = true
-          const res = await request(this.context, this.UIContext, '/product/getViplogList', {
+          const res = await request(this.context, '/product/getViplogList', {
             accessToken: this.accessToken,
             product: 'password',
             skip: this.viplogArray.length
@@ -222,10 +221,10 @@ struct Viplog {
     .backgroundColor($r('app.color.sheet_background'))
     .title('会员开通记录')
     .onAppear(async () => {
-      this.accessToken = await get()
+      this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {
         this.loading = true
-        const res = await request(this.context, this.UIContext, '/product/getViplogList', {
+        const res = await request(this.context, '/product/getViplogList', {
           accessToken: this.accessToken,
           product: 'password'
         })

@@ -5,7 +5,7 @@ import { util } from '@kit.ArkTS'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { netBoost } from '@kit.NetworkBoostKit'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
-import { set } from '../common/Accesstoken'
+import { setAccount } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 
@@ -20,8 +20,7 @@ export default struct Login {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '登录中...'
@@ -36,7 +35,7 @@ export default struct Login {
             scene: 'login',
             sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
           })
-          const res = await request(this.context, this.UIContext, '/account/getAccessToken', {
+          const res = await request(this.context, '/account/getAccessToken', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode
           })
@@ -50,19 +49,19 @@ export default struct Login {
             const uid = JSON.parse(res).uid as string
             const email = JSON.parse(res).email as string
             const endDate = JSON.parse(res).endDate as number
-            await set(accessToken, {
+            await setAccount(accessToken, {
               uid: uid,
               email: email,
               endDate: endDate
             })
-            promptAction.openToast({
+            await promptAction.openToast({
               message: '登录成功'
             })
             this.isShowLoginSheet = false
           }
         }
         if (err) {
-          promptAction.openToast({
+          await promptAction.openToast({
             message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
           })
         }
@@ -219,7 +218,7 @@ export default struct Login {
               .width('100%')
               .onClick(async () => {
                 if (!this.email) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '请输入邮箱'
                   })
                   return
@@ -230,12 +229,12 @@ export default struct Login {
                   })
                 })
                 dialogControllerProgress.open()
-                const res = await request(this.context, this.UIContext, '/account/sendEmailCode', {
+                const res = await request(this.context, '/account/sendEmailCode', {
                   email: this.email
                 })
                 dialogControllerProgress.close()
                 if (res !== 'fail') {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '验证码已成功发送到邮箱：' + this.email
                   })
                   this.buttonEnabled = false
@@ -261,25 +260,25 @@ export default struct Login {
             .width('100%')
             .onClick(async () => {
               if (!this.email) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请输入邮箱'
                 })
                 return
               }
               if (this.type === 'password' && this.password.length < 8) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请输入正确的密码'
                 })
                 return
               }
               if (this.type === 'mfa' && this.mfa.length !== 6) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请输入正确的 MFA'
                 })
                 return
               }
               if (this.type === 'emailcode' && this.emailcode.length !== 8) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请输入正确的邮箱验证码'
                 })
                 return
@@ -299,7 +298,7 @@ export default struct Login {
                 scene: 'login',
                 sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
               })
-              const res = await request(this.context, this.UIContext, '/account/getAccessToken', {
+              const res = await request(this.context, '/account/getAccessToken', {
                 verifyType: this.type,
                 verifyCode: code,
                 email: this.email
@@ -314,12 +313,12 @@ export default struct Login {
                 const uid = JSON.parse(res).uid as string
                 const email = JSON.parse(res).email as string
                 const endDate = JSON.parse(res).endDate as number
-                await set(accessToken, {
+                await setAccount(accessToken, {
                   uid: uid,
                   email: email,
                   endDate: endDate
                 })
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '登录成功'
                 })
                 this.isShowLoginSheet = false
@@ -350,7 +349,7 @@ export default struct Login {
             .width('100%')
             .onClick(async () => {
               try {
-                const resa = await fido2.authenticate(this.context, {
+                const publicKeyAssertionCredential = await fido2.authenticate(this.context, {
                   publicKey: {
                     challenge: new util.TextEncoder().encodeInto(String(Date.now()).slice(0, -5) + '00000')
                   }
@@ -360,14 +359,15 @@ export default struct Login {
                   scene: 'login',
                   sceneEvent: netBoost.SceneEvent.SCENE_EVENT_ENTER
                 })
-                const resb = await request(this.context, this.UIContext, '/account/getAccessToken', {
+                const loginResponse = await request(this.context, '/account/getAccessToken', {
                   verifyType: 'passkey',
-                  rawId: new util.Base64Helper().encodeToStringSync(resa.rawId, util.Type.BASIC_URL_SAFE),
-                  authenticatorData: new util.Base64Helper().encodeToStringSync(resa.response.authenticatorData,
+                  rawId: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.rawId,
                     util.Type.BASIC_URL_SAFE),
-                  clientDataJSON: new util.Base64Helper().encodeToStringSync(resa.response.clientDataJson,
+                  authenticatorData: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.authenticatorData,
                     util.Type.BASIC_URL_SAFE),
-                  signature: new util.Base64Helper().encodeToStringSync(resa.response.signature,
+                  clientDataJSON: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.clientDataJson,
+                    util.Type.BASIC_URL_SAFE),
+                  signature: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.signature,
                     util.Type.BASIC_URL_SAFE)
                 })
                 netBoost.setSceneDesc({
@@ -375,23 +375,23 @@ export default struct Login {
                   sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
                 })
                 this.dialogControllerProgress.close()
-                if (resb !== 'fail') {
-                  const accessToken = JSON.parse(resb).accessToken as string
-                  const uid = JSON.parse(resb).uid as string
-                  const email = JSON.parse(resb).email as string
-                  const endDate = JSON.parse(resb).endDate as number
-                  await set(accessToken, {
+                if (loginResponse !== 'fail') {
+                  const accessToken = JSON.parse(loginResponse).accessToken as string
+                  const uid = JSON.parse(loginResponse).uid as string
+                  const email = JSON.parse(loginResponse).email as string
+                  const endDate = JSON.parse(loginResponse).endDate as number
+                  await setAccount(accessToken, {
                     uid: uid,
                     email: email,
                     endDate: endDate
                   })
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '登录成功'
                   })
                   this.isShowLoginSheet = false
                 }
               } catch (err) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
               }
@@ -402,8 +402,8 @@ export default struct Login {
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_l')
             })
-            .onClick(() => {
-              openLink(this.context, 'https://www.zhangls2512.cn/product/account/register')
+            .onClick(async () => {
+              await openLink(this.context, 'https://www.zhangls2512.cn/product/account/register')
             })
           Row() {
             Toggle({
@@ -420,26 +420,26 @@ export default struct Login {
               Span('已阅读并同意')
               Span('《轩铭密码智能备忘录用户服务条款与条件》')
                 .fontColor($r('sys.color.font_emphasize'))
-                .onClick(() => {
+                .onClick(async () => {
                   try {
                     const appPrivacyLink =
                       privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 2)
-                    openLink(this.context, appPrivacyLink?.url as string)
+                    await openLink(this.context, appPrivacyLink?.url as string)
                   } catch (err) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }
                 })
               Span('《关于轩铭密码智能备忘录与隐私的声明》')
                 .fontColor($r('sys.color.font_emphasize'))
-                .onClick(() => {
+                .onClick(async () => {
                   try {
                     const appPrivacyLink =
                       privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
-                    openLink(this.context, appPrivacyLink?.url as string)
+                    await openLink(this.context, appPrivacyLink?.url as string)
                   } catch (err) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                     })
                   }
@@ -447,14 +447,14 @@ export default struct Login {
               Span('。如果使用华为账号登录，已阅读并同意')
               Span('《华为账号用户认证协议》')
                 .fontColor($r('sys.color.font_emphasize'))
-                .onClick(() => {
-                  openLink(this.context,
+                .onClick(async () => {
+                  await openLink(this.context,
                     'https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN')
                 })
               Span('《关于华为账号与隐私的声明》')
                 .fontColor($r('sys.color.font_emphasize'))
-                .onClick(() => {
-                  openLink(this.context,
+                .onClick(async () => {
+                  await openLink(this.context,
                     'https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN')
                 })
               Span('。')

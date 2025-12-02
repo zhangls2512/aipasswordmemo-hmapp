@@ -4,7 +4,7 @@ import { fileIo, picker } from '@kit.CoreFileKit'
 import { importCsvPassword, parseCsvLine } from '../common/Csv'
 import { getInfoList, getPasswordList, getPasswordMaxId, getTagList, PasswordInfoItem } from '../common/Dataget'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
-import { read } from '../common/File'
+import { readUri } from '../common/File'
 import openLink from '../common/Openlink'
 
 export interface PasswordOutItem {
@@ -136,19 +136,19 @@ struct DataInOut {
                 const uris = await documentViewPicker.select(documentSelectOptions)
                 if (uris.length === 1) {
                   const filePath = uris[0]
-                  const filestring = read(filePath)
+                  const filestring = await readUri(filePath)
                   let conflictResolution = 0
                   if (this.index === 1) {
                     conflictResolution = 5
                   }
                   if (filePath.endsWith('.txt')) {
                     await importPassword(this.context, filestring, conflictResolution)
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '导入成功'
                     })
                   }
                   if (filePath.endsWith('.csv')) {
-                    importCsvPassword(this.context, filestring)
+                    await importCsvPassword(this.context, filestring)
                   }
                 }
               })
@@ -198,13 +198,13 @@ struct DataInOut {
                 const uris = await documentViewPicker.select(documentSelectOptions)
                 if (uris.length === 1) {
                   const filePath = uris[0]
-                  const filestring = read(filePath)
+                  const filestring = await readUri(filePath)
                   let conflictResolution = 0
                   if (this.index === 1) {
                     conflictResolution = 5
                   }
                   await importInfo(this.context, filestring, conflictResolution)
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导入成功'
                   })
                 }
@@ -255,13 +255,13 @@ struct DataInOut {
                 const uris = await documentViewPicker.select(documentSelectOptions)
                 if (uris.length === 1) {
                   const filePath = uris[0]
-                  const filestring = read(filePath)
+                  const filestring = await readUri(filePath)
                   let conflictResolution = 0
                   if (this.index === 1) {
                     conflictResolution = 5
                   }
                   await importTag(this.context, filestring, conflictResolution)
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导入成功'
                   })
                 }
@@ -277,8 +277,8 @@ struct DataInOut {
               Span('此文档')
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontWeight(FontWeight.Medium)
-                .onClick(() => {
-                  openLink(this.context, 'https://docs.qq.com/doc/p/a12dc0f6d9e9ab998d81ddd1ddc95b5445518209')
+                .onClick(async () => {
+                  await openLink(this.context, 'https://docs.qq.com/doc/p/a12dc0f6d9e9ab998d81ddd1ddc95b5445518209')
                 })
               Span('中所述的标准格式。\n因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导入。')
                 .fontColor($r('sys.color.font_secondary'))
@@ -349,7 +349,7 @@ struct DataInOut {
                 const uris = await documentViewPicker.select(documentSelectOptions)
                 if (uris.length === 1) {
                   const filePath = uris[0]
-                  const filestring = read(filePath)
+                  const filestring = await readUri(filePath)
                   let conflictResolution = 0
                   if (this.index === 1) {
                     conflictResolution = 5
@@ -385,7 +385,7 @@ struct DataInOut {
                     })
                   }
                   await importPassword(this.context, JSON.stringify(result), conflictResolution)
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导入成功'
                   })
                 }
@@ -505,14 +505,14 @@ struct DataInOut {
                     const uris = await documentViewPicker.save(documentSaveOptions)
                     const filePath = uris[0]
                     const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-                    fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                    await fileIo.write(file.fd, JSON.stringify(arrayOut))
                     fileIo.closeSync(file)
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '导出成功'
                     })
                   } catch (err) {
                     if (err.code !== 13900020) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '发生错误，错误码：' + err.code
                       })
                     }
@@ -552,14 +552,14 @@ struct DataInOut {
                     const uris = await documentViewPicker.save(documentSaveOptions)
                     const filePath = uris[0]
                     const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-                    fileIo.writeSync(file.fd, filestring)
+                    await fileIo.write(file.fd, filestring)
                     fileIo.closeSync(file)
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '导出成功'
                     })
                   } catch (err) {
                     if (err.code !== 13900020) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '发生错误，错误码：' + err.code
                       })
                     }
@@ -627,14 +627,14 @@ struct DataInOut {
                       cloudBackupTime: cloudBackupTime
                     }
                   })
-                  fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                  await fileIo.write(file.fd, JSON.stringify(arrayOut))
                   fileIo.closeSync(file)
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导出成功'
                   })
                 } catch (err) {
                   if (err.code !== 13900020) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code
                     })
                   }
@@ -701,14 +701,14 @@ struct DataInOut {
                       cloudBackupTime: cloudBackupTime
                     }
                   })
-                  fileIo.writeSync(file.fd, JSON.stringify(arrayOut))
+                  await fileIo.write(file.fd, JSON.stringify(arrayOut))
                   fileIo.closeSync(file)
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导出成功'
                   })
                 } catch (err) {
                   if (err.code !== 13900020) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code
                     })
                   }

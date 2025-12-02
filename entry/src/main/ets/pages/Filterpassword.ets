@@ -119,8 +119,8 @@ export default struct Filterpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '用户名') {
@@ -134,8 +134,8 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.USER_NAME)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '密码') {
@@ -149,8 +149,8 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Password)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '姓名') {
@@ -163,8 +163,8 @@ export default struct Filterpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '手机号') {
@@ -178,8 +178,8 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.PhoneNumber)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '邮箱') {
@@ -193,8 +193,8 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Email)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '银行卡号') {
@@ -208,8 +208,8 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Number)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '身份证号') {
@@ -222,8 +222,8 @@ export default struct Filterpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === 'URL') {
@@ -236,8 +236,8 @@ export default struct Filterpassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.URL)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (!this.specialInfoTypes.includes(this.getCurrentInfoType())) {
@@ -249,8 +249,8 @@ export default struct Filterpassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
         }
@@ -281,17 +281,17 @@ export default struct Filterpassword {
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
                     .width('10%')
-                    .onError((err) => {
-                      promptAction.openToast({
+                    .onError(async (err) => {
+                      await promptAction.openToast({
                         message: '发生错误，错误信息：' + err.message
                       })
                     })
                 }
                 Image($r('app.media.add'))
                   .width('8%')
-                  .onClick(() => {
+                  .onClick(async () => {
                     if (this.passwordInfoArray.some(item => item.type === this.getCurrentInfoType())) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '已添加此类型信息'
                       })
                       return
@@ -322,19 +322,19 @@ export default struct Filterpassword {
             .onClick(async () => {
               const infoType = this.getCurrentInfoType()
               if (!infoType) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请输入类型'
                 })
                 return
               }
               if (this.passwordInfoArray.some(item => item.type === infoType)) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '已添加此类型信息'
                 })
                 return
               }
               if (!this.infoValue) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请输入内容'
                 })
                 return
@@ -436,9 +436,9 @@ export default struct Filterpassword {
                   })
                 Image($r('app.media.add'))
                   .width('8%')
-                  .onClick(() => {
+                  .onClick(async () => {
                     if (this.passwordTagArray.some(tagItem => tagItem === item.value)) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '已添加此标签'
                       })
                       return
@@ -462,15 +462,15 @@ export default struct Filterpassword {
       ListItem() {
         Button('添加')
           .width('100%')
-          .onClick(() => {
+          .onClick(async () => {
             if (!this.passwordTag) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请输入内容'
               })
               return
             }
             if (this.passwordTagArray.some(item => item === this.passwordTag)) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '已添加此标签'
               })
               return
