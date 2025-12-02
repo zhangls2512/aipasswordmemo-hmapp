@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { netBoost } from '@kit.NetworkBoostKit'
-import { get, getAccountInfo } from '../common/Accesstoken'
+import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 
@@ -23,8 +23,7 @@ export default struct Vip {
   @Local iapStatusLoading: boolean = false
   @Local agree: boolean = false
   @Local hoverId: number = -1
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   accessToken = ''
   uid = ''
@@ -75,7 +74,7 @@ export default struct Vip {
 
   async getVipStatus() {
     this.vipStatusLoading = true
-    const userres = await request(this.context, this.UIContext, '/product/getUserInfo', {
+    const userres = await request(this.context, '/product/getUserInfo', {
       accessToken: this.accessToken,
       product: 'password'
     })
@@ -108,7 +107,7 @@ export default struct Vip {
 
   async buyVip(id: string, type: iap.ProductType) {
     if (!this.agree) {
-      promptAction.openToast({
+      await promptAction.openToast({
         message: '请阅读并同意服务协议'
       })
       return
@@ -127,7 +126,7 @@ export default struct Vip {
         scene: 'transaction',
         sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
       })
-      promptAction.openToast({
+      await promptAction.openToast({
         message: '服务器正在验证，大约需要 5-20 秒，请稍候'
       })
     } catch (err) {
@@ -140,18 +139,18 @@ export default struct Vip {
         return
       }
       if (errCode === 1001860050) {
-        promptAction.openToast({
+        await promptAction.openToast({
           message: '系统未登录华为账号，无法购买'
         })
         return
       }
       if (errCode === 1001860051) {
-        promptAction.openToast({
+        await promptAction.openToast({
           message: '已购买，无需重复购买'
         })
         return
       }
-      promptAction.openToast({
+      await promptAction.openToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
@@ -260,8 +259,8 @@ export default struct Vip {
                         this.hoverId = index + 4
                       }
                     })
-                    .onClick(() => {
-                      this.buyVip(item.id, item.type)
+                    .onClick(async () => {
+                      await this.buyVip(item.id, item.type)
                     })
                   })
                 }
@@ -281,14 +280,16 @@ export default struct Vip {
                     Span('已阅读并同意')
                     Span('《轩铭密码智能备忘录会员服务协议》')
                       .fontColor($r('sys.color.font_emphasize'))
-                      .onClick(() => {
-                        openLink(this.context, 'https://docs.qq.com/doc/p/4e810651bda479462dc9a5e8677273e5e1b72383')
+                      .onClick(async () => {
+                        await openLink(this.context,
+                          'https://docs.qq.com/doc/p/4e810651bda479462dc9a5e8677273e5e1b72383')
                       })
                     Span('。如果购买连续包月/季/年，已阅读并同意')
                     Span('《轩铭密码智能备忘录会员自动续订服务协议》')
                       .fontColor($r('sys.color.font_emphasize'))
-                      .onClick(() => {
-                        openLink(this.context, 'https://docs.qq.com/doc/p/b205f991609f7a39a58b309a6d271bf160d65cc5')
+                      .onClick(async () => {
+                        await openLink(this.context,
+                          'https://docs.qq.com/doc/p/b205f991609f7a39a58b309a6d271bf160d65cc5')
                       })
                     Span('。')
                   }
@@ -368,11 +369,11 @@ export default struct Vip {
                     this.hoverId = 0
                   }
                 })
-                .onClick(() => {
+                .onClick(async () => {
                   const uiWindowParameter: iap.UIWindowParameter = {
                     windowScreenMode: iap.WindowScreenMode.DIALOG_BOX
                   }
-                  iap.showManagedSubscriptions(this.context, uiWindowParameter)
+                  await iap.showManagedSubscriptions(this.context, uiWindowParameter)
                 })
 
                 Divider()
@@ -531,14 +532,14 @@ export default struct Vip {
     .title('会员中心')
     .titleMode(NavigationTitleMode.Mini)
     .onAppear(async () => {
-      this.accessToken = await get()
+      this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {
         const accountInfo = await getAccountInfo()
         this.uid = accountInfo.uid
-        await this.getVipStatus()
-        this.context.eventHub.on('refreshVip', () => {
-          this.getVipStatus()
+        this.context.eventHub.on('refreshVip', async () => {
+          await this.getVipStatus()
         })
+        await this.getVipStatus()
         this.iapStatusLoading = true
         if (this.vipEndDate === '终身') {
           this.iapStatusLoading = false
@@ -550,7 +551,7 @@ export default struct Vip {
             this.iapStatus = true
           } catch (err) {
             this.iapStatusLoading = false
-            promptAction.openToast({
+            await promptAction.openToast({
               message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
             })
           }

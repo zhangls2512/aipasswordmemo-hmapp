@@ -20,8 +20,7 @@ struct Newpasskey {
   @Local emailcode: string = ''
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -128,12 +127,12 @@ struct Newpasskey {
                       })
                     })
                     dialogControllerProgress.open()
-                    const res = await request(this.context, this.UIContext, '/account/sendEmailCode', {
+                    const res = await request(this.context, '/account/sendEmailCode', {
                       email: this.email
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '验证码已成功发送到邮箱：' + this.email
                       })
                       this.buttonEnabled = false
@@ -158,13 +157,13 @@ struct Newpasskey {
                 .width('100%')
                 .onClick(async () => {
                   if (this.type === 'mfa' && this.mfa.length !== 6) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '请输入正确的 MFA'
                     })
                     return
                   }
                   if (this.type === 'emailcode' && this.emailcode.length !== 8) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '请输入正确的邮箱验证码'
                     })
                     return
@@ -182,7 +181,7 @@ struct Newpasskey {
                     })
                   })
                   dialogControllerProgress.open()
-                  const res = await request(this.context, this.UIContext, '/account/bindExternalAccount', {
+                  const res = await request(this.context, '/account/bindExternalAccount', {
                     email: this.email,
                     verifyType: this.type,
                     verifyCode: code,
@@ -192,7 +191,7 @@ struct Newpasskey {
                   })
                   dialogControllerProgress.close()
                   if (res !== 'fail') {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '新增成功'
                     })
                     this.pageInfos.pop()
@@ -241,7 +240,7 @@ struct Newpasskey {
           this.rawId = new util.Base64Helper().encodeToStringSync(res.rawId, util.Type.BASIC_URL_SAFE)
           this.publicKey = new util.Base64Helper().encodeToStringSync(res.response.publicKey, util.Type.BASIC_URL_SAFE)
         } catch (err) {
-          promptAction.openToast({
+          await promptAction.openToast({
             message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
           })
         }

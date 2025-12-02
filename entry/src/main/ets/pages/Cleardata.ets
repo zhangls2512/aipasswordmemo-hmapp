@@ -1,4 +1,4 @@
-import { common } from '@kit.AbilityKit'
+import { bundleManager, common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { webview } from '@kit.ArkWeb'
@@ -6,6 +6,7 @@ import { asset } from '@kit.AssetStoreKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { stringToArray } from '../common/Crypto'
 import { getPasswordList, getTypeInfoList } from '../common/Dataget'
+import { getDirectorySize } from '../common/File'
 
 @ComponentV2
 export default struct Cleardata {
@@ -21,15 +22,46 @@ export default struct Cleardata {
   @Local appCache: boolean = false
   @Local webviewCache: boolean = false
   @Local invitationQrcodeCache: boolean = false
+  @Local invitationQrcodeCacheSize: string = ''
   @Local log: string[] = []
   @Local allLog: boolean = false
   @Local errorLog: boolean = false
+  @Local errorLogSize: string = ''
   @Local nouse: string[] = []
   @Local allNouse: boolean = false
   @Local speakSettingNouse: boolean = false
   @Local oldaccountNouse: boolean = false
   @Local passwordIconNouse: boolean = false
+  @Local passwordIconNouseSize: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
+
+  getSizeString(size: number) {
+    if (size < Math.pow(1024, 1)) {
+      return size + ' B'
+    }
+    if (size >= Math.pow(1024, 1) && size < Math.pow(1024, 2)) {
+      return (size / Math.pow(1024, 1)).toFixed(2) + ' KB'
+    }
+    if (size >= Math.pow(1024, 2) && size < Math.pow(1024, 3)) {
+      return (size / Math.pow(1024, 2)).toFixed(2) + ' MB'
+    }
+    if (size >= Math.pow(1024, 3) && size < Math.pow(1024, 4)) {
+      return (size / Math.pow(1024, 3)).toFixed(2) + ' GB'
+    }
+    if (size >= Math.pow(1024, 4)) {
+      return (size / Math.pow(1024, 4)).toFixed(2) + ' TB'
+    }
+    return ''
+  }
+
+  async getSize() {
+    const invitationQrcodeCacheSize = await getDirectorySize(this.context.filesDir + '/media/invitationqrcode/')
+    this.invitationQrcodeCacheSize = this.getSizeString(invitationQrcodeCacheSize)
+    const errorLogSize = await getDirectorySize(this.context.filesDir + '/log/error/')
+    this.errorLogSize = this.getSizeString(errorLogSize)
+    const passwordIconNouseSize = await getDirectorySize(this.context.filesDir + '/media/passwordicon/')
+    this.passwordIconNouseSize = this.getSizeString(passwordIconNouseSize)
+  }
 
   build() {
     List() {
@@ -46,6 +78,12 @@ export default struct Cleardata {
             })
           Column() {
             Row() {
+              Text('全部')
+                .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               CheckboxGroup({
                 group: 'setting'
               })
@@ -54,9 +92,6 @@ export default struct Cleardata {
                 .onChange((itemName) => {
                   this.setting = itemName.name
                 })
-              Text('全部')
-                .fontWeight(FontWeight.Bold)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -68,15 +103,18 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('云备份')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Checkbox({
                 name: 'cloudbackupSetting',
                 group: 'setting'
               })
                 .select(this.cloudbackupSetting!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('云备份')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -88,15 +126,18 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('数据')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Checkbox({
                 name: 'dataSetting',
                 group: 'setting'
               })
                 .select(this.dataSetting!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('数据')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -108,15 +149,18 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('通用')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Checkbox({
                 name: 'commonSetting',
                 group: 'setting'
               })
                 .select(this.commonSetting!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('通用')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -128,15 +172,18 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('权限')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Checkbox({
                 name: 'permissionSetting',
                 group: 'setting'
               })
                 .select(this.permissionSetting!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('权限')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -148,15 +195,18 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('调试')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Checkbox({
                 name: 'debugSetting',
                 group: 'setting'
               })
                 .select(this.debugSetting!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('调试')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -194,7 +244,7 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              this.setting.forEach((item) => {
+              this.setting.forEach(async (item) => {
                 if (item === 'dataSetting') {
                   const keys = [
                     'autoSyncTables',
@@ -214,9 +264,9 @@ export default struct Cleardata {
                   })
                   return
                 }
-                preferences.deletePreferences(this.context, item)
+                await preferences.deletePreferences(this.context, item)
               })
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '清理成功'
               })
             }
@@ -239,6 +289,12 @@ export default struct Cleardata {
             })
           Column() {
             Row() {
+              Text('全部')
+                .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               CheckboxGroup({
                 group: 'cache'
               })
@@ -247,9 +303,6 @@ export default struct Cleardata {
                 .onChange((itemName) => {
                   this.cache = itemName.name
                 })
-              Text('全部')
-                .fontWeight(FontWeight.Bold)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -261,15 +314,18 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('应用')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Checkbox({
                 name: 'appCache',
                 group: 'cache'
               })
                 .select(this.appCache!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('应用')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -281,15 +337,18 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('Webview')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Checkbox({
                 name: 'webviewCache',
                 group: 'cache'
               })
                 .select(this.webviewCache!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('Webview')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -301,15 +360,24 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('邀请二维码图片')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Text(this.invitationQrcodeCacheSize)
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                })
               Checkbox({
                 name: 'invitationQrcodeCache',
                 group: 'cache'
               })
                 .select(this.invitationQrcodeCache!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('邀请二维码图片')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -318,29 +386,6 @@ export default struct Cleardata {
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
-
-          Text() {
-            Span('可前往')
-              .fontColor($r('sys.color.font_secondary'))
-            Span('系统设置')
-              .fontColor($r('sys.color.font_emphasize'))
-              .fontWeight(FontWeight.Medium)
-              .onClick(() => {
-                this.context.startAbility({
-                  bundleName: 'com.huawei.hmos.settings',
-                  abilityName: 'com.huawei.hmos.settings.MainAbility',
-                  uri: 'storage_settings'
-                })
-              })
-            Span('清理更多缓存。')
-              .fontColor($r('sys.color.font_secondary'))
-          }
-          .fontSize($r('sys.float.ohos_id_text_size_body3'))
-          .margin({
-            top: 6,
-            left: 12,
-            right: 12
-          })
         }
         .alignItems(HorizontalAlign.Start)
       }
@@ -370,41 +415,33 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              this.cache.forEach((item) => {
+              this.cache.forEach(async (item) => {
                 if (item === 'appCache') {
-                  const cacheDir = this.context.cacheDir
-                  const filenames = fileIo.listFileSync(cacheDir)
-                  for (let i = 0; i < filenames.length; i++) {
-                    const path = cacheDir + '/' + filenames[i]
-                    if (fileIo.statSync(path).isDirectory()) {
-                      fileIo.rmdirSync(path)
-                    } else {
-                      fileIo.unlinkSync(path)
-                    }
-                  }
+                  await bundleManager.cleanBundleCacheFilesForSelf()
                 }
                 if (item === 'webviewCache') {
                   webview.WebviewController.removeAllCache(true)
                 }
                 if (item === 'invitationQrcodeCache') {
                   try {
-                    const invitationcodeQrcodeDir = this.context.filesDir + '/media/invitationqrcode'
-                    const filenames = fileIo.listFileSync(invitationcodeQrcodeDir)
-                    for (let i = 0; i < filenames.length; i++) {
-                      fileIo.unlinkSync(invitationcodeQrcodeDir + '/' + filenames[i])
+                    const invitationcodeQrcodeDir = this.context.filesDir + '/media/invitationqrcode/'
+                    const fileNames = await fileIo.listFile(invitationcodeQrcodeDir)
+                    for (let i = 0; i < fileNames.length; i++) {
+                      await fileIo.unlink(invitationcodeQrcodeDir + fileNames[i])
                     }
                   } catch (err) {
                     if (err.code !== 13900002) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '发生错误，错误码：' + err.code
                       })
                     }
                   }
                 }
               })
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '清理成功'
               })
+              await this.getSize()
             }
           })
       }
@@ -425,6 +462,12 @@ export default struct Cleardata {
             })
           Column() {
             Row() {
+              Text('全部')
+                .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               CheckboxGroup({
                 group: 'log'
               })
@@ -433,9 +476,6 @@ export default struct Cleardata {
                 .onChange((itemName) => {
                   this.log = itemName.name
                 })
-              Text('全部')
-                .fontWeight(FontWeight.Bold)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -447,15 +487,24 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('故障')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Text(this.errorLogSize)
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                })
               Checkbox({
                 name: 'errorLog',
                 group: 'log'
               })
                 .select(this.errorLog!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('故障')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -493,26 +542,27 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              this.log.forEach((item) => {
+              this.log.forEach(async (item) => {
                 if (item === 'errorLog') {
                   try {
-                    const errorLogDir = this.context.filesDir + '/log/error'
-                    const filenames = fileIo.listFileSync(errorLogDir)
-                    for (let i = 0; i < filenames.length; i++) {
-                      fileIo.unlinkSync(errorLogDir + '/' + filenames[i])
+                    const errorLogDir = this.context.filesDir + '/log/error/'
+                    const fileNames = await fileIo.listFile(errorLogDir)
+                    for (let i = 0; i < fileNames.length; i++) {
+                      await fileIo.unlink(errorLogDir + fileNames[i])
                     }
                   } catch (err) {
                     if (err.code !== 13900002) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '发生错误，错误码：' + err.code
                       })
                     }
                   }
                 }
               })
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '清理成功'
               })
+              await this.getSize()
             }
           })
       }
@@ -533,6 +583,12 @@ export default struct Cleardata {
             })
           Column() {
             Row() {
+              Text('全部')
+                .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               CheckboxGroup({
                 group: 'nouse'
               })
@@ -541,9 +597,6 @@ export default struct Cleardata {
                 .onChange((itemName) => {
                   this.nouse = itemName.name
                 })
-              Text('全部')
-                .fontWeight(FontWeight.Bold)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -555,16 +608,19 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('AI助手设置数据')
+                .enableAutoSpacing(true)
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Checkbox({
                 name: 'speakSettingNouse',
                 group: 'nouse'
               })
                 .select(this.speakSettingNouse!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('AI助手设置数据')
-                .enableAutoSpacing(true)
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -576,15 +632,18 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('旧账号数据')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
               Checkbox({
                 name: 'oldaccountNouse',
                 group: 'nouse'
               })
                 .select(this.oldaccountNouse!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('旧账号数据')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -596,15 +655,24 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('无用密码图标图片')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Text(this.passwordIconNouseSize)
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                })
               Checkbox({
                 name: 'passwordIconNouse',
                 group: 'nouse'
               })
                 .select(this.passwordIconNouse!!)
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
-              Text('无用密码图标图片')
-                .fontWeight(FontWeight.Medium)
-                .layoutWeight(1)
             }
             .borderRadius(12)
             .padding(12)
@@ -625,7 +693,7 @@ export default struct Cleardata {
           .enabled(this.nouse.length > 0)
           .role(ButtonRole.ERROR)
           .width('100%')
-          .onClick(() => {
+          .onClick(async () => {
             this.nouse.forEach(async (item) => {
               if (item === 'oldaccountNouse') {
                 try {
@@ -637,20 +705,20 @@ export default struct Cleardata {
                   })
                 } catch (err) {
                   if (err.code !== 24000002) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code
                     })
                   }
                 }
               }
               if (item === 'speakSettingNouse') {
-                preferences.deletePreferences(this.context, 'speakSetting')
+                await preferences.deletePreferences(this.context, 'speakSetting')
               }
               if (item === 'passwordIconNouse') {
                 try {
-                  const passwordIconDir = this.context.filesDir + '/media/passwordicon'
-                  const passwordIconFileArray =
-                    fileIo.listFileSync(passwordIconDir).map(item => passwordIconDir + '/' + item)
+                  const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
+                  const passwordIconFileNameArray = await fileIo.listFile(passwordIconDir)
+                  const passwordIconFilePathArray = passwordIconFileNameArray.map(item => passwordIconDir + item)
                   const passwordArray = await getPasswordList(this.context)
                   const passwordIconPathArray: string[] = []
                   passwordArray.forEach((item) => {
@@ -663,22 +731,24 @@ export default struct Cleardata {
                   const infoArray = await getTypeInfoList(this.context, '图标')
                   const infoIconPathArray = infoArray.map(item => item.replace('file://com.zhangxm.aipasswordmemo', ''))
                   const iconPathSet = new Set(passwordIconPathArray.concat(infoIconPathArray))
-                  const nousePasswordIconFilePathArray = passwordIconFileArray.filter(item => !iconPathSet.has(item))
-                  nousePasswordIconFilePathArray.forEach(item => {
-                    fileIo.unlinkSync(item)
+                  const nousePasswordIconFilePathArray =
+                    passwordIconFilePathArray.filter(item => !iconPathSet.has(item))
+                  nousePasswordIconFilePathArray.forEach(async (item) => {
+                    await fileIo.unlink(item)
                   })
                 } catch (err) {
                   if (err.code !== 13900002) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code
                     })
                   }
                 }
               }
             })
-            promptAction.openToast({
+            await promptAction.openToast({
               message: '清理成功'
             })
+            await this.getSize()
           })
       }
       .margin({
@@ -689,6 +759,9 @@ export default struct Cleardata {
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
       left: $r('sys.float.ohos_id_max_padding_start'),
       right: $r('sys.float.ohos_id_max_padding_end')
+    })
+    .onAppear(async () => {
+      await this.getSize()
     })
     .onDisAppear(() => {
       this.context.eventHub.emit('refreshSetting')

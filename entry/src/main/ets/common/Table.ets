@@ -26,17 +26,17 @@ export async function syncTable(context: Context, table: string, networkId: stri
   try {
     const res = await rdbStore.sync(syncMode, predicates)
     if (res[0][1] !== 0) {
-      promptAction.openToast({
+      await promptAction.openToast({
         message: '同步失败，设备 ID：' + res[0][0] + '，错误码：' + res[0][1]
       })
     }
     if (res[0][1] === 0) {
-      promptAction.openToast({
+      await promptAction.openToast({
         message: '同步成功，设备 ID：' + res[0][0]
       })
     }
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
   }
@@ -54,7 +54,7 @@ export async function autoSyncTable(context: Context, table: string) {
   const pauseAutoSyncWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
   const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
   if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '电池电量低，自动暂停同步'
     })
     return
@@ -66,7 +66,7 @@ export async function autoSyncTable(context: Context, table: string) {
     if (power.getPowerMode() === 603) {
       text = '超级'
     }
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '系统开启' + text + '省电模式，暂停自动同步'
     })
     return
@@ -99,7 +99,7 @@ export async function backupTable(context: Context, table: string) {
   const isBackupTables: string[] = dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
   dataSettingDataPreferences.putSync('isBackupTables', Array.from(new Set([...isBackupTables, table])))
   dataSettingDataPreferences.flushSync()
-  promptAction.openToast({
+  await promptAction.openToast({
     message: '备份成功'
   })
 }
@@ -116,7 +116,7 @@ export async function autoBackupTable(context: Context, table: string) {
   const pauseAutoBackupWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false)
   const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
   if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '电池电量低，自动暂停同步'
     })
     return
@@ -128,7 +128,7 @@ export async function autoBackupTable(context: Context, table: string) {
     if (power.getPowerMode() === 603) {
       text = '超级'
     }
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '系统开启' + text + '省电模式，暂停自动备份'
     })
     return
@@ -151,7 +151,7 @@ export async function recoveryTable(context: Context, table: string) {
     allowRebuild: true
   })
   await rdbStore.restore(table + 'Backup.db')
-  promptAction.openToast({
+  await promptAction.openToast({
     message: '恢复成功'
   })
 }

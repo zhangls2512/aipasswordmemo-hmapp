@@ -95,30 +95,30 @@ export default struct Updatepassword {
               isPhotoTakingSupported: false,
               isOriginalSupported: false
             })
-            const fileSource = await fileIo.open(pickerres.photoUris[0])
+            const fileSource = fileIo.openSync(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
             const imageSize = imagePixelMap.getImageInfoSync().size
             if (imageSize.width !== imageSize.height) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请选择宽高比为 1:1 的图片'
               })
               return
             }
             if (this.infoValue) {
               try {
-                fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
               } catch (err) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '发生错误，错误码：' + err.code
                 })
               }
             }
-            const passwordIconDir = this.context.filesDir + '/media/passwordicon'
+            const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
             if (!fileIo.accessSync(passwordIconDir)) {
-              fileIo.mkdirSync(passwordIconDir, true)
+              await fileIo.mkdir(passwordIconDir, true)
             }
-            const filePath = passwordIconDir + '/' + Date.now() + '.png'
+            const filePath = passwordIconDir + Date.now() + '.png'
             const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
             const imagePacker = image.createImagePacker()
             await imagePacker.packToFile(imagePixelMap, file.fd, {
@@ -129,7 +129,7 @@ export default struct Updatepassword {
             this.infoValue = fileUri.getUriFromPath(filePath)
           } catch (err) {
             if (err.code !== 13900020) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '发生错误，错误码：' + err.code
               })
             }
@@ -181,13 +181,13 @@ export default struct Updatepassword {
           CollaborationServiceStateDialog({
             async onState(stateCode: number, bufferType: string, buffer: ArrayBuffer) {
               if (stateCode !== 0) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '发生错误，错误码：' + stateCode
                 })
                 return
               }
               if (bufferType !== 'general.image') {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请选择图片'
                 })
                 return
@@ -196,25 +196,25 @@ export default struct Updatepassword {
               const imagePixelMap = await imageSource.createPixelMap()
               const imageSize = imagePixelMap.getImageInfoSync().size
               if (imageSize.width !== imageSize.height) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请选择宽高比为 1:1 的图片'
                 })
                 return
               }
               if (this.infoValue) {
                 try {
-                  fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
                 } catch (err) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
                 }
               }
-              const passwordIconDir = this.context.filesDir + '/media/passwordicon'
+              const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
               if (!fileIo.accessSync(passwordIconDir)) {
-                fileIo.mkdirSync(passwordIconDir, true)
+                await fileIo.mkdir(passwordIconDir, true)
               }
-              const filePath = passwordIconDir + '/' + Date.now() + '.png'
+              const filePath = passwordIconDir + Date.now() + '.png'
               const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
               const imagePacker = image.createImagePacker()
               await imagePacker.packToFile(imagePixelMap, file.fd, {
@@ -244,9 +244,9 @@ export default struct Updatepassword {
               }
               if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                 try {
-                  fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
                 } catch (err) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
                 }
@@ -279,9 +279,9 @@ export default struct Updatepassword {
                 }
                 if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                   try {
-                    fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                    await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
                   } catch (err) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code
                     })
                   }
@@ -319,8 +319,8 @@ export default struct Updatepassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '用户名') {
@@ -334,8 +334,8 @@ export default struct Updatepassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.USER_NAME)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '密码') {
@@ -373,8 +373,8 @@ export default struct Updatepassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Password)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === 'MFA') {
@@ -466,8 +466,8 @@ export default struct Updatepassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '手机号') {
@@ -481,8 +481,8 @@ export default struct Updatepassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.PhoneNumber)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '邮箱') {
@@ -496,8 +496,8 @@ export default struct Updatepassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Email)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '银行卡号') {
@@ -511,8 +511,8 @@ export default struct Updatepassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Number)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === '身份证号') {
@@ -525,8 +525,8 @@ export default struct Updatepassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (this.getCurrentInfoType() === 'URL') {
@@ -539,8 +539,8 @@ export default struct Updatepassword {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.URL)
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
           if (!this.specialInfoTypes.includes(this.getCurrentInfoType())) {
@@ -552,8 +552,8 @@ export default struct Updatepassword {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onBlur(() => {
-                this.inputBlur()
+              .onBlur(async () => {
+                await this.inputBlur()
               })
           }
         }
@@ -584,17 +584,17 @@ export default struct Updatepassword {
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
                     .width('10%')
-                    .onError((err) => {
-                      promptAction.openToast({
+                    .onError(async (err) => {
+                      await promptAction.openToast({
                         message: '发生错误，错误信息：' + err.message
                       })
                     })
                 }
                 Image($r('app.media.add'))
                   .width('8%')
-                  .onClick(() => {
+                  .onClick(async () => {
                     if (this.passwordInfoArray.some(item => item.type === this.getCurrentInfoType())) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '已添加此类型信息'
                       })
                       return
@@ -628,26 +628,26 @@ export default struct Updatepassword {
               .onClick(async () => {
                 const infoType = this.getCurrentInfoType()
                 if (!infoType) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '请输入类型'
                   })
                   return
                 }
                 if (this.passwordInfoArray.some(item => item.type === infoType)) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '已添加此类型信息'
                   })
                   return
                 }
                 let value = this.infoValue
                 if (infoType === '图标' && !value) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '请选择图片'
                   })
                   return
                 }
                 if (infoType !== '图标' && infoType !== 'MFA' && !value) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '请输入内容'
                   })
                   return
@@ -655,19 +655,19 @@ export default struct Updatepassword {
                 if (infoType === 'MFA') {
                   if (!this.otpauthUri) {
                     if (!value) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '请输入密钥'
                       })
                       return
                     }
                     if (!this.mfaStep) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '请输入步长'
                       })
                       return
                     }
                     if (!this.mfaDigits) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '请输入位数'
                       })
                       return
@@ -677,14 +677,14 @@ export default struct Updatepassword {
                   if (this.otpauthUri) {
                     const uriInstance = new uri.URI(this.otpauthUri)
                     if (uriInstance.scheme !== 'otpauth') {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '请输入有效的 otpauthUri'
                       })
                       return
                     }
                     const uriSecret = uriInstance.getQueryValue('secret')
                     if (!uriSecret) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '请输入有效的 otpauthUri'
                       })
                       return
@@ -722,7 +722,7 @@ export default struct Updatepassword {
                 .buttonStyle(ButtonStyleMode.NORMAL)
                 .onClick(async () => {
                   if (this.passwordInfoArray.some(item => item.type === 'MFA')) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '已添加此类型信息'
                     })
                     return
@@ -733,14 +733,14 @@ export default struct Updatepassword {
                     })
                     const uriInstance = new uri.URI(res.originalValue)
                     if (uriInstance.scheme !== 'otpauth') {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '请扫描有效的 MFA 添加二维码'
                       })
                       return
                     }
                     const uriSecret = uriInstance.getQueryValue('secret')
                     if (!uriSecret) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '请扫描有效的 MFA 添加二维码'
                       })
                       return
@@ -771,7 +771,7 @@ export default struct Updatepassword {
                     }
                   } catch (err) {
                     if (err.code !== 1000500002) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '发生错误，错误码：' + err.code
                       })
                     }
@@ -795,8 +795,8 @@ export default struct Updatepassword {
                   Image(item.value)
                     .copyOption(CopyOptions.LocalDevice)
                     .width('10%')
-                    .onError((err) => {
-                      promptAction.openToast({
+                    .onError(async (err) => {
+                      await promptAction.openToast({
                         message: '发生错误，错误信息：' + err.message
                       })
                     })
@@ -907,9 +907,9 @@ export default struct Updatepassword {
                   })
                 Image($r('app.media.add'))
                   .width('8%')
-                  .onClick(() => {
+                  .onClick(async () => {
                     if (this.passwordTagArray.some(tagItem => tagItem === item.value)) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '已添加此标签'
                       })
                       return
@@ -933,15 +933,15 @@ export default struct Updatepassword {
       ListItem() {
         Button('添加')
           .width('100%')
-          .onClick(() => {
+          .onClick(async () => {
             if (!this.passwordTag) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请输入内容'
               })
               return
             }
             if (this.passwordTagArray.some(item => item === this.passwordTag)) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '已添加此标签'
               })
               return
@@ -1111,18 +1111,18 @@ export default struct Updatepassword {
           .width('100%')
           .onClick(async () => {
             if (!this.passwordName) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请输入名称'
               })
               return
             }
             if (this.passwordInfoArray.length === 0) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请添加信息'
               })
               return
             }
-            await updatePassword(this.context, this.UIContext, this.passwordId, {
+            await updatePassword(this.context, this.passwordId, {
               name: this.passwordName,
               info: this.passwordInfoArray,
               tag: this.passwordTagArray,
@@ -1138,9 +1138,9 @@ export default struct Updatepassword {
               tagCloudBackup = true
             }
             if (this.autoNewInfo) {
-              this.passwordInfoArray.forEach(item => {
+              this.passwordInfoArray.forEach(async (item) => {
                 if (item.type !== 'MFA') {
-                  newInfo(this.context, this.UIContext, {
+                  await newInfo(this.context, {
                     type: item.type,
                     value: item.value,
                     cloudBackup: infoCloudBackup
@@ -1149,8 +1149,8 @@ export default struct Updatepassword {
               })
             }
             if (this.autoNewTag) {
-              this.passwordTagArray.forEach(item => {
-                newTag(this.context, this.UIContext, {
+              this.passwordTagArray.forEach(async (item) => {
+                await newTag(this.context, {
                   value: item,
                   color: '',
                   cloudBackup: tagCloudBackup
@@ -1170,9 +1170,9 @@ export default struct Updatepassword {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      this.preferType = getPreferType()
+      this.preferType = getPreferType(this.UIContext)
       display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId)
+        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
       })
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
         name: 'commonSetting'
@@ -1190,7 +1190,7 @@ export default struct Updatepassword {
       this.passwordName = passwordInfo.name
       this.passwordInfoArray = passwordInfo.info
       this.passwordTagArray = passwordInfo.tag.map(item => item.value)
-      const res = await getCloudServiceStatus(this.context, this.UIContext)
+      const res = await getCloudServiceStatus(this.context)
       const key = getKey()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'

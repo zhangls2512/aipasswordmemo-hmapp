@@ -52,7 +52,7 @@ export default struct InfoPage {
           time: Date.now()
         })
       }
-      await setCloudBackup(this.context, this.UIContext, {
+      await setCloudBackup(this.context, {
         type: 'info',
         id: item.id,
         content: JSON.stringify({
@@ -93,7 +93,7 @@ export default struct InfoPage {
         })
           .onClick(async () => {
             if (item.type !== '图标') {
-              copy(this.context, this.UIContext, item.type + '：' + item.value)
+              await copy(this.context, this.UIContext, item.type + '：' + item.value)
             }
             if (item.type === '图标') {
               const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
@@ -104,15 +104,15 @@ export default struct InfoPage {
                 }])
                 const srcFile = fileIo.openSync(item.value)
                 const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
-                fileIo.copyFileSync(srcFile.fd, destFile.fd)
+                await fileIo.copyFile(srcFile.fd, destFile.fd)
                 fileIo.closeSync(srcFile)
                 fileIo.closeSync(destFile)
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '保存成功'
                 })
               } catch (err) {
                 if (err.code !== 13900020) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
                 }
@@ -173,7 +173,7 @@ export default struct InfoPage {
                 })
               })
               dialogControllerProgress.open()
-              await deleteCloudBackup(this.context, this.UIContext, {
+              await deleteCloudBackup(this.context, {
                 type: 'info',
                 id: item.id
               })
@@ -536,8 +536,8 @@ export default struct InfoPage {
                           Image(item.value)
                             .copyOption(CopyOptions.LocalDevice)
                             .width('10%')
-                            .onError((err) => {
-                              promptAction.openToast({
+                            .onError(async (err) => {
+                              await promptAction.openToast({
                                 message: '发生错误，错误信息：' + err.message
                               })
                             })
@@ -573,12 +573,12 @@ export default struct InfoPage {
                         this.hoverId = index
                       }
                     })
-                    .onClick(() => {
+                    .onClick(async () => {
                       if (this.multipleSelect) {
                         return
                       }
                       if (item.type === '图标') {
-                        promptAction.openToast({
+                        await promptAction.openToast({
                           message: '图标类型不支持修改'
                         })
                         return
@@ -618,20 +618,20 @@ export default struct InfoPage {
       top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
-      this.preferType = getPreferType()
+      this.preferType = getPreferType(this.UIContext)
       display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId)
+        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
       })
       this.context.eventHub.on('refreshInfo', async () => {
         this.enableCloudBackup = false
         this.loading = true
-        const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
+        const cloudServiceStatus = await getCloudServiceStatus(this.context)
         if (cloudServiceStatus && getKey()) {
           this.enableCloudBackup = true
         }
       })
       this.loading = true
-      const cloudServiceStatus = await getCloudServiceStatus(this.context, this.UIContext)
+      const cloudServiceStatus = await getCloudServiceStatus(this.context)
       if (cloudServiceStatus && getKey()) {
         this.enableCloudBackup = true
       }

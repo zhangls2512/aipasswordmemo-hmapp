@@ -20,8 +20,7 @@ struct Cloudbackupimport {
   @Local value: string = '保留'
   @Local autoImport: string[] = []
   @Local hoverId: number = -1
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'cloudbackupSetting'
   })
@@ -186,7 +185,7 @@ struct Cloudbackupimport {
               .onClick(async () => {
                 if (!getKey()) {
                   const promptAction = this.getUIContext().getPromptAction()
-                  promptAction.showDialog({
+                  await promptAction.showDialog({
                     title: '导入失败',
                     message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
                     buttons: [
@@ -199,15 +198,15 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const res = await importCloudBackupPassword(this.context, this.UIContext)
+                const res = await importCloudBackupPassword(this.context)
                 this.dialogControllerProgress.close()
                 if (res === 'success') {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导入成功'
                   })
                 }
                 if (res === 'fail') {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导入失败'
                   })
                 }
@@ -253,7 +252,7 @@ struct Cloudbackupimport {
               .onClick(async () => {
                 if (!getKey()) {
                   const promptAction = this.getUIContext().getPromptAction()
-                  promptAction.showDialog({
+                  await promptAction.showDialog({
                     title: '导入失败',
                     message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
                     buttons: [
@@ -266,15 +265,15 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const res = await importCloudBackupInfo(this.context, this.UIContext)
+                const res = await importCloudBackupInfo(this.context)
                 this.dialogControllerProgress.close()
                 if (res === 'success') {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导入成功'
                   })
                 }
                 if (res === 'fail') {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导入失败'
                   })
                 }
@@ -320,7 +319,7 @@ struct Cloudbackupimport {
               .onClick(async () => {
                 if (!getKey()) {
                   const promptAction = this.getUIContext().getPromptAction()
-                  promptAction.showDialog({
+                  await promptAction.showDialog({
                     title: '导入失败',
                     message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
                     buttons: [
@@ -333,15 +332,15 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const res = await importCloudBackupTag(this.context, this.UIContext)
+                const res = await importCloudBackupTag(this.context)
                 this.dialogControllerProgress.close()
                 if (res === 'success') {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导入成功'
                   })
                 }
                 if (res === 'fail') {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '导入失败'
                   })
                 }

@@ -1,15 +1,15 @@
-import { get } from './Accesstoken'
+import { getAccountAccessToken } from './Accesstoken'
 import request from './Request'
 
-export default async function getCloudServiceStatus(context: Context, UIContext: UIContext) {
-  const accessToken = await get()
+export default async function getCloudServiceStatus(context: Context) {
+  const accessToken = await getAccountAccessToken()
   if (accessToken) {
-    const infores = await request(context, UIContext, '/account/getAccountInfo', {
+    const accountInfoResponse = await request(context, '/account/getAccountInfo', {
       accessToken: accessToken
     })
-    if (infores !== 'fail') {
-      const service = JSON.parse(infores).data.service as string[]
-      return service.includes('password')
+    if (accountInfoResponse !== 'fail') {
+      const services = JSON.parse(accountInfoResponse).data.service as string[]
+      return services.includes('password')
     }
     return false
   }

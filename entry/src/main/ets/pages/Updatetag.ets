@@ -19,8 +19,7 @@ export default struct Updatetag {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   colorArray: string[] = [
     '#000000',
     '#0000FF',
@@ -184,12 +183,12 @@ export default struct Updatetag {
           .width('100%')
           .onClick(async () => {
             if (!this.tagValue) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请输入内容'
               })
               return
             }
-            const res = await updateTag(this.context, this.UIContext, this.tagId, {
+            const res = await updateTag(this.context, this.tagId, {
               value: this.tagValue,
               color: this.tagColor,
               cloudBackup: this.cloudBackup
@@ -212,7 +211,7 @@ export default struct Updatetag {
       const tagInfo = await getTagInfo(this.context, this.tagId) as Tag
       this.tagValue = tagInfo.value
       this.tagColor = tagInfo.color
-      const res = await getCloudServiceStatus(this.context, this.UIContext)
+      const res = await getCloudServiceStatus(this.context)
       const key = getKey()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'

@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
-import { get, getAccountInfo } from '../common/Accesstoken'
+import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
 
 export interface Account {
@@ -25,20 +25,19 @@ struct Huaweiaccount {
   @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err, response) => {
         if (this.type === 'mfa' && this.mfa.length !== 6) {
-          promptAction.openToast({
+          await promptAction.openToast({
             message: '请输入正确的 MFA'
           })
           return
         }
         if (this.type === 'emailcode' && this.emailcode.length !== 8) {
-          promptAction.openToast({
+          await promptAction.openToast({
             message: '请输入正确的邮箱验证码'
           })
           return
@@ -57,7 +56,7 @@ struct Huaweiaccount {
             })
           })
           dialogControllerProgress.open()
-          const res = await request(this.context, this.UIContext, '/account/bindExternalAccount', {
+          const res = await request(this.context, '/account/bindExternalAccount', {
             verifyType: this.type,
             verifyCode: code,
             email: this.email,
@@ -66,7 +65,7 @@ struct Huaweiaccount {
           })
           dialogControllerProgress.close()
           if (res !== 'fail') {
-            promptAction.openToast({
+            await promptAction.openToast({
               message: '绑定成功'
             })
             this.pageInfos.pop()
@@ -74,7 +73,7 @@ struct Huaweiaccount {
           }
         }
         if (err) {
-          promptAction.openToast({
+          await promptAction.openToast({
             message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
           })
         }
@@ -194,12 +193,12 @@ struct Huaweiaccount {
                       })
                     })
                     dialogControllerProgress.open()
-                    const res = await request(this.context, this.UIContext, '/account/sendEmailCode', {
+                    const res = await request(this.context, '/account/sendEmailCode', {
                       email: this.email
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '验证码已成功发送到邮箱：' + this.email
                       })
                       this.buttonEnabled = false
@@ -244,13 +243,13 @@ struct Huaweiaccount {
                   .width('100%')
                   .onClick(async () => {
                     if (this.type === 'mfa' && this.mfa.length !== 6) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '请输入正确的 MFA'
                       })
                       return
                     }
                     if (this.type === 'emailcode' && this.emailcode.length !== 8) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '请输入正确的邮箱验证码'
                       })
                       return
@@ -268,7 +267,7 @@ struct Huaweiaccount {
                       })
                     })
                     dialogControllerProgress.open()
-                    const res = await request(this.context, this.UIContext, '/account/unbindExternalAccount', {
+                    const res = await request(this.context, '/account/unbindExternalAccount', {
                       verifyType: this.type,
                       verifyCode: code,
                       email: this.email,
@@ -276,7 +275,7 @@ struct Huaweiaccount {
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '解绑成功'
                       })
                       this.pageInfos.pop()
@@ -344,10 +343,10 @@ struct Huaweiaccount {
       this.controller.setEnabled(false)
       const accountInfo = await getAccountInfo()
       this.email = accountInfo.email
-      const accessToken = await get()
+      const accessToken = await getAccountAccessToken()
       if (accessToken) {
         this.loading = true
-        const res = await request(this.context, this.UIContext, '/account/getExternalAccount', {
+        const res = await request(this.context, '/account/getExternalAccount', {
           accessToken: accessToken
         })
         this.loading = false

@@ -203,8 +203,8 @@ export default struct Passwordgenerate {
                 this.hoverId = 0
               }
             })
-            .onClick(() => {
-              copy(this.context, this.UIContext, this.password)
+            .onClick(async () => {
+              await copy(this.context, this.UIContext, this.password)
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

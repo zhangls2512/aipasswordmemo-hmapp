@@ -375,8 +375,8 @@ struct DataBackupRecovery {
                       this.hoverId = 3
                     }
                   })
-                  .onClick(() => {
-                    recoveryTable(this.context, item)
+                  .onClick(async () => {
+                    await recoveryTable(this.context, item)
                   })
                 })
               }

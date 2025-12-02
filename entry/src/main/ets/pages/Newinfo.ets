@@ -25,8 +25,7 @@ export default struct Newinfo {
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   oftenUsedInfoTypes = ['自定义']
   specialInfoTypes = ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
 
@@ -51,30 +50,30 @@ export default struct Newinfo {
               isPhotoTakingSupported: false,
               isOriginalSupported: false
             })
-            const fileSource = await fileIo.open(pickerres.photoUris[0])
+            const fileSource = fileIo.openSync(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
             const imageSize = imagePixelMap.getImageInfoSync().size
             if (imageSize.width !== imageSize.height) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请选择宽高比为 1:1 的图片'
               })
               return
             }
             if (this.infoValue) {
               try {
-                fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
               } catch (err) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '发生错误，错误码：' + err.code
                 })
               }
             }
-            const passwordIconDir = this.context.filesDir + '/media/passwordicon'
+            const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
             if (!fileIo.accessSync(passwordIconDir)) {
-              fileIo.mkdirSync(passwordIconDir, true)
+              await fileIo.mkdir(passwordIconDir, true)
             }
-            const filePath = passwordIconDir + '/' + Date.now() + '.png'
+            const filePath = passwordIconDir + Date.now() + '.png'
             const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
             const imagePacker = image.createImagePacker()
             await imagePacker.packToFile(imagePixelMap, file.fd, {
@@ -85,7 +84,7 @@ export default struct Newinfo {
             this.infoValue = fileUri.getUriFromPath(filePath)
           } catch (err) {
             if (err.code !== 13900020) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '发生错误，错误码：' + err.code
               })
             }
@@ -114,13 +113,13 @@ export default struct Newinfo {
           CollaborationServiceStateDialog({
             async onState(stateCode: number, bufferType: string, buffer: ArrayBuffer) {
               if (stateCode !== 0) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '发生错误，错误码：' + stateCode
                 })
                 return
               }
               if (bufferType !== 'general.image') {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请选择图片'
                 })
                 return
@@ -129,25 +128,25 @@ export default struct Newinfo {
               const imagePixelMap = await imageSource.createPixelMap()
               const imageSize = imagePixelMap.getImageInfoSync().size
               if (imageSize.width !== imageSize.height) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请选择宽高比为 1:1 的图片'
                 })
                 return
               }
               if (this.infoValue) {
                 try {
-                  fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
                 } catch (err) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
                 }
               }
-              const passwordIconDir = this.context.filesDir + '/media/passwordicon'
+              const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
               if (!fileIo.accessSync(passwordIconDir)) {
-                fileIo.mkdirSync(passwordIconDir, true)
+                await fileIo.mkdir(passwordIconDir, true)
               }
-              const filePath = passwordIconDir + '/' + Date.now() + '.png'
+              const filePath = passwordIconDir + Date.now() + '.png'
               const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
               const imagePacker = image.createImagePacker()
               await imagePacker.packToFile(imagePixelMap, file.fd, {
@@ -165,16 +164,16 @@ export default struct Newinfo {
           }))
             .selected(this.infoTypeIndex!!)
             .value(this.infoTypeValue!!)
-            .onSelect((index, value) => {
+            .onSelect(async (index, value) => {
               if (value === '图标') {
                 this.infoValue = ''
                 this.cloudBackup = false
               }
               if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                 try {
-                  fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
                 } catch (err) {
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
                 }
@@ -191,7 +190,7 @@ export default struct Newinfo {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onChange((value) => {
+              .onChange(async (value) => {
                 if (this.oftenUsedInfoTypes.includes(value)) {
                   this.infoTypeIndex = this.oftenUsedInfoTypes.indexOf(value)
                   this.infoTypeValue = value
@@ -203,9 +202,9 @@ export default struct Newinfo {
                 }
                 if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                   try {
-                    fileIo.unlinkSync(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
+                    await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
                   } catch (err) {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '发生错误，错误码：' + err.code
                     })
                   }
@@ -408,18 +407,18 @@ export default struct Newinfo {
           .onClick(async () => {
             const infoType = this.getCurrentInfoType()
             if (!infoType) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请输入类型'
               })
               return
             }
             if (!this.infoValue) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请输入内容'
               })
               return
             }
-            const res = await newInfo(this.context, this.UIContext, {
+            const res = await newInfo(this.context, {
               type: infoType,
               value: this.infoValue,
               cloudBackup: this.cloudBackup
@@ -445,7 +444,7 @@ export default struct Newinfo {
       const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码', '图标']) as string[]
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
-      const res = await getCloudServiceStatus(this.context, this.UIContext)
+      const res = await getCloudServiceStatus(this.context)
       const key = getKey()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'

@@ -15,12 +15,8 @@ export function stringToArray(str: string) {
 }
 
 function arrayToString(arr: Uint8Array) {
-  const textDecoder = util.TextDecoder.create('utf-8', {
-    ignoreBOM: true
-  })
-  return textDecoder.decodeToString(arr, {
-    stream: false
-  })
+  const textDecoder = util.TextDecoder.create('utf-8')
+  return textDecoder.decodeToString(arr)
 }
 
 function encodeBase64(arr: Uint8Array) {
@@ -53,8 +49,7 @@ export function getKey(): string {
 
 export async function setRandomKey() {
   const keyGenerator = cryptoFramework.createSymKeyGenerator('AES256')
-  const keyres = await keyGenerator.generateSymKey()
-  const key = keyres.getEncoded().data
+  const key = keyGenerator.generateSymKeySync().getEncoded().data
   await huks.importKeyItem('key', {
     inData: key,
     properties: [
@@ -77,7 +72,7 @@ export async function setRandomKey() {
   query.set(asset.Tag.ALIAS, stringToArray('key'))
   query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
   asset.addSync(query)
-  promptAction.openToast({
+  await promptAction.openToast({
     message: '导入成功'
   })
 }
@@ -105,7 +100,7 @@ export async function setCustomKey(key: string) {
   query.set(asset.Tag.ALIAS, stringToArray('key'))
   query.set(asset.Tag.CONFLICT_RESOLUTION, asset.ConflictResolution.OVERWRITE)
   asset.addSync(query)
-  promptAction.openToast({
+  await promptAction.openToast({
     message: '导入成功'
   })
 }
@@ -115,13 +110,14 @@ export async function removeKey() {
   const query: asset.AssetMap = new Map()
   query.set(asset.Tag.ALIAS, stringToArray('key'))
   asset.removeSync(query)
-  promptAction.openToast({
+  await promptAction.openToast({
     message: '删除成功'
   })
 }
 
 export async function encrypt(content: string): Promise<EncryptData> {
   const random = cryptoFramework.createRandom()
+  random.enableHardwareEntropy()
   const iv = random.generateRandomSync(16).data
   const options: huks.HuksOptions = {
     inData: stringToArray(content),
@@ -195,7 +191,7 @@ export async function decrypt(encryptData: EncryptData): Promise<string> {
     const res = await huks.finishSession(session.handle, options)
     return arrayToString(res.outData as Uint8Array)
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return 'fail'

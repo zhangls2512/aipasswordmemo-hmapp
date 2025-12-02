@@ -37,24 +37,37 @@ export async function importPassword(context: Context, data: string, conflict: r
       encrypt: true,
       allowRebuild: true
     })
-    array.forEach((item: PasswordInItem) => {
+    array.forEach(async (item: PasswordInItem) => {
       let cloudBackupTime = JSON.stringify([])
       if (typeof (item.cloudBackupTime) === 'string') {
         cloudBackupTime = item.cloudBackupTime
       }
-      rdbStore.insertSync('password', {
-        id: item.id,
-        name: item.name,
-        info: JSON.stringify(item.info.filter(itema => itema.type !== '图标')),
-        tag: JSON.stringify(item.tag),
-        updateTime: item.updateTime,
-        cloudBackupTime: cloudBackupTime
-      }, conflict)
+      try {
+        await rdbStore.insert('password', {
+          id: item.id,
+          name: item.name,
+          info: JSON.stringify(item.info.filter(itema => itema.type !== '图标')),
+          tag: JSON.stringify(item.tag),
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }, conflict)
+      } catch (err) {
+        if (err.code !== 14800032) {
+          await promptAction.openToast({
+            message: '发生错误，错误码：' + err.code
+          })
+        }
+        if (err.code === 14800032) {
+          await promptAction.openToast({
+            message: '导入失败，原因：已存在'
+          })
+        }
+      }
     })
-    autoSyncTable(context, 'password')
-    autoBackupTable(context, 'password')
+    await autoSyncTable(context, 'password')
+    await autoBackupTable(context, 'password')
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
   }
@@ -69,25 +82,38 @@ export async function importInfo(context: Context, data: string, conflict: relat
       encrypt: true,
       allowRebuild: true
     })
-    array.forEach((item: InfoInItem) => {
+    array.forEach(async (item: InfoInItem) => {
       if (item.type !== '图标') {
         let cloudBackupTime = JSON.stringify([])
         if (typeof (item.cloudBackupTime) === 'string') {
           cloudBackupTime = item.cloudBackupTime
         }
-        rdbStore.insertSync('info', {
-          id: item.id,
-          type: item.type,
-          value: item.value,
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }, conflict)
+        try {
+          await rdbStore.insert('info', {
+            id: item.id,
+            type: item.type,
+            value: item.value,
+            updateTime: item.updateTime,
+            cloudBackupTime: cloudBackupTime
+          }, conflict)
+        } catch (err) {
+          if (err.code !== 14800032) {
+            await promptAction.openToast({
+              message: '发生错误，错误码：' + err.code
+            })
+          }
+          if (err.code === 14800032) {
+            await promptAction.openToast({
+              message: '导入失败，原因：已存在'
+            })
+          }
+        }
       }
     })
-    autoSyncTable(context, 'info')
-    autoBackupTable(context, 'info')
+    await autoSyncTable(context, 'info')
+    await autoBackupTable(context, 'info')
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
   }
@@ -102,23 +128,36 @@ export async function importTag(context: Context, data: string, conflict: relati
       encrypt: true,
       allowRebuild: true
     })
-    array.forEach((item: TagInItem) => {
+    array.forEach(async (item: TagInItem) => {
       let cloudBackupTime = JSON.stringify([])
       if (typeof (item.cloudBackupTime) === 'string') {
         cloudBackupTime = item.cloudBackupTime
       }
-      rdbStore.insertSync('tag', {
-        id: item.id,
-        value: item.value,
-        color: item.color,
-        updateTime: item.updateTime,
-        cloudBackupTime: cloudBackupTime
-      }, conflict)
+      try {
+        await rdbStore.insert('tag', {
+          id: item.id,
+          value: item.value,
+          color: item.color,
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }, conflict)
+      } catch (err) {
+        if (err.code !== 14800032) {
+          await promptAction.openToast({
+            message: '发生错误，错误码：' + err.code
+          })
+        }
+        if (err.code === 14800032) {
+          await promptAction.openToast({
+            message: '导入失败，原因：已存在'
+          })
+        }
+      }
     })
-    autoSyncTable(context, 'tag')
-    autoBackupTable(context, 'tag')
+    await autoSyncTable(context, 'tag')
+    await autoBackupTable(context, 'tag')
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
   }

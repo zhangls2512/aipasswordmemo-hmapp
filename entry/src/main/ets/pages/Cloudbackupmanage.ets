@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog } from '@kit.ArkUI'
-import { get } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
 interface Count {
@@ -27,13 +27,12 @@ struct Cloudbackupmanage {
   @Local tagSelected: boolean = false
   @Local types: string[] = []
   @Local accessToken: string = ''
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   async getCount() {
     if (this.accessToken) {
       this.loading = true
-      const countres = await request(this.context, this.UIContext, '/password/getBackupCount', {
+      const countres = await request(this.context, '/password/getBackupCount', {
         accessToken: this.accessToken
       })
       this.loading = false
@@ -65,14 +64,6 @@ struct Cloudbackupmanage {
             Column() {
               Column() {
                 Row() {
-                  CheckboxGroup({
-                    group: 'type'
-                  })
-                    .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
-                    .selectAll(this.allSelected!!)
-                    .onChange((itemName) => {
-                      this.types = itemName.name
-                    })
                   Text('全部')
                     .fontWeight(FontWeight.Bold)
                     .layoutWeight(1)
@@ -82,6 +73,17 @@ struct Cloudbackupmanage {
                   Text(this.total)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                    })
+                  CheckboxGroup({
+                    group: 'type'
+                  })
+                    .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
+                    .selectAll(this.allSelected!!)
+                    .onChange((itemName) => {
+                      this.types = itemName.name
+                    })
                 }
                 .borderRadius(12)
                 .padding(12)
@@ -93,12 +95,6 @@ struct Cloudbackupmanage {
                     right: 12
                   })
                 Row() {
-                  Checkbox({
-                    name: 'password',
-                    group: 'type'
-                  })
-                    .select(this.passwordSelected!!)
-                    .shape(CheckBoxShape.ROUNDED_SQUARE)
                   Text('密码')
                     .fontWeight(FontWeight.Medium)
                     .layoutWeight(1)
@@ -108,6 +104,15 @@ struct Cloudbackupmanage {
                   Text(this.password)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                    })
+                  Checkbox({
+                    name: 'password',
+                    group: 'type'
+                  })
+                    .select(this.passwordSelected!!)
+                    .shape(CheckBoxShape.ROUNDED_SQUARE)
                 }
                 .borderRadius(12)
                 .padding(12)
@@ -119,12 +124,6 @@ struct Cloudbackupmanage {
                     right: 12
                   })
                 Row() {
-                  Checkbox({
-                    name: 'info',
-                    group: 'type'
-                  })
-                    .select(this.infoSelected!!)
-                    .shape(CheckBoxShape.ROUNDED_SQUARE)
                   Text('常用信息')
                     .fontWeight(FontWeight.Medium)
                     .layoutWeight(1)
@@ -134,6 +133,15 @@ struct Cloudbackupmanage {
                   Text(this.info)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                    })
+                  Checkbox({
+                    name: 'info',
+                    group: 'type'
+                  })
+                    .select(this.infoSelected!!)
+                    .shape(CheckBoxShape.ROUNDED_SQUARE)
                 }
                 .borderRadius(12)
                 .padding(12)
@@ -145,12 +153,6 @@ struct Cloudbackupmanage {
                     right: 12
                   })
                 Row() {
-                  Checkbox({
-                    name: 'tag',
-                    group: 'type'
-                  })
-                    .select(this.tagSelected!!)
-                    .shape(CheckBoxShape.ROUNDED_SQUARE)
                   Text('标签')
                     .fontWeight(FontWeight.Medium)
                     .layoutWeight(1)
@@ -160,6 +162,15 @@ struct Cloudbackupmanage {
                   Text(this.tag)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                    })
+                  Checkbox({
+                    name: 'tag',
+                    group: 'type'
+                  })
+                    .select(this.tagSelected!!)
+                    .shape(CheckBoxShape.ROUNDED_SQUARE)
                 }
                 .borderRadius(12)
                 .padding(12)
@@ -199,16 +210,16 @@ struct Cloudbackupmanage {
                       })
                     })
                     dialogControllerProgress.open()
-                    const res = await request(this.context, this.UIContext, '/password/clearBackup', {
+                    const res = await request(this.context, '/password/clearBackup', {
                       accessToken: this.accessToken,
                       types: this.types
                     })
                     dialogControllerProgress.close()
                     if (res !== 'fail') {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '清理成功'
                       })
-                      this.getCount()
+                      await this.getCount()
                     }
                   }
                 })
@@ -229,8 +240,8 @@ struct Cloudbackupmanage {
     .backgroundColor($r('app.color.sheet_background'))
     .title('管理云备份')
     .onAppear(async () => {
-      this.accessToken = await get()
-      this.getCount()
+      this.accessToken = await getAccountAccessToken()
+      await this.getCount()
     })
   }
 }

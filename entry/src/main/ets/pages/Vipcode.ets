@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { get } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
 @Builder
@@ -11,8 +11,7 @@ export function VipcodeBuilder() {
 @ComponentV2
 struct Vipcode {
   @Local vipCode: string = ''
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -34,7 +33,7 @@ struct Vipcode {
               })
               .width('100%')
               .onClick(async () => {
-                const accessToken = await get()
+                const accessToken = await getAccountAccessToken()
                 if (accessToken) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
@@ -42,13 +41,13 @@ struct Vipcode {
                     })
                   })
                   dialogControllerProgress.open()
-                  const res = await request(this.context, this.UIContext, '/product/useVipcode', {
+                  const res = await request(this.context, '/product/useVipcode', {
                     accessToken: accessToken,
                     vipcode: this.vipCode
                   })
                   dialogControllerProgress.close()
                   if (res !== 'fail') {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '兑换成功'
                     })
                     this.pageInfos.pop()
@@ -72,8 +71,8 @@ struct Vipcode {
               .margin({
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })
-              .onClick(() => {
-                this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+              .onClick(async () => {
+                await this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
               })
             Text('· 提供有效反馈')
               .fontColor($r('sys.color.font_emphasize'))
