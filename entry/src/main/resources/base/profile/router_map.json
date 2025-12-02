@@ -169,6 +169,11 @@
       "name": "Email",
       "pageSourceFile": "src/main/ets/pages/Email.ets",
       "buildFunction": "EmailBuilder"
+    },
+    {
+      "name": "Reward",
+      "pageSourceFile": "src/main/ets/pages/Reward.ets",
+      "buildFunction": "RewardBuilder"
     }
   ]
 }

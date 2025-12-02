@@ -29,7 +29,7 @@ export function parseCsvLine(line: string) {
 
 export async function importCsvPassword(context: Context, content: string) {
   if (!content) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '导入失败，原因：文件为空'
     })
     return
@@ -70,12 +70,12 @@ export async function importCsvPassword(context: Context, content: string) {
       }
     }
     await importPassword(context, JSON.stringify(result), 0)
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '导入成功'
     })
   }
   if (nameIndex === -1) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '导入失败，原因：无名称列'
     })
   }

@@ -339,11 +339,11 @@ struct Tablesync {
                   this.hoverId = '0,' + index
                 }
               })
-              .onClick(() => {
+              .onClick(async () => {
                 const autoSyncDevices = this.autoSyncDevices.filter(device => device.deviceId !== item.deviceId)
                 this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
                 this.dataSettingDataPreferences.flushSync()
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '已关闭'
                 })
                 this.getSetting()
@@ -441,10 +441,10 @@ struct Tablesync {
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
             Button('刷新')
-              .onClick(() => {
+              .onClick(async () => {
                 this.availableDeviceArray = distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo')
                   .getAvailableDeviceListSync() as Item[]
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '刷新成功'
                 })
               })
@@ -579,11 +579,11 @@ struct Tablesync {
                     this.hoverId = '1,' + index
                   }
                 })
-                .onClick(() => {
+                .onClick(async () => {
                   const autoSyncDevices = [...this.autoSyncDevices, item]
                   this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
                   this.dataSettingDataPreferences.flushSync()
-                  promptAction.openToast({
+                  await promptAction.openToast({
                     message: '已开启'
                   })
                   this.getSetting()

@@ -24,21 +24,21 @@ export default struct Urlcheck {
       ListItem() {
         Button('添加')
           .width('100%')
-          .onClick(() => {
+          .onClick(async () => {
             if (this.urlArray.length >= 10) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '数量达到上限'
               })
               return
             }
             if (!this.url) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请输入 URL'
               })
               return
             }
             if (this.urlArray.includes(this.url)) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '已添加此 URL'
               })
               return
@@ -83,7 +83,7 @@ export default struct Urlcheck {
           .width('100%')
           .onClick(async () => {
             if (this.urlArray.length === 0) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '请添加 URL'
               })
               return
@@ -102,7 +102,7 @@ export default struct Urlcheck {
               this.resultArray = res.results
             } catch (err) {
               dialogControllerProgress.close()
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
               })
             }

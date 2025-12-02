@@ -4,11 +4,11 @@ import { uri } from '@kit.ArkTS'
 import { display, window } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
-import { get } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Accesstoken'
 import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import getDeviceToken from '../common/Devicetoken'
-import { read } from '../common/File'
+import { readUri } from '../common/File'
 import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
 import request from '../common/Request'
 import Password from './Password'
@@ -149,7 +149,7 @@ struct Index {
       })
       this.context.eventHub.on('wantUri', async (wantUri: string) => {
         if (wantUri.endsWith('.txt') || wantUri.endsWith('.csv')) {
-          const filestring = read(wantUri)
+          const filestring = await readUri(wantUri)
           if (wantUri.endsWith('.txt')) {
             const promptAction = this.UIContext.getPromptAction()
             const data = await promptAction.showActionMenu({
@@ -181,7 +181,7 @@ struct Index {
               await importTag(this.context, filestring, 0)
               this.context.eventHub.emit('refreshTag')
             }
-            promptAction.openToast({
+            await promptAction.openToast({
               message: '导入成功'
             })
           }
@@ -195,10 +195,10 @@ struct Index {
           const urires = new uri.URI(wantUri)
           const invitationCode = urires.getQueryValue('invitationcode')
           const vipCode = urires.getQueryValue('vipcode')
-          const accessToken = await get()
+          const accessToken = await getAccountAccessToken()
           if (invitationCode) {
             if (!accessToken) {
-              promptAction.showDialog({
+              await promptAction.showDialog({
                 title: '提示',
                 message: '邀请码使用失败，原因：未登录账号',
                 buttons: [
@@ -212,14 +212,14 @@ struct Index {
             if (accessToken) {
               const deviceToken = await getDeviceToken()
               if (deviceToken) {
-                const res = await request(this.context, this.UIContext, '/product/useInvitationcode', {
+                const res = await request(this.context, '/product/useInvitationcode', {
                   accessToken: accessToken,
                   deviceToken: deviceToken,
                   product: 'password',
                   invitationcode: invitationCode
                 })
                 if (res !== 'fail') {
-                  promptAction.showDialog({
+                  await promptAction.showDialog({
                     title: '提示',
                     message: '邀请码使用成功',
                     buttons: [
@@ -235,7 +235,7 @@ struct Index {
           }
           if (vipCode) {
             if (!accessToken) {
-              promptAction.showDialog({
+              await promptAction.showDialog({
                 title: '提示',
                 message: '兑换码使用失败，原因：未登录账号',
                 buttons: [
@@ -247,12 +247,12 @@ struct Index {
               })
             }
             if (accessToken) {
-              const res = await request(this.context, this.UIContext, '/product/useVipcode', {
+              const res = await request(this.context, '/product/useVipcode', {
                 accessToken: accessToken,
                 vipcode: vipCode
               })
               if (res !== 'fail') {
-                promptAction.showDialog({
+                await promptAction.showDialog({
                   title: '提示',
                   message: '兑换码使用成功',
                   buttons: [
@@ -267,9 +267,22 @@ struct Index {
           }
         }
       })
-      this.preferType = getPreferType()
+      const promptAction = this.UIContext.getPromptAction()
+      this.context.eventHub.on('dialog', async (title: string, message: string) => {
+        await promptAction.showDialog({
+          title: title,
+          message: message,
+          buttons: [
+            {
+              text: '确定',
+              color: $r('sys.color.font_emphasize')
+            }
+          ]
+        })
+      })
+      this.preferType = getPreferType(this.UIContext)
       display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId)
+        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
       })
       const currentIndex = this.index
       this.index = -1
@@ -281,6 +294,7 @@ struct Index {
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshIndex')
+      this.context.eventHub.off('dialog')
       this.context.eventHub.off('wantUri')
       this.context.eventHub.off('clearData')
       display.off('change')

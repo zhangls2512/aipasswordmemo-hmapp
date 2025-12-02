@@ -52,7 +52,7 @@ struct About {
                       })
                     }
                     if (data.index === 1) {
-                      promptAction.openToast({
+                      await promptAction.openToast({
                         message: '暂未上线，敬请期待'
                       })
                     }
@@ -152,16 +152,16 @@ struct About {
                   this.updateLoading = false
                   this.hasUpdate = res.updateAvailable
                   if (res.updateAvailable === 1) {
-                    updateManager.showUpdateDialog(this.context)
+                    await updateManager.showUpdateDialog(this.context)
                   }
                 }
                 if (this.hasUpdate === 1) {
-                  updateManager.showUpdateDialog(this.context)
+                  await updateManager.showUpdateDialog(this.context)
                 }
               } catch (err) {
                 this.updateLoading = false
                 this.hasUpdate = -1
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                 })
               }
@@ -268,8 +268,8 @@ struct About {
                 this.hoverId = 2
               }
             })
-            .onClick(() => {
-              openLink(this.context, 'https://docs.qq.com/doc/p/118bdf185c72968b4623d30bfdd809521b09d6ed')
+            .onClick(async () => {
+              await openLink(this.context, 'https://docs.qq.com/doc/p/118bdf185c72968b4623d30bfdd809521b09d6ed')
             })
 
             Divider()
@@ -319,8 +319,8 @@ struct About {
                 this.hoverId = 3
               }
             })
-            .onClick(() => {
-              openLink(this.context, 'https://docs.qq.com/doc/p/ad13731bb5a5562d7e7b11ee738928c6f1974b51')
+            .onClick(async () => {
+              await openLink(this.context, 'https://docs.qq.com/doc/p/ad13731bb5a5562d7e7b11ee738928c6f1974b51')
             })
 
             Divider()
@@ -360,8 +360,8 @@ struct About {
                 this.hoverId = 4
               }
             })
-            .onClick(() => {
-              this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo')
+            .onClick(async () => {
+              await this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo')
             })
 
             Divider()
@@ -401,8 +401,8 @@ struct About {
                 this.hoverId = 5
               }
             })
-            .onClick(() => {
-              this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+            .onClick(async () => {
+              await this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
             })
 
             Divider()
@@ -510,8 +510,8 @@ struct About {
                   this.hoverId = 7
                 }
               })
-              .onClick(() => {
-                call.makeCall('18846496985')
+              .onClick(async () => {
+                await call.makeCall('18846496985')
               })
 
               Divider()
@@ -561,8 +561,8 @@ struct About {
                   this.hoverId = 8
                 }
               })
-              .onClick(() => {
-                this.context.startAbilityByType('mail', {
+              .onClick(async () => {
+                await this.context.startAbilityByType('mail', {
                   email: ['2300990296@qq.com']
                 }, {
                   onError: () => {
@@ -617,8 +617,8 @@ struct About {
                   this.hoverId = 9
                 }
               })
-              .onClick(() => {
-                copy(this.context, this.UIContext, 'gerenyinsi_z07x17m')
+              .onClick(async () => {
+                await copy(this.context, this.UIContext, 'gerenyinsi_z07x17m')
               })
 
               Divider()
@@ -669,8 +669,8 @@ struct About {
                   this.hoverId = 10
                 }
               })
-              .onClick(() => {
-                openLink(this.context, 'https://qm.qq.com/q/8Ugei32784')
+              .onClick(async () => {
+                await openLink(this.context, 'https://qm.qq.com/q/8Ugei32784')
               })
 
               Divider()
@@ -721,8 +721,8 @@ struct About {
                   this.hoverId = 11
                 }
               })
-              .onClick(() => {
-                this.context.openLink('https://www.chuckfang.com/MeoW/appLinking?channelId=e734229e5e9141ba83682e72ecd9df41')
+              .onClick(async () => {
+                await this.context.openLink('https://www.chuckfang.com/MeoW/appLinking?channelId=e734229e5e9141ba83682e72ecd9df41')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -789,8 +789,8 @@ struct About {
                   this.hoverId = 12
                 }
               })
-              .onClick(() => {
-                openLink(this.context, 'https://www.zhangls2512.cn/index')
+              .onClick(async () => {
+                await openLink(this.context, 'https://www.zhangls2512.cn/index')
               })
 
               Divider()
@@ -840,8 +840,8 @@ struct About {
                   this.hoverId = 13
                 }
               })
-              .onClick(() => {
-                openLink(this.context, 'https://space.bilibili.com/448824492')
+              .onClick(async () => {
+                await openLink(this.context, 'https://space.bilibili.com/448824492')
               })
 
               Divider()
@@ -891,8 +891,8 @@ struct About {
                   this.hoverId = 14
                 }
               })
-              .onClick(() => {
-                openLink(this.context, 'https://gitcode.com/zhangls2512/aipasswordmemo-hmapp')
+              .onClick(async () => {
+                await openLink(this.context, 'https://gitcode.com/zhangls2512/aipasswordmemo-hmapp')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -907,14 +907,28 @@ struct About {
 
         ListItem() {
           Column() {
-            Text('资质证照')
-              .fontColor($r('sys.color.font_emphasize'))
-              .fontSize($r('sys.float.ohos_id_text_size_body3'))
-              .onClick(() => {
-                this.pageInfos.pushPath({
-                  name: 'License'
+            Row() {
+              Text('资质证照')
+                .fontColor($r('sys.color.font_emphasize'))
+                .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-              })
+                .onClick(() => {
+                  this.pageInfos.pushPath({
+                    name: 'License'
+                  })
+                })
+              Text('获得奖项')
+                .fontColor('#FFD700')
+                .fontSize($r('sys.float.ohos_id_text_size_body3'))
+                .onClick(() => {
+                  this.pageInfos.pushPath({
+                    name: 'Reward'
+                  })
+                })
+            }
+
             Text('版权所有 ©️ 2025 张轩铭 保留一切权利')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body3'))

@@ -1,4 +1,4 @@
-import { get, getAccountInfo } from '../common/Accesstoken'
+import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import { decrypt, getKey } from '../common/Crypto'
 import { PasswordInfoItem } from '../common/Dataget'
 import { importInfo, importPassword, importTag, InfoInItem, PasswordInItem, TagInItem } from '../common/Dataimport'
@@ -32,26 +32,26 @@ interface TagCloudBackup {
   cloudBackupTime: string | number
 }
 
-export async function importCloudBackupPassword(context: Context, UIContext: UIContext) {
-  const accessToken = await get()
-  const accountInfo = await getAccountInfo()
+export async function importCloudBackupPassword(context: Context) {
+  const accessToken = await getAccountAccessToken()
   if (accessToken && getKey()) {
-    const countres = await request(context, UIContext, '/password/getBackupCount', {
+    const countResponse = await request(context, '/password/getBackupCount', {
       accessToken: accessToken
     })
-    if (countres !== 'fail') {
-      const total = JSON.parse(countres).count.password as number
+    if (countResponse !== 'fail') {
+      const total = JSON.parse(countResponse).count.password as number
       for (let i = 0; i < total; i += 50) {
-        const listres = await request(context, UIContext, '/password/getBackupList', {
+        const listResponse = await request(context, '/password/getBackupList', {
           accessToken: accessToken,
           type: 'password',
           skip: i,
           count: 50
         })
-        if (listres !== 'fail') {
-          const listarray = JSON.parse(listres).data as Item[]
-          const array: PasswordInItem[] = []
-          const promises = listarray.map(async (item) => {
+        if (listResponse !== 'fail') {
+          const array = JSON.parse(listResponse).data as Item[]
+          const passwordArray: PasswordInItem[] = []
+          const accountInfo = await getAccountInfo()
+          const promises = array.map(async (item) => {
             const itemstring = await decrypt({
               content: item.content,
               iv: item.iv
@@ -65,7 +65,7 @@ export async function importCloudBackupPassword(context: Context, UIContext: UIC
                   time: itemobject.cloudBackupTime
                 }])
               }
-              array.push({
+              passwordArray.push({
                 id: item.id,
                 name: itemobject.name,
                 info: itemobject.info,
@@ -76,7 +76,7 @@ export async function importCloudBackupPassword(context: Context, UIContext: UIC
             }
           })
           await Promise.all(promises)
-          await importPassword(context, JSON.stringify(array), 0)
+          await importPassword(context, JSON.stringify(passwordArray), 0)
         }
       }
       return 'success'
@@ -85,26 +85,26 @@ export async function importCloudBackupPassword(context: Context, UIContext: UIC
   return 'fail'
 }
 
-export async function importCloudBackupInfo(context: Context, UIContext: UIContext) {
-  const accessToken = await get()
-  const accountInfo = await getAccountInfo()
+export async function importCloudBackupInfo(context: Context) {
+  const accessToken = await getAccountAccessToken()
   if (accessToken && getKey()) {
-    const countres = await request(context, UIContext, '/password/getBackupCount', {
+    const countResponse = await request(context, '/password/getBackupCount', {
       accessToken: accessToken
     })
-    if (countres !== 'fail') {
-      const total = JSON.parse(countres).count.info as number
+    if (countResponse !== 'fail') {
+      const total = JSON.parse(countResponse).count.info as number
       for (let i = 0; i < total; i += 50) {
-        const listres = await request(context, UIContext, '/password/getBackupList', {
+        const listResponse = await request(context, '/password/getBackupList', {
           accessToken: accessToken,
           type: 'info',
           skip: i,
           count: 50
         })
-        if (listres !== 'fail') {
-          const listarray = JSON.parse(listres).data as Item[]
-          const array: InfoInItem[] = []
-          const promises = listarray.map(async (item) => {
+        if (listResponse !== 'fail') {
+          const array = JSON.parse(listResponse).data as Item[]
+          const infoArray: InfoInItem[] = []
+          const accountInfo = await getAccountInfo()
+          const promises = array.map(async (item) => {
             const itemstring = await decrypt({
               content: item.content,
               iv: item.iv
@@ -118,7 +118,7 @@ export async function importCloudBackupInfo(context: Context, UIContext: UIConte
                   time: itemobject.cloudBackupTime
                 }])
               }
-              array.push({
+              infoArray.push({
                 id: item.id,
                 type: itemobject.type,
                 value: itemobject.value,
@@ -128,7 +128,7 @@ export async function importCloudBackupInfo(context: Context, UIContext: UIConte
             }
           })
           await Promise.all(promises)
-          await importInfo(context, JSON.stringify(array), 0)
+          await importInfo(context, JSON.stringify(infoArray), 0)
         }
       }
       return 'success'
@@ -137,26 +137,26 @@ export async function importCloudBackupInfo(context: Context, UIContext: UIConte
   return 'fail'
 }
 
-export async function importCloudBackupTag(context: Context, UIContext: UIContext) {
-  const accessToken = await get()
-  const accountInfo = await getAccountInfo()
+export async function importCloudBackupTag(context: Context) {
+  const accessToken = await getAccountAccessToken()
   if (accessToken && getKey()) {
-    const countres = await request(context, UIContext, '/password/getBackupCount', {
+    const countResponse = await request(context, '/password/getBackupCount', {
       accessToken: accessToken
     })
-    if (countres !== 'fail') {
-      const total = JSON.parse(countres).count.tag as number
+    if (countResponse !== 'fail') {
+      const total = JSON.parse(countResponse).count.tag as number
       for (let i = 0; i < total; i += 50) {
-        const listres = await request(context, UIContext, '/password/getBackupList', {
+        const listResponse = await request(context, '/password/getBackupList', {
           accessToken: accessToken,
           type: 'tag',
           skip: i,
           count: 50
         })
-        if (listres !== 'fail') {
-          const listarray = JSON.parse(listres).data as Item[]
-          const array: TagInItem[] = []
-          const promises = listarray.map(async (item) => {
+        if (listResponse !== 'fail') {
+          const array = JSON.parse(listResponse).data as Item[]
+          const tagArray: TagInItem[] = []
+          const accountInfo = await getAccountInfo()
+          const promises = array.map(async (item) => {
             const itemstring = await decrypt({
               content: item.content,
               iv: item.iv
@@ -170,7 +170,7 @@ export async function importCloudBackupTag(context: Context, UIContext: UIContex
                   time: itemobject.cloudBackupTime
                 }])
               }
-              array.push({
+              tagArray.push({
                 id: item.id,
                 value: itemobject.value,
                 color: itemobject.color,
@@ -180,7 +180,7 @@ export async function importCloudBackupTag(context: Context, UIContext: UIContex
             }
           })
           await Promise.all(promises)
-          await importTag(context, JSON.stringify(array), 0)
+          await importTag(context, JSON.stringify(tagArray), 0)
         }
       }
       return 'success'

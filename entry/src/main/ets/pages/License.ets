@@ -63,8 +63,8 @@ struct License {
             Span('ICP备案：')
             Span('黑ICP备2024023054号-9A')
               .fontColor($r('sys.color.font_emphasize'))
-              .onClick(() => {
-                openLink(this.context, 'https://beian.miit.gov.cn/#/Integrated/recordQuery')
+              .onClick(async () => {
+                await openLink(this.context, 'https://beian.miit.gov.cn/#/Integrated/recordQuery')
               })
           }
           .enableAutoSpacing(true)
@@ -78,8 +78,8 @@ struct License {
             Text('公安备案')
               .fontColor($r('sys.color.font_emphasize'))
               .fontWeight(FontWeight.Bold)
-              .onClick(() => {
-                openLink(this.context, 'https://beian.mps.gov.cn/#/query/appSearch')
+              .onClick(async () => {
+                await openLink(this.context, 'https://beian.mps.gov.cn/#/query/appSearch')
               })
             Flex({
               alignItems: ItemAlign.Stretch,
@@ -139,8 +139,9 @@ struct License {
             Span('产品备案：')
             Span('轩铭2512品备12号-HA')
               .fontColor($r('sys.color.font_emphasize'))
-              .onClick(() => {
-                openLink(this.context, 'https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512品备12号-HA')
+              .onClick(async () => {
+                await openLink(this.context,
+                  'https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512品备12号-HA')
               })
           }
           .enableAutoSpacing(true)
@@ -208,8 +209,9 @@ struct License {
                   .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_emphasize'))
                   .textAlign(TextAlign.Center)
-                  .onClick(() => {
-                    openLink(this.context, 'https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512许12号-1M')
+                  .onClick(async () => {
+                    await openLink(this.context,
+                      'https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512许12号-1M')
                   })
               }
               .border({
@@ -283,9 +285,9 @@ struct License {
                   Text(item.property)
                     .fontColor($r('sys.color.font_emphasize'))
                     .textAlign(TextAlign.Center)
-                    .onClick(() => {
+                    .onClick(async () => {
                       const promptAction = this.getUIContext().getPromptAction()
-                      promptAction.showDialog({
+                      await promptAction.showDialog({
                         title: '描述',
                         message: item.desc,
                         buttons: [
@@ -313,8 +315,9 @@ struct License {
                     .enableAutoSpacing(true)
                     .fontColor($r('sys.color.font_emphasize'))
                     .textAlign(TextAlign.Center)
-                    .onClick(() => {
-                      openLink(this.context, 'https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=' + item.value)
+                    .onClick(async () => {
+                      await openLink(this.context,
+                        'https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=' + item.value)
                     })
                 }
                 .border({
@@ -405,8 +408,8 @@ struct License {
                   .enableAutoSpacing(true)
                   .fontColor($r('sys.color.font_emphasize'))
                   .textAlign(TextAlign.Center)
-                  .onClick(() => {
-                    openLink(this.context,
+                  .onClick(async () => {
+                    await openLink(this.context,
                       'https://www.zhangls2512.cn/product/baxk/jqcx?baxknumber=轩铭2512私安备12号-1')
                   })
               }

@@ -30,8 +30,7 @@ export default struct Ainewinfo {
   @Local text: string = ''
   @Local showCard: boolean = false
   @Local hoverId: number = -1
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   cloudBackup = false
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
@@ -95,7 +94,7 @@ export default struct Ainewinfo {
             const pickerres = await picker.pick(this.context, [picker.PickerMediaType.PHOTO], {
               cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK
             })
-            const fileSource = await fileIo.open(pickerres.resultUri)
+            const fileSource = fileIo.openSync(pickerres.resultUri)
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
             const initres = await textRecognition.init()
@@ -107,11 +106,11 @@ export default struct Ainewinfo {
               this.dialogControllerProgress.close()
               this.text = textrecognitionres.value
               await textRecognition.release()
-              this.getList(this.text)
+              await this.getList(this.text)
             }
           } catch (err) {
             if (err.code !== 13900002) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '发生错误，错误码：' + err.code
               })
             }
@@ -127,7 +126,7 @@ export default struct Ainewinfo {
               isPhotoTakingSupported: false,
               isOriginalSupported: false
             })
-            const fileSource = await fileIo.open(pickerres.photoUris[0])
+            const fileSource = fileIo.openSync(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
             const initres = await textRecognition.init()
@@ -139,11 +138,11 @@ export default struct Ainewinfo {
               this.dialogControllerProgress.close()
               this.text = textrecognitionres.value
               await textRecognition.release()
-              this.getList(this.text)
+              await this.getList(this.text)
             }
           } catch (err) {
             if (err.code !== 13900020) {
-              promptAction.openToast({
+              await promptAction.openToast({
                 message: '发生错误，错误码：' + err.code
               })
             }
@@ -173,13 +172,13 @@ export default struct Ainewinfo {
           CollaborationServiceStateDialog({
             async onState(stateCode: number, bufferType: string, buffer: ArrayBuffer) {
               if (stateCode !== 0) {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '发生错误，错误码：' + stateCode
                 })
                 return
               }
               if (bufferType !== 'general.image') {
-                promptAction.openToast({
+                await promptAction.openToast({
                   message: '请导入图片'
                 })
                 return
@@ -269,8 +268,8 @@ export default struct Ainewinfo {
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
-            .onChange((value) => {
-              this.getList(value)
+            .onChange(async (value) => {
+              await this.getList(value)
             })
         }
         .alignItems(HorizontalAlign.Start)
@@ -364,8 +363,8 @@ export default struct Ainewinfo {
                 this.hoverId = index
               }
             })
-            .onClick(() => {
-              newInfo(this.context, this.UIContext, {
+            .onClick(async () => {
+              await newInfo(this.context, {
                 type: item.type,
                 value: item.value,
                 cloudBackup: this.cloudBackup
@@ -397,7 +396,7 @@ export default struct Ainewinfo {
     })
     .onAppear(async () => {
       await textProcessing.init()
-      const res = await getCloudServiceStatus(this.context, this.UIContext)
+      const res = await getCloudServiceStatus(this.context)
       const key = getKey()
       if (res && key) {
         const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {

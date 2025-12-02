@@ -1,3 +1,4 @@
+import { promptAction } from '@kit.ArkUI'
 import { cryptoFramework } from '@kit.CryptoArchitectureKit'
 
 interface Totp {
@@ -78,28 +79,38 @@ function numberToBigEndianUint8Array(num: bigint) {
   return new Uint8Array(buffer)
 }
 
-export default function getTotp(key: string, step: number, digits: number): Totp {
+export default async function getTotp(key: string, step: number, digits: number): Promise<Totp> {
   const keyArray = base32Decode(key)
   const time = Math.floor(Date.now() / 1000 / step)
   const timeArray = numberToBigEndianUint8Array(BigInt(time))
-  const macGenerator = cryptoFramework.createSymKeyGenerator('HMAC')
-  const symKey = macGenerator.convertKeySync({
-    data: keyArray
-  })
-  const mac = cryptoFramework.createMac('SHA1')
-  mac.initSync(symKey)
-  mac.updateSync({
-    data: timeArray
-  })
-  const hmac = mac.doFinalSync().data
-  const offset = hmac[hmac.length - 1] & 0xf
-  const binary = ((hmac[offset] & 0x7f) << 24) |
-    ((hmac[offset + 1] & 0xff) << 16) |
-    ((hmac[offset + 2] & 0xff) << 8) |
-    (hmac[offset + 3] & 0xff)
-  const otp = binary % Math.pow(10, digits)
-  return {
-    value: otp.toString().padStart(digits, '0'),
-    secondsRemaining: Math.ceil(step - (Date.now() / 1000 % step))
+  try {
+    const macGenerator = cryptoFramework.createSymKeyGenerator('HMAC')
+    const symKey = macGenerator.convertKeySync({
+      data: keyArray
+    })
+    const mac = cryptoFramework.createMac('SHA1')
+    mac.initSync(symKey)
+    mac.updateSync({
+      data: timeArray
+    })
+    const hmac = mac.doFinalSync().data
+    const offset = hmac[hmac.length - 1] & 0xf
+    const binary = ((hmac[offset] & 0x7f) << 24) |
+      ((hmac[offset + 1] & 0xff) << 16) |
+      ((hmac[offset + 2] & 0xff) << 8) |
+      (hmac[offset + 3] & 0xff)
+    const otp = binary % Math.pow(10, digits)
+    return {
+      value: otp.toString().padStart(digits, '0'),
+      secondsRemaining: Math.ceil(step - (Date.now() / 1000 % step))
+    }
+  } catch (err) {
+    await promptAction.openToast({
+      message: '发生错误，错误码：' + err.code
+    })
+    return {
+      value: 'fail',
+      secondsRemaining: -1
+    }
   }
 }

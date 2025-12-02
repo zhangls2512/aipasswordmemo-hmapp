@@ -56,8 +56,8 @@ struct Keypage {
                     this.hoverId = 0
                   }
                 })
-                .onClick(() => {
-                  copy(this.context, this.UIContext, this.keyValue)
+                .onClick(async () => {
+                  await copy(this.context, this.UIContext, this.keyValue)
                 })
               }
               .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

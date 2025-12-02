@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { get } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import request from '../common/Request'
 
@@ -9,9 +9,8 @@ export default struct Cloudservice {
   @Consumer() isShowCloudserviceSheet: boolean = false
   @Local cloudService: boolean = false
   @Local loading: boolean = false
-  UIContext = this.getUIContext()
-  context = this.UIContext.getHostContext() as common.UIAbilityContext
-  accessToken: string = ''
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  accessToken = ''
 
   build() {
     List() {
@@ -71,13 +70,13 @@ export default struct Cloudservice {
                     })
                   })
                   dialogControllerProgress.open()
-                  const res = await request(this.context, this.UIContext, '/account/openService', {
+                  const res = await request(this.context, '/account/openService', {
                     accessToken: this.accessToken,
                     service: 'password'
                   })
                   dialogControllerProgress.close()
                   if (res !== 'fail') {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '开通成功'
                     })
                     this.cloudService = true
@@ -98,13 +97,13 @@ export default struct Cloudservice {
                     })
                   })
                   dialogControllerProgress.open()
-                  const res = await request(this.context, this.UIContext, '/account/closeService', {
+                  const res = await request(this.context, '/account/closeService', {
                     accessToken: this.accessToken,
                     service: 'password'
                   })
                   dialogControllerProgress.close()
                   if (res !== 'fail') {
-                    promptAction.openToast({
+                    await promptAction.openToast({
                       message: '取消开通成功'
                     })
                     this.cloudService = false
@@ -127,10 +126,10 @@ export default struct Cloudservice {
       right: $r('sys.float.ohos_id_max_padding_end')
     })
     .onAppear(async () => {
-      this.accessToken = await get()
+      this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {
         this.loading = true
-        this.cloudService = await getCloudServiceStatus(this.context, this.UIContext)
+        this.cloudService = await getCloudServiceStatus(this.context)
         this.loading = false
       }
     })

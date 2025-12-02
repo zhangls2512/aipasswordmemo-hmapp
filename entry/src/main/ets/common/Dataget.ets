@@ -150,7 +150,7 @@ export async function getPasswordList(context: Context) {
     resultSet.close()
     return array
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return []
@@ -232,7 +232,7 @@ export async function getFilterPasswordList(context: Context, nameKeyword: strin
     resultSet.close()
     return array
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return []
@@ -346,7 +346,7 @@ export async function getInfoList(context: Context) {
     resultSet.close()
     return array
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return []
@@ -375,7 +375,7 @@ export async function getInfoTypeList(context: Context) {
     resultSet.close()
     return array
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return []
@@ -401,7 +401,7 @@ export async function getTypeInfoList(context: Context, type: string) {
     resultSet.close()
     return array
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return []
@@ -521,7 +521,7 @@ export async function getTagList(context: Context, orderColumn: string = 'update
     resultSet.close()
     return array
   } catch (err) {
-    promptAction.openToast({
+    await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
     })
     return []
