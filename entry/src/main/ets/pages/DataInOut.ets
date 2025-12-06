@@ -42,7 +42,8 @@ struct DataInOut {
   @Local index: number = 0
   @Local value: string = '保留'
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   escapeCsvField(value?: string) {
@@ -476,7 +477,7 @@ struct DataInOut {
                   return {
                     id: item.id,
                     name: item.name,
-                    info: item.info.filter(itema => itema.type !== '图标'),
+                    info: item.info.filter(infoItem => infoItem.type !== '图标'),
                     tag: item.tag.map(item => item.value),
                     updateTime: item.updateTime,
                     cloudBackupTime: cloudBackupTime
@@ -484,7 +485,7 @@ struct DataInOut {
                 })
                 const documentSaveOptions = new picker.DocumentSaveOptions()
                 documentSaveOptions.newFileNames = ['password']
-                const promptAction = this.getUIContext().getPromptAction()
+                const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showActionMenu({
                   title: '选择格式',
                   buttons: [
@@ -524,9 +525,9 @@ struct DataInOut {
                     if (arrayOut.length > 0) {
                       const allInfoTypesArray: string[] = []
                       arrayOut.forEach(item => {
-                        item.info.forEach(itema => {
-                          if (!allInfoTypesArray.includes(itema.type)) {
-                            allInfoTypesArray.push(itema.type)
+                        item.info.forEach(infoItem => {
+                          if (!allInfoTypesArray.includes(infoItem.type)) {
+                            allInfoTypesArray.push(infoItem.type)
                           }
                         })
                       })
@@ -539,8 +540,11 @@ struct DataInOut {
                       const rows = arrayOut.map((item) => {
                         const values = [item.name]
                         for (const infotype of allInfoTypesArray) {
-                          const value = item.info.findIndex(item => item.type === infotype) === -1 ? '' :
-                            item.info.find(item => item.type === infotype)?.value
+                          let value = ''
+                          const infoValue = item.info.find(item => item.type === infotype)
+                          if (infoValue) {
+                            value = infoValue.value
+                          }
                           values.push(this.escapeCsvField(value))
                         }
                         return values.join(',')
@@ -736,8 +740,8 @@ struct DataInOut {
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+        right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))

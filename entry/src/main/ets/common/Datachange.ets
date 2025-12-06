@@ -67,7 +67,7 @@ export async function newPassword(context: Context, data: PasswordInput) {
       id: id,
       content: JSON.stringify({
         name: data.name,
-        info: JSON.stringify(data.info.filter(itema => itema.type !== '图标')),
+        info: JSON.stringify(data.info.filter(infoItem => infoItem.type !== '图标')),
         tag: JSON.stringify(data.tag),
         updateTime: updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTime)
@@ -125,7 +125,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
       id: id,
       content: JSON.stringify({
         name: data.name,
-        info: JSON.stringify(data.info.filter(itema => itema.type !== '图标')),
+        info: JSON.stringify(data.info.filter(infoItem => infoItem.type !== '图标')),
         tag: JSON.stringify(data.tag),
         updateTime: updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTimeArray)

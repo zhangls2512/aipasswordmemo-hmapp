@@ -368,9 +368,15 @@ export default class EntryAbility extends UIAbility {
     if (netConnected) {
       const checkVersionUpdate = commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
       if (checkVersionUpdate === 2 || (checkVersionUpdate === 1 && currentNetworkBearerType !== 0)) {
-        const res = await updateManager.checkAppUpdate(this.context)
-        if (res.updateAvailable === 1) {
-          await updateManager.showUpdateDialog(this.context)
+        try {
+          const res = await updateManager.checkAppUpdate(this.context)
+          if (res.updateAvailable === 1) {
+            await updateManager.showUpdateDialog(this.context)
+          }
+        } catch (err) {
+          await promptAction.openToast({
+            message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+          })
         }
       }
     }
@@ -606,7 +612,7 @@ export default class EntryAbility extends UIAbility {
 
   async onContinue(wantParam: Record<string, Object>) {
     try {
-      if (wantParam.version !== 38) {
+      if (wantParam.version !== 39) {
         await promptAction.openToast({
           message: '接续失败，原因：目标端应用版本号与发起端不匹配'
         })

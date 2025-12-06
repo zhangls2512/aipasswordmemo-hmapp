@@ -46,7 +46,7 @@ export async function importPassword(context: Context, data: string, conflict: r
         await rdbStore.insert('password', {
           id: item.id,
           name: item.name,
-          info: JSON.stringify(item.info.filter(itema => itema.type !== '图标')),
+          info: JSON.stringify(item.info.filter(infoItem => infoItem.type !== '图标')),
           tag: JSON.stringify(item.tag),
           updateTime: item.updateTime,
           cloudBackupTime: cloudBackupTime

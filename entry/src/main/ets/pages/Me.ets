@@ -5,7 +5,7 @@ import { getAccountAccessToken, getAccountInfo, removeAccount } from '../common/
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
-import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
+import getPreferType from '../common/Prefertype'
 import Cloudservice from './Cloudservice'
 import Login from './Login'
 import Passwordcheck from './Passwordcheck'
@@ -658,7 +658,7 @@ export default struct Me {
             .role(ButtonRole.ERROR)
             .width('100%')
             .onClick(async () => {
-              const promptAction = this.getUIContext().getPromptAction()
+              const promptAction = this.UIContext.getPromptAction()
               const data = await promptAction.showDialog({
                 title: '提示',
                 message: '确定退出登录？',
@@ -691,14 +691,16 @@ export default struct Me {
       }
     }
     .padding({
-      left: $r('sys.float.ohos_id_max_padding_start'),
-      right: $r('sys.float.ohos_id_max_padding_end'),
+      left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+      right: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
       top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
+      display.on('change', () => {
+        setTimeout(() => {
+          this.preferType = getPreferType(this.UIContext)
+        }, 200)
       })
       this.context.eventHub.on('refreshMe', async () => {
         await this.get()
