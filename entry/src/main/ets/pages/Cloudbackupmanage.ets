@@ -27,7 +27,8 @@ struct Cloudbackupmanage {
   @Local tagSelected: boolean = false
   @Local types: string[] = []
   @Local accessToken: string = ''
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
 
   async getCount() {
     if (this.accessToken) {
@@ -188,7 +189,7 @@ struct Cloudbackupmanage {
                 .role(ButtonRole.ERROR)
                 .width('100%')
                 .onClick(async () => {
-                  const promptAction = this.getUIContext().getPromptAction()
+                  const promptAction = this.UIContext.getPromptAction()
                   const data = await promptAction.showDialog({
                     title: '提示',
                     message: '清理成功后数据无法恢复。确定清理？',
@@ -233,8 +234,8 @@ struct Cloudbackupmanage {
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+        right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))

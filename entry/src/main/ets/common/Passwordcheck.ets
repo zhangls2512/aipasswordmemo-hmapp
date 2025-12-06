@@ -27,9 +27,9 @@ export async function getPasswordStrengthList(context: Context) {
   const array: ListItem[][] = [[], [], []]
   while (resultSet.goToNextRow()) {
     const infoArray = JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[]
-    const passwordIndex = infoArray.findIndex(item => item.type === '密码')
-    if (passwordIndex !== -1) {
-      const password = infoArray[passwordIndex].value
+    const passwordItem = infoArray.find(item => item.type === '密码')
+    if (passwordItem) {
+      const password = passwordItem.value
       const length = password.length
       const hasDigit = /[0-9]/.test(password)
       const hasLower = /[a-z]/.test(password)
@@ -121,7 +121,7 @@ export async function getOldPasswordList(context: Context) {
   while (resultSet.goToNextRow()) {
     const infoArray = JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[]
     const updateTime = resultSet.getValue(updateTimeIndex) as number
-    if (infoArray.findIndex(item => item.type === '密码') !== -1 && updateTime < Date.now() - 31536000000) {
+    if (infoArray.find(item => item.type === '密码') && updateTime < Date.now() - 31536000000) {
       array.push({
         id: resultSet.getValue(idIndex) as number,
         name: resultSet.getValue(nameIndex) as string

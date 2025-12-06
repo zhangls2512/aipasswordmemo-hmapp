@@ -19,7 +19,8 @@ export function LicenseBuilder() {
 
 @ComponentV2
 struct License {
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   gabaInfoArray: Item[] = [
     { property: '名称', value: '轩铭密码智能备忘录' },
     { property: '主体类型', value: '个人' },
@@ -286,7 +287,7 @@ struct License {
                     .fontColor($r('sys.color.font_emphasize'))
                     .textAlign(TextAlign.Center)
                     .onClick(async () => {
-                      const promptAction = this.getUIContext().getPromptAction()
+                      const promptAction = this.UIContext.getPromptAction()
                       await promptAction.showDialog({
                         title: '描述',
                         message: item.desc,
@@ -442,8 +443,8 @@ struct License {
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+        right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))

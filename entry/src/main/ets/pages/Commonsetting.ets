@@ -38,7 +38,8 @@ struct Commonsetting {
   @Local openLinkTypeIndex: number = 0
   @Local openLinkTypeValue: string = '系统默认'
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
@@ -142,7 +143,7 @@ struct Commonsetting {
                   .onChange(async (isOn) => {
                     this.commonSettingDataPreferences.putSync('allowContinue', isOn)
                     this.commonSettingDataPreferences.flushSync()
-                    const promptAction = this.getUIContext().getPromptAction()
+                    const promptAction = this.UIContext.getPromptAction()
                     const data = await promptAction.showDialog({
                       title: '提示',
                       message: '设置成功，需重启应用生效，是否重启？',
@@ -214,7 +215,7 @@ struct Commonsetting {
                   .onChange(async (isOn) => {
                     this.commonSettingDataPreferences.putSync('allowRestore', isOn)
                     this.commonSettingDataPreferences.flushSync()
-                    const promptAction = this.getUIContext().getPromptAction()
+                    const promptAction = this.UIContext.getPromptAction()
                     const data = await promptAction.showDialog({
                       title: '提示',
                       message: '设置成功，需重启应用生效，是否重启？',
@@ -431,7 +432,7 @@ struct Commonsetting {
                     .onChange(async (isOn) => {
                       this.commonSettingDataPreferences.putSync('windowRectAutoSave', isOn)
                       this.commonSettingDataPreferences.flushSync()
-                      const promptAction = this.getUIContext().getPromptAction()
+                      const promptAction = this.UIContext.getPromptAction()
                       const data = await promptAction.showDialog({
                         title: '提示',
                         message: '设置成功，需重启应用生效，是否重启？',
@@ -620,7 +621,7 @@ struct Commonsetting {
                   return
                 }
                 if (res) {
-                  const promptAction = this.getUIContext().getPromptAction()
+                  const promptAction = this.UIContext.getPromptAction()
                   const data = await promptAction.showActionMenu({
                     title: '设置背景图',
                     buttons: [
@@ -990,8 +991,8 @@ struct Commonsetting {
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+        right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))

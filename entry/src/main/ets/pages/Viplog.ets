@@ -21,7 +21,8 @@ struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   accessToken = ''
   empty: boolean | undefined = undefined
 
@@ -164,7 +165,7 @@ struct Viplog {
                 })
                 .onClick(async () => {
                   try {
-                    await iap.createRefundRequest(this.getUIContext().getHostContext(), item.info)
+                    await iap.createRefundRequest(this.UIContext.getHostContext(), item.info)
                   } catch (err) {
                     if (err.code !== 1001860000) {
                       await promptAction.openToast({
@@ -196,8 +197,8 @@ struct Viplog {
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+        right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
       .onReachEnd(async () => {
         if (this.accessToken && this.empty === false) {

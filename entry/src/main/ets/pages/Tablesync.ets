@@ -111,7 +111,7 @@ struct Tablesync {
                         const res =
                           await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
                         if (!res) {
-                          this.onTables = this.onTables.filter(itema => itema !== item.value)
+                          this.onTables = this.onTables.filter(inItem => inItem !== item.value)
                         }
                         if (res) {
                           let securityLevel = 4
@@ -182,7 +182,7 @@ struct Tablesync {
                     .onChange((isOn) => {
                       let autoSyncTables: string[] = []
                       if (!isOn) {
-                        autoSyncTables = this.autoSyncTables.filter(itema => itema !== item.value)
+                        autoSyncTables = this.autoSyncTables.filter(inItem => inItem !== item.value)
                       }
                       if (isOn) {
                         autoSyncTables = [...this.autoSyncTables, item.value]
@@ -627,7 +627,7 @@ struct Tablesync {
                 }
               })
               .onClick(async () => {
-                const promptAction = this.getUIContext().getPromptAction()
+                const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showActionMenu({
                   title: '选择数据类型',
                   buttons: [
@@ -700,7 +700,7 @@ struct Tablesync {
                 }
               })
               .onClick(async () => {
-                const promptAction = this.getUIContext().getPromptAction()
+                const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showActionMenu({
                   title: '选择数据类型',
                   buttons: [
@@ -755,8 +755,8 @@ struct Tablesync {
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+        right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))

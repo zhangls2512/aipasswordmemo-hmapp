@@ -20,7 +20,8 @@ struct Cloudbackupimport {
   @Local value: string = '保留'
   @Local autoImport: string[] = []
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'cloudbackupSetting'
   })
@@ -113,7 +114,7 @@ struct Cloudbackupimport {
                     .onChange((isOn) => {
                       let autoImport: string[] = []
                       if (!isOn) {
-                        autoImport = this.autoImport.filter(itema => itema !== item.value)
+                        autoImport = this.autoImport.filter(inItem => inItem !== item.value)
                       }
                       if (isOn) {
                         autoImport = [...this.autoImport, item.value]
@@ -184,7 +185,7 @@ struct Cloudbackupimport {
               })
               .onClick(async () => {
                 if (!getKey()) {
-                  const promptAction = this.getUIContext().getPromptAction()
+                  const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: '导入失败',
                     message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
@@ -251,7 +252,7 @@ struct Cloudbackupimport {
               })
               .onClick(async () => {
                 if (!getKey()) {
-                  const promptAction = this.getUIContext().getPromptAction()
+                  const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: '导入失败',
                     message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
@@ -318,7 +319,7 @@ struct Cloudbackupimport {
               })
               .onClick(async () => {
                 if (!getKey()) {
-                  const promptAction = this.getUIContext().getPromptAction()
+                  const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: '导入失败',
                     message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
@@ -358,8 +359,8 @@ struct Cloudbackupimport {
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+        right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
