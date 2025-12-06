@@ -85,9 +85,9 @@ export async function getPasswordInfo(context: Context, id: number) {
     if (typeof (info.cloudBackupTime) === 'string') {
       const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
       const accountInfo = await getAccountInfo()
-      const cloudBackupTimeIndex = cloudBackupTime.findIndex(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeIndex !== -1) {
-        if (cloudBackupTime[cloudBackupTimeIndex].time >= info.updateTime) {
+      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+      if (cloudBackupTimeItem) {
+        if (cloudBackupTimeItem.time >= info.updateTime) {
           info.isCloudBackup = true
         }
       }
@@ -138,9 +138,9 @@ export async function getPasswordList(context: Context) {
       if (typeof (info.cloudBackupTime) === 'string') {
         const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
         const accountInfo = await getAccountInfo()
-        const cloudBackupTimeIndex = cloudBackupTime.findIndex(item => item.uid === accountInfo.uid)
-        if (cloudBackupTimeIndex !== -1) {
-          if (cloudBackupTime[cloudBackupTimeIndex].time >= info.updateTime) {
+        const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+        if (cloudBackupTimeItem) {
+          if (cloudBackupTimeItem.time >= info.updateTime) {
             info.isCloudBackup = true
           }
         }
@@ -219,9 +219,9 @@ export async function getFilterPasswordList(context: Context, nameKeyword: strin
         if (typeof (info.cloudBackupTime) === 'string') {
           const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
           const accountInfo = await getAccountInfo()
-          const cloudBackupTimeIndex = cloudBackupTime.findIndex(item => item.uid === accountInfo.uid)
-          if (cloudBackupTimeIndex !== -1) {
-            if (cloudBackupTime[cloudBackupTimeIndex].time >= info.updateTime) {
+          const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+          if (cloudBackupTimeItem) {
+            if (cloudBackupTimeItem.time >= info.updateTime) {
               info.isCloudBackup = true
             }
           }
@@ -289,9 +289,9 @@ export async function getInfoInfo(context: Context, id: number) {
     if (typeof (info.cloudBackupTime) === 'string') {
       const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
       const accountInfo = await getAccountInfo()
-      const cloudBackupTimeIndex = cloudBackupTime.findIndex(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeIndex !== -1) {
-        if (cloudBackupTime[cloudBackupTimeIndex].time >= info.updateTime) {
+      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+      if (cloudBackupTimeItem) {
+        if (cloudBackupTimeItem.time >= info.updateTime) {
           info.isCloudBackup = true
         }
       }
@@ -334,9 +334,9 @@ export async function getInfoList(context: Context) {
       if (typeof (info.cloudBackupTime) === 'string') {
         const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
         const accountInfo = await getAccountInfo()
-        const cloudBackupTimeIndex = cloudBackupTime.findIndex(item => item.uid === accountInfo.uid)
-        if (cloudBackupTimeIndex !== -1) {
-          if (cloudBackupTime[cloudBackupTimeIndex].time >= info.updateTime) {
+        const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+        if (cloudBackupTimeItem) {
+          if (cloudBackupTimeItem.time >= info.updateTime) {
             info.isCloudBackup = true
           }
         }
@@ -459,9 +459,9 @@ export async function getTagInfo(context: Context, id: number) {
     if (typeof (info.cloudBackupTime) === 'string') {
       const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
       const accountInfo = await getAccountInfo()
-      const cloudBackupTimeIndex = cloudBackupTime.findIndex(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeIndex !== -1) {
-        if (cloudBackupTime[cloudBackupTimeIndex].time >= info.updateTime) {
+      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+      if (cloudBackupTimeItem) {
+        if (cloudBackupTimeItem.time >= info.updateTime) {
           info.isCloudBackup = true
         }
       }
@@ -509,9 +509,9 @@ export async function getTagList(context: Context, orderColumn: string = 'update
       if (typeof (info.cloudBackupTime) === 'string') {
         const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
         const accountInfo = await getAccountInfo()
-        const cloudBackupTimeIndex = cloudBackupTime.findIndex(item => item.uid === accountInfo.uid)
-        if (cloudBackupTimeIndex !== -1) {
-          if (cloudBackupTime[cloudBackupTimeIndex].time >= info.updateTime) {
+        const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+        if (cloudBackupTimeItem) {
+          if (cloudBackupTimeItem.time >= info.updateTime) {
             info.isCloudBackup = true
           }
         }

@@ -9,7 +9,7 @@ import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import getDeviceToken from '../common/Devicetoken'
 import { readUri } from '../common/File'
-import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
+import getPreferType from '../common/Prefertype'
 import request from '../common/Request'
 import Password from './Password'
 import Info from './Info'
@@ -67,7 +67,7 @@ struct Index {
           .fontWeight(FontWeight.Bold)
           .margin({
             bottom: $r('sys.float.ohos_id_elements_margin_vertical_l'),
-            left: $r('sys.float.ohos_id_default_padding_start')
+            left: $r('sys.float.ohos_id_elements_margin_horizontal_l')
           })
       }
       Tabs({
@@ -281,8 +281,10 @@ struct Index {
         })
       })
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
+      display.on('change', () => {
+        setTimeout(() => {
+          this.preferType = getPreferType(this.UIContext)
+        }, 200)
       })
       const currentIndex = this.index
       this.index = -1

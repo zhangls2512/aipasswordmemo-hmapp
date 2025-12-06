@@ -16,7 +16,7 @@ import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { newInfo, newTag, updatePassword } from '../common/Datachange'
 import { getPasswordInfo, getTagList, getTypeInfoList, Password, PasswordInfoItem, Tag } from '../common/Dataget'
-import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
+import getPreferType from '../common/Prefertype'
 import { SelectItem } from './Newpassword'
 import Passwordgenerate from './Passwordgenerate'
 
@@ -564,7 +564,7 @@ export default struct Updatepassword {
       })
 
       ForEach(this.infoArray, (item: string) => {
-        if (!this.passwordInfoArray.some(itema => itema.value === item)) {
+        if (!this.passwordInfoArray.some(infoItem => infoItem.value === item)) {
           ListItem() {
             Column() {
               Row() {
@@ -1166,13 +1166,15 @@ export default struct Updatepassword {
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-      left: $r('sys.float.ohos_id_max_padding_start'),
-      right: $r('sys.float.ohos_id_max_padding_end')
+      left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+      right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
+      display.on('change', () => {
+        setTimeout(() => {
+          this.preferType = getPreferType(this.UIContext)
+        }, 200)
       })
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
         name: 'commonSetting'

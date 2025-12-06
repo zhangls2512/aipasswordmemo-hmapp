@@ -6,7 +6,7 @@ import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { CloudBackupTimeItem, getTagList, Tag } from '../common/Dataget'
-import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
+import getPreferType from '../common/Prefertype'
 import NewTag from './Newtag'
 import UpdateTag from './Updatetag'
 
@@ -84,7 +84,7 @@ export default struct TagPage {
           content: '删除'
         })
           .onClick(async () => {
-            const promptAction = this.getUIContext().getPromptAction()
+            const promptAction = this.UIContext.getPromptAction()
             const data = await promptAction.showDialog({
               title: '提示',
               message: '删除成功后无法恢复，确定删除？',
@@ -220,7 +220,7 @@ export default struct TagPage {
               .buildEffect())
             .width(40)
             .onClick(async () => {
-              const promptAction = this.getUIContext().getPromptAction()
+              const promptAction = this.UIContext.getPromptAction()
               const data = await promptAction.showDialog({
                 title: '提示',
                 message: '删除成功后无法恢复，确定删除？',
@@ -331,7 +331,7 @@ export default struct TagPage {
                 this.loading = true
               },
               onWillDismiss: async (DismissSheetAction) => {
-                const promptAction = this.getUIContext().getPromptAction()
+                const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
                   message: '数据尚未保存，确定退出？',
@@ -496,14 +496,16 @@ export default struct TagPage {
       .height('100%')
     }
     .padding({
-      left: $r('sys.float.ohos_id_max_padding_start'),
-      right: $r('sys.float.ohos_id_max_padding_end'),
+      left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+      right: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
       top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
+      display.on('change', () => {
+        setTimeout(() => {
+          this.preferType = getPreferType(this.UIContext)
+        }, 200)
       })
       this.context.eventHub.on('refreshTag', async () => {
         this.enableCloudBackup = false
@@ -533,7 +535,7 @@ export default struct TagPage {
         this.loading = true
       },
       onWillDismiss: async (DismissSheetAction) => {
-        const promptAction = this.getUIContext().getPromptAction()
+        const promptAction = this.UIContext.getPromptAction()
         const data = await promptAction.showDialog({
           title: '提示',
           message: '数据尚未保存，确定退出？',

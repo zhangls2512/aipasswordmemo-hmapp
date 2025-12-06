@@ -7,7 +7,7 @@ import {
   ListItem,
   RepeatItem
 } from '../common/Passwordcheck'
-import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
+import getPreferType from '../common/Prefertype'
 import UpdatePassword from './Updatepassword'
 
 @ComponentV2
@@ -403,7 +403,7 @@ export default struct Passwordcheck {
             .fontColor($r('sys.color.font_emphasize'))
             .fontSize($r('sys.float.ohos_id_text_size_body3'))
             .onClick(async () => {
-              const promptAction = this.getUIContext().getPromptAction()
+              const promptAction = this.UIContext.getPromptAction()
               await promptAction.showDialog({
                 title: '数据不准确说明',
                 message: '因为目前存储密码的底层数据结构不支持记录“密码”类型信息的修改时间，只支持记录“密码”类型信息所在数据行整体的修改时间，所以此列表列出的为“密码”类型信息所在数据行整体修改时间早于近一年的密码，未列出“密码”类型信息所在数据行整体修改时间在近一年但“密码”类型信息未修改的密码，请知悉。此问题计划在未来修改存储密码的底层数据结构时解决。',
@@ -424,13 +424,15 @@ export default struct Passwordcheck {
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-      left: $r('sys.float.ohos_id_max_padding_start'),
-      right: $r('sys.float.ohos_id_max_padding_end')
+      left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+      right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
+      display.on('change', () => {
+        setTimeout(() => {
+          this.preferType = getPreferType(this.UIContext)
+        }, 200)
       })
       const passwordStrengthArray = await getPasswordStrengthList(this.context)
       this.lowStrengthPasswordArray = passwordStrengthArray[0]
@@ -448,7 +450,7 @@ export default struct Passwordcheck {
         title: '修改密码'
       },
       onWillDismiss: async (DismissSheetAction) => {
-        const promptAction = this.getUIContext().getPromptAction()
+        const promptAction = this.UIContext.getPromptAction()
         const data = await promptAction.showDialog({
           title: '提示',
           message: '数据尚未保存，确定退出？',

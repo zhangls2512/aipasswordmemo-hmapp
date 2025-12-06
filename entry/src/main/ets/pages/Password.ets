@@ -14,7 +14,7 @@ import {
   PasswordTagItem
 } from '../common/Dataget'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
-import { getPreferType, getPreferTypeByDisplayId } from '../common/Prefertype'
+import getPreferType from '../common/Prefertype'
 import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
 import PasswordInfo from './Passwordinfo'
@@ -81,7 +81,7 @@ export default struct PasswordPage {
       content: JSON.stringify({
         id: item.id,
         name: item.name,
-        info: item.info.filter(itema => itema.type !== '图标'),
+        info: item.info.filter(infoItem => infoItem.type !== '图标'),
         tag: item.tag.map(item => item.value),
         updateTime: item.updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
@@ -124,7 +124,7 @@ export default struct PasswordPage {
           content: '删除'
         })
           .onClick(async () => {
-            const promptAction = this.getUIContext().getPromptAction()
+            const promptAction = this.UIContext.getPromptAction()
             const data = await promptAction.showDialog({
               title: '提示',
               message: '删除成功后无法恢复，确定删除？',
@@ -272,7 +272,7 @@ export default struct PasswordPage {
               .buildEffect())
             .width(40)
             .onClick(async () => {
-              const promptAction = this.getUIContext().getPromptAction()
+              const promptAction = this.UIContext.getPromptAction()
               const data = await promptAction.showDialog({
                 title: '提示',
                 message: '删除成功后无法恢复，确定删除？',
@@ -395,7 +395,7 @@ export default struct PasswordPage {
                 this.loading = true
               },
               onWillDismiss: async (DismissSheetAction) => {
-                const promptAction = this.getUIContext().getPromptAction()
+                const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
                   message: '数据尚未保存，确定退出？',
@@ -505,7 +505,7 @@ export default struct PasswordPage {
                 }
               },
               onWillDismiss: async (DismissSheetAction) => {
-                const promptAction = this.getUIContext().getPromptAction()
+                const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
                   message: '数据尚未保存，确定退出？',
@@ -627,8 +627,8 @@ export default struct PasswordPage {
                         })
                         .width('5%')
                     }
-                    if (item.info.some(itema => itema.type === '图标')) {
-                      Image(item.info[item.info.findIndex(itema => itema.type === '图标')].value)
+                    if (item.info.find(infoItem => infoItem.type === '图标')) {
+                      Image(item.info.find(infoItem => infoItem.type === '图标')?.value)
                         .copyOption(CopyOptions.LocalDevice)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -644,14 +644,14 @@ export default struct PasswordPage {
                       Text(item.name)
                         .enableAutoSpacing(true)
                         .fontWeight(FontWeight.Bold)
-                      if (this.showPassword && item.info.findIndex(infoItem => infoItem.type === '密码') !== -1) {
+                      if (this.showPassword && item.info.find(infoItem => infoItem.type === '密码')) {
                         Row() {
                           Text('密码')
                             .fontWeight(FontWeight.Medium)
                             .margin({
                               right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                             })
-                          Text(item.info[item.info.findIndex(infoItem => infoItem.type === '密码')].value)
+                          Text(item.info.find(infoItem => infoItem.type === '密码')?.value)
                             .copyOption(CopyOptions.LocalDevice)
                         }
                         .margin({
@@ -756,14 +756,16 @@ export default struct PasswordPage {
       .height('100%')
     }
     .padding({
-      left: $r('sys.float.ohos_id_max_padding_start'),
-      right: $r('sys.float.ohos_id_max_padding_end'),
+      left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+      right: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
       top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', (displayId) => {
-        this.preferType = getPreferTypeByDisplayId(displayId, this.UIContext)
+      display.on('change', () => {
+        setTimeout(() => {
+          this.preferType = getPreferType(this.UIContext)
+        }, 200)
       })
       this.showPassword = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
       this.hideTag = this.commonSettingDataPreferences.getSync('hideTagInIndex', false) as boolean
@@ -842,7 +844,7 @@ export default struct PasswordPage {
         this.loading = true
       },
       onWillDismiss: async (DismissSheetAction) => {
-        const promptAction = this.getUIContext().getPromptAction()
+        const promptAction = this.UIContext.getPromptAction()
         const data = await promptAction.showDialog({
           title: '提示',
           message: '数据尚未保存，确定退出？',

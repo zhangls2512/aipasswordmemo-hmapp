@@ -33,7 +33,8 @@ export default struct Cleardata {
   @Local oldaccountNouse: boolean = false
   @Local passwordIconNouse: boolean = false
   @Local passwordIconNouseSize: string = ''
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
 
   getSizeString(size: number) {
     if (size < Math.pow(1024, 1)) {
@@ -228,7 +229,7 @@ export default struct Cleardata {
           .role(ButtonRole.ERROR)
           .width('100%')
           .onClick(async () => {
-            const promptAction = this.getUIContext().getPromptAction()
+            const promptAction = this.UIContext.getPromptAction()
             const data = await promptAction.showDialog({
               title: '提示',
               message: '清理成功后将恢复所选设置为默认，无法恢复。确定清理？',
@@ -399,7 +400,7 @@ export default struct Cleardata {
           .role(ButtonRole.ERROR)
           .width('100%')
           .onClick(async () => {
-            const promptAction = this.getUIContext().getPromptAction()
+            const promptAction = this.UIContext.getPromptAction()
             const data = await promptAction.showDialog({
               title: '提示',
               message: '清理成功后性能可能略微降低，但不会影响正常使用。确定清理？',
@@ -526,7 +527,7 @@ export default struct Cleardata {
           .role(ButtonRole.ERROR)
           .width('100%')
           .onClick(async () => {
-            const promptAction = this.getUIContext().getPromptAction()
+            const promptAction = this.UIContext.getPromptAction()
             const data = await promptAction.showDialog({
               title: '提示',
               message: '日志有助于开发者定位问题。清理成功后无法恢复，确定清理？',
@@ -722,10 +723,9 @@ export default struct Cleardata {
                   const passwordArray = await getPasswordList(this.context)
                   const passwordIconPathArray: string[] = []
                   passwordArray.forEach((item) => {
-                    const index = item.info.findIndex(infoItem => infoItem.type === '图标')
-                    if (index !== -1) {
-                      passwordIconPathArray.push(item.info[index].value.replace('file://com.zhangxm.aipasswordmemo',
-                        ''))
+                    const infoItem = item.info.find(infoItem => infoItem.type === '图标')
+                    if (infoItem) {
+                      passwordIconPathArray.push(infoItem.value.replace('file://com.zhangxm.aipasswordmemo', ''))
                     }
                   })
                   const infoArray = await getTypeInfoList(this.context, '图标')
@@ -757,8 +757,8 @@ export default struct Cleardata {
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-      left: $r('sys.float.ohos_id_max_padding_start'),
-      right: $r('sys.float.ohos_id_max_padding_end')
+      left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+      right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
     })
     .onAppear(async () => {
       await this.getSize()

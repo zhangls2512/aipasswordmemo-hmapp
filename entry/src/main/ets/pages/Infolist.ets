@@ -14,7 +14,8 @@ export function InfolistBuilder() {
 struct Infolist {
   @Local accessToken: string = ''
   @Local hoverId: number = -1
-  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  UIContext = this.getUIContext()
+  context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
 
   build() {
@@ -612,7 +613,7 @@ struct Infolist {
                 const deviceToken = await getDeviceToken()
                 dialogControllerProgress.close()
                 if (deviceToken) {
-                  const promptAction = this.getUIContext().getPromptAction()
+                  const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: 'DeviceToken',
                     message: deviceToken,
@@ -881,7 +882,7 @@ struct Infolist {
               .onClick(async () => {
                 try {
                   const pushToken = await pushService.getToken()
-                  const promptAction = this.getUIContext().getPromptAction()
+                  const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: 'PushToken',
                     message: pushToken,
@@ -1168,8 +1169,8 @@ struct Infolist {
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+        right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))

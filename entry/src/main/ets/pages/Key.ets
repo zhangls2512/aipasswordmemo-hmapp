@@ -117,7 +117,7 @@ struct Keypage {
             })
             .onClick(async () => {
               if (!this.keyValue) {
-                const promptAction = this.getUIContext().getPromptAction()
+                const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showActionMenu({
                   title: '选择导入方式',
                   buttons: [
@@ -143,7 +143,7 @@ struct Keypage {
                 return
               }
               if (this.keyValue) {
-                const promptAction = this.getUIContext().getPromptAction()
+                const promptAction = this.UIContext.getPromptAction()
                 const confirm = await promptAction.showDialog({
                   title: '提示',
                   message: '导入成功后新密钥将覆盖当前密钥，当前密钥无法恢复，需重新导入当前密钥才可解密使用当前密钥加密的云备份数据，确定导入？',
@@ -159,7 +159,7 @@ struct Keypage {
                   ]
                 })
                 if (confirm.index === 1) {
-                  const promptAction = this.getUIContext().getPromptAction()
+                  const promptAction = this.UIContext.getPromptAction()
                   const data = await promptAction.showActionMenu({
                     title: '选择导入方式',
                     buttons: [
@@ -226,7 +226,7 @@ struct Keypage {
                 }
               })
               .onClick(async () => {
-                const promptAction = this.getUIContext().getPromptAction()
+                const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
                   message: '删除成功后无法恢复，需重新导入此密钥才可解密使用此密钥加密的云备份数据，确定删除？',
@@ -258,8 +258,8 @@ struct Keypage {
       }
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_end')
+        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
+        right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
