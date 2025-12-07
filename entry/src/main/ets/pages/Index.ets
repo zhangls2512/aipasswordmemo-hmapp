@@ -75,19 +75,16 @@ struct Index {
       }) {
         TabContent() {
           Password()
-            .height('100%')
         }
         .tabBar(this.tabBuilder(0, $r('app.media.password'), '密码'))
 
         TabContent() {
           Info()
-            .height('100%')
         }
         .tabBar(this.tabBuilder(1, $r('app.media.info'), '常用信息'))
 
         TabContent() {
           Tag()
-            .height('100%')
         }
         .tabBar(this.tabBuilder(2, $r('app.media.tag'), '标签'))
 

@@ -493,7 +493,6 @@ export default struct TagPage {
         })
       }
       .alignItems(HorizontalAlign.Start)
-      .height('100%')
     }
     .padding({
       left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
