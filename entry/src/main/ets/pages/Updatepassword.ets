@@ -578,6 +578,7 @@ export default struct Updatepassword {
                 }
                 if (this.getCurrentInfoType() === '图标') {
                   Image(item)
+                    .autoResize(true)
                     .copyOption(CopyOptions.LocalDevice)
                     .layoutWeight(1)
                     .margin({
@@ -793,6 +794,7 @@ export default struct Updatepassword {
               Column() {
                 if (item.type === '图标') {
                   Image(item.value)
+                    .autoResize(true)
                     .copyOption(CopyOptions.LocalDevice)
                     .width('10%')
                     .onError(async (err) => {

@@ -121,6 +121,7 @@ export default struct Passwordinfo {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                 Image(item.value)
+                  .autoResize(true)
                   .copyOption(CopyOptions.LocalDevice)
                   .width('10%')
                   .onError(async (err) => {

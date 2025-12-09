@@ -275,6 +275,7 @@ export default struct Filterpassword {
                 }
                 if (this.getCurrentInfoType() === '图标') {
                   Image(item)
+                    .autoResize(true)
                     .copyOption(CopyOptions.LocalDevice)
                     .layoutWeight(1)
                     .margin({

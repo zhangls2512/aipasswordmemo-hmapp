@@ -534,6 +534,7 @@ export default struct InfoPage {
                         }
                         if (item.type === '图标') {
                           Image(item.value)
+                            .autoResize(true)
                             .copyOption(CopyOptions.LocalDevice)
                             .width('10%')
                             .onError(async (err) => {

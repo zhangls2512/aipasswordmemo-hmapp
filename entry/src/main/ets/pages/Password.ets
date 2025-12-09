@@ -629,6 +629,7 @@ export default struct PasswordPage {
                     }
                     if (item.info.find(infoItem => infoItem.type === '图标')) {
                       Image(item.info.find(infoItem => infoItem.type === '图标')?.value)
+                        .autoResize(true)
                         .copyOption(CopyOptions.LocalDevice)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
