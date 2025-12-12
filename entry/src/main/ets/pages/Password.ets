@@ -51,11 +51,11 @@ export default struct PasswordPage {
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
   passwordId = 0
-  filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'filterPassword'
-  })
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
+  })
+  filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'filterPassword'
   })
 
   async cloudBackup(item: Password) {
@@ -712,7 +712,9 @@ export default struct PasswordPage {
                   .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
                     hapticFeedbackMode: HapticFeedbackMode.AUTO
                   })
-                  .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick)
+                  .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick, {
+                    hapticFeedbackMode: HapticFeedbackMode.AUTO
+                  })
                 }
                 .backgroundColor($r('sys.color.comp_background_primary'))
                 .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))

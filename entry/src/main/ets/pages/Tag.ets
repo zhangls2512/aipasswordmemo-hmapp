@@ -473,7 +473,9 @@ export default struct TagPage {
                     .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
                       hapticFeedbackMode: HapticFeedbackMode.AUTO
                     })
-                    .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick)
+                    .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick, {
+                      hapticFeedbackMode: HapticFeedbackMode.AUTO
+                    })
                   }
                   .backgroundColor($r('sys.color.comp_background_primary'))
                   .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
