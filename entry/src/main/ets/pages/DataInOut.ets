@@ -359,9 +359,8 @@ struct DataInOut {
                   const result: PasswordOutItem[] = []
                   const maxId = await getPasswordMaxId(this.context)
                   let idCounter = maxId + 1
-                  for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i]
-                    const parsedFields = parseCsvLine(line)
+                  lines.forEach(item => {
+                    const parsedFields = parseCsvLine(item)
                     const name = parsedFields[0]
                     const url = parsedFields[1]
                     const username = parsedFields[2]
@@ -384,7 +383,7 @@ struct DataInOut {
                       updateTime: Date.now(),
                       cloudBackupTime: JSON.stringify([])
                     })
-                  }
+                  })
                   await importPassword(this.context, JSON.stringify(result), conflictResolution)
                   await promptAction.openToast({
                     message: '导入成功'
@@ -537,7 +536,7 @@ struct DataInOut {
                       })
                       allInfoTypesArray.sort(collator.compare)
                       const headers = ['名称'].concat(allInfoTypesArray)
-                      const rows = arrayOut.map((item) => {
+                      const rows = arrayOut.map(item => {
                         const values = [item.name]
                         for (const infotype of allInfoTypesArray) {
                           let value = ''

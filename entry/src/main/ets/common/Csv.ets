@@ -39,36 +39,39 @@ export async function importCsvPassword(context: Context, content: string) {
   const maxId = await getPasswordMaxId(context)
   let idCounter = maxId + 1
   const firstLine = parseCsvLine(lines[0])
-  const columnCount = firstLine.length
   const nameIndex = firstLine.findIndex(item => item === '名称')
   if (nameIndex !== -1) {
     const infoColumnsIndex: number[] = []
-    for (let i = 0; i < columnCount; i++) {
-      if (i !== nameIndex) {
-        infoColumnsIndex.push(i)
+    firstLine.forEach((item, index) => {
+      if (index !== nameIndex) {
+        infoColumnsIndex.push(index)
       }
-    }
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i]
-      const parsedLine = parseCsvLine(line)
-      const name = parsedLine[nameIndex]
-      const info: PasswordInfoItem[] = []
-      infoColumnsIndex.forEach(item => {
-        if (firstLine[item] && parsedLine[item] && firstLine[item] !== '图标' && firstLine[item] !== 'MFA') {
-          info.push({ type: firstLine[item], value: parsedLine[item] })
-        }
-      })
-      if (name && info.length > 0) {
-        result.push({
-          id: idCounter++,
-          name: name,
-          info,
-          tag: [],
-          updateTime: Date.now(),
-          cloudBackupTime: JSON.stringify([])
+    })
+    lines.forEach((item, index) => {
+      if (index !== 0) {
+        const parsedLine = parseCsvLine(item)
+        const name = parsedLine[nameIndex]
+        const info: PasswordInfoItem[] = []
+        infoColumnsIndex.forEach(item => {
+          if (firstLine[item] && parsedLine[item] && firstLine[item] !== '图标' && firstLine[item] !== 'MFA') {
+            info.push({
+              type: firstLine[item],
+              value: parsedLine[item]
+            })
+          }
         })
+        if (name && info.length > 0) {
+          result.push({
+            id: idCounter++,
+            name: name,
+            info: info,
+            tag: [],
+            updateTime: Date.now(),
+            cloudBackupTime: JSON.stringify([])
+          })
+        }
       }
-    }
+    })
     await importPassword(context, JSON.stringify(result), 0)
     await promptAction.openToast({
       message: '导入成功'

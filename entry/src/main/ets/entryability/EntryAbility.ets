@@ -215,9 +215,10 @@ export default class EntryAbility extends UIAbility {
       ],
       onReceive: async (domain, appEventGroups) => {
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
-          appEventGroups.forEach(async (item) => {
+          const promises = appEventGroups.map(async (item) => {
             await write(errorLogDir + Date.now() + '.txt', JSON.stringify(item))
           })
+          await Promise.all(promises)
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
@@ -349,13 +350,13 @@ export default class EntryAbility extends UIAbility {
       if (fileIo.accessSync(errorLogDir)) {
         const errorLogFileName = await fileIo.listFile(errorLogDir)
         const errorLogFilePath = errorLogFileName.map(item => errorLogDir + item)
-        for (let i = 0; i < errorLogFilePath.length; i++) {
-          const item = errorLogFilePath[i]
+        const promises = errorLogFilePath.map(async (item) => {
           const time = Number(item.replace(errorLogDir, '').replace('.txt', ''))
           if (time < updateTime) {
             await fileIo.unlink(item)
           }
-        }
+        })
+        await Promise.all(promises)
       }
     }
     let netConnected = false
@@ -440,8 +441,8 @@ export default class EntryAbility extends UIAbility {
     await tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag(id INTEGER PRIMARY KEY AUTOINCREMENT,value,color,updateTime,cloudBackupTime,UNIQUE(value,color))')
     await tagRdbStore.executeSql('CREATE INDEX IF NOT EXISTS value ON tag(value)')
     passwordRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
-      for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await passwordRdbStore.obtainDistributedTableName(deviceIds[i], 'password')
+      const promises = deviceIds.map(async (item) => {
+        const tableName = await passwordRdbStore.obtainDistributedTableName(item, 'password')
         const predicates = new relationalStore.RdbPredicates(tableName)
         const resultSet = await passwordRdbStore.query(predicates)
         const idIndex = resultSet.getColumnIndex('id')
@@ -474,13 +475,14 @@ export default class EntryAbility extends UIAbility {
           }
         }
         resultSet.close()
-      }
+      })
+      await Promise.all(promises)
       this.context.eventHub.emit('refreshPassword')
       await autoBackupTable(this.context, 'password')
     })
     infoRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
-      for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await infoRdbStore.obtainDistributedTableName(deviceIds[i], 'info')
+      const promises = deviceIds.map(async (item) => {
+        const tableName = await infoRdbStore.obtainDistributedTableName(item, 'info')
         const predicates = new relationalStore.RdbPredicates(tableName)
         const resultSet = await infoRdbStore.query(predicates)
         const idIndex = resultSet.getColumnIndex('id')
@@ -511,13 +513,14 @@ export default class EntryAbility extends UIAbility {
           }
         }
         resultSet.close()
-      }
+      })
+      await Promise.all(promises)
       this.context.eventHub.emit('refreshInfo')
       await autoBackupTable(this.context, 'info')
     })
     tagRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
-      for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await tagRdbStore.obtainDistributedTableName(deviceIds[i], 'tag')
+      const promises = deviceIds.map(async (item) => {
+        const tableName = await tagRdbStore.obtainDistributedTableName(item, 'tag')
         const predicates = new relationalStore.RdbPredicates(tableName)
         const resultSet = await tagRdbStore.query(predicates)
         const idIndex = resultSet.getColumnIndex('id')
@@ -548,7 +551,8 @@ export default class EntryAbility extends UIAbility {
           }
         }
         resultSet.close()
-      }
+      })
+      await Promise.all(promises)
       this.context.eventHub.emit('refreshTag')
       await autoBackupTable(this.context, 'tag')
     })

@@ -1144,7 +1144,7 @@ export default struct Newpassword {
               tagCloudBackup = true
             }
             if (this.autoNewInfo) {
-              this.passwordInfoArray.forEach(async (item) => {
+              const promises = this.passwordInfoArray.map(async (item) => {
                 if (item.type !== 'MFA') {
                   await newInfo(this.context, {
                     type: item.type,
@@ -1153,15 +1153,17 @@ export default struct Newpassword {
                   })
                 }
               })
+              await Promise.all(promises)
             }
             if (this.autoNewTag) {
-              this.passwordTagArray.forEach(async (item) => {
+              const promises = this.passwordTagArray.map(async (item) => {
                 await newTag(this.context, {
                   value: item,
                   color: '',
                   cloudBackup: tagCloudBackup
                 })
               })
+              await Promise.all(promises)
             }
             this.isShowNewSheet = false
           })

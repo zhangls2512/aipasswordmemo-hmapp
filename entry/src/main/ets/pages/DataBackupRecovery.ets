@@ -40,7 +40,8 @@ struct DataBackupRecovery {
 
   getSetting() {
     this.isBackupTables = this.dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
-    this.autoBackupTables = this.dataSettingDataPreferences.getSync('autoBackupTables', []) as string[]
+    this.autoBackupTables =
+      this.dataSettingDataPreferences.getSync('autoBackupTables', ['password', 'info', 'tag']) as string[]
     this.pauseAutoBackupWhenLowBatteryCapacityLevel =
       this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false) as boolean
     this.pauseAutoBackupWhenPowerSave =

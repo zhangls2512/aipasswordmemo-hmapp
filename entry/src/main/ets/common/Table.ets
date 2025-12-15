@@ -133,7 +133,8 @@ export async function autoBackupTable(context: Context, table: string) {
     })
     return
   }
-  const autoBackupTables: string[] = dataSettingDataPreferences.getSync('autoBackupTables', []) as string[]
+  const autoBackupTables: string[] =
+    dataSettingDataPreferences.getSync('autoBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoBackupTables.includes(table)) {
     await backupTable(context, table)
   }

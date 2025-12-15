@@ -50,7 +50,7 @@ export default struct Ainewinfo {
           EntityType.ID_NO
         ]
       })
-      entity.forEach((item) => {
+      entity.forEach(item => {
         if (item.type === EntityType.EMAIL) {
           this.list.push({
             type: '邮箱',

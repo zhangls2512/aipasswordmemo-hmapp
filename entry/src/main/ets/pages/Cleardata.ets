@@ -245,7 +245,7 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              this.setting.forEach(async (item) => {
+              const promises = this.setting.map(async (item) => {
                 if (item === 'dataSetting') {
                   const keys = [
                     'autoSyncTables',
@@ -259,7 +259,7 @@ export default struct Cleardata {
                   const dataPreferences = preferences.getPreferencesSync(this.context, {
                     name: 'dataSetting'
                   })
-                  keys.forEach((item) => {
+                  keys.forEach(item => {
                     dataPreferences.deleteSync(item)
                     dataPreferences.flushSync()
                   })
@@ -267,6 +267,7 @@ export default struct Cleardata {
                 }
                 await preferences.deletePreferences(this.context, item)
               })
+              await Promise.all(promises)
               await promptAction.openToast({
                 message: '清理成功'
               })
@@ -416,7 +417,7 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              this.cache.forEach(async (item) => {
+              const promises = this.cache.map(async (item) => {
                 if (item === 'appCache') {
                   await bundleManager.cleanBundleCacheFilesForSelf()
                 }
@@ -427,9 +428,10 @@ export default struct Cleardata {
                   try {
                     const invitationcodeQrcodeDir = this.context.filesDir + '/media/invitationqrcode/'
                     const fileNames = await fileIo.listFile(invitationcodeQrcodeDir)
-                    for (let i = 0; i < fileNames.length; i++) {
-                      await fileIo.unlink(invitationcodeQrcodeDir + fileNames[i])
-                    }
+                    const promises = fileNames.map(async (item) => {
+                      await fileIo.unlink(invitationcodeQrcodeDir + item)
+                    })
+                    await Promise.all(promises)
                   } catch (err) {
                     if (err.code !== 13900002) {
                       await promptAction.openToast({
@@ -439,6 +441,7 @@ export default struct Cleardata {
                   }
                 }
               })
+              await Promise.all(promises)
               await promptAction.openToast({
                 message: '清理成功'
               })
@@ -543,14 +546,15 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              this.log.forEach(async (item) => {
+              const promises = this.log.map(async (item) => {
                 if (item === 'errorLog') {
                   try {
                     const errorLogDir = this.context.filesDir + '/log/error/'
                     const fileNames = await fileIo.listFile(errorLogDir)
-                    for (let i = 0; i < fileNames.length; i++) {
-                      await fileIo.unlink(errorLogDir + fileNames[i])
-                    }
+                    const promises = fileNames.map(async (item) => {
+                      await fileIo.unlink(errorLogDir + item)
+                    })
+                    await Promise.all(promises)
                   } catch (err) {
                     if (err.code !== 13900002) {
                       await promptAction.openToast({
@@ -560,6 +564,7 @@ export default struct Cleardata {
                   }
                 }
               })
+              await Promise.all(promises)
               await promptAction.openToast({
                 message: '清理成功'
               })
@@ -695,7 +700,7 @@ export default struct Cleardata {
           .role(ButtonRole.ERROR)
           .width('100%')
           .onClick(async () => {
-            this.nouse.forEach(async (item) => {
+            const promises = this.nouse.map(async (item) => {
               if (item === 'oldaccountNouse') {
                 try {
                   const query: asset.AssetMap = new Map()
@@ -722,7 +727,7 @@ export default struct Cleardata {
                   const passwordIconFilePathArray = passwordIconFileNameArray.map(item => passwordIconDir + item)
                   const passwordArray = await getPasswordList(this.context)
                   const passwordIconPathArray: string[] = []
-                  passwordArray.forEach((item) => {
+                  passwordArray.forEach(item => {
                     const infoItem = item.info.find(infoItem => infoItem.type === '图标')
                     if (infoItem) {
                       passwordIconPathArray.push(infoItem.value.replace('file://com.zhangxm.aipasswordmemo', ''))
@@ -733,9 +738,10 @@ export default struct Cleardata {
                   const iconPathSet = new Set(passwordIconPathArray.concat(infoIconPathArray))
                   const nousePasswordIconFilePathArray =
                     passwordIconFilePathArray.filter(item => !iconPathSet.has(item))
-                  nousePasswordIconFilePathArray.forEach(async (item) => {
+                  const promises = nousePasswordIconFilePathArray.map(async (item) => {
                     await fileIo.unlink(item)
                   })
+                  await Promise.all(promises)
                 } catch (err) {
                   if (err.code !== 13900002) {
                     await promptAction.openToast({
@@ -745,6 +751,7 @@ export default struct Cleardata {
                 }
               }
             })
+            await Promise.all(promises)
             await promptAction.openToast({
               message: '清理成功'
             })

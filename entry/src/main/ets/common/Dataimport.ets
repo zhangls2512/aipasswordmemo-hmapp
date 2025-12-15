@@ -37,7 +37,7 @@ export async function importPassword(context: Context, data: string, conflict: r
       encrypt: true,
       allowRebuild: true
     })
-    array.forEach(async (item: PasswordInItem) => {
+    const promises = array.map(async (item: PasswordInItem) => {
       let cloudBackupTime = JSON.stringify([])
       if (typeof (item.cloudBackupTime) === 'string') {
         cloudBackupTime = item.cloudBackupTime
@@ -64,6 +64,7 @@ export async function importPassword(context: Context, data: string, conflict: r
         }
       }
     })
+    await Promise.all(promises)
     await autoSyncTable(context, 'password')
     await autoBackupTable(context, 'password')
   } catch (err) {
@@ -82,7 +83,7 @@ export async function importInfo(context: Context, data: string, conflict: relat
       encrypt: true,
       allowRebuild: true
     })
-    array.forEach(async (item: InfoInItem) => {
+    const promises = array.map(async (item: InfoInItem) => {
       if (item.type !== '图标') {
         let cloudBackupTime = JSON.stringify([])
         if (typeof (item.cloudBackupTime) === 'string') {
@@ -110,6 +111,7 @@ export async function importInfo(context: Context, data: string, conflict: relat
         }
       }
     })
+    await Promise.all(promises)
     await autoSyncTable(context, 'info')
     await autoBackupTable(context, 'info')
   } catch (err) {
@@ -128,7 +130,7 @@ export async function importTag(context: Context, data: string, conflict: relati
       encrypt: true,
       allowRebuild: true
     })
-    array.forEach(async (item: TagInItem) => {
+    const promises = array.map(async (item: TagInItem) => {
       let cloudBackupTime = JSON.stringify([])
       if (typeof (item.cloudBackupTime) === 'string') {
         cloudBackupTime = item.cloudBackupTime
@@ -154,6 +156,7 @@ export async function importTag(context: Context, data: string, conflict: relati
         }
       }
     })
+    await Promise.all(promises)
     await autoSyncTable(context, 'tag')
     await autoBackupTable(context, 'tag')
   } catch (err) {
