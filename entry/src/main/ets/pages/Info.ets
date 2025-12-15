@@ -97,11 +97,11 @@ export default struct InfoPage {
             }
             if (item.type === '图标') {
               const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
-              try {
-                const uris = await phAccessHelper.showAssetsCreationDialog([item.value], [{
-                  fileNameExtension: 'png',
-                  photoType: photoAccessHelper.PhotoType.IMAGE
-                }])
+              const uris = await phAccessHelper.showAssetsCreationDialog([item.value], [{
+                fileNameExtension: 'png',
+                photoType: photoAccessHelper.PhotoType.IMAGE
+              }])
+              if (uris.length === 1) {
                 const srcFile = fileIo.openSync(item.value)
                 const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
                 await fileIo.copyFile(srcFile.fd, destFile.fd)
@@ -110,12 +110,6 @@ export default struct InfoPage {
                 await promptAction.openToast({
                   message: '保存成功'
                 })
-              } catch (err) {
-                if (err.code !== 13900020) {
-                  await promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
-                }
               }
             }
           })

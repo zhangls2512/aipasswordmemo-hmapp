@@ -146,11 +146,11 @@ struct Invite {
                     }
                     const qrcodeUri = fileUri.getUriFromPath(qrcodePath)
                     const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
-                    try {
-                      const uris = await phAccessHelper.showAssetsCreationDialog([qrcodeUri], [{
-                        fileNameExtension: 'png',
-                        photoType: photoAccessHelper.PhotoType.IMAGE
-                      }])
+                    const uris = await phAccessHelper.showAssetsCreationDialog([qrcodeUri], [{
+                      fileNameExtension: 'png',
+                      photoType: photoAccessHelper.PhotoType.IMAGE
+                    }])
+                    if (uris.length === 1) {
                       const srcFile = fileIo.openSync(qrcodeUri)
                       const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
                       await fileIo.copyFile(srcFile.fd, destFile.fd)
@@ -159,12 +159,6 @@ struct Invite {
                       await promptAction.openToast({
                         message: '保存成功'
                       })
-                    } catch (err) {
-                      if (err.code !== 13900020) {
-                        await promptAction.openToast({
-                          message: '发生错误，错误码：' + err.code
-                        })
-                      }
                     }
                   })
               }
