@@ -165,12 +165,7 @@ export default struct Passwordinfo {
                   await promptAction.openToast({
                     message: '保存成功'
                   })
-                } catch (err) {
-                  if (err.code !== 13900020) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code
-                    })
-                  }
+                } catch {
                 }
               })
             }

@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
+import { preferences, relationalStore } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { display, window } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
@@ -11,11 +11,11 @@ import getDeviceToken from '../common/Devicetoken'
 import { readUri } from '../common/File'
 import getPreferType from '../common/Prefertype'
 import request from '../common/Request'
-import Password from './Password'
-import Info from './Info'
-import Tag from './Tag'
-import Me from './Me'
 import Cleardata from './Cleardata'
+import Info from './Info'
+import Me from './Me'
+import Password from './Password'
+import Tag from './Tag'
 
 @Entry
 @ComponentV2
@@ -167,15 +167,15 @@ struct Index {
               ]
             })
             if (data.index === 0) {
-              await importPassword(this.context, filestring, 0)
+              await importPassword(this.context, filestring, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
               this.context.eventHub.emit('refreshPassword')
             }
             if (data.index === 1) {
-              await importInfo(this.context, filestring, 0)
+              await importInfo(this.context, filestring, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
               this.context.eventHub.emit('refreshInfo')
             }
             if (data.index === 2) {
-              await importTag(this.context, filestring, 0)
+              await importTag(this.context, filestring, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
               this.context.eventHub.emit('refreshTag')
             }
             await promptAction.openToast({

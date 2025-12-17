@@ -97,7 +97,7 @@ struct About {
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                     })
                 }
-                if (this.hasUpdate === 0) {
+                if (this.hasUpdate === updateManager.UpdateAvailableCode.LATER_VERSION_NOT_EXIST) {
                   Text('已是最新版本')
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -105,7 +105,7 @@ struct About {
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
                     })
                 }
-                if (this.hasUpdate === 1) {
+                if (this.hasUpdate === updateManager.UpdateAvailableCode.LATER_VERSION_EXIST) {
                   Text('有新版本')
                     .fontColor($r('sys.color.font_emphasize'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -151,11 +151,11 @@ struct About {
                   const res = await updateManager.checkAppUpdate(this.context)
                   this.updateLoading = false
                   this.hasUpdate = res.updateAvailable
-                  if (res.updateAvailable === 1) {
+                  if (res.updateAvailable === updateManager.UpdateAvailableCode.LATER_VERSION_EXIST) {
                     await updateManager.showUpdateDialog(this.context)
                   }
                 }
-                if (this.hasUpdate === 1) {
+                if (this.hasUpdate === updateManager.UpdateAvailableCode.LATER_VERSION_EXIST) {
                   await updateManager.showUpdateDialog(this.context)
                 }
               } catch (err) {

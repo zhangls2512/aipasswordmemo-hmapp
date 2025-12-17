@@ -432,12 +432,7 @@ export default struct Cleardata {
                       await fileIo.unlink(invitationcodeQrcodeDir + item)
                     })
                     await Promise.all(promises)
-                  } catch (err) {
-                    if (err.code !== 13900002) {
-                      await promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code
-                      })
-                    }
+                  } catch {
                   }
                 }
               })
@@ -555,12 +550,7 @@ export default struct Cleardata {
                       await fileIo.unlink(errorLogDir + item)
                     })
                     await Promise.all(promises)
-                  } catch (err) {
-                    if (err.code !== 13900002) {
-                      await promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code
-                      })
-                    }
+                  } catch {
                   }
                 }
               })
@@ -709,12 +699,7 @@ export default struct Cleardata {
                   await preferences.deletePreferences(this.context, {
                     name: 'login'
                   })
-                } catch (err) {
-                  if (err.code !== 24000002) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code
-                    })
-                  }
+                } catch {
                 }
               }
               if (item === 'speakSettingNouse') {
@@ -742,12 +727,7 @@ export default struct Cleardata {
                     await fileIo.unlink(item)
                   })
                   await Promise.all(promises)
-                } catch (err) {
-                  if (err.code !== 13900002) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code
-                    })
-                  }
+                } catch {
                 }
               }
             })

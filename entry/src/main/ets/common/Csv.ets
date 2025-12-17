@@ -1,3 +1,4 @@
+import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getPasswordMaxId, PasswordInfoItem } from '../common/Dataget'
 import { importPassword } from '../common/Dataimport'
@@ -72,7 +73,7 @@ export async function importCsvPassword(context: Context, content: string) {
         }
       }
     })
-    await importPassword(context, JSON.stringify(result), 0)
+    await importPassword(context, JSON.stringify(result), relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
     await promptAction.openToast({
       message: '导入成功'
     })

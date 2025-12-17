@@ -114,9 +114,9 @@ struct Tablesync {
                           this.onTables = this.onTables.filter(inItem => inItem !== item.value)
                         }
                         if (res) {
-                          let securityLevel = 4
+                          let securityLevel = relationalStore.SecurityLevel.S4
                           if (item.value === 'tag') {
-                            securityLevel = 1
+                            securityLevel = relationalStore.SecurityLevel.S1
                           }
                           const rdbStore = await relationalStore.getRdbStore(this.context, {
                             name: item.value,

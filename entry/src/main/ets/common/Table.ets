@@ -11,9 +11,9 @@ interface Item {
 
 export async function syncTable(context: Context, table: string, networkId: string,
   syncMode: relationalStore.SyncMode) {
-  let securityLevel = 4
+  let securityLevel = relationalStore.SecurityLevel.S4
   if (table === 'tag') {
-    securityLevel = 1
+    securityLevel = relationalStore.SecurityLevel.S1
   }
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: table,
@@ -52,7 +52,8 @@ export async function autoSyncTable(context: Context, table: string) {
   const pauseAutoSyncWhenLowBatteryCapacityLevel =
     dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false)
   const pauseAutoSyncWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
-  const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
+  const lowBatteryCapacityLevel =
+    debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
   if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
     await promptAction.openToast({
       message: '电池电量低，自动暂停同步'
@@ -82,9 +83,9 @@ export async function autoSyncTable(context: Context, table: string) {
 }
 
 export async function backupTable(context: Context, table: string) {
-  let securityLevel = 4
+  let securityLevel = relationalStore.SecurityLevel.S4
   if (table === 'tag') {
-    securityLevel = 1
+    securityLevel = relationalStore.SecurityLevel.S1
   }
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: table,
@@ -114,7 +115,8 @@ export async function autoBackupTable(context: Context, table: string) {
   const pauseAutoBackupWhenLowBatteryCapacityLevel =
     dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false)
   const pauseAutoBackupWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false)
-  const lowBatteryCapacityLevel = debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
+  const lowBatteryCapacityLevel =
+    debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
   if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
     await promptAction.openToast({
       message: '电池电量低，自动暂停同步'
@@ -141,9 +143,9 @@ export async function autoBackupTable(context: Context, table: string) {
 }
 
 export async function recoveryTable(context: Context, table: string) {
-  let securityLevel = 4
+  let securityLevel = relationalStore.SecurityLevel.S4
   if (table === 'tag') {
-    securityLevel = 1
+    securityLevel = relationalStore.SecurityLevel.S1
   }
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: table,

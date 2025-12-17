@@ -33,43 +33,30 @@ export async function importPassword(context: Context, data: string, conflict: r
     const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as PasswordInItem[]
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'password',
-      securityLevel: 4,
+      securityLevel: relationalStore.SecurityLevel.S4,
       encrypt: true,
       allowRebuild: true
     })
-    const promises = array.map(async (item: PasswordInItem) => {
+    const promises = array.map(item => {
       let cloudBackupTime = JSON.stringify([])
       if (typeof (item.cloudBackupTime) === 'string') {
         cloudBackupTime = item.cloudBackupTime
       }
-      try {
-        await rdbStore.insert('password', {
-          id: item.id,
-          name: item.name,
-          info: JSON.stringify(item.info.filter(infoItem => infoItem.type !== '图标')),
-          tag: JSON.stringify(item.tag),
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }, conflict)
-      } catch (err) {
-        if (err.code !== 14800032) {
-          await promptAction.openToast({
-            message: '发生错误，错误码：' + err.code
-          })
-        }
-        if (err.code === 14800032) {
-          await promptAction.openToast({
-            message: '导入失败，原因：已存在'
-          })
-        }
-      }
+      rdbStore.insertSync('password', {
+        id: item.id,
+        name: item.name,
+        info: JSON.stringify(item.info.filter(infoItem => infoItem.type !== '图标')),
+        tag: JSON.stringify(item.tag),
+        updateTime: item.updateTime,
+        cloudBackupTime: cloudBackupTime
+      }, conflict)
     })
     await Promise.all(promises)
     await autoSyncTable(context, 'password')
     await autoBackupTable(context, 'password')
-  } catch (err) {
+  } catch {
     await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code
+      message: '导入失败'
     })
   }
 }
@@ -79,44 +66,31 @@ export async function importInfo(context: Context, data: string, conflict: relat
     const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as InfoInItem[]
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
-      securityLevel: 4,
+      securityLevel: relationalStore.SecurityLevel.S4,
       encrypt: true,
       allowRebuild: true
     })
-    const promises = array.map(async (item: InfoInItem) => {
+    const promises = array.map(item => {
       if (item.type !== '图标') {
         let cloudBackupTime = JSON.stringify([])
         if (typeof (item.cloudBackupTime) === 'string') {
           cloudBackupTime = item.cloudBackupTime
         }
-        try {
-          await rdbStore.insert('info', {
-            id: item.id,
-            type: item.type,
-            value: item.value,
-            updateTime: item.updateTime,
-            cloudBackupTime: cloudBackupTime
-          }, conflict)
-        } catch (err) {
-          if (err.code !== 14800032) {
-            await promptAction.openToast({
-              message: '发生错误，错误码：' + err.code
-            })
-          }
-          if (err.code === 14800032) {
-            await promptAction.openToast({
-              message: '导入失败，原因：已存在'
-            })
-          }
-        }
+        rdbStore.insertSync('info', {
+          id: item.id,
+          type: item.type,
+          value: item.value,
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }, conflict)
       }
     })
     await Promise.all(promises)
     await autoSyncTable(context, 'info')
     await autoBackupTable(context, 'info')
-  } catch (err) {
+  } catch {
     await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code
+      message: '导入失败'
     })
   }
 }
@@ -126,42 +100,29 @@ export async function importTag(context: Context, data: string, conflict: relati
     const array = JSON.parse(data.replace(/[\r\n\s\u0000]/g, '')) as TagInItem[]
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'tag',
-      securityLevel: 1,
+      securityLevel: relationalStore.SecurityLevel.S1,
       encrypt: true,
       allowRebuild: true
     })
-    const promises = array.map(async (item: TagInItem) => {
+    const promises = array.map(item => {
       let cloudBackupTime = JSON.stringify([])
       if (typeof (item.cloudBackupTime) === 'string') {
         cloudBackupTime = item.cloudBackupTime
       }
-      try {
-        await rdbStore.insert('tag', {
-          id: item.id,
-          value: item.value,
-          color: item.color,
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }, conflict)
-      } catch (err) {
-        if (err.code !== 14800032) {
-          await promptAction.openToast({
-            message: '发生错误，错误码：' + err.code
-          })
-        }
-        if (err.code === 14800032) {
-          await promptAction.openToast({
-            message: '导入失败，原因：已存在'
-          })
-        }
-      }
+      rdbStore.insertSync('tag', {
+        id: item.id,
+        value: item.value,
+        color: item.color,
+        updateTime: item.updateTime,
+        cloudBackupTime: cloudBackupTime
+      }, conflict)
     })
     await Promise.all(promises)
     await autoSyncTable(context, 'tag')
     await autoBackupTable(context, 'tag')
-  } catch (err) {
+  } catch {
     await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code
+      message: '导入失败'
     })
   }
 }

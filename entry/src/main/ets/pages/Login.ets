@@ -361,8 +361,7 @@ export default struct Login {
                 })
                 const loginResponse = await request(this.context, '/account/getAccessToken', {
                   verifyType: 'passkey',
-                  rawId: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.rawId,
-                    util.Type.BASIC_URL_SAFE),
+                  credentialId: publicKeyAssertionCredential.id,
                   authenticatorData: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.authenticatorData,
                     util.Type.BASIC_URL_SAFE),
                   clientDataJSON: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.clientDataJson,
@@ -391,9 +390,11 @@ export default struct Login {
                   this.isShowLoginSheet = false
                 }
               } catch (err) {
-                await promptAction.openToast({
-                  message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                })
+                if (err.code !== 1021300004) {
+                  await promptAction.openToast({
+                    message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                  })
+                }
               }
             })
           Text('注册账号')
@@ -422,8 +423,8 @@ export default struct Login {
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(async () => {
                   try {
-                    const appPrivacyLink =
-                      privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 2)
+                    const appPrivacyLink = privacyManager.getAppPrivacyMgmtInfo()
+                      .privacyInfo.find(item => item.type === privacyManager.AppPrivacyLinkType.USER_AGREEMENT_LINK)
                     await openLink(this.context, appPrivacyLink?.url as string)
                   } catch (err) {
                     await promptAction.openToast({
@@ -435,8 +436,8 @@ export default struct Login {
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(async () => {
                   try {
-                    const appPrivacyLink =
-                      privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
+                    const appPrivacyLink = privacyManager.getAppPrivacyMgmtInfo()
+                      .privacyInfo.find(item => item.type === privacyManager.AppPrivacyLinkType.PRIVACY_STATEMENT_LINK)
                     await openLink(this.context, appPrivacyLink?.url as string)
                   } catch (err) {
                     await promptAction.openToast({

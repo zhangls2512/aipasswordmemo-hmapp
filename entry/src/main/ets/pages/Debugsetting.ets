@@ -1,7 +1,8 @@
 import { appRecovery, common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { deviceInfo } from '@kit.BasicServicesKit'
+import { webview } from '@kit.ArkWeb'
+import { batteryInfo, deviceInfo } from '@kit.BasicServicesKit'
 
 @Builder
 export function DebugsettingBuilder() {
@@ -28,18 +29,18 @@ struct Debugsetting {
   @Local autoReportHighLatency: boolean = false
   @Local highLatencyThreshold: string = '200'
   @Local optimizeParserBudget: boolean = true
-  @Local destroyModeIndex: number = 0
+  @Local destroyModeIndex: webview.WebDestroyMode = webview.WebDestroyMode.NORMAL_MODE
   @Local destroyModeValue: string = '普通'
   @Local allService: boolean = false
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-  debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'debugSetting'
-  })
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
+  })
+  debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'debugSetting'
   })
 
   getSetting() {
@@ -57,8 +58,9 @@ struct Debugsetting {
     this.autoUploadErrorLog = this.debugSettingDataPreferences.getSync('autoUploadErrorLog', true) as boolean
     this.showMemoryLevelChange = this.debugSettingDataPreferences.getSync('showMemoryLevelChange', false) as boolean
     this.processCache = this.debugSettingDataPreferences.getSync('processCache', true) as boolean
-    const lowBatteryCapacityLevel = this.debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', 4)
-    this.lowBatteryCapacityLevelIndex = (lowBatteryCapacityLevel as number) - 1
+    const lowBatteryCapacityLevel = this.debugSettingDataPreferences.getSync('lowBatteryCapacityLevel',
+      batteryInfo.BatteryCapacityLevel.LEVEL_LOW) as batteryInfo.BatteryCapacityLevel
+    this.lowBatteryCapacityLevelIndex = lowBatteryCapacityLevel - 1
     if (lowBatteryCapacityLevel === 1) {
       this.lowBatteryCapacityLevelValue = '满'
     }
@@ -92,8 +94,8 @@ struct Debugsetting {
     this.showNetSceneChange = this.debugSettingDataPreferences.getSync('showNetSceneChange', false) as boolean
     this.highLatencyThreshold = String(this.debugSettingDataPreferences.getSync('highLatencyThreshold', 200))
     this.optimizeParserBudget = this.debugSettingDataPreferences.getSync('optimizeParserBudget', true) as boolean
-    const destroyMode = this.debugSettingDataPreferences.getSync('destroyMode', 0)
-    this.destroyModeIndex = destroyMode as number
+    const destroyMode = this.debugSettingDataPreferences.getSync('destroyMode', webview.WebDestroyMode.NORMAL_MODE)
+    this.destroyModeIndex = destroyMode as webview.WebDestroyMode
     if (destroyMode === 0) {
       this.destroyModeValue = '普通'
     }

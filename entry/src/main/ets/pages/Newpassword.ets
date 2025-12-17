@@ -107,15 +107,6 @@ export default struct Newpassword {
               })
               return
             }
-            if (this.infoValue) {
-              try {
-                await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-              } catch (err) {
-                await promptAction.openToast({
-                  message: '发生错误，错误码：' + err.code
-                })
-              }
-            }
             const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
             if (!fileIo.accessSync(passwordIconDir)) {
               await fileIo.mkdir(passwordIconDir, true)
@@ -129,12 +120,7 @@ export default struct Newpassword {
             })
             fileIo.closeSync(file)
             this.infoValue = fileUri.getUriFromPath(filePath)
-          } catch (err) {
-            if (err.code !== 13900020) {
-              await promptAction.openToast({
-                message: '发生错误，错误码：' + err.code
-              })
-            }
+          } catch {
           }
         })
       if (deviceInfo.deviceType !== 'phone') {
@@ -204,15 +190,6 @@ export default struct Newpassword {
                 })
                 return
               }
-              if (this.infoValue) {
-                try {
-                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-                } catch (err) {
-                  await promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
-                }
-              }
               const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
               if (!fileIo.accessSync(passwordIconDir)) {
                 await fileIo.mkdir(passwordIconDir, true)
@@ -246,13 +223,6 @@ export default struct Newpassword {
                 this.infoArray = []
               }
               if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
-                try {
-                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-                } catch (err) {
-                  await promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
-                }
                 this.infoValue = ''
               }
             })
@@ -281,13 +251,6 @@ export default struct Newpassword {
                   this.infoArray = []
                 }
                 if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
-                  try {
-                    await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-                  } catch (err) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code
-                    })
-                  }
                   this.infoValue = ''
                 }
               })

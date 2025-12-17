@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit'
+import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { fileIo, picker } from '@kit.CoreFileKit'
 import { importCsvPassword, parseCsvLine } from '../common/Csv'
@@ -138,9 +139,9 @@ struct DataInOut {
                 if (uris.length === 1) {
                   const filePath = uris[0]
                   const filestring = await readUri(filePath)
-                  let conflictResolution = 0
+                  let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
                   if (this.index === 1) {
-                    conflictResolution = 5
+                    conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
                   }
                   if (filePath.endsWith('.txt')) {
                     await importPassword(this.context, filestring, conflictResolution)
@@ -200,9 +201,9 @@ struct DataInOut {
                 if (uris.length === 1) {
                   const filePath = uris[0]
                   const filestring = await readUri(filePath)
-                  let conflictResolution = 0
+                  let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
                   if (this.index === 1) {
-                    conflictResolution = 5
+                    conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
                   }
                   await importInfo(this.context, filestring, conflictResolution)
                   await promptAction.openToast({
@@ -257,9 +258,9 @@ struct DataInOut {
                 if (uris.length === 1) {
                   const filePath = uris[0]
                   const filestring = await readUri(filePath)
-                  let conflictResolution = 0
+                  let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
                   if (this.index === 1) {
-                    conflictResolution = 5
+                    conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
                   }
                   await importTag(this.context, filestring, conflictResolution)
                   await promptAction.openToast({
