@@ -720,6 +720,19 @@ export default struct Setting {
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text('数据防丢失指南')
+              .fontColor($r('sys.color.font_emphasize'))
+              .fontSize($r('sys.float.ohos_id_text_size_body3'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                top: 6,
+                left: 12,
+                right: 12
+              })
+              .onClick(async () => {
+                await openLink(this.context, 'https://docs.qq.com/doc/p/4168ccb976b6c8825e574cee297388cb431b6383')
+              })
           }
           .alignItems(HorizontalAlign.Start)
         }
