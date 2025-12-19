@@ -341,8 +341,7 @@ export default struct Login {
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
           Button('通行密钥登录')
-          //.enabled(this.agree)
-            .enabled(false)
+            .enabled(this.agree)
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
@@ -351,7 +350,9 @@ export default struct Login {
               try {
                 const publicKeyAssertionCredential = await fido2.authenticate(this.context, {
                   publicKey: {
-                    challenge: new util.TextEncoder().encodeInto(String(Date.now()).slice(0, -5) + '00000')
+                    challenge: new util.TextEncoder().encodeInto(String(Date.now()).slice(0, -5) + '00000'),
+                    timeout: 100000,
+                    rpId: 'www.zhangls2512.cn'
                   }
                 })
                 this.dialogControllerProgress.open()
@@ -361,7 +362,8 @@ export default struct Login {
                 })
                 const loginResponse = await request(this.context, '/account/getAccessToken', {
                   verifyType: 'passkey',
-                  credentialId: publicKeyAssertionCredential.id,
+                  credentialId: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.rawId,
+                    util.Type.BASIC_URL_SAFE),
                   authenticatorData: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.authenticatorData,
                     util.Type.BASIC_URL_SAFE),
                   clientDataJSON: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.clientDataJson,

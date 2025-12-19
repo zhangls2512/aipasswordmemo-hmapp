@@ -268,12 +268,6 @@ export default struct Setting {
                     })
                     return
                   }
-                  if (1 === 1) {
-                    await promptAction.openToast({
-                      message: '暂未上线，敬请期待'
-                    })
-                    return
-                  }
                   this.pageInfos.pushPath({
                     name: 'Newpasskey'
                   })
@@ -305,8 +299,7 @@ export default struct Setting {
                     type: ToggleType.Switch,
                     isOn: this.autoLoginByPasskey!!
                   })
-                  //.enabled(!this.autoLoginByHuaweiAccount)
-                    .enabled(false)
+                    .enabled(!this.autoLoginByHuaweiAccount)
                     .onChange((isOn) => {
                       this.commonSettingDataPreferences.putSync('autoLoginByPasskey', isOn)
                       this.commonSettingDataPreferences.flushSync()

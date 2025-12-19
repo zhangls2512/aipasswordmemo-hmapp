@@ -132,7 +132,9 @@ export async function autoLogin(context: Context) {
       if (autoLoginByPasskey && !autoLoginByHuaweiAccount) {
         const publicKeyAssertionCredential = await fido2.authenticate(context, {
           publicKey: {
-            challenge: new util.TextEncoder().encodeInto(String(Date.now()).slice(0, -5) + '00000')
+            challenge: new util.TextEncoder().encodeInto(String(Date.now()).slice(0, -5) + '00000'),
+            timeout: 100000,
+            rpId: 'www.zhangls2512.cn'
           }
         })
         netBoost.setSceneDesc({
@@ -141,7 +143,7 @@ export async function autoLogin(context: Context) {
         })
         const loginResponse = await request(context, '/account/getAccessToken', {
           verifyType: 'passkey',
-          rawId: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.rawId,
+          credentialId: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.rawId,
             util.Type.BASIC_URL_SAFE),
           authenticatorData: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.authenticatorData,
             util.Type.BASIC_URL_SAFE),

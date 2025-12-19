@@ -3,6 +3,7 @@ import { util } from '@kit.ArkTS'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
 import { getAccountInfo } from '../common/Accesstoken'
+import getPublicKey from '../common/Publickey'
 import request from '../common/Request'
 
 @Builder
@@ -223,7 +224,8 @@ struct Newpasskey {
           const res = await fido2.register(this.context, {
             publicKey: {
               rp: {
-                name: 'xm2512'
+                id: 'www.zhangls2512.cn',
+                name: 'www.zhangls2512.cn'
               },
               user: {
                 id: new util.TextEncoder().encodeInto(accountInfo.uid),
@@ -235,16 +237,15 @@ struct Newpasskey {
                 {
                   type: fido2.PublicKeyCredentialType.PUBLIC_KEY,
                   alg: fido2.Algorithm.ES256
-                },
-                {
-                  type: fido2.PublicKeyCredentialType.PUBLIC_KEY,
-                  alg: fido2.Algorithm.RS256
                 }
-              ]
+              ],
+              authenticatorSelection: {
+                residentKey: fido2.UserVerificationRequirement.PREFERRED
+              }
             }
           })
-          this.credentialId = res.id
-          this.publicKey = new util.Base64Helper().encodeToStringSync(res.response.publicKey, util.Type.BASIC_URL_SAFE)
+          this.credentialId = new util.Base64Helper().encodeToStringSync(res.rawId, util.Type.BASIC_URL_SAFE)
+          this.publicKey = getPublicKey(res.response.attestationObject)
         } catch (err) {
           if (err.code !== 1021300004) {
             await promptAction.openToast({
