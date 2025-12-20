@@ -258,7 +258,7 @@ struct Invite {
               top: $r('sys.float.ohos_id_text_paragraph_margin_s')
             })
 
-            if (deviceInfo.deviceType === 'phone') {
+            if (deviceInfo.deviceType !== 'tablet') {
               Text() {
                 Span('3. 本设备停留在本页面，让新用户')
                   .fontWeight(FontWeight.Medium)
@@ -331,7 +331,7 @@ struct Invite {
         })
         if (userres !== 'fail') {
           this.invitationcode = JSON.parse(userres).data.invitationCode as string
-          if (deviceInfo.deviceType === 'phone') {
+          if (deviceInfo.deviceType !== 'tablet') {
             const shareData = new systemShare.SharedData({
               utd: uniformTypeDescriptor.UniformDataType.HYPERLINK,
               title: '邀请您使用轩铭密码智能备忘录',
@@ -358,7 +358,7 @@ struct Invite {
       }
     })
     .onDisAppear(() => {
-      if (deviceInfo.deviceType === 'phone') {
+      if (deviceInfo.deviceType !== 'tablet') {
         harmonyShare.off('knockShare')
         harmonyShare.off('gesturesShare')
       }

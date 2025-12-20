@@ -7,6 +7,7 @@ import { fileIo } from '@kit.CoreFileKit'
 import { stringToArray } from '../common/Crypto'
 import { getPasswordList, getTypeInfoList } from '../common/Dataget'
 import { getDirectorySize } from '../common/File'
+import { getSizeString } from '../common/Stringformat'
 
 @ComponentV2
 export default struct Cleardata {
@@ -38,32 +39,13 @@ export default struct Cleardata {
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
 
-  getSizeString(size: number) {
-    if (size < Math.pow(1024, 1)) {
-      return size + ' B'
-    }
-    if (size >= Math.pow(1024, 1) && size < Math.pow(1024, 2)) {
-      return (size / Math.pow(1024, 1)).toFixed(2) + ' KB'
-    }
-    if (size >= Math.pow(1024, 2) && size < Math.pow(1024, 3)) {
-      return (size / Math.pow(1024, 2)).toFixed(2) + ' MB'
-    }
-    if (size >= Math.pow(1024, 3) && size < Math.pow(1024, 4)) {
-      return (size / Math.pow(1024, 3)).toFixed(2) + ' GB'
-    }
-    if (size >= Math.pow(1024, 4)) {
-      return (size / Math.pow(1024, 4)).toFixed(2) + ' TB'
-    }
-    return ''
-  }
-
   async getSize() {
     const invitationQrcodeCacheSize = await getDirectorySize(this.context.filesDir + '/media/invitationqrcode/')
-    this.invitationQrcodeCacheSize = this.getSizeString(invitationQrcodeCacheSize)
+    this.invitationQrcodeCacheSize = getSizeString(invitationQrcodeCacheSize)
     const errorLogSize = await getDirectorySize(this.context.filesDir + '/log/error/')
-    this.errorLogSize = this.getSizeString(errorLogSize)
+    this.errorLogSize = getSizeString(errorLogSize)
     const tempFileNouseSize = await getDirectorySize(this.context.tempDir)
-    this.tempFileNouseSize = this.getSizeString(tempFileNouseSize)
+    this.tempFileNouseSize = getSizeString(tempFileNouseSize)
     const nousePasswordIconFilePathArray = await this.getNousePasswordIconFilePathArray()
     let passwordIconNouseSize = 0
     nousePasswordIconFilePathArray.forEach(item => {
@@ -71,7 +53,7 @@ export default struct Cleardata {
       passwordIconNouseSize += fileIo.statSync(file.fd).size
       fileIo.closeSync(file)
     })
-    this.passwordIconNouseSize = this.getSizeString(passwordIconNouseSize)
+    this.passwordIconNouseSize = getSizeString(passwordIconNouseSize)
   }
 
   async getNousePasswordIconFilePathArray() {

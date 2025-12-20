@@ -8,6 +8,7 @@ import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { getInfoList, getPasswordList, getTagList } from '../common/Dataget'
 import { write } from '../common/File'
 import { checkPermission } from '../common/Permission'
+import { getSizeString } from '../common/Stringformat'
 import { syncTable } from '../common/Table'
 import { InfoOutItem, PasswordOutItem, TagOutItem } from './DataInOut'
 
@@ -82,7 +83,7 @@ struct Tablesync {
     NavDestination() {
       Scroll() {
         Column() {
-          if (deviceInfo.deviceType === 'phone') {
+          if (deviceInfo.deviceType !== 'tablet') {
             TabSegmentButtonV2({
               items: new SegmentButtonV2Items([
                 { text: '可信' },
@@ -833,8 +834,11 @@ struct Tablesync {
                     })
                     const filePath = this.context.tempDir + '/password.txt'
                     await write(filePath, JSON.stringify(arrayOut))
+                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
+                      title: 'password.txt',
+                      description: getSizeString(fileIo.statSync(file.fd).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -846,7 +850,7 @@ struct Tablesync {
                     const promptAction = this.UIContext.getPromptAction()
                     await promptAction.showDialog({
                       title: '提示',
-                      message: '碰一碰/隔空传送邻近设备即可同步，同步成功后关闭弹窗',
+                      message: '碰一碰/隔空传送邻近设备即可同步，关闭此弹窗后停止同步',
                       buttons: [
                         {
                           text: '关闭',
@@ -854,6 +858,7 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
+                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
@@ -917,8 +922,11 @@ struct Tablesync {
                     }
                     const filePath = this.context.tempDir + '/passwordicon.zip'
                     await zlib.compressFiles(passwordIconFilePathArray, filePath, {})
+                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.ZIP_ARCHIVE,
+                      title: 'passwordicon.zip',
+                      description: getSizeString(fileIo.statSync(file.fd).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -929,7 +937,7 @@ struct Tablesync {
                     })
                     await promptAction.showDialog({
                       title: '提示',
-                      message: '碰一碰/隔空传送邻近设备即可同步，同步成功后关闭弹窗',
+                      message: '碰一碰/隔空传送邻近设备即可同步，关闭此弹窗后停止同步',
                       buttons: [
                         {
                           text: '关闭',
@@ -937,6 +945,7 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
+                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
@@ -998,8 +1007,11 @@ struct Tablesync {
                     })
                     const filePath = this.context.tempDir + '/info.txt'
                     await write(filePath, JSON.stringify(arrayOut))
+                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
+                      title: 'info.txt',
+                      description: getSizeString(fileIo.statSync(file.fd).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1011,7 +1023,7 @@ struct Tablesync {
                     const promptAction = this.UIContext.getPromptAction()
                     await promptAction.showDialog({
                       title: '提示',
-                      message: '碰一碰/隔空传送邻近设备即可同步，同步成功后关闭弹窗',
+                      message: '碰一碰/隔空传送邻近设备即可同步，关闭此弹窗后停止同步',
                       buttons: [
                         {
                           text: '关闭',
@@ -1019,6 +1031,7 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
+                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
@@ -1080,8 +1093,11 @@ struct Tablesync {
                     })
                     const filePath = this.context.tempDir + '/tag.txt'
                     await write(filePath, JSON.stringify(arrayOut))
+                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
+                      title: 'tag.txt',
+                      description: getSizeString(fileIo.statSync(file.fd).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1093,7 +1109,7 @@ struct Tablesync {
                     const promptAction = this.UIContext.getPromptAction()
                     await promptAction.showDialog({
                       title: '提示',
-                      message: '碰一碰/隔空传送邻近设备即可同步，同步成功后关闭弹窗',
+                      message: '碰一碰/隔空传送邻近设备即可同步，关闭此弹窗后停止同步',
                       buttons: [
                         {
                           text: '关闭',
@@ -1101,6 +1117,7 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
+                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
