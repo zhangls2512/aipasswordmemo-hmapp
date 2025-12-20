@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
+import { promptAction } from '@kit.ArkUI'
 import { backupTable, recoveryTable } from '../common/Table'
 
 interface Type {
@@ -223,6 +224,9 @@ struct DataBackupRecovery {
               })
               .onClick(async () => {
                 await backupTable(this.context, 'password')
+                await promptAction.openToast({
+                  message: '备份成功'
+                })
                 this.getSetting()
               })
 
@@ -265,6 +269,9 @@ struct DataBackupRecovery {
               })
               .onClick(async () => {
                 await backupTable(this.context, 'info')
+                await promptAction.openToast({
+                  message: '备份成功'
+                })
                 this.getSetting()
               })
 
@@ -307,6 +314,9 @@ struct DataBackupRecovery {
               })
               .onClick(async () => {
                 await backupTable(this.context, 'tag')
+                await promptAction.openToast({
+                  message: '备份成功'
+                })
                 this.getSetting()
               })
             }
@@ -378,6 +388,9 @@ struct DataBackupRecovery {
                   })
                   .onClick(async () => {
                     await recoveryTable(this.context, item)
+                    await promptAction.openToast({
+                      message: '恢复成功'
+                    })
                   })
                 })
               }

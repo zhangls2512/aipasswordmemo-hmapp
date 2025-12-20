@@ -67,7 +67,7 @@ export async function newPassword(context: Context, data: PasswordInput) {
       id: id,
       content: JSON.stringify({
         name: data.name,
-        info: JSON.stringify(data.info.filter(infoItem => infoItem.type !== '图标')),
+        info: JSON.stringify(data.info),
         tag: JSON.stringify(data.tag),
         updateTime: updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTime)
@@ -125,7 +125,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
       id: id,
       content: JSON.stringify({
         name: data.name,
-        info: JSON.stringify(data.info.filter(infoItem => infoItem.type !== '图标')),
+        info: JSON.stringify(data.info),
         tag: JSON.stringify(data.tag),
         updateTime: updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
@@ -165,7 +165,7 @@ export async function newInfo(context: Context, data: InfoInput) {
   })
   await autoSyncTable(context, 'info')
   await autoBackupTable(context, 'info')
-  if (data.cloudBackup && data.type !== '图标') {
+  if (data.cloudBackup) {
     const accountInfo = await getAccountInfo()
     const cloudBackupTime: CloudBackupTimeItem[] = [{
       uid: accountInfo.uid,

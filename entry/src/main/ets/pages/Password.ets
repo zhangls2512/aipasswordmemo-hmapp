@@ -81,7 +81,7 @@ export default struct PasswordPage {
       content: JSON.stringify({
         id: item.id,
         name: item.name,
-        info: item.info.filter(infoItem => infoItem.type !== '图标'),
+        info: item.info,
         tag: item.tag.map(item => item.value),
         updateTime: item.updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTimeArray)

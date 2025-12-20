@@ -1,11 +1,12 @@
 import { common } from '@kit.AbilityKit'
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
+import { zlib } from '@kit.BasicServicesKit'
 import { fileIo, picker } from '@kit.CoreFileKit'
 import { importCsvPassword, parseCsvLine } from '../common/Csv'
 import { getInfoList, getPasswordList, getPasswordMaxId, getTagList, PasswordInfoItem } from '../common/Dataget'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
-import { readUri } from '../common/File'
+import { readUri, writeUri } from '../common/File'
 import openLink from '../common/Openlink'
 
 export interface PasswordOutItem {
@@ -17,7 +18,7 @@ export interface PasswordOutItem {
   cloudBackupTime: string
 }
 
-interface InfoOutItem {
+export interface InfoOutItem {
   id: number,
   type: string,
   value: string,
@@ -25,7 +26,7 @@ interface InfoOutItem {
   cloudBackupTime: string
 }
 
-interface TagOutItem {
+export interface TagOutItem {
   id: number,
   value: string,
   color: string,
@@ -161,7 +162,7 @@ struct DataInOut {
                   right: 12
                 })
               Row() {
-                Text('常用信息')
+                Text('密码图标')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
@@ -195,20 +196,44 @@ struct DataInOut {
               .onClick(async () => {
                 const documentSelectOptions = new picker.DocumentSelectOptions()
                 documentSelectOptions.maxSelectNumber = 1
-                documentSelectOptions.fileSuffixFilters = ['.txt']
+                documentSelectOptions.fileSuffixFilters = ['.zip']
                 const documentViewPicker = new picker.DocumentViewPicker(this.context)
                 const uris = await documentViewPicker.select(documentSelectOptions)
                 if (uris.length === 1) {
-                  const filePath = uris[0]
-                  const filestring = await readUri(filePath)
-                  let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
-                  if (this.index === 1) {
-                    conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
+                  const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
+                  if (!fileIo.accessSync(passwordIconDir)) {
+                    await fileIo.mkdir(passwordIconDir, true)
                   }
-                  await importInfo(this.context, filestring, conflictResolution)
-                  await promptAction.openToast({
-                    message: '导入成功'
+                  const filePath = this.context.tempDir + '/passwordicon.zip'
+                  const srcFile = fileIo.openSync(uris[0])
+                  const destFile = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
+                  await fileIo.copyFile(srcFile.fd, destFile.fd)
+                  fileIo.closeSync(srcFile)
+                  fileIo.closeSync(destFile)
+                  await zlib.decompressFile(filePath, passwordIconDir)
+                  await fileIo.unlink(filePath)
+                  const promptAction = this.UIContext.getPromptAction()
+                  const data = await promptAction.showDialog({
+                    title: '提示',
+                    message: '导入成功，需重启应用生效，是否重启？',
+                    buttons: [
+                      {
+                        text: '取消',
+                        color: $r('sys.color.font_primary')
+                      },
+                      {
+                        text: '重启',
+                        color: $r('sys.color.font_emphasize')
+                      }
+                    ]
                   })
+                  if (data.index === 1) {
+                    const applicationContext = this.context.getApplicationContext()
+                    applicationContext.restartApp({
+                      bundleName: 'com.zhangxm.aipasswordmemo',
+                      abilityName: 'EntryAbility'
+                    })
+                  }
                 }
               })
 
@@ -218,7 +243,7 @@ struct DataInOut {
                   right: 12
                 })
               Row() {
-                Text('标签')
+                Text('常用信息')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
@@ -262,6 +287,63 @@ struct DataInOut {
                   if (this.index === 1) {
                     conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
                   }
+                  await importInfo(this.context, filestring, conflictResolution)
+                  await promptAction.openToast({
+                    message: '导入成功'
+                  })
+                }
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('标签')
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 3
+                }
+              })
+              .onClick(async () => {
+                const documentSelectOptions = new picker.DocumentSelectOptions()
+                documentSelectOptions.maxSelectNumber = 1
+                documentSelectOptions.fileSuffixFilters = ['.txt']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.select(documentSelectOptions)
+                if (uris.length === 1) {
+                  const filePath = uris[0]
+                  const filestring = await readUri(filePath)
+                  let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
+                  if (this.index === 1) {
+                    conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
+                  }
                   await importTag(this.context, filestring, conflictResolution)
                   await promptAction.openToast({
                     message: '导入成功'
@@ -282,7 +364,7 @@ struct DataInOut {
                 .onClick(async () => {
                   await openLink(this.context, 'https://docs.qq.com/doc/p/a12dc0f6d9e9ab998d81ddd1ddc95b5445518209')
                 })
-              Span('中所述的标准格式。\n因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导入。')
+              Span('中所述的标准格式。')
                 .fontColor($r('sys.color.font_secondary'))
             }
             .enableAutoSpacing(true)
@@ -327,7 +409,7 @@ struct DataInOut {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                  .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
                     $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
@@ -340,7 +422,7 @@ struct DataInOut {
                   this.hoverId = -1
                 }
                 if (isHover) {
-                  this.hoverId = 3
+                  this.hoverId = 4
                 }
               })
               .onClick(async () => {
@@ -451,7 +533,7 @@ struct DataInOut {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
+                  .backgroundColor(this.hoverId === 5 ? $r('sys.color.interactive_hover') :
                     $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
@@ -464,7 +546,7 @@ struct DataInOut {
                   this.hoverId = -1
                 }
                 if (isHover) {
-                  this.hoverId = 4
+                  this.hoverId = 5
                 }
               })
               .onClick(async () => {
@@ -477,7 +559,7 @@ struct DataInOut {
                   return {
                     id: item.id,
                     name: item.name,
-                    info: item.info.filter(infoItem => infoItem.type !== '图标'),
+                    info: item.info,
                     tag: item.tag.map(item => item.value),
                     updateTime: item.updateTime,
                     cloudBackupTime: cloudBackupTime
@@ -505,9 +587,7 @@ struct DataInOut {
                   const uris = await documentViewPicker.save(documentSaveOptions)
                   if (uris.length === 1) {
                     const filePath = uris[0]
-                    const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-                    await fileIo.write(file.fd, JSON.stringify(arrayOut))
-                    fileIo.closeSync(file)
+                    await writeUri(filePath, JSON.stringify(arrayOut))
                     await promptAction.openToast({
                       message: '导出成功'
                     })
@@ -549,9 +629,7 @@ struct DataInOut {
                   const uris = await documentViewPicker.save(documentSaveOptions)
                   if (uris.length === 1) {
                     const filePath = uris[0]
-                    const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-                    await fileIo.write(file.fd, filestring)
-                    fileIo.closeSync(file)
+                    await writeUri(filePath, filestring)
                     await promptAction.openToast({
                       message: '导出成功'
                     })
@@ -565,75 +643,7 @@ struct DataInOut {
                   right: 12
                 })
               Row() {
-                Text('常用信息')
-                  .fontWeight(FontWeight.Medium)
-                  .layoutWeight(1)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Image($r('app.media.right'))
-                  .fillColor($r('sys.color.icon_fourth'))
-                  .height(12)
-                  .width(12)
-              }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor(this.hoverId === 5 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onHover((isHover) => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 5
-                }
-              })
-              .onClick(async () => {
-                const documentSaveOptions = new picker.DocumentSaveOptions()
-                documentSaveOptions.newFileNames = ['info']
-                documentSaveOptions.fileSuffixChoices = ['.txt']
-                const documentViewPicker = new picker.DocumentViewPicker(this.context)
-                const uris = await documentViewPicker.save(documentSaveOptions)
-                if (uris.length === 1) {
-                  const filePath = uris[0]
-                  const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
-                  const array = await getInfoList(this.context)
-                  const arrayOut = array.map((item): InfoOutItem => {
-                    let cloudBackupTime = JSON.stringify([])
-                    if (typeof (item.cloudBackupTime) === 'string') {
-                      cloudBackupTime = item.cloudBackupTime
-                    }
-                    return {
-                      id: item.id,
-                      type: item.type,
-                      value: item.value,
-                      updateTime: item.updateTime,
-                      cloudBackupTime: cloudBackupTime
-                    }
-                  })
-                  await fileIo.write(file.fd, JSON.stringify(arrayOut))
-                  fileIo.closeSync(file)
-                  await promptAction.openToast({
-                    message: '导出成功'
-                  })
-                }
-              })
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('标签')
+                Text('密码图标')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
@@ -665,6 +675,145 @@ struct DataInOut {
                 }
               })
               .onClick(async () => {
+                const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
+                if (!fileIo.accessSync(passwordIconDir)) {
+                  await promptAction.openToast({
+                    message: '无密码图标，无需导出'
+                  })
+                  return
+                }
+                const passwordIconFileNameArray = await fileIo.listFile(passwordIconDir)
+                const passwordIconFilePathArray = passwordIconFileNameArray.map(item => passwordIconDir + item)
+                if (passwordIconFilePathArray.length === 0) {
+                  await promptAction.openToast({
+                    message: '无密码图标，无需导出'
+                  })
+                  return
+                }
+                const documentSaveOptions = new picker.DocumentSaveOptions()
+                documentSaveOptions.newFileNames = ['passwordicon']
+                documentSaveOptions.fileSuffixChoices = ['.zip']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.save(documentSaveOptions)
+                if (uris.length === 1) {
+                  const filePath = this.context.tempDir + '/passwordicon.zip'
+                  await zlib.compressFiles(passwordIconFilePathArray, filePath, {})
+                  const srcFile = fileIo.openSync(filePath)
+                  const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
+                  await fileIo.copyFile(srcFile.fd, destFile.fd)
+                  fileIo.closeSync(srcFile)
+                  fileIo.closeSync(destFile)
+                  await fileIo.unlink(filePath)
+                  await promptAction.openToast({
+                    message: '导出成功'
+                  })
+                }
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('常用信息')
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor(this.hoverId === 7 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 7
+                }
+              })
+              .onClick(async () => {
+                const documentSaveOptions = new picker.DocumentSaveOptions()
+                documentSaveOptions.newFileNames = ['info']
+                documentSaveOptions.fileSuffixChoices = ['.txt']
+                const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                const uris = await documentViewPicker.save(documentSaveOptions)
+                if (uris.length === 1) {
+                  const filePath = uris[0]
+                  const array = await getInfoList(this.context)
+                  const arrayOut = array.map((item): InfoOutItem => {
+                    let cloudBackupTime = JSON.stringify([])
+                    if (typeof (item.cloudBackupTime) === 'string') {
+                      cloudBackupTime = item.cloudBackupTime
+                    }
+                    return {
+                      id: item.id,
+                      type: item.type,
+                      value: item.value,
+                      updateTime: item.updateTime,
+                      cloudBackupTime: cloudBackupTime
+                    }
+                  })
+                  await writeUri(filePath, JSON.stringify(arrayOut))
+                  await promptAction.openToast({
+                    message: '导出成功'
+                  })
+                }
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('标签')
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor(this.hoverId === 8 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 8
+                }
+              })
+              .onClick(async () => {
                 const documentSaveOptions = new picker.DocumentSaveOptions()
                 documentSaveOptions.newFileNames = ['tag']
                 documentSaveOptions.fileSuffixChoices = ['.txt']
@@ -672,7 +821,6 @@ struct DataInOut {
                 const uris = await documentViewPicker.save(documentSaveOptions)
                 if (uris.length === 1) {
                   const filePath = uris[0]
-                  const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
                   const array = await getTagList(this.context)
                   const arrayOut = array.map((item): TagOutItem => {
                     let cloudBackupTime = JSON.stringify([])
@@ -687,8 +835,7 @@ struct DataInOut {
                       cloudBackupTime: cloudBackupTime
                     }
                   })
-                  await fileIo.write(file.fd, JSON.stringify(arrayOut))
-                  fileIo.closeSync(file)
+                  await writeUri(filePath, JSON.stringify(arrayOut))
                   await promptAction.openToast({
                     message: '导出成功'
                   })
@@ -698,15 +845,6 @@ struct DataInOut {
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
-
-            Text('因密码“图标”类型信息存储方式特殊 (图标文件存储在应用沙箱文件目录而非数据库)，目前不支持导出。')
-              .fontColor($r('sys.color.font_secondary'))
-              .fontSize($r('sys.float.ohos_id_text_size_body3'))
-              .margin({
-                top: 6,
-                left: 12,
-                right: 12
-              })
           }
           .alignItems(HorizontalAlign.Start)
         }

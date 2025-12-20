@@ -65,7 +65,7 @@ export default struct Newinfo {
               await fileIo.mkdir(passwordIconDir, true)
             }
             const filePath = passwordIconDir + Date.now() + '.png'
-            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
             const imagePacker = image.createImagePacker()
             await imagePacker.packToFile(imagePixelMap, file.fd, {
               format: 'image/png',
@@ -124,7 +124,7 @@ export default struct Newinfo {
                 await fileIo.mkdir(passwordIconDir, true)
               }
               const filePath = passwordIconDir + Date.now() + '.png'
-              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
               const imagePacker = image.createImagePacker()
               await imagePacker.packToFile(imagePixelMap, file.fd, {
                 format: 'image/png',
@@ -144,7 +144,6 @@ export default struct Newinfo {
             .onSelect((index, value) => {
               if (value === '图标') {
                 this.infoValue = ''
-                this.cloudBackup = false
               }
               if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                 this.infoValue = ''
@@ -168,7 +167,6 @@ export default struct Newinfo {
                 }
                 if (value === '图标') {
                   this.infoValue = ''
-                  this.cloudBackup = false
                 }
                 if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
                   this.infoValue = ''
@@ -337,7 +335,7 @@ export default struct Newinfo {
                 type: ToggleType.Switch,
                 isOn: this.cloudBackup!!
               })
-                .enabled(this.allowCloudBackup && this.getCurrentInfoType() !== '图标')
+                .enabled(this.allowCloudBackup)
             }
             .borderRadius(12)
             .padding(12)
@@ -423,7 +421,7 @@ export default struct Newinfo {
             name: 'cloudbackupSetting'
           })
           const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
-          if (autoOn.includes('info') && this.infoTypeValue !== '图标') {
+          if (autoOn.includes('info')) {
             this.cloudBackup = true
           }
         }

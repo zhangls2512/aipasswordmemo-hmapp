@@ -54,7 +54,7 @@ export async function importCsvPassword(context: Context, content: string) {
         const name = parsedLine[nameIndex]
         const info: PasswordInfoItem[] = []
         infoColumnsIndex.forEach(item => {
-          if (firstLine[item] && parsedLine[item] && firstLine[item] !== '图标' && firstLine[item] !== 'MFA') {
+          if (firstLine[item] && parsedLine[item] && firstLine[item] !== 'MFA') {
             info.push({
               type: firstLine[item],
               value: parsedLine[item]

@@ -35,34 +35,32 @@ export default struct InfoPage {
   updateId = 0
 
   async cloudBackup(item: Info) {
-    if (item.type !== '图标') {
-      let cloudBackupTime = JSON.stringify([])
-      if (typeof (item.cloudBackupTime) === 'string') {
-        cloudBackupTime = item.cloudBackupTime
-      }
-      const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-      const accountInfo = await getAccountInfo()
-      const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeIndex !== -1) {
-        cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-      }
-      if (cloudBackupTimeIndex === -1) {
-        cloudBackupTimeArray.push({
-          uid: accountInfo.uid,
-          time: Date.now()
-        })
-      }
-      await setCloudBackup(this.context, {
-        type: 'info',
-        id: item.id,
-        content: JSON.stringify({
-          type: item.type,
-          value: item.value,
-          updateTime: item.updateTime,
-          cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-        })
+    let cloudBackupTime = JSON.stringify([])
+    if (typeof (item.cloudBackupTime) === 'string') {
+      cloudBackupTime = item.cloudBackupTime
+    }
+    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
+    const accountInfo = await getAccountInfo()
+    const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
+    if (cloudBackupTimeIndex !== -1) {
+      cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
+    }
+    if (cloudBackupTimeIndex === -1) {
+      cloudBackupTimeArray.push({
+        uid: accountInfo.uid,
+        time: Date.now()
       })
     }
+    await setCloudBackup(this.context, {
+      type: 'info',
+      id: item.id,
+      content: JSON.stringify({
+        type: item.type,
+        value: item.value,
+        updateTime: item.updateTime,
+        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
+      })
+    })
   }
 
   @Builder
@@ -138,7 +136,7 @@ export default struct InfoPage {
               this.loading = true
             }
           })
-        if (this.enableCloudBackup && !item.isCloudBackup && item.type !== '图标') {
+        if (this.enableCloudBackup && !item.isCloudBackup) {
           MenuItem({
             startIcon: $r('app.media.cloud'),
             content: '云备份'

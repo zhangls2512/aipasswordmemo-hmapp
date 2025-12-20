@@ -112,7 +112,7 @@ export default struct Newpassword {
               await fileIo.mkdir(passwordIconDir, true)
             }
             const filePath = passwordIconDir + Date.now() + '.png'
-            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
             const imagePacker = image.createImagePacker()
             await imagePacker.packToFile(imagePixelMap, file.fd, {
               format: 'image/png',
@@ -195,7 +195,7 @@ export default struct Newpassword {
                 await fileIo.mkdir(passwordIconDir, true)
               }
               const filePath = passwordIconDir + Date.now() + '.png'
-              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
               const imagePacker = image.createImagePacker()
               await imagePacker.packToFile(imagePixelMap, file.fd, {
                 format: 'image/png',

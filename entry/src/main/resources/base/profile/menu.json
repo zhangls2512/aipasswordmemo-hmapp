@@ -10,7 +10,8 @@
           "menuRule": "single",
           "fileSupportType": [
             ".txt",
-            ".csv"
+            ".csv",
+            ".zip"
           ]
         }
       ]

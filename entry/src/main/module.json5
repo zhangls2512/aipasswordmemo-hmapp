@@ -58,6 +58,11 @@
                 "linkFeature": "FileOpen"
               },
               {
+                "scheme": "file",
+                "type": "general.zip-archive",
+                "linkFeature": "FileOpen"
+              },
+              {
                 "scheme": "storage",
                 "path": "clearcache",
                 "linkFeature": "AppStorageMgmt"
@@ -80,6 +85,11 @@
               {
                 "scheme": "file",
                 "utd": "general.comma-separated-values-text",
+                "maxFileSupported": 1
+              },
+              {
+                "scheme": "file",
+                "utd": "general.zip-archive",
                 "maxFileSupported": 1
               }
             ]

@@ -9,15 +9,15 @@ import {
   wantConstant
 } from '@kit.AbilityKit'
 import { appInfoManager, updateManager } from '@kit.AppGalleryKit'
-import { preferences, relationalStore } from '@kit.ArkData'
+import { preferences, relationalStore, uniformTypeDescriptor } from '@kit.ArkData'
 import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
-import { fileIo } from '@kit.CoreFileKit'
+import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
-import { systemShare } from '@kit.ShareKit'
+import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { autoLogin } from '../common/Accesstoken'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
 import { write } from '../common/File'
@@ -81,9 +81,7 @@ export default class EntryAbility extends UIAbility {
     if (want.uri) {
       if (want.uri === 'storage:///clearcache') {
         this.context.eventHub.emit('clearData')
-      }
-      if (want.uri.endsWith('.txt') || want.uri.endsWith('.csv') ||
-      want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
+      } else {
         this.context.eventHub.emit('wantUri', want.uri)
       }
     }
@@ -94,6 +92,33 @@ export default class EntryAbility extends UIAbility {
         this.context.eventHub.emit('wantUri', sharedRecords[0].uri)
       }
     } catch {
+    }
+    if (deviceInfo.deviceType === '2in1') {
+      const lastWindow = await window.getLastWindow(this.context)
+      harmonyShare.on('dataReceive', {
+        windowId: lastWindow.getWindowProperties().id,
+        capabilities: [
+          {
+            utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
+            maxSupportedCount: 1
+          },
+          {
+            utd: uniformTypeDescriptor.UniformDataType.COMMA_SEPARATED_VALUES_TEXT,
+            maxSupportedCount: 1
+          },
+          {
+            utd: uniformTypeDescriptor.UniformDataType.ZIP_ARCHIVE,
+            maxSupportedCount: 1
+          }
+        ]
+      }, async (receivableTarget) => {
+        await receivableTarget.receive(fileUri.getUriFromPath(this.context.tempDir), {
+          onDataReceived: (sharedData) => {
+            const sharedRecords = sharedData.getRecords()
+            this.context.eventHub.emit('wantUri', sharedRecords[0].uri)
+          }
+        })
+      })
     }
   }
 

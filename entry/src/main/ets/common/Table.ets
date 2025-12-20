@@ -55,21 +55,11 @@ export async function autoSyncTable(context: Context, table: string) {
   const lowBatteryCapacityLevel =
     debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
   if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    await promptAction.openToast({
-      message: '电池电量低，自动暂停同步'
-    })
     return
   }
   const currentPowerMode = power.getPowerMode()
   if (pauseAutoSyncWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
     currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
-    let text = ''
-    if (power.getPowerMode() === 603) {
-      text = '超级'
-    }
-    await promptAction.openToast({
-      message: '系统开启' + text + '省电模式，暂停自动同步'
-    })
     return
   }
   const autoSyncTables: string[] = dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
@@ -100,9 +90,6 @@ export async function backupTable(context: Context, table: string) {
   const isBackupTables: string[] = dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
   dataSettingDataPreferences.putSync('isBackupTables', Array.from(new Set([...isBackupTables, table])))
   dataSettingDataPreferences.flushSync()
-  await promptAction.openToast({
-    message: '备份成功'
-  })
 }
 
 export async function autoBackupTable(context: Context, table: string) {
@@ -118,21 +105,11 @@ export async function autoBackupTable(context: Context, table: string) {
   const lowBatteryCapacityLevel =
     debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
   if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    await promptAction.openToast({
-      message: '电池电量低，自动暂停同步'
-    })
     return
   }
   const currentPowerMode = power.getPowerMode()
   if (pauseAutoBackupWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
     currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
-    let text = ''
-    if (power.getPowerMode() === 603) {
-      text = '超级'
-    }
-    await promptAction.openToast({
-      message: '系统开启' + text + '省电模式，暂停自动备份'
-    })
     return
   }
   const autoBackupTables: string[] =
@@ -154,7 +131,4 @@ export async function recoveryTable(context: Context, table: string) {
     allowRebuild: true
   })
   await rdbStore.restore(table + 'Backup.db')
-  await promptAction.openToast({
-    message: '恢复成功'
-  })
 }

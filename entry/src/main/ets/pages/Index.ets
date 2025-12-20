@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { display, window } from '@kit.ArkUI'
+import { zlib } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
@@ -145,7 +146,7 @@ struct Index {
         }
       })
       this.context.eventHub.on('wantUri', async (wantUri: string) => {
-        if (wantUri.endsWith('.txt') || wantUri.endsWith('.csv')) {
+        if (wantUri.endsWith('.txt') || wantUri.endsWith('.csv') || wantUri.endsWith('.zip')) {
           const filestring = await readUri(wantUri)
           if (wantUri.endsWith('.txt')) {
             const promptAction = this.UIContext.getPromptAction()
@@ -185,6 +186,42 @@ struct Index {
           if (wantUri.endsWith('.csv')) {
             await importCsvPassword(this.context, filestring)
             this.context.eventHub.emit('refreshPassword')
+          }
+          if (wantUri.endsWith('.zip')) {
+            const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
+            if (!fileIo.accessSync(passwordIconDir)) {
+              await fileIo.mkdir(passwordIconDir, true)
+            }
+            const filePath = passwordIconDir + 'passwordicon.zip'
+            const srcFile = fileIo.openSync(wantUri)
+            const destFile = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
+            await fileIo.copyFile(srcFile.fd, destFile.fd)
+            fileIo.closeSync(srcFile)
+            fileIo.closeSync(destFile)
+            await zlib.decompressFile(filePath, passwordIconDir)
+            await fileIo.unlink(filePath)
+            const promptAction = this.UIContext.getPromptAction()
+            const data = await promptAction.showDialog({
+              title: '提示',
+              message: '导入成功，需重启应用生效，是否重启？',
+              buttons: [
+                {
+                  text: '取消',
+                  color: $r('sys.color.font_primary')
+                },
+                {
+                  text: '重启',
+                  color: $r('sys.color.font_emphasize')
+                }
+              ]
+            })
+            if (data.index === 1) {
+              const applicationContext = this.context.getApplicationContext()
+              applicationContext.restartApp({
+                bundleName: 'com.zhangxm.aipasswordmemo',
+                abilityName: 'EntryAbility'
+              })
+            }
           }
         }
         if (wantUri.startsWith('https://www.zhangls2512.cn/product/password')) {

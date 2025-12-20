@@ -6,9 +6,9 @@ function getNumber(data: number, start: number, end: number) {
   return parseInt(resultstring, 2)
 }
 
-export default function getPublicKey(inputData: Uint8Array): string {
+export default function getPublicKey(attestationObject: Uint8Array) {
   let publicKey = ''
-  const data = Array.from(inputData)
+  const data = Array.from(attestationObject)
   let offset = 0
   let pendingParseKeyCount = getNumber(data[offset], 3, 7)
   while (pendingParseKeyCount > 0) {
@@ -18,18 +18,18 @@ export default function getPublicKey(inputData: Uint8Array): string {
     const valueType = getNumber(data[offset], 0, 2)
     if (valueType === 2) {
       let valueValueLength = getNumber(data[offset], 3, 7)
-      if (valueValueLength == 24) {
+      if (valueValueLength === 24) {
         offset++
         valueValueLength = data[offset]
       }
-      if (valueValueLength == 25) {
+      if (valueValueLength === 25) {
         offset++
         let lengthstring = data[offset].toString(2).padStart(8, '0')
         offset++
         lengthstring += data[offset].toString(2).padStart(8, '0')
         valueValueLength = parseInt(lengthstring, 2)
       }
-      if (valueValueLength == 26) {
+      if (valueValueLength === 26) {
         let lengthstring = ''
         for (let i = 0; i < 4; i++) {
           offset++
@@ -37,7 +37,7 @@ export default function getPublicKey(inputData: Uint8Array): string {
         }
         valueValueLength = parseInt(lengthstring, 2)
       }
-      if (valueValueLength == 27) {
+      if (valueValueLength === 27) {
         let lengthstring = ''
         for (let i = 0; i < 8; i++) {
           offset++
@@ -81,18 +81,18 @@ export default function getPublicKey(inputData: Uint8Array): string {
         const valueTypea = getNumber(data[offset], 0, 2)
         if (valueTypea === 2) {
           let valueValueLength = getNumber(data[offset], 3, 7)
-          if (valueValueLength == 24) {
+          if (valueValueLength === 24) {
             offset++
             valueValueLength = data[offset]
           }
-          if (valueValueLength == 25) {
+          if (valueValueLength === 25) {
             offset++
             let lengthstring = data[offset].toString(2).padStart(8, '0')
             offset++
             lengthstring += data[offset].toString(2).padStart(8, '0')
             valueValueLength = parseInt(lengthstring, 2)
           }
-          if (valueValueLength == 26) {
+          if (valueValueLength === 26) {
             let lengthstring = ''
             for (let i = 0; i < 4; i++) {
               offset++
@@ -100,7 +100,7 @@ export default function getPublicKey(inputData: Uint8Array): string {
             }
             valueValueLength = parseInt(lengthstring, 2)
           }
-          if (valueValueLength == 27) {
+          if (valueValueLength === 27) {
             let lengthstring = ''
             for (let i = 0; i < 8; i++) {
               offset++
@@ -118,18 +118,18 @@ export default function getPublicKey(inputData: Uint8Array): string {
           while (pendingParseItemCount > 0) {
             offset++
             let itemLength = getNumber(data[offset], 3, 7)
-            if (itemLength == 24) {
+            if (itemLength === 24) {
               offset++
               itemLength = data[offset]
             }
-            if (itemLength == 25) {
+            if (itemLength === 25) {
               offset++
               let lengthstring = data[offset].toString(2).padStart(8, '0')
               offset++
               lengthstring += data[offset].toString(2).padStart(8, '0')
               itemLength = parseInt(lengthstring, 2)
             }
-            if (itemLength == 26) {
+            if (itemLength === 26) {
               let lengthstring = ''
               for (let i = 0; i < 4; i++) {
                 offset++
@@ -137,7 +137,7 @@ export default function getPublicKey(inputData: Uint8Array): string {
               }
               itemLength = parseInt(lengthstring, 2)
             }
-            if (itemLength == 27) {
+            if (itemLength === 27) {
               let lengthstring = ''
               for (let i = 0; i < 8; i++) {
                 offset++

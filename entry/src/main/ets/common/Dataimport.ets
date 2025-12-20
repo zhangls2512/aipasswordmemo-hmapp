@@ -45,7 +45,7 @@ export async function importPassword(context: Context, data: string, conflict: r
       rdbStore.insertSync('password', {
         id: item.id,
         name: item.name,
-        info: JSON.stringify(item.info.filter(infoItem => infoItem.type !== '图标')),
+        info: JSON.stringify(item.info),
         tag: JSON.stringify(item.tag),
         updateTime: item.updateTime,
         cloudBackupTime: cloudBackupTime
@@ -71,19 +71,17 @@ export async function importInfo(context: Context, data: string, conflict: relat
       allowRebuild: true
     })
     const promises = array.map(item => {
-      if (item.type !== '图标') {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
-        rdbStore.insertSync('info', {
-          id: item.id,
-          type: item.type,
-          value: item.value,
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }, conflict)
+      let cloudBackupTime = JSON.stringify([])
+      if (typeof (item.cloudBackupTime) === 'string') {
+        cloudBackupTime = item.cloudBackupTime
       }
+      rdbStore.insertSync('info', {
+        id: item.id,
+        type: item.type,
+        value: item.value,
+        updateTime: item.updateTime,
+        cloudBackupTime: cloudBackupTime
+      }, conflict)
     })
     await Promise.all(promises)
     await autoSyncTable(context, 'info')

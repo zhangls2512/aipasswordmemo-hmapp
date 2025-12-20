@@ -29,6 +29,8 @@ export default struct Cleardata {
   @Local errorLogSize: string = ''
   @Local nouse: string[] = []
   @Local allNouse: boolean = false
+  @Local tempFileNouse: boolean = false
+  @Local tempFileNouseSize: string = ''
   @Local speakSettingNouse: boolean = false
   @Local oldaccountNouse: boolean = false
   @Local passwordIconNouse: boolean = false
@@ -60,8 +62,37 @@ export default struct Cleardata {
     this.invitationQrcodeCacheSize = this.getSizeString(invitationQrcodeCacheSize)
     const errorLogSize = await getDirectorySize(this.context.filesDir + '/log/error/')
     this.errorLogSize = this.getSizeString(errorLogSize)
-    const passwordIconNouseSize = await getDirectorySize(this.context.filesDir + '/media/passwordicon/')
+    const tempFileNouseSize = await getDirectorySize(this.context.tempDir)
+    this.tempFileNouseSize = this.getSizeString(tempFileNouseSize)
+    const nousePasswordIconFilePathArray = await this.getNousePasswordIconFilePathArray()
+    let passwordIconNouseSize = 0
+    nousePasswordIconFilePathArray.forEach(item => {
+      const file = fileIo.openSync(item)
+      passwordIconNouseSize += fileIo.statSync(file.fd).size
+      fileIo.closeSync(file)
+    })
     this.passwordIconNouseSize = this.getSizeString(passwordIconNouseSize)
+  }
+
+  async getNousePasswordIconFilePathArray() {
+    const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
+    if (!fileIo.accessSync(passwordIconDir)) {
+      return []
+    }
+    const passwordIconFileNameArray = await fileIo.listFile(passwordIconDir)
+    const passwordIconFilePathArray = passwordIconFileNameArray.map(item => passwordIconDir + item)
+    const passwordArray = await getPasswordList(this.context)
+    const passwordIconPathArray: string[] = []
+    passwordArray.forEach(item => {
+      const infoItem = item.info.find(infoItem => infoItem.type === '图标')
+      if (infoItem) {
+        passwordIconPathArray.push(infoItem.value.replace('file://com.zhangxm.aipasswordmemo', ''))
+      }
+    })
+    const infoArray = await getTypeInfoList(this.context, '图标')
+    const infoIconPathArray = infoArray.map(item => item.replace('file://com.zhangxm.aipasswordmemo', ''))
+    const iconPathSet = new Set(passwordIconPathArray.concat(infoIconPathArray))
+    return passwordIconFilePathArray.filter(item => !iconPathSet.has(item))
   }
 
   build() {
@@ -604,6 +635,35 @@ export default struct Cleardata {
                 right: 12
               })
             Row() {
+              Text('临时文件')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Text(this.tempFileNouseSize)
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                })
+              Checkbox({
+                name: 'tempFileNouse',
+                group: 'nouse'
+              })
+                .select(this.tempFileNouse!!)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+            }
+            .borderRadius(12)
+            .padding(12)
+            .width('100%')
+
+            Divider()
+              .padding({
+                left: 12,
+                right: 12
+              })
+            Row() {
               Text('AI助手设置数据')
                 .enableAutoSpacing(true)
                 .fontWeight(FontWeight.Medium)
@@ -691,6 +751,20 @@ export default struct Cleardata {
           .width('100%')
           .onClick(async () => {
             const promises = this.nouse.map(async (item) => {
+              if (item === 'tempFileNouse') {
+                const tempDir = this.context.tempDir
+                const tempFiles = await fileIo.listFile(tempDir)
+                tempFiles.forEach(async (item) => {
+                  const path = tempDir + '/' + item
+                  const isDirectory = fileIo.statSync(path)
+                  if (!isDirectory) {
+                    await fileIo.unlink(path)
+                  }
+                  if (isDirectory) {
+                    await fileIo.rmdir(path)
+                  }
+                })
+              }
               if (item === 'oldaccountNouse') {
                 try {
                   const query: asset.AssetMap = new Map()
@@ -706,29 +780,11 @@ export default struct Cleardata {
                 await preferences.deletePreferences(this.context, 'speakSetting')
               }
               if (item === 'passwordIconNouse') {
-                try {
-                  const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
-                  const passwordIconFileNameArray = await fileIo.listFile(passwordIconDir)
-                  const passwordIconFilePathArray = passwordIconFileNameArray.map(item => passwordIconDir + item)
-                  const passwordArray = await getPasswordList(this.context)
-                  const passwordIconPathArray: string[] = []
-                  passwordArray.forEach(item => {
-                    const infoItem = item.info.find(infoItem => infoItem.type === '图标')
-                    if (infoItem) {
-                      passwordIconPathArray.push(infoItem.value.replace('file://com.zhangxm.aipasswordmemo', ''))
-                    }
-                  })
-                  const infoArray = await getTypeInfoList(this.context, '图标')
-                  const infoIconPathArray = infoArray.map(item => item.replace('file://com.zhangxm.aipasswordmemo', ''))
-                  const iconPathSet = new Set(passwordIconPathArray.concat(infoIconPathArray))
-                  const nousePasswordIconFilePathArray =
-                    passwordIconFilePathArray.filter(item => !iconPathSet.has(item))
-                  const promises = nousePasswordIconFilePathArray.map(async (item) => {
-                    await fileIo.unlink(item)
-                  })
-                  await Promise.all(promises)
-                } catch {
-                }
+                const nousePasswordIconFilePathArray = await this.getNousePasswordIconFilePathArray()
+                const promises = nousePasswordIconFilePathArray.map(async (item) => {
+                  await fileIo.unlink(item)
+                })
+                await Promise.all(promises)
               }
             })
             await Promise.all(promises)
