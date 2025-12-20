@@ -1,6 +1,9 @@
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { batteryInfo, power } from '@kit.BasicServicesKit'
+import { getInfoList, getPasswordList, getTagList } from './Dataget'
+import { write } from './File'
+import { InfoOutItem, PasswordOutItem, TagOutItem } from '../pages/DataInOut'
 
 interface Item {
   deviceId: string,
@@ -116,6 +119,62 @@ export async function autoBackupTable(context: Context, table: string) {
     dataSettingDataPreferences.getSync('autoBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoBackupTables.includes(table)) {
     await backupTable(context, table)
+  }
+  const autoFileBackupTables: string[] =
+    dataSettingDataPreferences.getSync('autoFileBackupTables', ['password', 'info', 'tag']) as string[]
+  if (autoFileBackupTables.includes(table)) {
+    if (table === 'password') {
+      const array = await getPasswordList(context)
+      const arrayOut = array.map((item): PasswordOutItem => {
+        let cloudBackupTime = JSON.stringify([])
+        if (typeof (item.cloudBackupTime) === 'string') {
+          cloudBackupTime = item.cloudBackupTime
+        }
+        return {
+          id: item.id,
+          name: item.name,
+          info: item.info,
+          tag: item.tag.map(item => item.value),
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }
+      })
+      await write(context.filesDir + '/backup/password.txt', JSON.stringify(arrayOut))
+    }
+    if (table === 'info') {
+      const array = await getInfoList(context)
+      const arrayOut = array.map((item): InfoOutItem => {
+        let cloudBackupTime = JSON.stringify([])
+        if (typeof (item.cloudBackupTime) === 'string') {
+          cloudBackupTime = item.cloudBackupTime
+        }
+        return {
+          id: item.id,
+          type: item.type,
+          value: item.value,
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }
+      })
+      await write(context.filesDir + '/backup/info.txt', JSON.stringify(arrayOut))
+    }
+    if (table === 'tag') {
+      const array = await getTagList(context)
+      const arrayOut = array.map((item): TagOutItem => {
+        let cloudBackupTime = JSON.stringify([])
+        if (typeof (item.cloudBackupTime) === 'string') {
+          cloudBackupTime = item.cloudBackupTime
+        }
+        return {
+          id: item.id,
+          value: item.value,
+          color: item.color,
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }
+      })
+      await write(context.filesDir + '/backup/tag.txt', JSON.stringify(arrayOut))
+    }
   }
 }
 

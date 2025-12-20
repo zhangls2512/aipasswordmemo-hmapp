@@ -350,7 +350,6 @@ export default struct Setting {
               Text('账号中心')
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontSize($r('sys.float.ohos_id_text_size_body3'))
-                .fontWeight(FontWeight.Medium)
                 .margin({
                   top: 6,
                   left: 12,
@@ -564,7 +563,6 @@ export default struct Setting {
                 Text('安全保障说明')
                   .fontColor($r('sys.color.font_emphasize'))
                   .fontSize($r('sys.float.ohos_id_text_size_body3'))
-                  .fontWeight(FontWeight.Medium)
                   .margin({
                     top: 6,
                     left: 12,
@@ -725,7 +723,6 @@ export default struct Setting {
             Text('数据防丢失指南')
               .fontColor($r('sys.color.font_emphasize'))
               .fontSize($r('sys.float.ohos_id_text_size_body3'))
-              .fontWeight(FontWeight.Medium)
               .margin({
                 top: 6,
                 left: 12,
