@@ -146,7 +146,7 @@ struct About {
             })
             .onClick(async () => {
               try {
-                if (this.hasUpdate !== 1) {
+                if (this.hasUpdate !== updateManager.UpdateAvailableCode.LATER_VERSION_EXIST) {
                   this.updateLoading = true
                   const res = await updateManager.checkAppUpdate(this.context)
                   this.updateLoading = false

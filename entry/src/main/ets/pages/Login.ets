@@ -425,8 +425,8 @@ export default struct Login {
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(async () => {
                   try {
-                    const appPrivacyLink = privacyManager.getAppPrivacyMgmtInfo()
-                      .privacyInfo.find(item => item.type === privacyManager.AppPrivacyLinkType.USER_AGREEMENT_LINK)
+                    const appPrivacyLink = privacyManager.getAppPrivacyMgmtInfo().privacyInfo
+                      .find(item => item.type === privacyManager.AppPrivacyLinkType.USER_AGREEMENT_LINK)
                     await openLink(this.context, appPrivacyLink?.url as string)
                   } catch (err) {
                     await promptAction.openToast({
@@ -438,8 +438,8 @@ export default struct Login {
                 .fontColor($r('sys.color.font_emphasize'))
                 .onClick(async () => {
                   try {
-                    const appPrivacyLink = privacyManager.getAppPrivacyMgmtInfo()
-                      .privacyInfo.find(item => item.type === privacyManager.AppPrivacyLinkType.PRIVACY_STATEMENT_LINK)
+                    const appPrivacyLink = privacyManager.getAppPrivacyMgmtInfo().privacyInfo
+                      .find(item => item.type === privacyManager.AppPrivacyLinkType.PRIVACY_STATEMENT_LINK)
                     await openLink(this.context, appPrivacyLink?.url as string)
                   } catch (err) {
                     await promptAction.openToast({
