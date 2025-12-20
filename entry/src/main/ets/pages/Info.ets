@@ -35,34 +35,32 @@ export default struct InfoPage {
   updateId = 0
 
   async cloudBackup(item: Info) {
-    if (item.type !== '图标') {
-      let cloudBackupTime = JSON.stringify([])
-      if (typeof (item.cloudBackupTime) === 'string') {
-        cloudBackupTime = item.cloudBackupTime
-      }
-      const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-      const accountInfo = await getAccountInfo()
-      const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeIndex !== -1) {
-        cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
-      }
-      if (cloudBackupTimeIndex === -1) {
-        cloudBackupTimeArray.push({
-          uid: accountInfo.uid,
-          time: Date.now()
-        })
-      }
-      await setCloudBackup(this.context, {
-        type: 'info',
-        id: item.id,
-        content: JSON.stringify({
-          type: item.type,
-          value: item.value,
-          updateTime: item.updateTime,
-          cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-        })
+    let cloudBackupTime = JSON.stringify([])
+    if (typeof (item.cloudBackupTime) === 'string') {
+      cloudBackupTime = item.cloudBackupTime
+    }
+    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
+    const accountInfo = await getAccountInfo()
+    const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
+    if (cloudBackupTimeIndex !== -1) {
+      cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
+    }
+    if (cloudBackupTimeIndex === -1) {
+      cloudBackupTimeArray.push({
+        uid: accountInfo.uid,
+        time: Date.now()
       })
     }
+    await setCloudBackup(this.context, {
+      type: 'info',
+      id: item.id,
+      content: JSON.stringify({
+        type: item.type,
+        value: item.value,
+        updateTime: item.updateTime,
+        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
+      })
+    })
   }
 
   @Builder
@@ -97,11 +95,11 @@ export default struct InfoPage {
             }
             if (item.type === '图标') {
               const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
-              try {
-                const uris = await phAccessHelper.showAssetsCreationDialog([item.value], [{
-                  fileNameExtension: 'png',
-                  photoType: photoAccessHelper.PhotoType.IMAGE
-                }])
+              const uris = await phAccessHelper.showAssetsCreationDialog([item.value], [{
+                fileNameExtension: 'png',
+                photoType: photoAccessHelper.PhotoType.IMAGE
+              }])
+              if (uris.length === 1) {
                 const srcFile = fileIo.openSync(item.value)
                 const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
                 await fileIo.copyFile(srcFile.fd, destFile.fd)
@@ -110,12 +108,6 @@ export default struct InfoPage {
                 await promptAction.openToast({
                   message: '保存成功'
                 })
-              } catch (err) {
-                if (err.code !== 13900020) {
-                  await promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
-                }
               }
             }
           })
@@ -144,7 +136,7 @@ export default struct InfoPage {
               this.loading = true
             }
           })
-        if (this.enableCloudBackup && !item.isCloudBackup && item.type !== '图标') {
+        if (this.enableCloudBackup && !item.isCloudBackup) {
           MenuItem({
             startIcon: $r('app.media.cloud'),
             content: '云备份'
@@ -534,6 +526,7 @@ export default struct InfoPage {
                         }
                         if (item.type === '图标') {
                           Image(item.value)
+                            .autoResize(true)
                             .copyOption(CopyOptions.LocalDevice)
                             .width('10%')
                             .onError(async (err) => {
@@ -589,7 +582,9 @@ export default struct InfoPage {
                     .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
                       hapticFeedbackMode: HapticFeedbackMode.AUTO
                     })
-                    .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick)
+                    .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick, {
+                      hapticFeedbackMode: HapticFeedbackMode.AUTO
+                    })
                   }
                   .backgroundColor($r('sys.color.comp_background_primary'))
                   .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -610,7 +605,6 @@ export default struct InfoPage {
         })
       }
       .alignItems(HorizontalAlign.Start)
-      .height('100%')
     }
     .padding({
       left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),

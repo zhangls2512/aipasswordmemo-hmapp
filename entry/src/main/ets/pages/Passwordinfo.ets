@@ -121,6 +121,7 @@ export default struct Passwordinfo {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                 Image(item.value)
+                  .autoResize(true)
                   .copyOption(CopyOptions.LocalDevice)
                   .width('10%')
                   .onError(async (err) => {
@@ -164,12 +165,7 @@ export default struct Passwordinfo {
                   await promptAction.openToast({
                     message: '保存成功'
                   })
-                } catch (err) {
-                  if (err.code !== 13900020) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code
-                    })
-                  }
+                } catch {
                 }
               })
             }

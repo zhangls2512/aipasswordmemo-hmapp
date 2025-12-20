@@ -27,11 +27,6 @@ export default struct Updateinfo {
             text: this.infoType!!
           })
             .enableAutoSpacing(true)
-            .onChange((value) => {
-              if (value === '图标') {
-                this.cloudBackup = false
-              }
-            })
           if (this.infoType === '昵称') {
             TextInput({
               placeholder: '请输入内容',
@@ -163,7 +158,7 @@ export default struct Updateinfo {
                 type: ToggleType.Switch,
                 isOn: this.cloudBackup!!
               })
-                .enabled(this.allowCloudBackup && this.infoType !== '图标')
+                .enabled(this.allowCloudBackup)
             }
             .borderRadius(12)
             .padding(12)

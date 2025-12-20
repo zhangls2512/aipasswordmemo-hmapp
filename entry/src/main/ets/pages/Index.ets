@@ -1,7 +1,8 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
+import { preferences, relationalStore } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { display, window } from '@kit.ArkUI'
+import { zlib } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
@@ -11,11 +12,11 @@ import getDeviceToken from '../common/Devicetoken'
 import { readUri } from '../common/File'
 import getPreferType from '../common/Prefertype'
 import request from '../common/Request'
-import Password from './Password'
-import Info from './Info'
-import Tag from './Tag'
-import Me from './Me'
 import Cleardata from './Cleardata'
+import Info from './Info'
+import Me from './Me'
+import Password from './Password'
+import Tag from './Tag'
 
 @Entry
 @ComponentV2
@@ -75,19 +76,16 @@ struct Index {
       }) {
         TabContent() {
           Password()
-            .height('100%')
         }
         .tabBar(this.tabBuilder(0, $r('app.media.password'), '密码'))
 
         TabContent() {
           Info()
-            .height('100%')
         }
         .tabBar(this.tabBuilder(1, $r('app.media.info'), '常用信息'))
 
         TabContent() {
           Tag()
-            .height('100%')
         }
         .tabBar(this.tabBuilder(2, $r('app.media.tag'), '标签'))
 
@@ -148,7 +146,7 @@ struct Index {
         }
       })
       this.context.eventHub.on('wantUri', async (wantUri: string) => {
-        if (wantUri.endsWith('.txt') || wantUri.endsWith('.csv')) {
+        if (wantUri.endsWith('.txt') || wantUri.endsWith('.csv') || wantUri.endsWith('.zip')) {
           const filestring = await readUri(wantUri)
           if (wantUri.endsWith('.txt')) {
             const promptAction = this.UIContext.getPromptAction()
@@ -170,15 +168,15 @@ struct Index {
               ]
             })
             if (data.index === 0) {
-              await importPassword(this.context, filestring, 0)
+              await importPassword(this.context, filestring, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
               this.context.eventHub.emit('refreshPassword')
             }
             if (data.index === 1) {
-              await importInfo(this.context, filestring, 0)
+              await importInfo(this.context, filestring, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
               this.context.eventHub.emit('refreshInfo')
             }
             if (data.index === 2) {
-              await importTag(this.context, filestring, 0)
+              await importTag(this.context, filestring, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
               this.context.eventHub.emit('refreshTag')
             }
             await promptAction.openToast({
@@ -188,6 +186,42 @@ struct Index {
           if (wantUri.endsWith('.csv')) {
             await importCsvPassword(this.context, filestring)
             this.context.eventHub.emit('refreshPassword')
+          }
+          if (wantUri.endsWith('.zip')) {
+            const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
+            if (!fileIo.accessSync(passwordIconDir)) {
+              await fileIo.mkdir(passwordIconDir, true)
+            }
+            const filePath = passwordIconDir + 'passwordicon.zip'
+            const srcFile = fileIo.openSync(wantUri)
+            const destFile = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
+            await fileIo.copyFile(srcFile.fd, destFile.fd)
+            fileIo.closeSync(srcFile)
+            fileIo.closeSync(destFile)
+            await zlib.decompressFile(filePath, passwordIconDir)
+            await fileIo.unlink(filePath)
+            const promptAction = this.UIContext.getPromptAction()
+            const data = await promptAction.showDialog({
+              title: '提示',
+              message: '导入成功，需重启应用生效，是否重启？',
+              buttons: [
+                {
+                  text: '取消',
+                  color: $r('sys.color.font_primary')
+                },
+                {
+                  text: '重启',
+                  color: $r('sys.color.font_emphasize')
+                }
+              ]
+            })
+            if (data.index === 1) {
+              const applicationContext = this.context.getApplicationContext()
+              applicationContext.restartApp({
+                bundleName: 'com.zhangxm.aipasswordmemo',
+                abilityName: 'EntryAbility'
+              })
+            }
           }
         }
         if (wantUri.startsWith('https://www.zhangls2512.cn/product/password')) {

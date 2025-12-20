@@ -50,7 +50,7 @@ export default struct Ainewinfo {
           EntityType.ID_NO
         ]
       })
-      entity.forEach((item) => {
+      entity.forEach(item => {
         if (item.type === EntityType.EMAIL) {
           this.list.push({
             type: '邮箱',
@@ -108,12 +108,7 @@ export default struct Ainewinfo {
               await textRecognition.release()
               await this.getList(this.text)
             }
-          } catch (err) {
-            if (err.code !== 13900002) {
-              await promptAction.openToast({
-                message: '发生错误，错误码：' + err.code
-              })
-            }
+          } catch {
           }
         })
       MenuItem({ content: '从图库中选择' })
@@ -140,12 +135,7 @@ export default struct Ainewinfo {
               await textRecognition.release()
               await this.getList(this.text)
             }
-          } catch (err) {
-            if (err.code !== 13900020) {
-              await promptAction.openToast({
-                message: '发生错误，错误码：' + err.code
-              })
-            }
+          } catch {
           }
         })
       if (deviceInfo.deviceType !== 'phone') {

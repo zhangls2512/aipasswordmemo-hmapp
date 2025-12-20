@@ -36,7 +36,8 @@ export default struct Setting {
     this.allService = this.commonSettingDataPreferences.getSync('allService', true) as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
-      this.agreedPrivacyAgreement = appPrivacyResults.find(item => item.type === 1)?.result
+      this.agreedPrivacyAgreement =
+        appPrivacyResults.find(item => item.type === privacyManager.AppPrivacyType.PRIVACY_AGREEMENT)?.result
     } catch (err) {
       await promptAction.openToast({
         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
@@ -268,12 +269,6 @@ export default struct Setting {
                     })
                     return
                   }
-                  if (1 === 1) {
-                    await promptAction.openToast({
-                      message: '暂未上线，敬请期待'
-                    })
-                    return
-                  }
                   this.pageInfos.pushPath({
                     name: 'Newpasskey'
                   })
@@ -305,8 +300,7 @@ export default struct Setting {
                     type: ToggleType.Switch,
                     isOn: this.autoLoginByPasskey!!
                   })
-                  //.enabled(!this.autoLoginByHuaweiAccount)
-                    .enabled(false)
+                    .enabled(!this.autoLoginByHuaweiAccount)
                     .onChange((isOn) => {
                       this.commonSettingDataPreferences.putSync('autoLoginByPasskey', isOn)
                       this.commonSettingDataPreferences.flushSync()
@@ -356,7 +350,6 @@ export default struct Setting {
               Text('账号中心')
                 .fontColor($r('sys.color.font_emphasize'))
                 .fontSize($r('sys.float.ohos_id_text_size_body3'))
-                .fontWeight(FontWeight.Medium)
                 .margin({
                   top: 6,
                   left: 12,
@@ -570,7 +563,6 @@ export default struct Setting {
                 Text('安全保障说明')
                   .fontColor($r('sys.color.font_emphasize'))
                   .fontSize($r('sys.float.ohos_id_text_size_body3'))
-                  .fontWeight(FontWeight.Medium)
                   .margin({
                     top: 6,
                     left: 12,
@@ -727,6 +719,18 @@ export default struct Setting {
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+            Text('数据防丢失指南')
+              .fontColor($r('sys.color.font_emphasize'))
+              .fontSize($r('sys.float.ohos_id_text_size_body3'))
+              .margin({
+                top: 6,
+                left: 12,
+                right: 12
+              })
+              .onClick(async () => {
+                await openLink(this.context, 'https://docs.qq.com/doc/p/4168ccb976b6c8825e574cee297388cb431b6383')
+              })
           }
           .alignItems(HorizontalAlign.Start)
         }
@@ -1077,8 +1081,8 @@ export default struct Setting {
               })
               .onClick(async () => {
                 try {
-                  const appPrivacyLink =
-                    privacyManager.getAppPrivacyMgmtInfo().privacyInfo.find(item => item.type === 1)
+                  const appPrivacyLink = privacyManager.getAppPrivacyMgmtInfo().privacyInfo
+                    .find(item => item.type === privacyManager.AppPrivacyLinkType.PRIVACY_STATEMENT_LINK)
                   this.pageInfos.pushPath({
                     name: 'Webview',
                     param: appPrivacyLink?.url
@@ -1435,10 +1439,6 @@ export default struct Setting {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
       }
-      .nestedScroll({
-        scrollForward: NestedScrollMode.SELF_ONLY,
-        scrollBackward: NestedScrollMode.SELF_ONLY
-      })
       .padding({
         bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),

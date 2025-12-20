@@ -3,6 +3,7 @@ import { util } from '@kit.ArkTS'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
 import { getAccountInfo } from '../common/Accesstoken'
+import getPublicKey from '../common/Publickey'
 import request from '../common/Request'
 
 @Builder
@@ -13,7 +14,7 @@ export function NewpasskeyBuilder() {
 @ComponentV2
 struct Newpasskey {
   @Local email: string = ''
-  @Local rawId: string = ''
+  @Local credentialId: string = ''
   @Local publicKey: string = ''
   @Local type: string = 'mfa'
   @Local mfa: string = ''
@@ -26,7 +27,7 @@ struct Newpasskey {
   build() {
     NavDestination() {
       List() {
-        if (this.email && this.rawId && this.publicKey) {
+        if (this.email && this.credentialId && this.publicKey) {
           ListItem() {
             Column() {
               Row() {
@@ -186,7 +187,7 @@ struct Newpasskey {
                     verifyType: this.type,
                     verifyCode: code,
                     platform: 'passkey',
-                    rawId: this.rawId,
+                    credentialId: this.credentialId,
                     publicKey: this.publicKey
                   })
                   dialogControllerProgress.close()
@@ -223,7 +224,8 @@ struct Newpasskey {
           const res = await fido2.register(this.context, {
             publicKey: {
               rp: {
-                name: 'xm2512'
+                id: 'www.zhangls2512.cn',
+                name: 'www.zhangls2512.cn'
               },
               user: {
                 id: new util.TextEncoder().encodeInto(accountInfo.uid),
@@ -231,18 +233,25 @@ struct Newpasskey {
                 displayName: accountInfo.email
               },
               challenge: new util.TextEncoder().encodeInto(String(Date.now()).slice(0, -5) + '00000'),
-              pubKeyCredParams: [{
-                type: fido2.PublicKeyCredentialType.PUBLIC_KEY,
-                alg: -7
-              }]
+              pubKeyCredParams: [
+                {
+                  type: fido2.PublicKeyCredentialType.PUBLIC_KEY,
+                  alg: fido2.Algorithm.ES256
+                }
+              ],
+              authenticatorSelection: {
+                residentKey: fido2.UserVerificationRequirement.PREFERRED
+              }
             }
           })
-          this.rawId = new util.Base64Helper().encodeToStringSync(res.rawId, util.Type.BASIC_URL_SAFE)
-          this.publicKey = new util.Base64Helper().encodeToStringSync(res.response.publicKey, util.Type.BASIC_URL_SAFE)
+          this.credentialId = new util.Base64Helper().encodeToStringSync(res.rawId, util.Type.BASIC_URL_SAFE)
+          this.publicKey = getPublicKey(res.response.attestationObject)
         } catch (err) {
-          await promptAction.openToast({
-            message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-          })
+          if (err.code !== 1021300004) {
+            await promptAction.openToast({
+              message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+            })
+          }
         }
       }
     })

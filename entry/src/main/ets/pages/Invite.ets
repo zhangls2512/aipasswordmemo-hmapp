@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { uniformTypeDescriptor } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
@@ -94,7 +95,7 @@ struct Invite {
                         await fileIo.mkdir(qrcodeDir, true)
                       }
                       const qrcodeFile =
-                        fileIo.openSync(qrcodePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+                        fileIo.openSync(qrcodePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
                       const imagePacker = image.createImagePacker()
                       await imagePacker.packToFile(qrcodePixelMap, qrcodeFile.fd, {
                         format: 'image/png',
@@ -136,7 +137,7 @@ struct Invite {
                         await fileIo.mkdir(qrcodeDir, true)
                       }
                       const qrcodeFile =
-                        fileIo.openSync(qrcodePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+                        fileIo.openSync(qrcodePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
                       const imagePacker = image.createImagePacker()
                       await imagePacker.packToFile(qrcodePixelMap, qrcodeFile.fd, {
                         format: 'image/png',
@@ -146,11 +147,11 @@ struct Invite {
                     }
                     const qrcodeUri = fileUri.getUriFromPath(qrcodePath)
                     const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.context)
-                    try {
-                      const uris = await phAccessHelper.showAssetsCreationDialog([qrcodeUri], [{
-                        fileNameExtension: 'png',
-                        photoType: photoAccessHelper.PhotoType.IMAGE
-                      }])
+                    const uris = await phAccessHelper.showAssetsCreationDialog([qrcodeUri], [{
+                      fileNameExtension: 'png',
+                      photoType: photoAccessHelper.PhotoType.IMAGE
+                    }])
+                    if (uris.length === 1) {
                       const srcFile = fileIo.openSync(qrcodeUri)
                       const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
                       await fileIo.copyFile(srcFile.fd, destFile.fd)
@@ -159,12 +160,6 @@ struct Invite {
                       await promptAction.openToast({
                         message: '保存成功'
                       })
-                    } catch (err) {
-                      if (err.code !== 13900020) {
-                        await promptAction.openToast({
-                          message: '发生错误，错误码：' + err.code
-                        })
-                      }
                     }
                   })
               }
@@ -263,18 +258,20 @@ struct Invite {
               top: $r('sys.float.ohos_id_text_paragraph_margin_s')
             })
 
-            Text() {
-              Span('3. 本设备停留在本页面，让新用户')
-                .fontWeight(FontWeight.Medium)
-              Span('登录轩铭2512统一账号后')
-                .fontWeight(FontWeight.Bold)
-              Span('与本设备碰一碰/隔空传送进入本应用。')
-                .fontWeight(FontWeight.Medium)
+            if (deviceInfo.deviceType !== 'tablet') {
+              Text() {
+                Span('3. 本设备停留在本页面，让新用户')
+                  .fontWeight(FontWeight.Medium)
+                Span('登录轩铭2512统一账号后')
+                  .fontWeight(FontWeight.Bold)
+                Span('与本设备碰一碰/隔空传送进入本应用。')
+                  .fontWeight(FontWeight.Medium)
+              }
+              .enableAutoSpacing(true)
+              .margin({
+                top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+              })
             }
-            .enableAutoSpacing(true)
-            .margin({
-              top: $r('sys.float.ohos_id_text_paragraph_margin_s')
-            })
           }
           .alignItems(HorizontalAlign.Start)
         }
@@ -334,19 +331,21 @@ struct Invite {
         })
         if (userres !== 'fail') {
           this.invitationcode = JSON.parse(userres).data.invitationCode as string
-          const shareData = new systemShare.SharedData({
-            utd: uniformTypeDescriptor.UniformDataType.HYPERLINK,
-            title: '邀请您使用轩铭密码智能备忘录',
-            description: '邀请您使用轩铭密码智能备忘录，方便、智能地记录、管理密码。',
-            thumbnail: this.context.resourceManager.getMediaByNameSync('icon'),
-            content: 'https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode
-          })
-          harmonyShare.on('knockShare', async (sharableTarget) => {
-            await sharableTarget.share(shareData)
-          })
-          harmonyShare.on('gesturesShare', async (sharableTarget) => {
-            await sharableTarget.share(shareData)
-          })
+          if (deviceInfo.deviceType !== 'tablet') {
+            const shareData = new systemShare.SharedData({
+              utd: uniformTypeDescriptor.UniformDataType.HYPERLINK,
+              title: '邀请您使用轩铭密码智能备忘录',
+              description: '邀请您使用轩铭密码智能备忘录，方便、智能地记录、管理密码。',
+              thumbnail: this.context.resourceManager.getMediaByNameSync('icon'),
+              content: 'https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode
+            })
+            harmonyShare.on('knockShare', async (sharableTarget) => {
+              await sharableTarget.share(shareData)
+            })
+            harmonyShare.on('gesturesShare', async (sharableTarget) => {
+              await sharableTarget.share(shareData)
+            })
+          }
         }
         const countres = await request(this.context, '/product/getInviteUserCount', {
           accessToken: this.accessToken,
@@ -359,8 +358,10 @@ struct Invite {
       }
     })
     .onDisAppear(() => {
-      harmonyShare.off('knockShare')
-      harmonyShare.off('gesturesShare')
+      if (deviceInfo.deviceType !== 'tablet') {
+        harmonyShare.off('knockShare')
+        harmonyShare.off('gesturesShare')
+      }
     })
   }
 }
