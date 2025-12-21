@@ -51,11 +51,11 @@ export default struct PasswordPage {
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
   passwordId = 0
-  filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'filterPassword'
-  })
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
+  })
+  filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
+    name: 'filterPassword'
   })
 
   async cloudBackup(item: Password) {
@@ -81,7 +81,7 @@ export default struct PasswordPage {
       content: JSON.stringify({
         id: item.id,
         name: item.name,
-        info: item.info.filter(infoItem => infoItem.type !== '图标'),
+        info: item.info,
         tag: item.tag.map(item => item.value),
         updateTime: item.updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
@@ -629,6 +629,7 @@ export default struct PasswordPage {
                     }
                     if (item.info.find(infoItem => infoItem.type === '图标')) {
                       Image(item.info.find(infoItem => infoItem.type === '图标')?.value)
+                        .autoResize(true)
                         .copyOption(CopyOptions.LocalDevice)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -711,7 +712,9 @@ export default struct PasswordPage {
                   .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
                     hapticFeedbackMode: HapticFeedbackMode.AUTO
                   })
-                  .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick)
+                  .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick, {
+                    hapticFeedbackMode: HapticFeedbackMode.AUTO
+                  })
                 }
                 .backgroundColor($r('sys.color.comp_background_primary'))
                 .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -753,7 +756,6 @@ export default struct PasswordPage {
         })
       }
       .alignItems(HorizontalAlign.Start)
-      .height('100%')
     }
     .padding({
       left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),

@@ -105,21 +105,12 @@ export default struct Updatepassword {
               })
               return
             }
-            if (this.infoValue) {
-              try {
-                await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-              } catch (err) {
-                await promptAction.openToast({
-                  message: '发生错误，错误码：' + err.code
-                })
-              }
-            }
             const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
             if (!fileIo.accessSync(passwordIconDir)) {
               await fileIo.mkdir(passwordIconDir, true)
             }
             const filePath = passwordIconDir + Date.now() + '.png'
-            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
             const imagePacker = image.createImagePacker()
             await imagePacker.packToFile(imagePixelMap, file.fd, {
               format: 'image/png',
@@ -127,12 +118,7 @@ export default struct Updatepassword {
             })
             fileIo.closeSync(file)
             this.infoValue = fileUri.getUriFromPath(filePath)
-          } catch (err) {
-            if (err.code !== 13900020) {
-              await promptAction.openToast({
-                message: '发生错误，错误码：' + err.code
-              })
-            }
+          } catch {
           }
         })
       if (deviceInfo.deviceType !== 'phone') {
@@ -201,21 +187,12 @@ export default struct Updatepassword {
                 })
                 return
               }
-              if (this.infoValue) {
-                try {
-                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-                } catch (err) {
-                  await promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
-                }
-              }
               const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
               if (!fileIo.accessSync(passwordIconDir)) {
                 await fileIo.mkdir(passwordIconDir, true)
               }
               const filePath = passwordIconDir + Date.now() + '.png'
-              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
               const imagePacker = image.createImagePacker()
               await imagePacker.packToFile(imagePixelMap, file.fd, {
                 format: 'image/png',
@@ -243,13 +220,6 @@ export default struct Updatepassword {
                 this.infoArray = []
               }
               if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
-                try {
-                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-                } catch (err) {
-                  await promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
-                }
                 this.infoValue = ''
               }
             })
@@ -278,13 +248,6 @@ export default struct Updatepassword {
                   this.infoArray = []
                 }
                 if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
-                  try {
-                    await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-                  } catch (err) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code
-                    })
-                  }
                   this.infoValue = ''
                 }
               })
@@ -578,6 +541,7 @@ export default struct Updatepassword {
                 }
                 if (this.getCurrentInfoType() === '图标') {
                   Image(item)
+                    .autoResize(true)
                     .copyOption(CopyOptions.LocalDevice)
                     .layoutWeight(1)
                     .margin({
@@ -793,6 +757,7 @@ export default struct Updatepassword {
               Column() {
                 if (item.type === '图标') {
                   Image(item.value)
+                    .autoResize(true)
                     .copyOption(CopyOptions.LocalDevice)
                     .width('10%')
                     .onError(async (err) => {
@@ -1138,7 +1103,7 @@ export default struct Updatepassword {
               tagCloudBackup = true
             }
             if (this.autoNewInfo) {
-              this.passwordInfoArray.forEach(async (item) => {
+              const promises = this.passwordInfoArray.map(async (item) => {
                 if (item.type !== 'MFA') {
                   await newInfo(this.context, {
                     type: item.type,
@@ -1147,15 +1112,17 @@ export default struct Updatepassword {
                   })
                 }
               })
+              await Promise.all(promises)
             }
             if (this.autoNewTag) {
-              this.passwordTagArray.forEach(async (item) => {
+              const promises = this.passwordTagArray.map(async (item) => {
                 await newTag(this.context, {
                   value: item,
                   color: '',
                   cloudBackup: tagCloudBackup
                 })
               })
+              await Promise.all(promises)
             }
             this.isShowUpdateSheet = false
           })

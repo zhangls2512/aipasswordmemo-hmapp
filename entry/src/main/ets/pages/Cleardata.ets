@@ -7,6 +7,7 @@ import { fileIo } from '@kit.CoreFileKit'
 import { stringToArray } from '../common/Crypto'
 import { getPasswordList, getTypeInfoList } from '../common/Dataget'
 import { getDirectorySize } from '../common/File'
+import { getSizeString } from '../common/Stringformat'
 
 @ComponentV2
 export default struct Cleardata {
@@ -29,6 +30,8 @@ export default struct Cleardata {
   @Local errorLogSize: string = ''
   @Local nouse: string[] = []
   @Local allNouse: boolean = false
+  @Local tempFileNouse: boolean = false
+  @Local tempFileNouseSize: string = ''
   @Local speakSettingNouse: boolean = false
   @Local oldaccountNouse: boolean = false
   @Local passwordIconNouse: boolean = false
@@ -36,32 +39,42 @@ export default struct Cleardata {
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
 
-  getSizeString(size: number) {
-    if (size < Math.pow(1024, 1)) {
-      return size + ' B'
-    }
-    if (size >= Math.pow(1024, 1) && size < Math.pow(1024, 2)) {
-      return (size / Math.pow(1024, 1)).toFixed(2) + ' KB'
-    }
-    if (size >= Math.pow(1024, 2) && size < Math.pow(1024, 3)) {
-      return (size / Math.pow(1024, 2)).toFixed(2) + ' MB'
-    }
-    if (size >= Math.pow(1024, 3) && size < Math.pow(1024, 4)) {
-      return (size / Math.pow(1024, 3)).toFixed(2) + ' GB'
-    }
-    if (size >= Math.pow(1024, 4)) {
-      return (size / Math.pow(1024, 4)).toFixed(2) + ' TB'
-    }
-    return ''
-  }
-
   async getSize() {
     const invitationQrcodeCacheSize = await getDirectorySize(this.context.filesDir + '/media/invitationqrcode/')
-    this.invitationQrcodeCacheSize = this.getSizeString(invitationQrcodeCacheSize)
+    this.invitationQrcodeCacheSize = getSizeString(invitationQrcodeCacheSize)
     const errorLogSize = await getDirectorySize(this.context.filesDir + '/log/error/')
-    this.errorLogSize = this.getSizeString(errorLogSize)
-    const passwordIconNouseSize = await getDirectorySize(this.context.filesDir + '/media/passwordicon/')
-    this.passwordIconNouseSize = this.getSizeString(passwordIconNouseSize)
+    this.errorLogSize = getSizeString(errorLogSize)
+    const tempFileNouseSize = await getDirectorySize(this.context.tempDir)
+    this.tempFileNouseSize = getSizeString(tempFileNouseSize)
+    const nousePasswordIconFilePathArray = await this.getNousePasswordIconFilePathArray()
+    let passwordIconNouseSize = 0
+    nousePasswordIconFilePathArray.forEach(item => {
+      const file = fileIo.openSync(item)
+      passwordIconNouseSize += fileIo.statSync(file.fd).size
+      fileIo.closeSync(file)
+    })
+    this.passwordIconNouseSize = getSizeString(passwordIconNouseSize)
+  }
+
+  async getNousePasswordIconFilePathArray() {
+    const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
+    if (!fileIo.accessSync(passwordIconDir)) {
+      return []
+    }
+    const passwordIconFileNameArray = await fileIo.listFile(passwordIconDir)
+    const passwordIconFilePathArray = passwordIconFileNameArray.map(item => passwordIconDir + item)
+    const passwordArray = await getPasswordList(this.context)
+    const passwordIconPathArray: string[] = []
+    passwordArray.forEach(item => {
+      const infoItem = item.info.find(infoItem => infoItem.type === '图标')
+      if (infoItem) {
+        passwordIconPathArray.push(infoItem.value.replace('file://com.zhangxm.aipasswordmemo', ''))
+      }
+    })
+    const infoArray = await getTypeInfoList(this.context, '图标')
+    const infoIconPathArray = infoArray.map(item => item.replace('file://com.zhangxm.aipasswordmemo', ''))
+    const iconPathSet = new Set(passwordIconPathArray.concat(infoIconPathArray))
+    return passwordIconFilePathArray.filter(item => !iconPathSet.has(item))
   }
 
   build() {
@@ -245,7 +258,7 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              this.setting.forEach(async (item) => {
+              const promises = this.setting.map(async (item) => {
                 if (item === 'dataSetting') {
                   const keys = [
                     'autoSyncTables',
@@ -259,7 +272,7 @@ export default struct Cleardata {
                   const dataPreferences = preferences.getPreferencesSync(this.context, {
                     name: 'dataSetting'
                   })
-                  keys.forEach((item) => {
+                  keys.forEach(item => {
                     dataPreferences.deleteSync(item)
                     dataPreferences.flushSync()
                   })
@@ -267,6 +280,7 @@ export default struct Cleardata {
                 }
                 await preferences.deletePreferences(this.context, item)
               })
+              await Promise.all(promises)
               await promptAction.openToast({
                 message: '清理成功'
               })
@@ -416,7 +430,7 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              this.cache.forEach(async (item) => {
+              const promises = this.cache.map(async (item) => {
                 if (item === 'appCache') {
                   await bundleManager.cleanBundleCacheFilesForSelf()
                 }
@@ -427,18 +441,15 @@ export default struct Cleardata {
                   try {
                     const invitationcodeQrcodeDir = this.context.filesDir + '/media/invitationqrcode/'
                     const fileNames = await fileIo.listFile(invitationcodeQrcodeDir)
-                    for (let i = 0; i < fileNames.length; i++) {
-                      await fileIo.unlink(invitationcodeQrcodeDir + fileNames[i])
-                    }
-                  } catch (err) {
-                    if (err.code !== 13900002) {
-                      await promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code
-                      })
-                    }
+                    const promises = fileNames.map(async (item) => {
+                      await fileIo.unlink(invitationcodeQrcodeDir + item)
+                    })
+                    await Promise.all(promises)
+                  } catch {
                   }
                 }
               })
+              await Promise.all(promises)
               await promptAction.openToast({
                 message: '清理成功'
               })
@@ -543,23 +554,20 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              this.log.forEach(async (item) => {
+              const promises = this.log.map(async (item) => {
                 if (item === 'errorLog') {
                   try {
                     const errorLogDir = this.context.filesDir + '/log/error/'
                     const fileNames = await fileIo.listFile(errorLogDir)
-                    for (let i = 0; i < fileNames.length; i++) {
-                      await fileIo.unlink(errorLogDir + fileNames[i])
-                    }
-                  } catch (err) {
-                    if (err.code !== 13900002) {
-                      await promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code
-                      })
-                    }
+                    const promises = fileNames.map(async (item) => {
+                      await fileIo.unlink(errorLogDir + item)
+                    })
+                    await Promise.all(promises)
+                  } catch {
                   }
                 }
               })
+              await Promise.all(promises)
               await promptAction.openToast({
                 message: '清理成功'
               })
@@ -598,6 +606,35 @@ export default struct Cleardata {
                 .onChange((itemName) => {
                   this.nouse = itemName.name
                 })
+            }
+            .borderRadius(12)
+            .padding(12)
+            .width('100%')
+
+            Divider()
+              .padding({
+                left: 12,
+                right: 12
+              })
+            Row() {
+              Text('临时文件')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Text(this.tempFileNouseSize)
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                })
+              Checkbox({
+                name: 'tempFileNouse',
+                group: 'nouse'
+              })
+                .select(this.tempFileNouse!!)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
             }
             .borderRadius(12)
             .padding(12)
@@ -695,7 +732,21 @@ export default struct Cleardata {
           .role(ButtonRole.ERROR)
           .width('100%')
           .onClick(async () => {
-            this.nouse.forEach(async (item) => {
+            const promises = this.nouse.map(async (item) => {
+              if (item === 'tempFileNouse') {
+                const tempDir = this.context.tempDir
+                const tempFiles = await fileIo.listFile(tempDir)
+                tempFiles.forEach(async (item) => {
+                  const path = tempDir + '/' + item
+                  const isDirectory = fileIo.statSync(path)
+                  if (!isDirectory) {
+                    await fileIo.unlink(path)
+                  }
+                  if (isDirectory) {
+                    await fileIo.rmdir(path)
+                  }
+                })
+              }
               if (item === 'oldaccountNouse') {
                 try {
                   const query: asset.AssetMap = new Map()
@@ -704,47 +755,21 @@ export default struct Cleardata {
                   await preferences.deletePreferences(this.context, {
                     name: 'login'
                   })
-                } catch (err) {
-                  if (err.code !== 24000002) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code
-                    })
-                  }
+                } catch {
                 }
               }
               if (item === 'speakSettingNouse') {
                 await preferences.deletePreferences(this.context, 'speakSetting')
               }
               if (item === 'passwordIconNouse') {
-                try {
-                  const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
-                  const passwordIconFileNameArray = await fileIo.listFile(passwordIconDir)
-                  const passwordIconFilePathArray = passwordIconFileNameArray.map(item => passwordIconDir + item)
-                  const passwordArray = await getPasswordList(this.context)
-                  const passwordIconPathArray: string[] = []
-                  passwordArray.forEach((item) => {
-                    const infoItem = item.info.find(infoItem => infoItem.type === '图标')
-                    if (infoItem) {
-                      passwordIconPathArray.push(infoItem.value.replace('file://com.zhangxm.aipasswordmemo', ''))
-                    }
-                  })
-                  const infoArray = await getTypeInfoList(this.context, '图标')
-                  const infoIconPathArray = infoArray.map(item => item.replace('file://com.zhangxm.aipasswordmemo', ''))
-                  const iconPathSet = new Set(passwordIconPathArray.concat(infoIconPathArray))
-                  const nousePasswordIconFilePathArray =
-                    passwordIconFilePathArray.filter(item => !iconPathSet.has(item))
-                  nousePasswordIconFilePathArray.forEach(async (item) => {
-                    await fileIo.unlink(item)
-                  })
-                } catch (err) {
-                  if (err.code !== 13900002) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code
-                    })
-                  }
-                }
+                const nousePasswordIconFilePathArray = await this.getNousePasswordIconFilePathArray()
+                const promises = nousePasswordIconFilePathArray.map(async (item) => {
+                  await fileIo.unlink(item)
+                })
+                await Promise.all(promises)
               }
             })
+            await Promise.all(promises)
             await promptAction.openToast({
               message: '清理成功'
             })

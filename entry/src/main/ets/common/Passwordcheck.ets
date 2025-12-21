@@ -15,7 +15,7 @@ export interface RepeatItem {
 export async function getPasswordStrengthList(context: Context) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })
@@ -63,7 +63,7 @@ export async function getPasswordStrengthList(context: Context) {
 export async function getRepeatPasswordList(context: Context) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })
@@ -107,7 +107,7 @@ export async function getRepeatPasswordList(context: Context) {
 export async function getOldPasswordList(context: Context) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })

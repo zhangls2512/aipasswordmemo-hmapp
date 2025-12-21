@@ -1,3 +1,4 @@
+import { relationalStore } from '@kit.ArkData'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import { decrypt, getKey } from '../common/Crypto'
 import { PasswordInfoItem } from '../common/Dataget'
@@ -45,7 +46,7 @@ export async function importCloudBackupPassword(context: Context) {
           accessToken: accessToken,
           type: 'password',
           skip: i,
-          count: 50
+          limit: 50
         })
         if (listResponse !== 'fail') {
           const array = JSON.parse(listResponse).data as Item[]
@@ -76,7 +77,8 @@ export async function importCloudBackupPassword(context: Context) {
             }
           })
           await Promise.all(promises)
-          await importPassword(context, JSON.stringify(passwordArray), 0)
+          await importPassword(context, JSON.stringify(passwordArray),
+            relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
         }
       }
       return 'success'
@@ -98,7 +100,7 @@ export async function importCloudBackupInfo(context: Context) {
           accessToken: accessToken,
           type: 'info',
           skip: i,
-          count: 50
+          limit: 50
         })
         if (listResponse !== 'fail') {
           const array = JSON.parse(listResponse).data as Item[]
@@ -128,7 +130,7 @@ export async function importCloudBackupInfo(context: Context) {
             }
           })
           await Promise.all(promises)
-          await importInfo(context, JSON.stringify(infoArray), 0)
+          await importInfo(context, JSON.stringify(infoArray), relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
         }
       }
       return 'success'
@@ -150,7 +152,7 @@ export async function importCloudBackupTag(context: Context) {
           accessToken: accessToken,
           type: 'tag',
           skip: i,
-          count: 50
+          limit: 50
         })
         if (listResponse !== 'fail') {
           const array = JSON.parse(listResponse).data as Item[]
@@ -180,7 +182,7 @@ export async function importCloudBackupTag(context: Context) {
             }
           })
           await Promise.all(promises)
-          await importTag(context, JSON.stringify(tagArray), 0)
+          await importTag(context, JSON.stringify(tagArray), relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
         }
       }
       return 'success'

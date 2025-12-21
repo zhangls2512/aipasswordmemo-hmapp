@@ -67,7 +67,6 @@ struct Keypage {
               Text('建议点击上方密钥内容将其复制到剪贴板并妥善备份，防止其丢失导致无法解密使用其加密的云备份数据。')
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body3'))
-                .fontWeight(FontWeight.Medium)
                 .margin({
                   top: 6,
                   left: 12,

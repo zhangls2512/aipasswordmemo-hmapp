@@ -9,15 +9,15 @@ import {
   wantConstant
 } from '@kit.AbilityKit'
 import { appInfoManager, updateManager } from '@kit.AppGalleryKit'
-import { preferences, relationalStore } from '@kit.ArkData'
+import { preferences, relationalStore, uniformTypeDescriptor } from '@kit.ArkData'
 import { promptAction, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
-import { fileIo } from '@kit.CoreFileKit'
+import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
-import { systemShare } from '@kit.ShareKit'
+import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { autoLogin } from '../common/Accesstoken'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
 import { write } from '../common/File'
@@ -81,9 +81,7 @@ export default class EntryAbility extends UIAbility {
     if (want.uri) {
       if (want.uri === 'storage:///clearcache') {
         this.context.eventHub.emit('clearData')
-      }
-      if (want.uri.endsWith('.txt') || want.uri.endsWith('.csv') ||
-      want.uri.startsWith('https://www.zhangls2512.cn/product/password')) {
+      } else {
         this.context.eventHub.emit('wantUri', want.uri)
       }
     }
@@ -94,6 +92,33 @@ export default class EntryAbility extends UIAbility {
         this.context.eventHub.emit('wantUri', sharedRecords[0].uri)
       }
     } catch {
+    }
+    if (deviceInfo.deviceType === '2in1') {
+      const lastWindow = await window.getLastWindow(this.context)
+      harmonyShare.on('dataReceive', {
+        windowId: lastWindow.getWindowProperties().id,
+        capabilities: [
+          {
+            utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
+            maxSupportedCount: 1
+          },
+          {
+            utd: uniformTypeDescriptor.UniformDataType.COMMA_SEPARATED_VALUES_TEXT,
+            maxSupportedCount: 1
+          },
+          {
+            utd: uniformTypeDescriptor.UniformDataType.ZIP_ARCHIVE,
+            maxSupportedCount: 1
+          }
+        ]
+      }, async (receivableTarget) => {
+        await receivableTarget.receive(fileUri.getUriFromPath(this.context.tempDir), {
+          onDataReceived: (sharedData) => {
+            const sharedRecords = sharedData.getRecords()
+            this.context.eventHub.emit('wantUri', sharedRecords[0].uri)
+          }
+        })
+      })
     }
   }
 
@@ -215,9 +240,10 @@ export default class EntryAbility extends UIAbility {
       ],
       onReceive: async (domain, appEventGroups) => {
         if (debugSettingDataPreferences.getSync('saveErrorLog', true)) {
-          appEventGroups.forEach(async (item) => {
+          const promises = appEventGroups.map(async (item) => {
             await write(errorLogDir + Date.now() + '.txt', JSON.stringify(item))
           })
+          await Promise.all(promises)
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
@@ -276,12 +302,11 @@ export default class EntryAbility extends UIAbility {
     })
     netConnection.on('netCapabilitiesChange', (data) => {
       if (debugSettingDataPreferences.getSync('showNetCapabilitiesChange', false)) {
-        const netBearType = data.netCap.bearerTypes.includes(0) ? '蜂窝' :
-          data.netCap.bearerTypes.includes(1) ? 'Wi-Fi' :
-            data.netCap.bearerTypes.includes(2) ? '蓝牙' :
-              data.netCap.bearerTypes.includes(3) ? '以太网' :
-                data.netCap.bearerTypes.includes(4) ? 'VPN' :
-                  'undefined'
+        const netBearType = data.netCap.bearerTypes.includes(connection.NetBearType.BEARER_CELLULAR) ? '蜂窝' :
+          data.netCap.bearerTypes.includes(connection.NetBearType.BEARER_WIFI) ? 'Wi-Fi' :
+            data.netCap.bearerTypes.includes(connection.NetBearType.BEARER_BLUETOOTH) ? '蓝牙' :
+              data.netCap.bearerTypes.includes(connection.NetBearType.BEARER_ETHERNET) ? '以太网' :
+                data.netCap.bearerTypes.includes(connection.NetBearType.BEARER_VPN) ? 'VPN' : 'undefined'
         this.context.eventHub.emit('dialog', '网络能力变化',
           '数据网络句柄：' + data.netHandle.netId + '\n上行带宽：' + data.netCap.linkUpBandwidthKbps +
             ' KB/s\n下行带宽：' + data.netCap.linkDownBandwidthKbps + ' KB/s\n网络类型：' + netBearType)
@@ -291,11 +316,10 @@ export default class EntryAbility extends UIAbility {
       if (list.length > 0) {
         const data = list[0]
         if (debugSettingDataPreferences.getSync('showNetQosChange', false)) {
-          const pathType = data.pathType === 0 ? '蜂窝主卡' :
-            data.pathType === 1 ? '蜂窝副卡' :
-              data.pathType === 2 ? '主 Wi-Fi' :
-                data.pathType === 3 ? '副 Wi-Fi' :
-                  'undefined'
+          const pathType = data.pathType === netQuality.PathType.CELLULAR_PRIMARY ? '蜂窝主卡' :
+            data.pathType === netQuality.PathType.CELLULAR_SECONDARY ? '蜂窝副卡' :
+              data.pathType === netQuality.PathType.WIFI_PRIMARY ? '主 Wi-Fi' :
+                data.pathType === netQuality.PathType.WIFI_SECONDARY ? '副 Wi-Fi' : 'undefined'
           this.context.eventHub.emit('dialog', '网络质量变化',
             '数据路径：' + pathType + '\n上行带宽：' + data.linkUpBandwidth + ' bps\n下行带宽：' + data.linkDownBandwidth +
               ' bps\n上行速率：' + data.linkUpRate + ' bps\n下行速率：' + data.linkDownRate + '\nRTT 时延：' + data.rttMs +
@@ -318,22 +342,19 @@ export default class EntryAbility extends UIAbility {
       if (list.length > 0) {
         const data = list[0]
         if (debugSettingDataPreferences.getSync('showNetSceneChange', false)) {
-          const pathType = data.pathType === 0 ? '蜂窝主卡' :
-            data.pathType === 1 ? '蜂窝副卡' :
-              data.pathType === 2 ? '主 Wi-Fi' :
-                data.pathType === 3 ? '副 Wi-Fi' :
-                  'undefined'
+          const pathType = data.pathType === netQuality.PathType.CELLULAR_PRIMARY ? '蜂窝主卡' :
+            data.pathType === netQuality.PathType.CELLULAR_SECONDARY ? '蜂窝副卡' :
+              data.pathType === netQuality.PathType.WIFI_PRIMARY ? '主 Wi-Fi' :
+                data.pathType === netQuality.PathType.WIFI_SECONDARY ? '副 Wi-Fi' : 'undefined'
           const scene = data.scene === 'normal' ? '正常' :
             data.scene === 'congestion' ? '拥塞' :
               data.scene === 'frequentHandover' ? '小区切换频繁' :
-                data.scene === 'weakSignal' ? '弱信号' :
-                  'undefined'
+                data.scene === 'weakSignal' ? '弱信号' : 'undefined'
           const dataSpeedSimpleAction = data.recommendedAction === 'doCaching' ? '做缓存动作' :
             data.recommendedAction === 'suspendData' ? '停止发包' :
               data.recommendedAction === 'decreaseData' ? '降低发包速率' :
                 data.recommendedAction === 'increaseData' ? '增加发包速率' :
-                  data.recommendedAction === 'keepData' ? '保持当前发包速率' :
-                    'undefined'
+                  data.recommendedAction === 'keepData' ? '保持当前发包速率' : 'undefined'
           const isLastPredictionValid = data.weakSignalPrediction?.isLastPredictionValid ? '是' : '否'
           this.context.eventHub.emit('dialog', '网络场景变化',
             '数据路径：' + pathType + '\n场景类型：' + scene + '\n建议的数传策略：' + dataSpeedSimpleAction +
@@ -349,13 +370,13 @@ export default class EntryAbility extends UIAbility {
       if (fileIo.accessSync(errorLogDir)) {
         const errorLogFileName = await fileIo.listFile(errorLogDir)
         const errorLogFilePath = errorLogFileName.map(item => errorLogDir + item)
-        for (let i = 0; i < errorLogFilePath.length; i++) {
-          const item = errorLogFilePath[i]
+        const promises = errorLogFilePath.map(async (item) => {
           const time = Number(item.replace(errorLogDir, '').replace('.txt', ''))
           if (time < updateTime) {
             await fileIo.unlink(item)
           }
-        }
+        })
+        await Promise.all(promises)
       }
     }
     let netConnected = false
@@ -367,10 +388,11 @@ export default class EntryAbility extends UIAbility {
     }
     if (netConnected) {
       const checkVersionUpdate = commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
-      if (checkVersionUpdate === 2 || (checkVersionUpdate === 1 && currentNetworkBearerType !== 0)) {
+      if (checkVersionUpdate === 2 ||
+        (checkVersionUpdate === 1 && currentNetworkBearerType !== connection.NetBearType.BEARER_WIFI)) {
         try {
           const res = await updateManager.checkAppUpdate(this.context)
-          if (res.updateAvailable === 1) {
+          if (res.updateAvailable === updateManager.UpdateAvailableCode.LATER_VERSION_EXIST) {
             await updateManager.showUpdateDialog(this.context)
           }
         } catch (err) {
@@ -417,7 +439,7 @@ export default class EntryAbility extends UIAbility {
   async onCreate(want: Want) {
     const passwordRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'password',
-      securityLevel: 4,
+      securityLevel: relationalStore.SecurityLevel.S4,
       encrypt: true,
       allowRebuild: true
     })
@@ -425,7 +447,7 @@ export default class EntryAbility extends UIAbility {
     await passwordRdbStore.executeSql('CREATE INDEX IF NOT EXISTS name ON password(name)')
     const infoRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'info',
-      securityLevel: 4,
+      securityLevel: relationalStore.SecurityLevel.S4,
       encrypt: true,
       allowRebuild: true
     })
@@ -433,15 +455,15 @@ export default class EntryAbility extends UIAbility {
     await infoRdbStore.executeSql('CREATE INDEX IF NOT EXISTS type ON info(type)')
     const tagRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'tag',
-      securityLevel: 1,
+      securityLevel: relationalStore.SecurityLevel.S1,
       encrypt: true,
       allowRebuild: true
     })
     await tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag(id INTEGER PRIMARY KEY AUTOINCREMENT,value,color,updateTime,cloudBackupTime,UNIQUE(value,color))')
     await tagRdbStore.executeSql('CREATE INDEX IF NOT EXISTS value ON tag(value)')
     passwordRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
-      for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await passwordRdbStore.obtainDistributedTableName(deviceIds[i], 'password')
+      const promises = deviceIds.map(async (item) => {
+        const tableName = await passwordRdbStore.obtainDistributedTableName(item, 'password')
         const predicates = new relationalStore.RdbPredicates(tableName)
         const resultSet = await passwordRdbStore.query(predicates)
         const idIndex = resultSet.getColumnIndex('id')
@@ -451,36 +473,24 @@ export default class EntryAbility extends UIAbility {
         const updateTimeIndex = resultSet.getColumnIndex('updateTime')
         const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
         while (resultSet.goToNextRow()) {
-          try {
-            await passwordRdbStore.insert('password', {
-              id: resultSet.getValue(idIndex),
-              name: String(resultSet.getValue(nameIndex)),
-              info: resultSet.getValue(infoIndex),
-              tag: resultSet.getValue(tagIndex),
-              updateTime: resultSet.getValue(updateTimeIndex),
-              cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
-            }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
-          } catch (err) {
-            if (err.code !== 14800032) {
-              await promptAction.openToast({
-                message: '发生错误，错误码：' + err.code
-              })
-            }
-            if (err.code === 14800032) {
-              await promptAction.openToast({
-                message: '导入失败，原因：已存在'
-              })
-            }
-          }
+          passwordRdbStore.insertSync('password', {
+            id: resultSet.getValue(idIndex),
+            name: String(resultSet.getValue(nameIndex)),
+            info: resultSet.getValue(infoIndex),
+            tag: resultSet.getValue(tagIndex),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
         resultSet.close()
-      }
+      })
+      await Promise.all(promises)
       this.context.eventHub.emit('refreshPassword')
       await autoBackupTable(this.context, 'password')
     })
     infoRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
-      for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await infoRdbStore.obtainDistributedTableName(deviceIds[i], 'info')
+      const promises = deviceIds.map(async (item) => {
+        const tableName = await infoRdbStore.obtainDistributedTableName(item, 'info')
         const predicates = new relationalStore.RdbPredicates(tableName)
         const resultSet = await infoRdbStore.query(predicates)
         const idIndex = resultSet.getColumnIndex('id')
@@ -489,35 +499,23 @@ export default class EntryAbility extends UIAbility {
         const updateTimeIndex = resultSet.getColumnIndex('updateTime')
         const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
         while (resultSet.goToNextRow()) {
-          try {
-            await infoRdbStore.insert('info', {
-              id: resultSet.getValue(idIndex),
-              type: String(resultSet.getValue(typeIndex)),
-              value: String(resultSet.getValue(valueIndex)),
-              updateTime: resultSet.getValue(updateTimeIndex),
-              cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
-            }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
-          } catch (err) {
-            if (err.code !== 14800032) {
-              await promptAction.openToast({
-                message: '发生错误，错误码：' + err.code
-              })
-            }
-            if (err.code === 14800032) {
-              await promptAction.openToast({
-                message: '同步失败，原因：已存在'
-              })
-            }
-          }
+          infoRdbStore.insertSync('info', {
+            id: resultSet.getValue(idIndex),
+            type: String(resultSet.getValue(typeIndex)),
+            value: String(resultSet.getValue(valueIndex)),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
         resultSet.close()
-      }
+      })
+      await Promise.all(promises)
       this.context.eventHub.emit('refreshInfo')
       await autoBackupTable(this.context, 'info')
     })
     tagRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
-      for (let i = 0; i < deviceIds.length; i++) {
-        const tableName = await tagRdbStore.obtainDistributedTableName(deviceIds[i], 'tag')
+      const promises = deviceIds.map(async (item) => {
+        const tableName = await tagRdbStore.obtainDistributedTableName(item, 'tag')
         const predicates = new relationalStore.RdbPredicates(tableName)
         const resultSet = await tagRdbStore.query(predicates)
         const idIndex = resultSet.getColumnIndex('id')
@@ -526,29 +524,17 @@ export default class EntryAbility extends UIAbility {
         const updateTimeIndex = resultSet.getColumnIndex('updateTime')
         const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
         while (resultSet.goToNextRow()) {
-          try {
-            await tagRdbStore.insert('tag', {
-              id: resultSet.getValue(idIndex),
-              value: String(resultSet.getValue(valueIndex)),
-              color: String(resultSet.getValue(colorIndex)),
-              updateTime: resultSet.getValue(updateTimeIndex),
-              cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
-            }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
-          } catch (err) {
-            if (err.code !== 14800032) {
-              await promptAction.openToast({
-                message: '发生错误，错误码：' + err.code
-              })
-            }
-            if (err.code === 14800032) {
-              await promptAction.openToast({
-                message: '同步失败，原因：已存在'
-              })
-            }
-          }
+          tagRdbStore.insertSync('tag', {
+            id: resultSet.getValue(idIndex),
+            value: String(resultSet.getValue(valueIndex)),
+            color: String(resultSet.getValue(colorIndex)),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
         resultSet.close()
-      }
+      })
+      await Promise.all(promises)
       this.context.eventHub.emit('refreshTag')
       await autoBackupTable(this.context, 'tag')
     })
@@ -611,22 +597,18 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    try {
-      if (wantParam.version !== 39) {
-        await promptAction.openToast({
-          message: '接续失败，原因：目标端应用版本号与发起端不匹配'
-        })
-        return AbilityConstant.OnContinueResult.MISMATCH
-      }
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
+    if (wantParam.version !== 40) {
+      await promptAction.openToast({
+        message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })
-      const exitAfterContinue = commonSettingDataPreferences.getSync('exitAfterContinue', true)
-      wantParam[wantConstant.Params.SUPPORT_CONTINUE_SOURCE_EXIT_KEY] = exitAfterContinue
-      return AbilityConstant.OnContinueResult.AGREE
-    } catch {
-      return AbilityConstant.OnContinueResult.REJECT
+      return AbilityConstant.OnContinueResult.MISMATCH
     }
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    const exitAfterContinue = commonSettingDataPreferences.getSync('exitAfterContinue', true)
+    wantParam[wantConstant.Params.SUPPORT_CONTINUE_SOURCE_EXIT_KEY] = exitAfterContinue
+    return AbilityConstant.OnContinueResult.AGREE
   }
 
   onCollaborate() {
@@ -648,13 +630,13 @@ export default class EntryAbility extends UIAbility {
     const showMemoryLevelChange = debugSettingDataPreferences.getSync('showMemoryLevelChange', false)
     if (showMemoryLevelChange) {
       let memoryLevel = ''
-      if (level === 0) {
+      if (level === AbilityConstant.MemoryLevel.MEMORY_LEVEL_MODERATE) {
         memoryLevel = '适中'
       }
-      if (level === 1) {
+      if (level === AbilityConstant.MemoryLevel.MEMORY_LEVEL_LOW) {
         memoryLevel = '低'
       }
-      if (level === 2) {
+      if (level === AbilityConstant.MemoryLevel.MEMORY_LEVEL_CRITICAL) {
         memoryLevel = '高'
       }
       await promptAction.openToast({

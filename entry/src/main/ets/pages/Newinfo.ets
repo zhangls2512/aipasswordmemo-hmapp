@@ -60,21 +60,12 @@ export default struct Newinfo {
               })
               return
             }
-            if (this.infoValue) {
-              try {
-                await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-              } catch (err) {
-                await promptAction.openToast({
-                  message: '发生错误，错误码：' + err.code
-                })
-              }
-            }
             const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
             if (!fileIo.accessSync(passwordIconDir)) {
               await fileIo.mkdir(passwordIconDir, true)
             }
             const filePath = passwordIconDir + Date.now() + '.png'
-            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+            const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
             const imagePacker = image.createImagePacker()
             await imagePacker.packToFile(imagePixelMap, file.fd, {
               format: 'image/png',
@@ -82,12 +73,7 @@ export default struct Newinfo {
             })
             fileIo.closeSync(file)
             this.infoValue = fileUri.getUriFromPath(filePath)
-          } catch (err) {
-            if (err.code !== 13900020) {
-              await promptAction.openToast({
-                message: '发生错误，错误码：' + err.code
-              })
-            }
+          } catch {
           }
         })
       if (deviceInfo.deviceType !== 'phone') {
@@ -133,21 +119,12 @@ export default struct Newinfo {
                 })
                 return
               }
-              if (this.infoValue) {
-                try {
-                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-                } catch (err) {
-                  await promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
-                }
-              }
               const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
               if (!fileIo.accessSync(passwordIconDir)) {
                 await fileIo.mkdir(passwordIconDir, true)
               }
               const filePath = passwordIconDir + Date.now() + '.png'
-              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+              const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
               const imagePacker = image.createImagePacker()
               await imagePacker.packToFile(imagePixelMap, file.fd, {
                 format: 'image/png',
@@ -164,19 +141,11 @@ export default struct Newinfo {
           }))
             .selected(this.infoTypeIndex!!)
             .value(this.infoTypeValue!!)
-            .onSelect(async (index, value) => {
+            .onSelect((index, value) => {
               if (value === '图标') {
                 this.infoValue = ''
-                this.cloudBackup = false
               }
               if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
-                try {
-                  await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-                } catch (err) {
-                  await promptAction.openToast({
-                    message: '发生错误，错误码：' + err.code
-                  })
-                }
                 this.infoValue = ''
               }
             })
@@ -190,7 +159,7 @@ export default struct Newinfo {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onChange(async (value) => {
+              .onChange((value) => {
                 if (this.oftenUsedInfoTypes.includes(value)) {
                   this.infoTypeIndex = this.oftenUsedInfoTypes.indexOf(value)
                   this.infoTypeValue = value
@@ -198,16 +167,8 @@ export default struct Newinfo {
                 }
                 if (value === '图标') {
                   this.infoValue = ''
-                  this.cloudBackup = false
                 }
                 if (this.infoValue.startsWith('file://com.zhangxm.aipasswordmemo')) {
-                  try {
-                    await fileIo.unlink(this.infoValue.replace('file://com.zhangxm.aipasswordmemo', ''))
-                  } catch (err) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code
-                    })
-                  }
                   this.infoValue = ''
                 }
               })
@@ -374,7 +335,7 @@ export default struct Newinfo {
                 type: ToggleType.Switch,
                 isOn: this.cloudBackup!!
               })
-                .enabled(this.allowCloudBackup && this.getCurrentInfoType() !== '图标')
+                .enabled(this.allowCloudBackup)
             }
             .borderRadius(12)
             .padding(12)
@@ -460,7 +421,7 @@ export default struct Newinfo {
             name: 'cloudbackupSetting'
           })
           const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
-          if (autoOn.includes('info') && this.infoTypeValue !== '图标') {
+          if (autoOn.includes('info')) {
             this.cloudBackup = true
           }
         }

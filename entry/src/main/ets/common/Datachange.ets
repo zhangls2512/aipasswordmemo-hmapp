@@ -39,18 +39,18 @@ interface CloudBackupItem {
 export async function newPassword(context: Context, data: PasswordInput) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })
   const updateTime = Date.now()
-  const id = await rdbStore.insert('password', {
+  const id = rdbStore.insertSync('password', {
     name: data.name,
     info: JSON.stringify(data.info),
     tag: JSON.stringify(data.tag),
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
-  })
+  }, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
   await promptAction.openToast({
     message: '新增成功'
   })
@@ -67,7 +67,7 @@ export async function newPassword(context: Context, data: PasswordInput) {
       id: id,
       content: JSON.stringify({
         name: data.name,
-        info: JSON.stringify(data.info.filter(infoItem => infoItem.type !== '图标')),
+        info: JSON.stringify(data.info),
         tag: JSON.stringify(data.tag),
         updateTime: updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTime)
@@ -79,7 +79,7 @@ export async function newPassword(context: Context, data: PasswordInput) {
 export async function updatePassword(context: Context, id: number, data: PasswordInput) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })
@@ -95,13 +95,13 @@ export async function updatePassword(context: Context, id: number, data: Passwor
       cloudBackupTime = oldCloudBackupTime
     }
   }
-  await rdbStore.update({
+  rdbStore.updateSync({
     name: data.name,
     info: JSON.stringify(data.info),
     tag: JSON.stringify(data.tag),
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
-  }, predicates)
+  }, predicates, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
   await promptAction.openToast({
     message: '修改成功'
   })
@@ -125,7 +125,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
       id: id,
       content: JSON.stringify({
         name: data.name,
-        info: JSON.stringify(data.info.filter(infoItem => infoItem.type !== '图标')),
+        info: JSON.stringify(data.info),
         tag: JSON.stringify(data.tag),
         updateTime: updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
@@ -137,7 +137,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
 export async function newInfo(context: Context, data: InfoInput) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })
@@ -154,18 +154,18 @@ export async function newInfo(context: Context, data: InfoInput) {
   }
   resultSet.close()
   const updateTime = Date.now()
-  const id = await rdbStore.insert('info', {
+  const id = rdbStore.insertSync('info', {
     type: data.type,
     value: data.value,
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
-  })
+  }, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
   await promptAction.openToast({
     message: '新增成功'
   })
   await autoSyncTable(context, 'info')
   await autoBackupTable(context, 'info')
-  if (data.cloudBackup && data.type !== '图标') {
+  if (data.cloudBackup) {
     const accountInfo = await getAccountInfo()
     const cloudBackupTime: CloudBackupTimeItem[] = [{
       uid: accountInfo.uid,
@@ -194,7 +194,7 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
   }
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })
@@ -222,12 +222,12 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
       cloudBackupTime = oldCloudBackupTime
     }
   }
-  await rdbStore.update({
+  rdbStore.updateSync({
     type: data.type,
     value: data.value,
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
-  }, predicatesb)
+  }, predicatesb, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
   await promptAction.openToast({
     message: '修改成功'
   })
@@ -263,7 +263,7 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
 export async function newTag(context: Context, data: TagInput) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
-    securityLevel: 1,
+    securityLevel: relationalStore.SecurityLevel.S1,
     encrypt: true,
     allowRebuild: true
   })
@@ -279,12 +279,12 @@ export async function newTag(context: Context, data: TagInput) {
   }
   resultSet.close()
   const updateTime = Date.now()
-  const id = await rdbStore.insert('tag', {
+  const id = rdbStore.insertSync('tag', {
     value: data.value,
     color: data.color,
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
-  })
+  }, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
   await promptAction.openToast({
     message: '新增成功'
   })
@@ -313,7 +313,7 @@ export async function newTag(context: Context, data: TagInput) {
 export async function updateTag(context: Context, id: number, data: TagInput) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
-    securityLevel: 1,
+    securityLevel: relationalStore.SecurityLevel.S1,
     encrypt: true,
     allowRebuild: true
   })
@@ -341,12 +341,12 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
       cloudBackupTime = oldCloudBackupTime
     }
   }
-  await rdbStore.update({
+  rdbStore.updateSync({
     value: data.value,
     color: data.color,
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
-  }, predicatesb)
+  }, predicatesb, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
   await promptAction.openToast({
     message: '修改成功'
   })
@@ -380,9 +380,9 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
 }
 
 export async function deleteData(context: Context, type: string, id: number) {
-  let securityLevel = 4
+  let securityLevel = relationalStore.SecurityLevel.S4
   if (type === 'tag') {
-    securityLevel = 1
+    securityLevel = relationalStore.SecurityLevel.S1
   }
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: type,
@@ -392,7 +392,7 @@ export async function deleteData(context: Context, type: string, id: number) {
   })
   const predicates = new relationalStore.RdbPredicates(type)
   predicates.equalTo('id', id)
-  await rdbStore.delete(predicates)
+  rdbStore.deleteSync(predicates)
   await promptAction.openToast({
     message: '删除成功'
   })
@@ -414,9 +414,9 @@ export async function setCloudBackup(context: Context, data: CloudBackupItem) {
       iv: encryptres.iv
     })
     if (res !== 'fail') {
-      let securityLevel = 4
+      let securityLevel = relationalStore.SecurityLevel.S4
       if (data.type === 'tag') {
-        securityLevel = 1
+        securityLevel = relationalStore.SecurityLevel.S1
       }
       const rdbStore = await relationalStore.getRdbStore(context, {
         name: data.type,
@@ -452,9 +452,9 @@ export async function setCloudBackup(context: Context, data: CloudBackupItem) {
           cloudBackupTime = oldCloudBackupTimeArray
         }
       }
-      await rdbStore.update({
+      rdbStore.updateSync({
         cloudBackupTime: JSON.stringify(cloudBackupTime)
-      }, predicates)
+      }, predicates, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
       await promptAction.openToast({
         message: '云备份成功'
       })
@@ -472,9 +472,9 @@ export async function deleteCloudBackup(context: Context, data: CloudBackupItem)
       id: data.id
     })
     if (res !== 'fail') {
-      let securityLevel = 4
+      let securityLevel = relationalStore.SecurityLevel.S4
       if (data.type === 'tag') {
-        securityLevel = 1
+        securityLevel = relationalStore.SecurityLevel.S1
       }
       const rdbStore = await relationalStore.getRdbStore(context, {
         name: data.type,
@@ -498,9 +498,9 @@ export async function deleteCloudBackup(context: Context, data: CloudBackupItem)
           cloudBackupTime = oldCloudBackupTimeArray
         }
       }
-      await rdbStore.update({
+      rdbStore.updateSync({
         cloudBackupTime: JSON.stringify(cloudBackupTime)
-      }, predicates)
+      }, predicates, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
       await promptAction.openToast({
         message: '取消云备份成功'
       })

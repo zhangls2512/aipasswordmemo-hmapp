@@ -48,7 +48,7 @@ export interface Tag {
 export async function getPasswordInfo(context: Context, id: number) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })
@@ -102,7 +102,7 @@ export async function getPasswordList(context: Context) {
   try {
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'password',
-      securityLevel: 4,
+      securityLevel: relationalStore.SecurityLevel.S4,
       encrypt: true,
       allowRebuild: true
     })
@@ -163,7 +163,7 @@ export async function getFilterPasswordList(context: Context, nameKeyword: strin
   try {
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'password',
-      securityLevel: 4,
+      securityLevel: relationalStore.SecurityLevel.S4,
       encrypt: true,
       allowRebuild: true
     })
@@ -242,7 +242,7 @@ export async function getFilterPasswordList(context: Context, nameKeyword: strin
 export async function getPasswordMaxId(context: Context) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })
@@ -261,7 +261,7 @@ export async function getPasswordMaxId(context: Context) {
 export async function getInfoInfo(context: Context, id: number) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
-    securityLevel: 4,
+    securityLevel: relationalStore.SecurityLevel.S4,
     encrypt: true,
     allowRebuild: true
   })
@@ -306,7 +306,7 @@ export async function getInfoList(context: Context) {
   try {
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
-      securityLevel: 4,
+      securityLevel: relationalStore.SecurityLevel.S4,
       encrypt: true,
       allowRebuild: true
     })
@@ -357,7 +357,7 @@ export async function getInfoTypeList(context: Context) {
   try {
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
-      securityLevel: 4,
+      securityLevel: relationalStore.SecurityLevel.S4,
       encrypt: true,
       allowRebuild: true
     })
@@ -386,7 +386,7 @@ export async function getTypeInfoList(context: Context, type: string) {
   try {
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'info',
-      securityLevel: 4,
+      securityLevel: relationalStore.SecurityLevel.S4,
       encrypt: true,
       allowRebuild: true
     })
@@ -411,7 +411,7 @@ export async function getTypeInfoList(context: Context, type: string) {
 async function getTagColor(context: Context, value: string) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
-    securityLevel: 1,
+    securityLevel: relationalStore.SecurityLevel.S1,
     encrypt: true,
     allowRebuild: true
   })
@@ -431,7 +431,7 @@ async function getTagColor(context: Context, value: string) {
 export async function getTagInfo(context: Context, id: number) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
-    securityLevel: 1,
+    securityLevel: relationalStore.SecurityLevel.S1,
     encrypt: true,
     allowRebuild: true
   })
@@ -476,7 +476,7 @@ export async function getTagList(context: Context, orderColumn: string = 'update
   try {
     const rdbStore = await relationalStore.getRdbStore(context, {
       name: 'tag',
-      securityLevel: 1,
+      securityLevel: relationalStore.SecurityLevel.S1,
       encrypt: true,
       allowRebuild: true
     })

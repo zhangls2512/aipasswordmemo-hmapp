@@ -1,7 +1,7 @@
 import { common, ConfigurationConstant } from '@kit.AbilityKit'
 import { appInfoManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
-import { promptAction, uiAppearance, window } from '@kit.ArkUI'
+import { uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
@@ -109,12 +109,7 @@ struct Commonsetting {
                       if (index === 2) {
                         await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
                       }
-                    } catch (err) {
-                      if (err.code !== 1006800012 && err.code !== 1006800013) {
-                        await promptAction.openToast({
-                          message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                        })
-                      }
+                    } catch {
                     }
                     this.commonSettingDataPreferences.putSync('iconMode', index)
                     this.commonSettingDataPreferences.flushSync()
@@ -603,7 +598,7 @@ struct Commonsetting {
                       await fileIo.mkdir(this.context.filesDir + '/media')
                     }
                     const file =
-                      fileIo.openSync(backgroundImagePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+                      fileIo.openSync(backgroundImagePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
                     const imagePacker = image.createImagePacker()
                     await imagePacker.packToFile(imagePixelMap, file.fd, {
                       format: 'image/png',
@@ -611,12 +606,7 @@ struct Commonsetting {
                     })
                     fileIo.closeSync(file)
                     this.context.eventHub.emit('refreshIndex')
-                  } catch (err) {
-                    if (err.code !== 13900020) {
-                      await promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code
-                      })
-                    }
+                  } catch {
                   }
                   return
                 }
@@ -648,7 +638,7 @@ struct Commonsetting {
                       const imageSource = image.createImageSource(fileSource.fd)
                       const imagePixelMap = await imageSource.createPixelMap()
                       const file =
-                        fileIo.openSync(backgroundImagePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE)
+                        fileIo.openSync(backgroundImagePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
                       const imagePacker = image.createImagePacker()
                       await imagePacker.packToFile(imagePixelMap, file.fd, {
                         format: 'image/png',
@@ -656,12 +646,7 @@ struct Commonsetting {
                       })
                       fileIo.closeSync(file)
                       this.context.eventHub.emit('refreshIndex')
-                    } catch (err) {
-                      if (err.code !== 13900020) {
-                        await promptAction.openToast({
-                          message: '发生错误，错误码：' + err.code
-                        })
-                      }
+                    } catch {
                     }
                   }
                   if (data.index === 1) {

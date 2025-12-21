@@ -15,7 +15,7 @@ export function stringToArray(str: string) {
 }
 
 function arrayToString(arr: Uint8Array) {
-  const textDecoder = util.TextDecoder.create('utf-8')
+  const textDecoder = util.TextDecoder.create()
   return textDecoder.decodeToString(arr)
 }
 
