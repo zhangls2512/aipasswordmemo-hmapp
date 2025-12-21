@@ -3,6 +3,7 @@ import {
   appRecovery,
   bundleManager,
   ConfigurationConstant,
+  contextConstant,
   errorManager,
   UIAbility,
   Want,
@@ -11,8 +12,10 @@ import {
 import { appInfoManager, updateManager } from '@kit.AppGalleryKit'
 import { preferences, relationalStore, uniformTypeDescriptor } from '@kit.ArkData'
 import { promptAction, uiAppearance, window } from '@kit.ArkUI'
-import { deviceInfo } from '@kit.BasicServicesKit'
+import { commonEventManager, deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
+import { statusBarManager } from '@kit.DeskTopExtensionKit'
+import { image } from '@kit.ImageKit'
 import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { notificationManager } from '@kit.NotificationKit'
@@ -28,6 +31,14 @@ import { autoBackupTable } from '../common/Table'
 interface JsErrorObject {
   name: string,
   info: Error
+}
+
+interface MenuCodeEventData {
+  data: EventData
+}
+
+interface EventData {
+  menuCode: string
 }
 
 export default class EntryAbility extends UIAbility {
@@ -551,6 +562,82 @@ export default class EntryAbility extends UIAbility {
     }
     const allowRestore = commonSettingDataPreferences.getSync('allowRestore', true) as boolean
     this.context.setRestoreEnabled(allowRestore)
+    if (deviceInfo.deviceType === '2in1') {
+      statusBarManager.on('statusBarIconClick', async () => {
+        await this.context.showAbility()
+      })
+      statusBarManager.on('rightMenuClick', (data) => {
+        const datastring = JSON.stringify(data)
+        const eventData = JSON.parse(datastring) as MenuCodeEventData
+        this.context.eventHub.emit(eventData.data.menuCode)
+      })
+      const subscriber = commonEventManager.createSubscriberSync({
+        events: ['BACKGROUNDABILITY_EVENT_PREPARETOTERMINATE']
+      })
+      await commonEventManager.subscribeToEvent(subscriber, async (data) => {
+        if (data.event === 'BACKGROUNDABILITY_EVENT_PREPARETOTERMINATE') {
+          statusBarManager.removeFromStatusBar(this.context)
+          await this.context.terminateSelf()
+        }
+      })
+      const statusBar = commonSettingDataPreferences.getSync('statusBar', false)
+      if (statusBar) {
+        const blackFileData = this.context.resourceManager.getRawFileContentSync('iconblack.svg')
+        const blackPixelMap = await image.createImageSource(blackFileData.buffer).createPixelMap()
+        const whiteFileData = this.context.resourceManager.getRawFileContentSync('iconwhite.svg')
+        const whitePixelMap = await image.createImageSource(whiteFileData.buffer).createPixelMap()
+        statusBarManager.addToStatusBar(this.context, {
+          icons: {
+            black: blackPixelMap,
+            white: whitePixelMap
+          },
+          quickOperation: {
+            title: '',
+            height: 1,
+            abilityName: '',
+            moduleName: 'entry',
+            loadingStatus: true
+          }
+        })
+        statusBarManager.updateStatusBarMenu(this.context, [
+          [
+            {
+              title: '打开',
+              menuAction: {
+                abilityName: 'EntryAbility'
+              }
+            }
+          ],
+          [
+            {
+              title: '新增密码',
+              menuAction: {
+                abilityName: 'EntryAbility',
+                notifyOnly: true,
+                menuCode: 'newPassword'
+              }
+            },
+            {
+              title: '搜索密码',
+              menuAction: {
+                abilityName: 'EntryAbility',
+                notifyOnly: true,
+                menuCode: 'searchPassword'
+              }
+            }
+          ]
+        ])
+        setTimeout(async () => {
+          await this.context.startAbility({
+            bundleName: 'com.zhangxm.aipasswordmemo',
+            abilityName: 'BackGroundAbility'
+          }, {
+            processMode: contextConstant.ProcessMode.NEW_PROCESS_ATTACH_TO_STATUS_BAR_ITEM,
+            startupVisibility: contextConstant.StartupVisibility.STARTUP_HIDE
+          })
+        }, 200)
+      }
+    }
     const applicationContext = this.context.getApplicationContext()
     const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
     if (colorMode === 0) {
@@ -584,6 +671,17 @@ export default class EntryAbility extends UIAbility {
     await this.windowInit(windowStage)
   }
 
+  async onPrepareToTerminateAsync(): Promise<boolean> {
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    const statusBar = commonSettingDataPreferences.getSync('statusBar', false) as boolean
+    if (statusBar) {
+      await this.context.hideAbility()
+    }
+    return statusBar
+  }
+
   onBackPressed() {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
@@ -597,7 +695,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 40) {
+    if (wantParam.version !== 41) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })
