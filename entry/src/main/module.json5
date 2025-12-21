@@ -116,6 +116,12 @@
         "removeMissionAfterTerminate": true,
         "orientation": "auto_rotation_restricted",
         "recoverable": true
+      },
+      {
+        "name": "BackGroundAbility",
+        "srcEntry": "./ets/backgroundability/BackGroundAbility.ets",
+        "startWindowIcon": "$media:layered_image",
+        "startWindowBackground": "$color:start_window_background"
       }
     ],
     "extensionAbilities": [
@@ -151,6 +157,9 @@
       },
       {
         "name": "ohos.permission.INTERNET"
+      },
+      {
+        "name": "ohos.permission.PREPARE_APP_TERMINATE"
       },
       {
         "name": "ohos.permission.PRIVACY_WINDOW"
