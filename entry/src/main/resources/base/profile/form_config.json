@@ -4,7 +4,7 @@
       "name": "passwordentrance",
       "displayName": "$string:card_displayname",
       "description": "$string:card_description",
-      "src": "./ets/widget/pages/PasswordentranceCard.ets",
+      "src": "./ets/form/pages/PasswordentranceCard.ets",
       "uiSyntax": "arkts",
       "isDefault": true,
       "supportDimensions": [
