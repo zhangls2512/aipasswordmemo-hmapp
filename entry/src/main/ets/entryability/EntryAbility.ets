@@ -571,12 +571,16 @@ export default class EntryAbility extends UIAbility {
         const eventData = JSON.parse(datastring) as MenuCodeEventData
         this.context.eventHub.emit(eventData.data.menuCode)
       })
+      const statusBarDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'statusBar'
+      })
       const subscriber = commonEventManager.createSubscriberSync({
         events: ['BACKGROUNDABILITY_EVENT_PREPARETOTERMINATE']
       })
       await commonEventManager.subscribeToEvent(subscriber, async (data) => {
         if (data.event === 'BACKGROUNDABILITY_EVENT_PREPARETOTERMINATE') {
           statusBarManager.removeFromStatusBar(this.context)
+          statusBarDataPreferences.putSync('exist', false)
           await this.context.terminateSelf()
         }
       })
@@ -635,6 +639,7 @@ export default class EntryAbility extends UIAbility {
             processMode: contextConstant.ProcessMode.NEW_PROCESS_ATTACH_TO_STATUS_BAR_ITEM,
             startupVisibility: contextConstant.StartupVisibility.STARTUP_HIDE
           })
+          statusBarDataPreferences.putSync('exist', true)
         }, 200)
       }
     }
@@ -672,14 +677,14 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onPrepareToTerminateAsync(): Promise<boolean> {
-    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-      name: 'commonSetting'
+    const statusBarDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'statusBar'
     })
-    const statusBar = commonSettingDataPreferences.getSync('statusBar', false) as boolean
-    if (statusBar) {
+    const statusBarExist = statusBarDataPreferences.getSync('exist', false) as boolean
+    if (statusBarExist) {
       await this.context.hideAbility()
     }
-    return statusBar
+    return statusBarExist
   }
 
   onBackPressed() {
