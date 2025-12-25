@@ -264,6 +264,7 @@ export default struct Cleardata {
                     'autoSyncTables',
                     'autoSyncDevices',
                     'autoBackupTables',
+                    'autoFileBackupTables',
                     'pauseAutoSyncWhenLowBatteryCapacityLevel',
                     'pauseAutoSyncWhenPowerSave',
                     'pauseAutoBackupWhenLowBatteryCapacityLevel',

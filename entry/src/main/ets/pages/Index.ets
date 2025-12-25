@@ -17,10 +17,14 @@ import Info from './Info'
 import Me from './Me'
 import Password from './Password'
 import Tag from './Tag'
+import Uploaderrorlog from './Uploaderrorlog'
 
 @Entry
 @ComponentV2
 struct Index {
+  @Provider() isShowUploaderrorlogSheet: boolean = false
+  @Local errorType: string = ''
+  @Local errorObject: string = ''
   @Local backgroundImagePixelMap: PixelMap | undefined = undefined
   @Local preferType: number = 1
   @Local index: number = 0
@@ -58,6 +62,14 @@ struct Index {
   @Builder
   CleardataSheetBuilder() {
     Cleardata()
+  }
+
+  @Builder
+  UploaderrorlogSheetBuilder() {
+    Uploaderrorlog({
+      errorType: this.errorType,
+      errorObject: this.errorObject
+    })
   }
 
   build() {
@@ -127,6 +139,13 @@ struct Index {
         if (targetIndex === 3) {
           this.title = '我的'
           this.context.eventHub.emit('refreshMe')
+        }
+      })
+      .bindSheet(this.isShowUploaderrorlogSheet!!, this.UploaderrorlogSheetBuilder(), {
+        height: SheetSize.FIT_CONTENT,
+        preferType: this.preferType,
+        title: {
+          title: '上传故障日志'
         }
       })
     }
@@ -314,6 +333,11 @@ struct Index {
           ]
         })
       })
+      this.context.eventHub.on('uploadErrorLog', (errorType: string, errorObject: string) => {
+        this.errorType = errorType
+        this.errorObject = errorObject
+        this.isShowUploaderrorlogSheet = true
+      })
       this.preferType = getPreferType(this.UIContext)
       display.on('change', () => {
         setTimeout(() => {
@@ -330,6 +354,7 @@ struct Index {
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshIndex')
+      this.context.eventHub.off('uploadErrorLog')
       this.context.eventHub.off('dialog')
       this.context.eventHub.off('wantUri')
       this.context.eventHub.off('clearData')

@@ -25,7 +25,6 @@ import { autoLogin } from '../common/Accesstoken'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
 import { write } from '../common/File'
 import openLink from '../common/Openlink'
-import request from '../common/Request'
 import { autoBackupTable } from '../common/Table'
 
 interface JsErrorObject {
@@ -186,14 +185,7 @@ export default class EntryAbility extends UIAbility {
             'RESOURCE_OVERLIMIT',
             'ADDRESS_SANITIZER'
           ]) as string[]).includes('JS_ERROR')) {
-            const res = await request(context, '/debug/newErrorLog', {
-              product: 'password',
-              object: object
-            })
-            if (res !== 'fail') {
-              context.eventHub.emit('dialog', '提示',
-                '故障日志自动上传成功，故障类型：JS_ERROR。建议您依次进入“我的”>“设置”>“关于”，附带联系方式提交意见反馈或联系人工客服，便于开发者排查、处理问题。')
-            }
+            this.context.eventHub.emit('uploadErrorLog', object.name, JSON.stringify(object))
           }
         }
       }
@@ -229,14 +221,7 @@ export default class EntryAbility extends UIAbility {
             'RESOURCE_OVERLIMIT',
             'ADDRESS_SANITIZER'
           ]) as string[]).includes('JS_ERROR')) {
-            const res = await request(context, '/debug/newErrorLog', {
-              product: 'password',
-              object: object
-            })
-            if (res !== 'fail') {
-              this.context.eventHub.emit('dialog', '提示',
-                '故障日志自动上传成功，故障类型：JS_ERROR。建议您依次进入“我的”>“设置”>“关于”，附带联系方式提交意见反馈或联系人工客服，便于开发者排查、处理问题。')
-            }
+            this.context.eventHub.emit('uploadErrorLog', object.name, JSON.stringify(object))
           }
         }
       }
@@ -258,7 +243,7 @@ export default class EntryAbility extends UIAbility {
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
-          const promises = appEventGroups.map(async (item) => {
+          const promises = appEventGroups.map((item) => {
             if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
               'JS_ERROR',
               'APP_CRASH',
@@ -267,14 +252,7 @@ export default class EntryAbility extends UIAbility {
               'RESOURCE_OVERLIMIT',
               'ADDRESS_SANITIZER'
             ]) as string[]).includes(item.name)) {
-              const res = await request(context, '/debug/newErrorLog', {
-                product: 'password',
-                object: item
-              })
-              if (res !== 'fail') {
-                this.context.eventHub.emit('dialog', '提示', '故障日志自动上传成功，故障类型：' + item.name +
-                  '。建议您依次进入“我的”>“设置”>“关于”，附带联系方式提交意见反馈或联系人工客服，便于开发者排查、处理问题。')
-              }
+              this.context.eventHub.emit('uploadErrorLog', item.name, JSON.stringify(item))
             }
           })
           await Promise.all(promises)
@@ -472,6 +450,15 @@ export default class EntryAbility extends UIAbility {
     })
     await tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag(id INTEGER PRIMARY KEY AUTOINCREMENT,value,color,updateTime,cloudBackupTime,UNIQUE(value,color))')
     await tagRdbStore.executeSql('CREATE INDEX IF NOT EXISTS value ON tag(value)')
+    const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(this.context, {
+      name: 'huaweicloudsync',
+      securityLevel: relationalStore.SecurityLevel.S3,
+      encrypt: true,
+      allowRebuild: true
+    })
+    await huaweiCloudSyncRdbStore.executeSql('CREATE TABLE IF NOT EXISTS password(id TEXT PRIMARY KEY,name TEXT,info TEXT,tag TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
+    await huaweiCloudSyncRdbStore.executeSql('CREATE TABLE IF NOT EXISTS info(id TEXT PRIMARY KEY,type TEXT,value TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
+    await huaweiCloudSyncRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag(id TEXT PRIMARY KEY,value TEXT,color TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
     passwordRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       const promises = deviceIds.map(async (item) => {
         const tableName = await passwordRdbStore.obtainDistributedTableName(item, 'password')
@@ -700,7 +687,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 41) {
+    if (wantParam.version !== 42) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })
