@@ -25,7 +25,7 @@ import { autoLogin } from '../common/Accesstoken'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
 import { write } from '../common/File'
 import openLink from '../common/Openlink'
-import { autoBackupTable } from '../common/Table'
+import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from '../common/Table'
 
 interface JsErrorObject {
   name: string,
@@ -243,7 +243,7 @@ export default class EntryAbility extends UIAbility {
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
-          const promises = appEventGroups.map((item) => {
+          appEventGroups.map((item) => {
             if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
               'JS_ERROR',
               'APP_CRASH',
@@ -255,7 +255,6 @@ export default class EntryAbility extends UIAbility {
               this.context.eventHub.emit('uploadErrorLog', item.name, JSON.stringify(item))
             }
           })
-          await Promise.all(promises)
         }
       }
     })
@@ -479,12 +478,22 @@ export default class EntryAbility extends UIAbility {
             updateTime: resultSet.getValue(updateTimeIndex),
             cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
           }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+          huaweiCloudSyncRdbStore.insertSync('password', {
+            id: String(resultSet.getValue(idIndex)),
+            name: String(resultSet.getValue(nameIndex)),
+            info: resultSet.getValue(infoIndex),
+            tag: resultSet.getValue(tagIndex),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
         resultSet.close()
       })
       await Promise.all(promises)
       this.context.eventHub.emit('refreshPassword')
+      await autoSyncTable(this.context, 'password')
       await autoBackupTable(this.context, 'password')
+      await autoHuaweiCloudSyncTable(this.context, 'password')
     })
     infoRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       const promises = deviceIds.map(async (item) => {
@@ -504,12 +513,21 @@ export default class EntryAbility extends UIAbility {
             updateTime: resultSet.getValue(updateTimeIndex),
             cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
           }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+          huaweiCloudSyncRdbStore.insertSync('info', {
+            id: String(resultSet.getValue(idIndex)),
+            type: String(resultSet.getValue(typeIndex)),
+            value: String(resultSet.getValue(valueIndex)),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
         resultSet.close()
       })
       await Promise.all(promises)
       this.context.eventHub.emit('refreshInfo')
+      await autoSyncTable(this.context, 'info')
       await autoBackupTable(this.context, 'info')
+      await autoHuaweiCloudSyncTable(this.context, 'info')
     })
     tagRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       const promises = deviceIds.map(async (item) => {
@@ -529,13 +547,208 @@ export default class EntryAbility extends UIAbility {
             updateTime: resultSet.getValue(updateTimeIndex),
             cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
           }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+          huaweiCloudSyncRdbStore.insertSync('tag', {
+            id: String(resultSet.getValue(idIndex)),
+            value: String(resultSet.getValue(valueIndex)),
+            color: String(resultSet.getValue(colorIndex)),
+            updateTime: resultSet.getValue(updateTimeIndex),
+            cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+          }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
         resultSet.close()
       })
       await Promise.all(promises)
       this.context.eventHub.emit('refreshTag')
+      await autoSyncTable(this.context, 'tag')
       await autoBackupTable(this.context, 'tag')
+      await autoHuaweiCloudSyncTable(this.context, 'tag')
     })
+    huaweiCloudSyncRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_CLOUD_DETAILS,
+      (changeInfo: relationalStore.ChangeInfo[]) => {
+        changeInfo.forEach(async (item) => {
+          const table = item.table
+          const dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+            name: 'dataSetting'
+          })
+          const huaweiCloudSyncOnTables = dataSettingDataPreferences.getSync('huaweiCloudSyncOnTables', []) as string[]
+          if (huaweiCloudSyncOnTables.includes(table)) {
+            await huaweiCloudSyncRdbStore.cloudSync(relationalStore.SyncMode.SYNC_MODE_TIME_FIRST, [table],
+              async (progressDetails) => {
+                if (progressDetails.code === relationalStore.ProgressCode.SUCCESS) {
+                  if (table === 'password') {
+                    const insertedIdArray = item.inserted as string[]
+                    const insertpromises = insertedIdArray.map(async (id) => {
+                      const predicates = new relationalStore.RdbPredicates('password')
+                      predicates.equalTo('id', id)
+                      const resultSet = await huaweiCloudSyncRdbStore.query(predicates)
+                      const nameIndex = resultSet.getColumnIndex('name')
+                      const infoIndex = resultSet.getColumnIndex('info')
+                      const tagIndex = resultSet.getColumnIndex('tag')
+                      const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+                      const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+                      if (resultSet.goToNextRow()) {
+                        passwordRdbStore.insertSync('password', {
+                          id: Number(id),
+                          name: resultSet.getValue(nameIndex),
+                          info: resultSet.getValue(infoIndex),
+                          tag: resultSet.getValue(tagIndex),
+                          updateTime: resultSet.getValue(updateTimeIndex),
+                          cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+                        }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+                      }
+                      resultSet.close()
+                    })
+                    const updatedIdArray = item.updated as string[]
+                    const updatepromises = updatedIdArray.map(async (id) => {
+                      const predicates = new relationalStore.RdbPredicates('password')
+                      predicates.equalTo('id', id)
+                      const resultSet = await huaweiCloudSyncRdbStore.query(predicates)
+                      const nameIndex = resultSet.getColumnIndex('name')
+                      const infoIndex = resultSet.getColumnIndex('info')
+                      const tagIndex = resultSet.getColumnIndex('tag')
+                      const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+                      const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+                      if (resultSet.goToNextRow()) {
+                        const predicatesb = new relationalStore.RdbPredicates('password')
+                        predicatesb.equalTo('id', Number(id))
+                        passwordRdbStore.updateSync({
+                          name: resultSet.getValue(nameIndex),
+                          info: resultSet.getValue(infoIndex),
+                          tag: resultSet.getValue(tagIndex),
+                          updateTime: resultSet.getValue(updateTimeIndex),
+                          cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+                        }, predicatesb)
+                      }
+                      resultSet.close()
+                    })
+                    const deletedIdArray = item.deleted as string[]
+                    const deletepromises = deletedIdArray.map(async (id) => {
+                      const predicates = new relationalStore.RdbPredicates('password')
+                      predicates.equalTo('id', Number(id))
+                      passwordRdbStore.deleteSync(predicates)
+                      await huaweiCloudSyncRdbStore.cleanDirtyData(table)
+                    })
+                    await Promise.all(insertpromises)
+                    await Promise.all(updatepromises)
+                    await Promise.all(deletepromises)
+                    await autoSyncTable(this.context, table)
+                    await autoBackupTable(this.context, table)
+                  }
+                  if (table === 'info') {
+                    const insertedIdArray = item.inserted as string[]
+                    const insertpromises = insertedIdArray.map(async (id) => {
+                      const predicates = new relationalStore.RdbPredicates('info')
+                      predicates.equalTo('id', id)
+                      const resultSet = await huaweiCloudSyncRdbStore.query(predicates)
+                      const typeIndex = resultSet.getColumnIndex('type')
+                      const valueIndex = resultSet.getColumnIndex('value')
+                      const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+                      const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+                      if (resultSet.goToNextRow()) {
+                        infoRdbStore.insertSync('info', {
+                          id: Number(id),
+                          type: resultSet.getValue(typeIndex),
+                          value: resultSet.getValue(valueIndex),
+                          updateTime: resultSet.getValue(updateTimeIndex),
+                          cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+                        }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+                      }
+                      resultSet.close()
+                    })
+                    const updatedIdArray = item.updated as string[]
+                    const updatepromises = updatedIdArray.map(async (id) => {
+                      const predicates = new relationalStore.RdbPredicates('info')
+                      predicates.equalTo('id', id)
+                      const resultSet = await huaweiCloudSyncRdbStore.query(predicates)
+                      const typeIndex = resultSet.getColumnIndex('type')
+                      const valueIndex = resultSet.getColumnIndex('value')
+                      const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+                      const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+                      if (resultSet.goToNextRow()) {
+                        const predicatesb = new relationalStore.RdbPredicates('info')
+                        predicatesb.equalTo('id', Number(id))
+                        infoRdbStore.updateSync({
+                          type: resultSet.getValue(typeIndex),
+                          value: resultSet.getValue(valueIndex),
+                          updateTime: resultSet.getValue(updateTimeIndex),
+                          cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+                        }, predicatesb)
+                      }
+                      resultSet.close()
+                    })
+                    const deletedIdArray = item.deleted as string[]
+                    const deletepromises = deletedIdArray.map(async (id) => {
+                      const predicates = new relationalStore.RdbPredicates('info')
+                      predicates.equalTo('id', Number(id))
+                      infoRdbStore.deleteSync(predicates)
+                      await huaweiCloudSyncRdbStore.cleanDirtyData(table)
+                    })
+                    await Promise.all(insertpromises)
+                    await Promise.all(updatepromises)
+                    await Promise.all(deletepromises)
+                    await autoSyncTable(this.context, table)
+                    await autoBackupTable(this.context, table)
+                  }
+                  if (table === 'tag') {
+                    const insertedIdArray = item.inserted as string[]
+                    const insertpromises = insertedIdArray.map(async (id) => {
+                      const predicates = new relationalStore.RdbPredicates('tag')
+                      predicates.equalTo('id', id)
+                      const resultSet = await huaweiCloudSyncRdbStore.query(predicates)
+                      const valueIndex = resultSet.getColumnIndex('value')
+                      const colorIndex = resultSet.getColumnIndex('color')
+                      const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+                      const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+                      if (resultSet.goToNextRow()) {
+                        tagRdbStore.insertSync('tag', {
+                          id: Number(id),
+                          value: resultSet.getValue(valueIndex),
+                          color: resultSet.getValue(colorIndex),
+                          updateTime: resultSet.getValue(updateTimeIndex),
+                          cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+                        }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+                      }
+                      resultSet.close()
+                    })
+                    const updatedIdArray = item.updated as string[]
+                    const updatepromises = updatedIdArray.map(async (id) => {
+                      const predicates = new relationalStore.RdbPredicates('tag')
+                      predicates.equalTo('id', id)
+                      const resultSet = await huaweiCloudSyncRdbStore.query(predicates)
+                      const valueIndex = resultSet.getColumnIndex('value')
+                      const colorIndex = resultSet.getColumnIndex('color')
+                      const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+                      const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+                      if (resultSet.goToNextRow()) {
+                        const predicatesb = new relationalStore.RdbPredicates('tag')
+                        predicatesb.equalTo('id', Number(id))
+                        tagRdbStore.updateSync({
+                          value: resultSet.getValue(valueIndex),
+                          color: resultSet.getValue(colorIndex),
+                          updateTime: resultSet.getValue(updateTimeIndex),
+                          cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
+                        }, predicatesb)
+                      }
+                      resultSet.close()
+                    })
+                    const deletedIdArray = item.deleted as string[]
+                    const deletepromises = deletedIdArray.map(async (id) => {
+                      const predicates = new relationalStore.RdbPredicates('tag')
+                      predicates.equalTo('id', Number(id))
+                      tagRdbStore.deleteSync(predicates)
+                      await huaweiCloudSyncRdbStore.cleanDirtyData(table)
+                    })
+                    await Promise.all(insertpromises)
+                    await Promise.all(updatepromises)
+                    await Promise.all(deletepromises)
+                    await autoSyncTable(this.context, table)
+                    await autoBackupTable(this.context, table)
+                  }
+                }
+              })
+          }
+        })
+      })
     appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'

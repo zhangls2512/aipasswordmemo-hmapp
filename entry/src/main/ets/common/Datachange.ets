@@ -4,7 +4,7 @@ import { getAccountAccessToken, getAccountInfo } from './Accesstoken'
 import { encrypt } from './Crypto'
 import { CloudBackupTimeItem } from './Dataget'
 import request from './Request'
-import { autoBackupTable, autoSyncTable } from './Table'
+import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
 
 interface PasswordInfoItem {
   type: string,
@@ -43,6 +43,12 @@ export async function newPassword(context: Context, data: PasswordInput) {
     encrypt: true,
     allowRebuild: true
   })
+  const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+    name: 'huaweicloudsync',
+    securityLevel: relationalStore.SecurityLevel.S3,
+    encrypt: true,
+    allowRebuild: true
+  })
   const updateTime = Date.now()
   const id = rdbStore.insertSync('password', {
     name: data.name,
@@ -50,12 +56,21 @@ export async function newPassword(context: Context, data: PasswordInput) {
     tag: JSON.stringify(data.tag),
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
-  }, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+  })
+  huaweiCloudSyncRdbStore.insertSync('password', {
+    id: String(id),
+    name: data.name,
+    info: JSON.stringify(data.info),
+    tag: JSON.stringify(data.tag),
+    updateTime: updateTime,
+    cloudBackupTime: JSON.stringify([])
+  })
   await promptAction.openToast({
     message: '新增成功'
   })
   await autoSyncTable(context, 'password')
   await autoBackupTable(context, 'password')
+  await autoHuaweiCloudSyncTable(context, 'password')
   if (data.cloudBackup) {
     const accountInfo = await getAccountInfo()
     const cloudBackupTime: CloudBackupTimeItem[] = [{
@@ -83,6 +98,12 @@ export async function updatePassword(context: Context, id: number, data: Passwor
     encrypt: true,
     allowRebuild: true
   })
+  const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+    name: 'huaweicloudsync',
+    securityLevel: relationalStore.SecurityLevel.S3,
+    encrypt: true,
+    allowRebuild: true
+  })
   const predicates = new relationalStore.RdbPredicates('password')
   predicates.equalTo('id', id)
   const updateTime = Date.now()
@@ -101,12 +122,22 @@ export async function updatePassword(context: Context, id: number, data: Passwor
     tag: JSON.stringify(data.tag),
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
-  }, predicates, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+  }, predicates)
+  const predicatesb = new relationalStore.RdbPredicates('password')
+  predicatesb.equalTo('id', String(id))
+  huaweiCloudSyncRdbStore.updateSync({
+    name: data.name,
+    info: JSON.stringify(data.info),
+    tag: JSON.stringify(data.tag),
+    updateTime: updateTime,
+    cloudBackupTime: cloudBackupTime
+  }, predicatesb)
   await promptAction.openToast({
     message: '修改成功'
   })
   await autoSyncTable(context, 'password')
   await autoBackupTable(context, 'password')
+  await autoHuaweiCloudSyncTable(context, 'password')
   if (data.cloudBackup) {
     const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
     const accountInfo = await getAccountInfo()
@@ -141,6 +172,12 @@ export async function newInfo(context: Context, data: InfoInput) {
     encrypt: true,
     allowRebuild: true
   })
+  const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+    name: 'huaweicloudsync',
+    securityLevel: relationalStore.SecurityLevel.S3,
+    encrypt: true,
+    allowRebuild: true
+  })
   const predicates = new relationalStore.RdbPredicates('info')
   predicates.equalTo('type', data.type)
   predicates.equalTo('value', data.value)
@@ -159,12 +196,20 @@ export async function newInfo(context: Context, data: InfoInput) {
     value: data.value,
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
-  }, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+  })
+  huaweiCloudSyncRdbStore.insertSync('info', {
+    id: String(id),
+    type: data.type,
+    value: data.value,
+    updateTime: updateTime,
+    cloudBackupTime: JSON.stringify([])
+  })
   await promptAction.openToast({
     message: '新增成功'
   })
   await autoSyncTable(context, 'info')
   await autoBackupTable(context, 'info')
+  await autoHuaweiCloudSyncTable(context, 'info')
   if (data.cloudBackup) {
     const accountInfo = await getAccountInfo()
     const cloudBackupTime: CloudBackupTimeItem[] = [{
@@ -198,6 +243,12 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
     encrypt: true,
     allowRebuild: true
   })
+  const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+    name: 'huaweicloudsync',
+    securityLevel: relationalStore.SecurityLevel.S3,
+    encrypt: true,
+    allowRebuild: true
+  })
   const predicatesa = new relationalStore.RdbPredicates('info')
   predicatesa.equalTo('type', data.type)
   predicatesa.equalTo('value', data.value)
@@ -227,12 +278,21 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
     value: data.value,
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
-  }, predicatesb, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+  }, predicatesb)
+  const predicatesc = new relationalStore.RdbPredicates('info')
+  predicatesc.equalTo('id', String(id))
+  huaweiCloudSyncRdbStore.updateSync({
+    type: data.type,
+    value: data.value,
+    updateTime: updateTime,
+    cloudBackupTime: cloudBackupTime
+  }, predicatesc)
   await promptAction.openToast({
     message: '修改成功'
   })
   await autoSyncTable(context, 'info')
   await autoBackupTable(context, 'info')
+  await autoHuaweiCloudSyncTable(context, 'info')
   if (data.cloudBackup) {
     const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
     const accountInfo = await getAccountInfo()
@@ -267,6 +327,12 @@ export async function newTag(context: Context, data: TagInput) {
     encrypt: true,
     allowRebuild: true
   })
+  const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+    name: 'huaweicloudsync',
+    securityLevel: relationalStore.SecurityLevel.S3,
+    encrypt: true,
+    allowRebuild: true
+  })
   const predicates = new relationalStore.RdbPredicates('tag')
   predicates.equalTo('value', data.value)
   const resultSet = await rdbStore.query(predicates)
@@ -284,12 +350,20 @@ export async function newTag(context: Context, data: TagInput) {
     color: data.color,
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
-  }, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+  })
+  huaweiCloudSyncRdbStore.insertSync('tag', {
+    id: String(id),
+    value: data.value,
+    color: data.color,
+    updateTime: updateTime,
+    cloudBackupTime: JSON.stringify([])
+  })
   await promptAction.openToast({
     message: '新增成功'
   })
   await autoSyncTable(context, 'tag')
   await autoBackupTable(context, 'tag')
+  await autoHuaweiCloudSyncTable(context, 'tag')
   if (data.cloudBackup) {
     const accountInfo = await getAccountInfo()
     const cloudBackupTime: CloudBackupTimeItem[] = [{
@@ -317,11 +391,17 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
     encrypt: true,
     allowRebuild: true
   })
+  const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+    name: 'huaweicloudsync',
+    securityLevel: relationalStore.SecurityLevel.S3,
+    encrypt: true,
+    allowRebuild: true
+  })
   const predicatesa = new relationalStore.RdbPredicates('tag')
   predicatesa.equalTo('value', data.value)
+  predicatesa.equalTo('color', data.color)
   const resultSeta = await rdbStore.query(predicatesa)
-  const colorIndex = resultSeta.getColumnIndex('color')
-  if (resultSeta.goToNextRow() && resultSeta.getValue(colorIndex) as string === data.color) {
+  if (resultSeta.goToNextRow()) {
     resultSeta.close()
     await promptAction.openToast({
       message: '修改失败，原因：已存在'
@@ -346,12 +426,21 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
     color: data.color,
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
-  }, predicatesb, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+  }, predicatesb)
+  const predicatesc = new relationalStore.RdbPredicates('tag')
+  predicatesc.equalTo('id', String(id))
+  huaweiCloudSyncRdbStore.updateSync({
+    value: data.value,
+    color: data.color,
+    updateTime: updateTime,
+    cloudBackupTime: cloudBackupTime
+  }, predicatesc)
   await promptAction.openToast({
     message: '修改成功'
   })
   await autoSyncTable(context, 'tag')
   await autoBackupTable(context, 'tag')
+  await autoHuaweiCloudSyncTable(context, 'tag')
   if (data.cloudBackup) {
     const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
     const accountInfo = await getAccountInfo()
@@ -390,14 +479,24 @@ export async function deleteData(context: Context, type: string, id: number) {
     encrypt: true,
     allowRebuild: true
   })
+  const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+    name: 'huaweicloudsync',
+    securityLevel: relationalStore.SecurityLevel.S3,
+    encrypt: true,
+    allowRebuild: true
+  })
   const predicates = new relationalStore.RdbPredicates(type)
   predicates.equalTo('id', id)
   rdbStore.deleteSync(predicates)
+  const predicatesb = new relationalStore.RdbPredicates(type)
+  predicatesb.equalTo('id', String(id))
+  huaweiCloudSyncRdbStore.deleteSync(predicatesb)
   await promptAction.openToast({
     message: '删除成功'
   })
   await autoSyncTable(context, type)
   await autoBackupTable(context, type)
+  await autoHuaweiCloudSyncTable(context, type)
 }
 
 export async function setCloudBackup(context: Context, data: CloudBackupItem) {
@@ -421,6 +520,12 @@ export async function setCloudBackup(context: Context, data: CloudBackupItem) {
       const rdbStore = await relationalStore.getRdbStore(context, {
         name: data.type,
         securityLevel: securityLevel,
+        encrypt: true,
+        allowRebuild: true
+      })
+      const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+        name: 'huaweicloudsync',
+        securityLevel: relationalStore.SecurityLevel.S3,
         encrypt: true,
         allowRebuild: true
       })
@@ -454,10 +559,18 @@ export async function setCloudBackup(context: Context, data: CloudBackupItem) {
       }
       rdbStore.updateSync({
         cloudBackupTime: JSON.stringify(cloudBackupTime)
-      }, predicates, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+      }, predicates)
+      const predicatesb = new relationalStore.RdbPredicates(data.type)
+      predicatesb.equalTo('id', String(data.id))
+      huaweiCloudSyncRdbStore.updateSync({
+        cloudBackupTime: JSON.stringify(cloudBackupTime)
+      }, predicatesb)
       await promptAction.openToast({
         message: '云备份成功'
       })
+      await autoSyncTable(context, data.type)
+      await autoBackupTable(context, data.type)
+      await autoHuaweiCloudSyncTable(context, data.type)
     }
   }
 }
@@ -482,6 +595,12 @@ export async function deleteCloudBackup(context: Context, data: CloudBackupItem)
         encrypt: true,
         allowRebuild: true
       })
+      const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+        name: 'huaweicloudsync',
+        securityLevel: relationalStore.SecurityLevel.S3,
+        encrypt: true,
+        allowRebuild: true
+      })
       const predicates = new relationalStore.RdbPredicates(data.type)
       predicates.equalTo('id', data.id)
       const resultSet = await rdbStore.query(predicates)
@@ -500,10 +619,18 @@ export async function deleteCloudBackup(context: Context, data: CloudBackupItem)
       }
       rdbStore.updateSync({
         cloudBackupTime: JSON.stringify(cloudBackupTime)
-      }, predicates, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+      }, predicates)
+      const predicatesb = new relationalStore.RdbPredicates(data.type)
+      predicatesb.equalTo('id', String(data.id))
+      huaweiCloudSyncRdbStore.updateSync({
+        cloudBackupTime: JSON.stringify(cloudBackupTime)
+      }, predicatesb)
       await promptAction.openToast({
         message: '取消云备份成功'
       })
+      await autoSyncTable(context, data.type)
+      await autoBackupTable(context, data.type)
+      await autoHuaweiCloudSyncTable(context, data.type)
     }
   }
 }

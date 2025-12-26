@@ -929,8 +929,9 @@ struct Tablesync {
                           })
                         Toggle({
                           type: ToggleType.Switch,
-                          isOn: this.autoSyncTables.includes(item.value)
+                          isOn: this.autoHuaweiCloudSyncTables.includes(item.value)
                         })
+                          .enabled(this.huaweiCloudSyncOnTables.includes(item.value))
                           .onChange((isOn) => {
                             let autoHuaweiCloudSyncTables: string[] = []
                             if (!isOn) {
@@ -1280,7 +1281,7 @@ struct Tablesync {
                           })
                           await huaweiCloudSyncRdbStore.cloudSync(relationalStore.SyncMode.SYNC_MODE_TIME_FIRST,
                             ['info'], (progressDetails) => {
-                              this.passwordHuaweiCloudSyncProgressDetails = progressDetails
+                              this.infoHuaweiCloudSyncProgressDetails = progressDetails
                             })
                         })
                     }
@@ -1440,7 +1441,7 @@ struct Tablesync {
                           })
                           await huaweiCloudSyncRdbStore.cloudSync(relationalStore.SyncMode.SYNC_MODE_TIME_FIRST,
                             ['tag'], (progressDetails) => {
-                              this.passwordHuaweiCloudSyncProgressDetails = progressDetails
+                              this.tagHuaweiCloudSyncProgressDetails = progressDetails
                             })
                         })
                     }

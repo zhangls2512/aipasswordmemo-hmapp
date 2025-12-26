@@ -263,6 +263,7 @@ export default struct Cleardata {
                   const keys = [
                     'autoSyncTables',
                     'autoSyncDevices',
+                    'autoHuaweiCloudSyncTables',
                     'autoBackupTables',
                     'autoFileBackupTables',
                     'pauseAutoSyncWhenLowBatteryCapacityLevel',
