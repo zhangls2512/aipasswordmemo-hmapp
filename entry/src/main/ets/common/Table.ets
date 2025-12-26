@@ -65,13 +65,46 @@ export async function autoSyncTable(context: Context, table: string) {
     currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
     return
   }
-  const autoSyncTables: string[] = dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
+  const autoSyncTables = dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
   if (autoSyncTables.includes(table)) {
     const autoSyncDevices: Item[] = dataSettingDataPreferences.getSync('autoSyncDevices', []) as Item[]
     const promises = autoSyncDevices.map(async (item) => {
       await syncTable(context, table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
     })
     await Promise.all(promises)
+  }
+}
+
+export async function autoHuaweiCloudSyncTable(context: Context, table: string) {
+  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
+    name: 'dataSetting'
+  })
+  const debugSettingDataPreferences = preferences.getPreferencesSync(context, {
+    name: 'debugSetting'
+  })
+  const pauseAutoSyncWhenLowBatteryCapacityLevel =
+    dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false)
+  const pauseAutoSyncWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
+  const lowBatteryCapacityLevel =
+    debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
+  if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
+    return
+  }
+  const currentPowerMode = power.getPowerMode()
+  if (pauseAutoSyncWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
+    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
+    return
+  }
+  const autoHuaweiCloudSyncTables = dataSettingDataPreferences.getSync('autoHuaweiCloudSyncTables', []) as string[]
+  if (autoHuaweiCloudSyncTables.includes(table)) {
+    const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+      name: 'huaweicloudsync',
+      securityLevel: relationalStore.SecurityLevel.S3,
+      encrypt: true,
+      allowRebuild: true
+    })
+    await huaweiCloudSyncRdbStore.cloudSync(relationalStore.SyncMode.SYNC_MODE_TIME_FIRST, [table], () => {
+    })
   }
 }
 
@@ -90,7 +123,7 @@ export async function backupTable(context: Context, table: string) {
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
   })
-  const isBackupTables: string[] = dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
+  const isBackupTables = dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
   dataSettingDataPreferences.putSync('isBackupTables', Array.from(new Set([...isBackupTables, table])))
   dataSettingDataPreferences.flushSync()
 }
@@ -115,65 +148,71 @@ export async function autoBackupTable(context: Context, table: string) {
     currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
     return
   }
-  const autoBackupTables: string[] =
+  const autoBackupTables =
     dataSettingDataPreferences.getSync('autoBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoBackupTables.includes(table)) {
     await backupTable(context, table)
   }
-  const autoFileBackupTables: string[] =
+  const autoFileBackupTables =
     dataSettingDataPreferences.getSync('autoFileBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoFileBackupTables.includes(table)) {
     if (table === 'password') {
       const array = await getPasswordList(context)
-      const arrayOut = array.map((item): PasswordOutItem => {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
-        return {
-          id: item.id,
-          name: item.name,
-          info: item.info,
-          tag: item.tag.map(item => item.value),
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }
-      })
-      await write(context.filesDir + '/backup/password.txt', JSON.stringify(arrayOut))
+      if (array.length > 0) {
+        const arrayOut = array.map((item): PasswordOutItem => {
+          let cloudBackupTime = JSON.stringify([])
+          if (typeof (item.cloudBackupTime) === 'string') {
+            cloudBackupTime = item.cloudBackupTime
+          }
+          return {
+            id: item.id,
+            name: item.name,
+            info: item.info,
+            tag: item.tag.map(item => item.value),
+            updateTime: item.updateTime,
+            cloudBackupTime: cloudBackupTime
+          }
+        })
+        await write(context.filesDir + '/backup/password.txt', JSON.stringify(arrayOut))
+      }
     }
     if (table === 'info') {
       const array = await getInfoList(context)
-      const arrayOut = array.map((item): InfoOutItem => {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
-        return {
-          id: item.id,
-          type: item.type,
-          value: item.value,
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }
-      })
-      await write(context.filesDir + '/backup/info.txt', JSON.stringify(arrayOut))
+      if (array.length > 0) {
+        const arrayOut = array.map((item): InfoOutItem => {
+          let cloudBackupTime = JSON.stringify([])
+          if (typeof (item.cloudBackupTime) === 'string') {
+            cloudBackupTime = item.cloudBackupTime
+          }
+          return {
+            id: item.id,
+            type: item.type,
+            value: item.value,
+            updateTime: item.updateTime,
+            cloudBackupTime: cloudBackupTime
+          }
+        })
+        await write(context.filesDir + '/backup/info.txt', JSON.stringify(arrayOut))
+      }
     }
     if (table === 'tag') {
       const array = await getTagList(context)
-      const arrayOut = array.map((item): TagOutItem => {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
-        return {
-          id: item.id,
-          value: item.value,
-          color: item.color,
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }
-      })
-      await write(context.filesDir + '/backup/tag.txt', JSON.stringify(arrayOut))
+      if (array.length > 0) {
+        const arrayOut = array.map((item): TagOutItem => {
+          let cloudBackupTime = JSON.stringify([])
+          if (typeof (item.cloudBackupTime) === 'string') {
+            cloudBackupTime = item.cloudBackupTime
+          }
+          return {
+            id: item.id,
+            value: item.value,
+            color: item.color,
+            updateTime: item.updateTime,
+            cloudBackupTime: cloudBackupTime
+          }
+        })
+        await write(context.filesDir + '/backup/tag.txt', JSON.stringify(arrayOut))
+      }
     }
   }
 }

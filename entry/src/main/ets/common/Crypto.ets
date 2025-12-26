@@ -10,28 +10,23 @@ interface EncryptData {
 }
 
 export function stringToArray(str: string) {
-  const textEncoder = new util.TextEncoder()
-  return textEncoder.encodeInto(str)
+  return new util.TextEncoder().encodeInto(str)
 }
 
 function arrayToString(arr: Uint8Array) {
-  const textDecoder = util.TextDecoder.create()
-  return textDecoder.decodeToString(arr)
+  return util.TextDecoder.create().decodeToString(arr)
 }
 
 function encodeBase64(arr: Uint8Array) {
-  const base64 = new util.Base64Helper()
-  return base64.encodeSync(arr)
+  return new util.Base64Helper().encodeSync(arr)
 }
 
 function encodeBase64ToString(arr: Uint8Array) {
-  const base64 = new util.Base64Helper()
-  return base64.encodeToStringSync(arr)
+  return new util.Base64Helper().encodeToStringSync(arr)
 }
 
 function decodeBase64(arr: Uint8Array | string) {
-  const base64 = new util.Base64Helper()
-  return base64.decodeSync(arr)
+  return new util.Base64Helper().decodeSync(arr)
 }
 
 export function getKey(): string {
