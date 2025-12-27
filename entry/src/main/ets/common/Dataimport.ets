@@ -1,7 +1,7 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { PasswordInfoItem } from './Dataget'
-import { autoBackupTable, autoSyncTable } from './Table'
+import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
 
 export interface PasswordInItem {
   id: number,
@@ -37,7 +37,13 @@ export async function importPassword(context: Context, data: string, conflict: r
       encrypt: true,
       allowRebuild: true
     })
-    const promises = array.map(item => {
+    const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+      name: 'huaweicloudsync',
+      securityLevel: relationalStore.SecurityLevel.S3,
+      encrypt: true,
+      allowRebuild: true
+    })
+    array.map(item => {
       let cloudBackupTime = JSON.stringify([])
       if (typeof (item.cloudBackupTime) === 'string') {
         cloudBackupTime = item.cloudBackupTime
@@ -50,10 +56,18 @@ export async function importPassword(context: Context, data: string, conflict: r
         updateTime: item.updateTime,
         cloudBackupTime: cloudBackupTime
       }, conflict)
+      huaweiCloudSyncRdbStore.insertSync('password', {
+        id: String(item.id),
+        name: item.name,
+        info: JSON.stringify(item.info),
+        tag: JSON.stringify(item.tag),
+        updateTime: item.updateTime,
+        cloudBackupTime: cloudBackupTime
+      }, conflict)
     })
-    await Promise.all(promises)
     await autoSyncTable(context, 'password')
     await autoBackupTable(context, 'password')
+    await autoHuaweiCloudSyncTable(context, 'password')
   } catch {
     await promptAction.openToast({
       message: '导入失败'
@@ -70,7 +84,13 @@ export async function importInfo(context: Context, data: string, conflict: relat
       encrypt: true,
       allowRebuild: true
     })
-    const promises = array.map(item => {
+    const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+      name: 'huaweicloudsync',
+      securityLevel: relationalStore.SecurityLevel.S3,
+      encrypt: true,
+      allowRebuild: true
+    })
+    array.map(item => {
       let cloudBackupTime = JSON.stringify([])
       if (typeof (item.cloudBackupTime) === 'string') {
         cloudBackupTime = item.cloudBackupTime
@@ -82,10 +102,17 @@ export async function importInfo(context: Context, data: string, conflict: relat
         updateTime: item.updateTime,
         cloudBackupTime: cloudBackupTime
       }, conflict)
+      huaweiCloudSyncRdbStore.insertSync('info', {
+        id: String(item.id),
+        type: item.type,
+        value: item.value,
+        updateTime: item.updateTime,
+        cloudBackupTime: cloudBackupTime
+      }, conflict)
     })
-    await Promise.all(promises)
     await autoSyncTable(context, 'info')
     await autoBackupTable(context, 'info')
+    await autoHuaweiCloudSyncTable(context, 'info')
   } catch {
     await promptAction.openToast({
       message: '导入失败'
@@ -102,7 +129,13 @@ export async function importTag(context: Context, data: string, conflict: relati
       encrypt: true,
       allowRebuild: true
     })
-    const promises = array.map(item => {
+    const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
+      name: 'huaweicloudsync',
+      securityLevel: relationalStore.SecurityLevel.S3,
+      encrypt: true,
+      allowRebuild: true
+    })
+    array.map(item => {
       let cloudBackupTime = JSON.stringify([])
       if (typeof (item.cloudBackupTime) === 'string') {
         cloudBackupTime = item.cloudBackupTime
@@ -114,10 +147,17 @@ export async function importTag(context: Context, data: string, conflict: relati
         updateTime: item.updateTime,
         cloudBackupTime: cloudBackupTime
       }, conflict)
+      huaweiCloudSyncRdbStore.insertSync('tag', {
+        id: String(item.id),
+        value: item.value,
+        color: item.color,
+        updateTime: item.updateTime,
+        cloudBackupTime: cloudBackupTime
+      }, conflict)
     })
-    await Promise.all(promises)
     await autoSyncTable(context, 'tag')
     await autoBackupTable(context, 'tag')
+    await autoHuaweiCloudSyncTable(context, 'tag')
   } catch {
     await promptAction.openToast({
       message: '导入失败'
