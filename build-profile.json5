@@ -5,9 +5,9 @@
         "name": "release",
         "material": {
           "storeFile": "D:/code/harmonyproject/内部文件/发布签名材料/keystore.p12",
-          "storePassword": "000000195C12DD78581766951C4A14A8EF547FA599ED4F3FADCD2A726A6754A39C4C94E2BE42310E9F",
+          "storePassword": "0000001950FDDADD1F60392AAA8B0A125A6EC2BB0B18075B7DB386B3B2A50102CC2336DA7FCBDB8739",
           "keyAlias": "release",
-          "keyPassword": "0000001984A06F2DD1122ECB427C9217BA8AB41E9F05DD1E930B56A57A794CDCDDE59C83C4D9B71366",
+          "keyPassword": "000000196D93879C6B3E51616D3E99523FA7A67D6C4832FBF5EF213DE74F2E41369AE3E4AC186A5F25",
           "certpath": "D:/code/harmonyproject/内部文件/发布签名材料/zhangxm.cer",
           "profile": "D:/code/harmonyproject/内部文件/发布签名材料/aipasswordmemo.p7b",
           "signAlg": "SHA256withECDSA"
@@ -16,12 +16,12 @@
       {
         "name": "debug",
         "material": {
-          "storeFile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p12",
-          "storePassword": "0000001B33014B925957FCB6C07BE40FE428B2730EC2AE942DC2816298D18F08914C05D937B6D8763BB90E",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001B7808848AFBBCE9003182EC582F728A1FFC270F6D74912EAB804400EEFA599F8A74FFD5133841C7",
-          "certpath": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.cer",
-          "profile": "C:\\Users\\zls25\\.ohos\\config\\debug_aipasswordmemohmapp_rAH5p2u8dOdFjMTJqXwGsjqoJIs6CevWkf_Xtk4JvS0=.p7b",
+          "storeFile": "D:/code/harmonyproject/内部文件/调试签名材料/keystore.p12",
+          "storePassword": "00000019781F466FDFBB2E81D846E0D034E417F94D5AE1DAEBEA409B12E6EB6BDB185336572C90C123",
+          "keyAlias": "debug",
+          "keyPassword": "000000190902E5E754FD29172497FD207D5069C1FD571CE09EC19A4346C0CE2D84C3FD9764A644D6A7",
+          "certpath": "D:/code/harmonyproject/内部文件/调试签名材料/zhangxm.cer",
+          "profile": "D:/code/harmonyproject/内部文件/调试签名材料/aipasswordmemo.p7b",
           "signAlg": "SHA256withECDSA"
         }
       }

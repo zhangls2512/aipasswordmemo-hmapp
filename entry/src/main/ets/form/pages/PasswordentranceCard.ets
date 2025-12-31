@@ -3,7 +3,7 @@
 struct PasswordentranceCard {
   build() {
     Row() {
-      Image($r('app.media.new_card'))
+      Image($r('app.media.new_form'))
         .width('50%')
         .onClick(() => {
           postCardAction(this, {
@@ -14,7 +14,7 @@ struct PasswordentranceCard {
             }
           })
         })
-      Image($r('app.media.search_card'))
+      Image($r('app.media.search_form'))
         .width('50%')
         .onClick(() => {
           postCardAction(this, {

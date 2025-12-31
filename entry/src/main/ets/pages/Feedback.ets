@@ -110,7 +110,7 @@ struct Feedback {
                 dialogControllerProgress.open()
                 const res = await request(this.context, '/debug/sendFeedbackEmail', {
                   product: 'password',
-                  version: '2.0.7.0',
+                  version: '2.0.7.1',
                   content: this.content,
                   contactType: this.contactType,
                   contactValue: this.contactValue
