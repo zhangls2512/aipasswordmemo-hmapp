@@ -631,6 +631,7 @@ export default class EntryAbility extends UIAbility {
                     await Promise.all(insertpromises)
                     await Promise.all(updatepromises)
                     await Promise.all(deletepromises)
+                    this.context.eventHub.emit('refreshPassword')
                     await autoSyncTable(this.context, table)
                     await autoBackupTable(this.context, table)
                   }
@@ -686,6 +687,7 @@ export default class EntryAbility extends UIAbility {
                     await Promise.all(insertpromises)
                     await Promise.all(updatepromises)
                     await Promise.all(deletepromises)
+                    this.context.eventHub.emit('refreshInfo')
                     await autoSyncTable(this.context, table)
                     await autoBackupTable(this.context, table)
                   }
@@ -741,6 +743,7 @@ export default class EntryAbility extends UIAbility {
                     await Promise.all(insertpromises)
                     await Promise.all(updatepromises)
                     await Promise.all(deletepromises)
+                    this.context.eventHub.emit('refreshTag')
                     await autoSyncTable(this.context, table)
                     await autoBackupTable(this.context, table)
                   }
@@ -900,7 +903,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 43) {
+    if (wantParam.version !== 44) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })
