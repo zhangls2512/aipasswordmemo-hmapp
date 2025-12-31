@@ -576,7 +576,7 @@ struct DataInOut {
                       color: $r('sys.color.font_primary')
                     },
                     {
-                      text: 'csv (无修改时间、云备份时间)',
+                      text: 'csv (仅包含名称、信息)',
                       color: $r('sys.color.font_primary')
                     }
                   ]

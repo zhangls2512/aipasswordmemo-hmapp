@@ -631,6 +631,7 @@ export default class EntryAbility extends UIAbility {
                     await Promise.all(insertpromises)
                     await Promise.all(updatepromises)
                     await Promise.all(deletepromises)
+                    this.context.eventHub.emit('refreshPassword')
                     await autoSyncTable(this.context, table)
                     await autoBackupTable(this.context, table)
                   }
@@ -686,6 +687,7 @@ export default class EntryAbility extends UIAbility {
                     await Promise.all(insertpromises)
                     await Promise.all(updatepromises)
                     await Promise.all(deletepromises)
+                    this.context.eventHub.emit('refreshInfo')
                     await autoSyncTable(this.context, table)
                     await autoBackupTable(this.context, table)
                   }
@@ -741,6 +743,7 @@ export default class EntryAbility extends UIAbility {
                     await Promise.all(insertpromises)
                     await Promise.all(updatepromises)
                     await Promise.all(deletepromises)
+                    this.context.eventHub.emit('refreshTag')
                     await autoSyncTable(this.context, table)
                     await autoBackupTable(this.context, table)
                   }
