@@ -185,7 +185,7 @@ export default class EntryAbility extends UIAbility {
             'RESOURCE_OVERLIMIT',
             'ADDRESS_SANITIZER'
           ]) as string[]).includes('JS_ERROR')) {
-            this.context.eventHub.emit('uploadErrorLog', object.name, JSON.stringify(object))
+            context.eventHub.emit('uploadErrorLog', object.name, JSON.stringify(object))
           }
         }
       }
@@ -243,7 +243,7 @@ export default class EntryAbility extends UIAbility {
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
-          appEventGroups.map((item) => {
+          appEventGroups.forEach(item => {
             if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
               'JS_ERROR',
               'APP_CRASH',
@@ -900,7 +900,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 42) {
+    if (wantParam.version !== 43) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })
