@@ -929,7 +929,7 @@ struct About {
                 })
             }
 
-            Text('版权所有 ©️ 2025 张轩铭 保留一切权利')
+            Text('版权所有 ©️ 2025-' + new Date().getFullYear() + ' 张轩铭 保留一切权利')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body3'))
               .margin({
