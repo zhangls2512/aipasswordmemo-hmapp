@@ -7,7 +7,7 @@ import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { generateBarcode, scanCore } from '@kit.ScanKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
-import { hdsEffect } from '@kit.UIDesignKit'
+import { hdsEffect, HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
 import copy from '../common/Pasteboard'
@@ -31,7 +31,7 @@ struct Invite {
   pageInfos = new NavPathStack()
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -318,7 +318,14 @@ struct Invite {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('邀请新用户，免费得会员')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '邀请新用户，免费得会员'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.accessToken = await getAccountAccessToken()

@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -80,7 +81,7 @@ struct Huaweiaccount {
       })
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         if (this.loading) {
           ListItem() {
@@ -337,7 +338,14 @@ struct Huaweiaccount {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title(this.isBind ? '解绑华为账号' : '绑定华为账号')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: this.isBind ? '解绑华为账号' : '绑定华为账号'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.controller.setEnabled(false)

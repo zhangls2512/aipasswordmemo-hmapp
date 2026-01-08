@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -27,7 +28,7 @@ struct Viplog {
   empty: boolean | undefined = undefined
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         if (this.viplogArray.length === 0 && !this.loading) {
           ListItem() {
@@ -220,7 +221,14 @@ struct Viplog {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('会员开通记录')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '会员开通记录'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {

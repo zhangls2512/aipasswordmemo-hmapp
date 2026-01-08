@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -15,7 +16,7 @@ struct Vipcode {
   pageInfos = new NavPathStack()
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -121,7 +122,14 @@ struct Vipcode {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('兑换会员')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '兑换会员'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onReady((context) => {
       this.pageInfos = context.pathStack
     })

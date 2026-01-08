@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
 import { fileIo, picker } from '@kit.CoreFileKit'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getInfoList, getPasswordList, getTagList } from '../common/Dataget'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import { read, write } from '../common/File'
@@ -62,7 +63,7 @@ struct DataBackupRecovery {
   }
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       Scroll() {
         Column() {
           TabSegmentButtonV2({
@@ -1321,7 +1322,14 @@ struct DataBackupRecovery {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('数据备份与恢复')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '数据备份与恢复'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onAppear(() => {
       this.getSetting()
     })

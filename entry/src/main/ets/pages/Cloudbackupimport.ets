@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
 import { getKey } from '../common/Crypto'
 
@@ -50,7 +51,7 @@ struct Cloudbackupimport {
   }
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -364,7 +365,14 @@ struct Cloudbackupimport {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('导入云备份')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '导入云备份'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onAppear(() => {
       this.getSetting()
     })

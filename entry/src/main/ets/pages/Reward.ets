@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import openLink from '../common/Openlink'
 
 @Builder
@@ -11,7 +12,7 @@ struct Reward {
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Text('《App Linking解锁酷炫链接新玩法》优秀参与奖')
@@ -44,6 +45,13 @@ struct Reward {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('获得奖项')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '获得奖项'
+        }
+      },
+      enableComponentSafeArea: true
+    })
   }
 }

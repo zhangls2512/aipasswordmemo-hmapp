@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getPermission } from '../common/Permission'
 
 @Builder
@@ -17,7 +18,7 @@ struct Permissionsetting {
   })
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -43,7 +44,7 @@ struct Permissionsetting {
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
             .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
-            Text('系统自动开启此权限，无法手动管理。本应用使用此权限获取并根据网络、Wi-Fi等信息，使用互联网、应用关闭前执行自定义的预关闭动作、隐私窗口、振动、窗口置顶等能力优化使用体验。通过此权限获取的信息不上传到本应用开发者服务器。')
+            Text('系统自动开启此权限，无法手动管理。本应用使用此权限获取并根据网络、Wi-Fi等信息，使用互联网、应用关闭前执行自定义的预关闭动作、隐私窗口、全局闪控球、振动、窗口置顶等能力优化使用体验。通过此权限获取的信息不上传到本应用开发者服务器。')
               .enableAutoSpacing(true)
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body3'))
@@ -166,7 +167,14 @@ struct Permissionsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('权限管理')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '权限管理'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onAppear(() => {
       this.writePasteBoard = this.permissionSettingDataPreferences.getSync('writePasteBoard', false) as boolean
     })

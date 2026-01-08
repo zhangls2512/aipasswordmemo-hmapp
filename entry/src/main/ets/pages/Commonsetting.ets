@@ -6,6 +6,7 @@ import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 
 @Builder
 export function CommonsettingBuilder() {
@@ -33,6 +34,7 @@ struct Commonsetting {
   @Local passwordInfoValueDataDetector: boolean = true
   @Local mfaSecondsRemainingStyleIndex: number = 0
   @Local mfaSecondsRemainingStyleValue: string = 'progress'
+  @Local showMfaInFloatingBall: boolean = true
   @Local pushItemWhenBlur: boolean = false
   @Local checkVersionUpdateIndex: number = 1
   @Local checkVersionUpdateValue: string = '非流量下'
@@ -47,7 +49,7 @@ struct Commonsetting {
   })
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -905,6 +907,33 @@ struct Commonsetting {
               .padding(12)
               .width('100%')
 
+              if (deviceInfo.deviceType !== '2in1') {
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  Text('全局闪控球显示密码MFA类型信息')
+                    .enableAutoSpacing(true)
+                    .fontWeight(FontWeight.Medium)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.showMfaInFloatingBall!!
+                  })
+                    .onChange((isOn) => {
+                      this.commonSettingDataPreferences.putSync('showMfaInFloatingBall', isOn)
+                      this.commonSettingDataPreferences.flushSync()
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+                .width('100%')
+              }
               Divider()
                 .padding({
                   left: 12,
@@ -1030,7 +1059,14 @@ struct Commonsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('通用')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '通用'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       const iconMode = this.commonSettingDataPreferences.getSync('iconMode', 1)
@@ -1079,6 +1115,7 @@ struct Commonsetting {
       if (mfaSecondsRemainingStyle === 1) {
         this.mfaSecondsRemainingStyleValue = '数字'
       }
+      this.showMfaInFloatingBall = this.commonSettingDataPreferences.getSync('showMfaInFloatingBall', false) as boolean
       this.pushItemWhenBlur = this.commonSettingDataPreferences.getSync('pushItemWhenBlur', false) as boolean
       const checkVersionUpdate = this.commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
       this.checkVersionUpdateIndex = checkVersionUpdate as number

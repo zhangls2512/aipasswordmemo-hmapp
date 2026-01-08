@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -48,7 +49,7 @@ struct Cloudbackupmanage {
   }
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         if (this.loading) {
           ListItem() {
@@ -239,7 +240,14 @@ struct Cloudbackupmanage {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('管理云备份')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '管理云备份'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()
       await this.getCount()

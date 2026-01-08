@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import request from '../common/Request'
 
 @Builder
@@ -17,7 +18,7 @@ struct Feedback {
   pageInfos = new NavPathStack()
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -108,9 +109,9 @@ struct Feedback {
                   })
                 })
                 dialogControllerProgress.open()
-                const res = await request(this.context, '/debug/sendFeedbackEmail', {
+                const res = await request(this.context, '/product/sendFeedbackEmail', {
                   product: 'password',
-                  version: '2.0.7.1',
+                  version: '2.0.7.2',
                   content: this.content,
                   contactType: this.contactType,
                   contactValue: this.contactValue
@@ -147,7 +148,14 @@ struct Feedback {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('意见反馈')
+    .titleBar({
+      content: {
+        title: {
+          mainTitle: '意见反馈'
+        }
+      },
+      enableComponentSafeArea: true
+    })
     .onReady((context) => {
       this.pageInfos = context.pathStack
     })
