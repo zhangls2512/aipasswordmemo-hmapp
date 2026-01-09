@@ -6,8 +6,6 @@ import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
-import { policy } from '@kit.NetworkKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
 
 @Builder
 export function CommonsettingBuilder() {
@@ -50,7 +48,7 @@ struct Commonsetting {
   })
 
   build() {
-    HdsNavDestination() {
+    NavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -1042,47 +1040,6 @@ struct Commonsetting {
               .borderRadius(12)
               .padding(12)
               .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('联网设置')
-                  .fontWeight(FontWeight.Medium)
-                  .layoutWeight(1)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Image($r('app.media.right'))
-                  .fillColor($r('sys.color.icon_fourth'))
-                  .height(12)
-                  .width(12)
-              }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onHover((isHover) => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 4
-                }
-              })
-              .onClick(async () => {
-                await policy.showAppNetPolicySettings(this.context)
-              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -1101,14 +1058,7 @@ struct Commonsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .titleBar({
-      content: {
-        title: {
-          mainTitle: '通用'
-        }
-      },
-      enableComponentSafeArea: true
-    })
+    .title('通用')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       const iconMode = this.commonSettingDataPreferences.getSync('iconMode', 1)

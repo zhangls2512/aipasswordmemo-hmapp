@@ -2,7 +2,6 @@ import { common } from '@kit.AbilityKit'
 import { util } from '@kit.ArkTS'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -182,7 +181,7 @@ struct Newpasskey {
   }
 
   build() {
-    HdsNavDestination() {
+    NavDestination() {
       List() {
         if (this.email && this.credentialId && this.publicKey) {
           ListItem() {
@@ -371,14 +370,7 @@ struct Newpasskey {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .titleBar({
-      content: {
-        title: {
-          mainTitle: '新增通行密钥'
-        }
-      },
-      enableComponentSafeArea: true
-    })
+    .title('新增通行密钥')
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       const accountInfo = await getAccountInfo()

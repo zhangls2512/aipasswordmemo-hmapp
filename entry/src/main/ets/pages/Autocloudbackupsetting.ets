@@ -1,5 +1,4 @@
 import { preferences } from '@kit.ArkData'
-import { HdsNavDestination } from '@kit.UIDesignKit'
 
 interface Type {
   name: string,
@@ -38,7 +37,7 @@ struct Autocloudbackupsetting {
   }
 
   build() {
-    HdsNavDestination() {
+    NavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -94,14 +93,7 @@ struct Autocloudbackupsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .titleBar({
-      content: {
-        title: {
-          mainTitle: '云备份自动开启设置'
-        }
-      },
-      enableComponentSafeArea: true
-    })
+    .title('云备份自动开启设置')
     .onAppear(() => {
       this.getSetting()
     })

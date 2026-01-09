@@ -1,6 +1,5 @@
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
 
 @Builder
 export function OftenusedinfotypeBuilder() {
@@ -19,7 +18,7 @@ struct Oftenusedinfotype {
   })
 
   build() {
-    HdsNavDestination() {
+    NavDestination() {
       List() {
         ListItem() {
           TextInput({
@@ -166,14 +165,7 @@ struct Oftenusedinfotype {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .titleBar({
-      content: {
-        title: {
-          mainTitle: '常用信息类型'
-        }
-      },
-      enableComponentSafeArea: true
-    })
+    .title('常用信息类型')
     .onAppear(() => {
       this.oftenUsedInfoTypeArray = this.commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码']) as string[]
     })

@@ -1,6 +1,5 @@
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
 
 @Builder
 export function DefaulthidepasswordinfotypeBuilder() {
@@ -17,7 +16,7 @@ struct Defaulthidepasswordinfotype {
   })
 
   build() {
-    HdsNavDestination() {
+    NavDestination() {
       List() {
         ListItem() {
           TextInput({
@@ -97,14 +96,7 @@ struct Defaulthidepasswordinfotype {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .titleBar({
-      content: {
-        title: {
-          mainTitle: '默认隐藏内容密码信息类型'
-        }
-      },
-      enableComponentSafeArea: true
-    })
+    .title('默认隐藏内容密码信息类型')
     .onAppear(() => {
       this.defaultHidePasswordInfoTypeArray =
         this.commonSettingDataPreferences.getSync('defaultHidePasswordInfoType', []) as string[]

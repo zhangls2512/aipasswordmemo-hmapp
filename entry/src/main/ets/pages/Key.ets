@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { window } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getKey, removeKey, setRandomKey } from '../common/Crypto'
 import copy from '../common/Pasteboard'
 
@@ -19,7 +18,7 @@ struct Keypage {
   pageInfos = new NavPathStack()
 
   build() {
-    HdsNavDestination() {
+    NavDestination() {
       List() {
         if (this.keyValue) {
           ListItem() {
@@ -263,14 +262,7 @@ struct Keypage {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .titleBar({
-      content: {
-        title: {
-          mainTitle: '密钥'
-        }
-      },
-      enableComponentSafeArea: true
-    })
+    .title('密钥')
     .onReady((context) => {
       this.pageInfos = context.pathStack
       this.keyValue = getKey()

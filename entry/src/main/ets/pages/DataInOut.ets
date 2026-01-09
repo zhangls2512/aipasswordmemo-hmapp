@@ -3,7 +3,6 @@ import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { zlib } from '@kit.BasicServicesKit'
 import { fileIo, picker } from '@kit.CoreFileKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
 import { importCsvPassword, parseCsvLine } from '../common/Csv'
 import { getInfoList, getPasswordList, getPasswordMaxId, getTagList, PasswordInfoItem } from '../common/Dataget'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
@@ -58,7 +57,7 @@ struct DataInOut {
   }
 
   build() {
-    HdsNavDestination() {
+    NavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -860,14 +859,7 @@ struct DataInOut {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .titleBar({
-      content: {
-        title: {
-          mainTitle: '数据导入与导出'
-        }
-      },
-      enableComponentSafeArea: true
-    })
+    .title('数据导入与导出')
     .onReady((context) => {
       this.pageInfos = context.pathStack
     })

@@ -5,7 +5,6 @@ import { deviceInfo, zlib } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getInfoList, getPasswordList, getTagList } from '../common/Dataget'
 import { write } from '../common/File'
 import { checkPermission } from '../common/Permission'
@@ -99,7 +98,7 @@ struct Tablesync {
   }
 
   build() {
-    HdsNavDestination() {
+    NavDestination() {
       Scroll() {
         Column() {
           if (deviceInfo.deviceType !== 'tablet') {
@@ -2016,14 +2015,7 @@ struct Tablesync {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .titleBar({
-      content: {
-        title: {
-          mainTitle: '设备间数据同步'
-        }
-      },
-      enableComponentSafeArea: true
-    })
+    .title('设备间数据同步')
     .onAppear(async () => {
       this.getSetting()
       const res = await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
