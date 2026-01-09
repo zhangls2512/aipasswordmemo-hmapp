@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { display, LengthMetrics, LoadingDialog } from '@kit.ArkUI'
+import { display, LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -221,6 +221,12 @@ export default struct TagPage {
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
+              if (this.multipleSelectArray.length === 0) {
+                await promptAction.openToast({
+                  message: '未选择'
+                })
+                return
+              }
               const data = await promptAction.showDialog({
                 title: '提示',
                 message: '删除成功后无法恢复，确定删除？',
@@ -272,6 +278,12 @@ export default struct TagPage {
                 .buildEffect())
               .width(40)
               .onClick(async () => {
+                if (this.multipleSelectArray.length === 0) {
+                  await promptAction.openToast({
+                    message: '未选择'
+                  })
+                  return
+                }
                 for (let i = 0; i < this.multipleSelectArray.length; i++) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
