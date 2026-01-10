@@ -108,9 +108,9 @@ struct Feedback {
                   })
                 })
                 dialogControllerProgress.open()
-                const res = await request(this.context, '/debug/sendFeedbackEmail', {
+                const res = await request(this.context, '/product/sendFeedbackEmail', {
                   product: 'password',
-                  version: '2.0.7.1',
+                  version: '2.0.7.2',
                   content: this.content,
                   contactType: this.contactType,
                   contactValue: this.contactValue

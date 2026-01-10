@@ -344,9 +344,6 @@ struct Index {
           this.preferType = getPreferType(this.UIContext)
         }, 200)
       })
-      const currentIndex = this.index
-      this.index = -1
-      this.index = currentIndex
       this.context.eventHub.on('refreshIndex', () => {
         this.backgroundImagePixelMap = this.getBackgroundImage()
       })

@@ -258,6 +258,12 @@ export default struct InfoPage {
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
+              if (this.multipleSelectArray.length === 0) {
+                await promptAction.openToast({
+                  message: '未选择'
+                })
+                return
+              }
               const data = await promptAction.showDialog({
                 title: '提示',
                 message: '删除成功后无法恢复，确定删除？',
@@ -309,6 +315,12 @@ export default struct InfoPage {
                 .buildEffect())
               .width(40)
               .onClick(async () => {
+                if (this.multipleSelectArray.length === 0) {
+                  await promptAction.openToast({
+                    message: '未选择'
+                  })
+                  return
+                }
                 for (let i = 0; i < this.multipleSelectArray.length; i++) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({

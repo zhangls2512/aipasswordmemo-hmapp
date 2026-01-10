@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
-import { LengthMetrics, promptAction } from '@kit.ArkUI'
+import { floatingBall, LengthMetrics, promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { getPasswordInfo, Password, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
@@ -27,6 +27,7 @@ export default struct Passwordinfo {
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
+  interval = 0
 
   build() {
     List() {
@@ -365,7 +366,23 @@ export default struct Passwordinfo {
       this.passwordTag = passwordInfo.tag
       const mfaInfo = this.passwordInfo.find(item => item.type === 'MFA')
       if (mfaInfo) {
-        const interval = setInterval(async () => {
+        const floatingBallController = await floatingBall.create({
+          context: this.context
+        })
+        const showMfaInFloatingBall = commonSettingDataPreferences.getSync('showMfaInFloatingBall', false)
+        if (showMfaInFloatingBall) {
+          await floatingBallController.startFloatingBall({
+            template: floatingBall.FloatingBallTemplate.NORMAL,
+            title: '000000'
+          })
+          this.context.eventHub.on('stopFloatingBall', async () => {
+            try {
+              await floatingBallController.stopFloatingBall()
+            } catch {
+            }
+          })
+        }
+        this.interval = setInterval(async () => {
           const mfaInfoArray = mfaInfo.value.split('\0')
           let mfaOthauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
           mfaOthauthUri = mfaOthauthUri.addQueryValue('secret', mfaInfoArray[0])
@@ -377,6 +394,13 @@ export default struct Passwordinfo {
           if (res.value !== 'fail') {
             this.mfaValue = res.value
             this.mfaSecondsRemaining = res.secondsRemaining
+            if (showMfaInFloatingBall) {
+              await floatingBallController.updateFloatingBall({
+                template: floatingBall.FloatingBallTemplate.NORMAL,
+                title: res.value,
+                content: String(res.secondsRemaining)
+              })
+            }
             const mfaSecondsRemainingPercent = Number((this.mfaSecondsRemaining / this.mfaStep).toFixed(2))
             if (mfaSecondsRemainingPercent >= 0.5) {
               this.mfaSecondsRemainingColor = Color.Green
@@ -392,9 +416,23 @@ export default struct Passwordinfo {
             }
           }
           if (res.value === 'fail') {
-            clearInterval(interval)
+            clearInterval(this.interval)
+            try {
+              await floatingBallController.stopFloatingBall()
+            } catch {
+            }
           }
         }, 500)
+      }
+    })
+    .onDisAppear(() => {
+      clearInterval(this.interval)
+      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+        name: 'commonSetting'
+      })
+      const showMfaInFloatingBall = commonSettingDataPreferences.getSync('showMfaInFloatingBall', false)
+      if (showMfaInFloatingBall) {
+        this.context.eventHub.emit('stopFloatingBall')
       }
     })
   }
