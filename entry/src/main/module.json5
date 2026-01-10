@@ -165,6 +165,10 @@
         "name": "ohos.permission.PRIVACY_WINDOW"
       },
       {
+        "name": "ohos.permission.USE_FLOAT_BALL",
+        "reason": "$string:USE_FLOAT_BALL_reason"
+      },
+      {
         "name": "ohos.permission.VIBRATE"
       },
       {

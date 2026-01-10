@@ -83,6 +83,9 @@ export default class EntryAbility extends UIAbility {
     if (want.parameters?.shortcutId === 'searchPassword') {
       this.context.eventHub.emit('searchPassword')
     }
+    if (want.parameters?.action === 'passwordInfo') {
+      this.context.eventHub.emit('passwordInfo', Number(want.parameters.passwordId))
+    }
     if (want.parameters?.menuHandler === 'clickMenu') {
       const uriList = want.parameters.uriList as string[]
       const fileUri = uriList[0] as string
@@ -903,7 +906,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 43) {
+    if (wantParam.version !== 44) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

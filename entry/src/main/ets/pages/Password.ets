@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { display, LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -47,6 +48,7 @@ export default struct PasswordPage {
   @Local multipleSelectArray: Password[] = []
   @Local hoverId: number = -1
   @Local buttonHoverId: number = -1
+  @Local quickBarPasswordArray: number[] = []
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
@@ -89,6 +91,11 @@ export default struct PasswordPage {
     })
   }
 
+  getQuickBarPasswordList() {
+    const quickBarPasswordIds: number[] = []
+    return quickBarPasswordIds
+  }
+
   @Builder
   MenuBuilder(item: Password) {
     Menu() {
@@ -111,6 +118,32 @@ export default struct PasswordPage {
             this.multipleSelect = true
             this.multipleSelectArray.push(item)
           })
+        if (deviceInfo.deviceType === '2in1') {
+          if (!this.quickBarPasswordArray.includes(item.id)) {
+            MenuItem({
+              startIcon: $r('app.media.addcircle'),
+              content: '添加至快捷栏'
+            })
+              .onClick(async () => {
+                const promptAction = this.UIContext.getPromptAction()
+                await promptAction.openToast({
+                  message: '敬请期待'
+                })
+              })
+          }
+          if (this.quickBarPasswordArray.includes(item.id)) {
+            MenuItem({
+              startIcon: $r('app.media.removecircle'),
+              content: '从快捷栏移除'
+            })
+              .onClick(async () => {
+                const promptAction = this.UIContext.getPromptAction()
+                await promptAction.openToast({
+                  message: '敬请期待'
+                })
+              })
+          }
+        }
         MenuItem({
           startIcon: $r('app.media.edit'),
           content: '修改'
@@ -273,6 +306,12 @@ export default struct PasswordPage {
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
+              if (this.multipleSelectArray.length === 0) {
+                await promptAction.openToast({
+                  message: '未选择'
+                })
+                return
+              }
               const data = await promptAction.showDialog({
                 title: '提示',
                 message: '删除成功后无法恢复，确定删除？',
@@ -324,6 +363,12 @@ export default struct PasswordPage {
                 .buildEffect())
               .width(40)
               .onClick(async () => {
+                if (this.multipleSelectArray.length === 0) {
+                  await promptAction.openToast({
+                    message: '未选择'
+                  })
+                  return
+                }
                 for (let i = 0; i < this.multipleSelectArray.length; i++) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
@@ -730,6 +775,7 @@ export default struct PasswordPage {
         .onRefreshing(async () => {
           this.passwordArray =
             await getFilterPasswordList(this.context, this.nameKeyword, this.info, this.tag, this.orderColumn)
+          this.quickBarPasswordArray = this.getQuickBarPasswordList()
           this.tags = await getTagList(this.context, 'value')
           this.loading = false
         })
@@ -812,6 +858,13 @@ export default struct PasswordPage {
         this.tag = data.tag
         this.loading = true
       })
+      this.context.eventHub.on('passwordInfo', (passwordId: number) => {
+        if (this.isShowInfoSheet) {
+          this.isShowInfoSheet = false
+        }
+        this.passwordId = passwordId
+        this.isShowInfoSheet = true
+      })
       this.loading = true
       const cloudServiceStatus = await getCloudServiceStatus(this.context)
       if (cloudServiceStatus && getKey()) {
@@ -819,10 +872,11 @@ export default struct PasswordPage {
       }
     })
     .onDisAppear(() => {
-      this.context.eventHub.off('newPassword')
-      this.context.eventHub.off('searchPassword')
-      this.context.eventHub.off('refreshPassword')
+      this.context.eventHub.off('passwordInfo')
       this.context.eventHub.off('refreshFilterPassword')
+      this.context.eventHub.off('refreshPassword')
+      this.context.eventHub.off('searchPassword')
+      this.context.eventHub.off('newPassword')
       display.off('change')
     })
     .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
