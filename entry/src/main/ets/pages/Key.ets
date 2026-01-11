@@ -115,8 +115,8 @@ struct Keypage {
               }
             })
             .onClick(async () => {
+              const promptAction = this.UIContext.getPromptAction()
               if (!this.keyValue) {
-                const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showActionMenu({
                   title: '选择导入方式',
                   buttons: [
@@ -142,7 +142,6 @@ struct Keypage {
                 return
               }
               if (this.keyValue) {
-                const promptAction = this.UIContext.getPromptAction()
                 const confirm = await promptAction.showDialog({
                   title: '提示',
                   message: '导入成功后新密钥将覆盖当前密钥，当前密钥无法恢复，需重新导入当前密钥才可解密使用当前密钥加密的云备份数据，确定导入？',
@@ -158,7 +157,6 @@ struct Keypage {
                   ]
                 })
                 if (confirm.index === 1) {
-                  const promptAction = this.UIContext.getPromptAction()
                   const data = await promptAction.showActionMenu({
                     title: '选择导入方式',
                     buttons: [
