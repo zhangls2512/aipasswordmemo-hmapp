@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
-import { display, window } from '@kit.ArkUI'
+import { display, LoadingDialog, window } from '@kit.ArkUI'
 import { zlib } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
@@ -164,11 +164,11 @@ struct Index {
           this.isShowCleardataSheet = true
         }
       })
+      const promptAction = this.UIContext.getPromptAction()
       this.context.eventHub.on('wantUri', async (wantUri: string) => {
         if (wantUri.endsWith('.txt') || wantUri.endsWith('.csv') || wantUri.endsWith('.zip')) {
           const filestring = await readUri(wantUri)
           if (wantUri.endsWith('.txt')) {
-            const promptAction = this.UIContext.getPromptAction()
             const data = await promptAction.showActionMenu({
               title: '选择导入类型',
               buttons: [
@@ -219,7 +219,6 @@ struct Index {
             fileIo.closeSync(destFile)
             await zlib.decompressFile(filePath, passwordIconDir)
             await fileIo.unlink(filePath)
-            const promptAction = this.UIContext.getPromptAction()
             const data = await promptAction.showDialog({
               title: '提示',
               message: '导入成功，需重启应用生效，是否重启？',
@@ -243,12 +242,28 @@ struct Index {
             }
           }
         }
+        const accessToken = await getAccountAccessToken()
+        const dialogControllerProgress = new CustomDialogController({
+          builder: LoadingDialog({
+            content: '加载中...'
+          })
+        })
         if (wantUri.startsWith('https://www.zhangls2512.cn/product/password')) {
-          const promptAction = this.UIContext.getPromptAction()
           const urires = new uri.URI(wantUri)
           const invitationCode = urires.getQueryValue('invitationcode')
           const vipCode = urires.getQueryValue('vipcode')
-          const accessToken = await getAccountAccessToken()
+          if (!invitationCode && !vipCode) {
+            await promptAction.showDialog({
+              title: '提示',
+              message: '链接格式错误',
+              buttons: [
+                {
+                  text: '确定',
+                  color: $r('sys.color.font_emphasize')
+                }
+              ]
+            })
+          }
           if (invitationCode) {
             if (!accessToken) {
               await promptAction.showDialog({
@@ -265,12 +280,14 @@ struct Index {
             if (accessToken) {
               const deviceToken = await getDeviceToken()
               if (deviceToken) {
+                dialogControllerProgress.open()
                 const res = await request(this.context, '/product/useInvitationcode', {
                   accessToken: accessToken,
                   deviceToken: deviceToken,
                   product: 'password',
                   invitationcode: invitationCode
                 })
+                dialogControllerProgress.close()
                 if (res !== 'fail') {
                   await promptAction.showDialog({
                     title: '提示',
@@ -300,10 +317,12 @@ struct Index {
               })
             }
             if (accessToken) {
+              dialogControllerProgress.open()
               const res = await request(this.context, '/product/useVipcode', {
                 accessToken: accessToken,
                 vipcode: vipCode
               })
+              dialogControllerProgress.close()
               if (res !== 'fail') {
                 await promptAction.showDialog({
                   title: '提示',
@@ -319,8 +338,74 @@ struct Index {
             }
           }
         }
+        if (wantUri.startsWith('https://www.zhangls2512.cn/product/account/login')) {
+          const urires = new uri.URI(wantUri)
+          const ticket = urires.getQueryValue('ticket')
+          if (!ticket) {
+            await promptAction.showDialog({
+              title: '提示',
+              message: '链接格式错误',
+              buttons: [
+                {
+                  text: '确定',
+                  color: $r('sys.color.font_emphasize')
+                }
+              ]
+            })
+          }
+          if (ticket) {
+            const accessToken = await getAccountAccessToken()
+            if (!accessToken) {
+              await promptAction.showDialog({
+                title: '提示',
+                message: '扫码登录失败，原因：未登录账号',
+                buttons: [
+                  {
+                    text: '确定',
+                    color: $r('sys.color.font_emphasize')
+                  }
+                ]
+              })
+            }
+            if (accessToken) {
+              const confirm = await promptAction.showDialog({
+                title: '提示',
+                message: '确定登录？',
+                buttons: [
+                  {
+                    text: '取消',
+                    color: $r('sys.color.font_primary')
+                  },
+                  {
+                    text: '确定',
+                    color: $r('sys.color.font_emphasize')
+                  }
+                ]
+              })
+              if (confirm.index === 1) {
+                dialogControllerProgress.open()
+                const res = await request(this.context, '/account/confirmTicket', {
+                  accessToken: accessToken,
+                  ticket: ticket
+                })
+                dialogControllerProgress.close()
+                if (res !== 'fail') {
+                  await promptAction.showDialog({
+                    title: '提示',
+                    message: '确定成功',
+                    buttons: [
+                      {
+                        text: '确定',
+                        color: $r('sys.color.font_emphasize')
+                      }
+                    ]
+                  })
+                }
+              }
+            }
+          }
+        }
       })
-      const promptAction = this.UIContext.getPromptAction()
       this.context.eventHub.on('dialog', async (title: string, message: string) => {
         await promptAction.showDialog({
           title: title,
