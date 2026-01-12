@@ -1,11 +1,14 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { display, window } from '@kit.ArkUI'
+import { uri } from '@kit.ArkTS'
+import { display, LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { scanBarcode, scanCore } from '@kit.ScanKit'
 import { getAccountAccessToken, getAccountInfo, removeAccount } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
 import getPreferType from '../common/Prefertype'
+import request from '../common/Request'
 import Cloudservice from './Cloudservice'
 import Login from './Login'
 import Passwordcheck from './Passwordcheck'
@@ -169,15 +172,16 @@ export default struct Me {
                 right: 12
               })
             Row() {
-              Text('UID')
+              Text('扫码登录')
                 .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
-              Text(this.uid)
-                .fontColor($r('sys.color.font_secondary'))
-                .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                .layoutWeight(1)
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
             }
             .borderRadius(12)
             .padding(12)
@@ -197,6 +201,140 @@ export default struct Me {
               }
               if (isHover) {
                 this.hoverId = 1
+              }
+            })
+            .onClick(async () => {
+              try {
+                const promptAction = this.UIContext.getPromptAction()
+                const scanres = await scanBarcode.startScanForResult(this.context, {
+                  scanTypes: [scanCore.ScanType.QR_CODE]
+                })
+                if (!scanres.originalValue.startsWith('https://www.zhangls2512.cn/product/account/login')) {
+                  await promptAction.showDialog({
+                    title: '提示',
+                    message: '请扫描有效的登录二维码',
+                    buttons: [
+                      {
+                        text: '确定',
+                        color: $r('sys.color.font_emphasize')
+                      }
+                    ]
+                  })
+                  return
+                }
+                const uriInstance = new uri.URI(scanres.originalValue)
+                const ticket = uriInstance.getQueryValue('ticket')
+                if (!ticket) {
+                  await promptAction.showDialog({
+                    title: '提示',
+                    message: '链接格式错误',
+                    buttons: [
+                      {
+                        text: '确定',
+                        color: $r('sys.color.font_emphasize')
+                      }
+                    ]
+                  })
+                }
+                if (ticket) {
+                  const accessToken = await getAccountAccessToken()
+                  if (!accessToken) {
+                    await promptAction.showDialog({
+                      title: '提示',
+                      message: '扫码登录失败，原因：未登录账号',
+                      buttons: [
+                        {
+                          text: '确定',
+                          color: $r('sys.color.font_emphasize')
+                        }
+                      ]
+                    })
+                  }
+                  if (accessToken) {
+                    const confirm = await promptAction.showDialog({
+                      title: '提示',
+                      message: '确定登录？',
+                      buttons: [
+                        {
+                          text: '取消',
+                          color: $r('sys.color.font_primary')
+                        },
+                        {
+                          text: '确定',
+                          color: $r('sys.color.font_emphasize')
+                        }
+                      ]
+                    })
+                    if (confirm.index === 1) {
+                      const dialogControllerProgress = new CustomDialogController({
+                        builder: LoadingDialog({
+                          content: '加载中...'
+                        })
+                      })
+                      dialogControllerProgress.open()
+                      const res = await request(this.context, '/account/confirmTicket', {
+                        accessToken: accessToken,
+                        ticket: ticket
+                      })
+                      dialogControllerProgress.close()
+                      if (res !== 'fail') {
+                        await promptAction.showDialog({
+                          title: '提示',
+                          message: '确定成功',
+                          buttons: [
+                            {
+                              text: '确定',
+                              color: $r('sys.color.font_emphasize')
+                            }
+                          ]
+                        })
+                      }
+                    }
+                  }
+                }
+              } catch (err) {
+                if (err.code !== 1000500002) {
+                  await promptAction.openToast({
+                    message: '发生错误，错误码：' + err.code
+                  })
+                }
+              }
+            })
+
+            Divider()
+              .padding({
+                left: 12,
+                right: 12
+              })
+            Row() {
+              Text('UID')
+                .fontWeight(FontWeight.Medium)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Text(this.uid)
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .layoutWeight(1)
+            }
+            .borderRadius(12)
+            .padding(12)
+            .stateStyles({
+              normal: {
+                .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.comp_background_primary'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.comp_background_secondary'))
+              }
+            })
+            .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 2
               }
             })
             .onClick(async () => {
@@ -230,7 +368,7 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
                   $r('sys.color.comp_background_primary'))
               },
               pressed: {
@@ -243,7 +381,7 @@ export default struct Me {
                 this.hoverId = -1
               }
               if (isHover) {
-                this.hoverId = 2
+                this.hoverId = 3
               }
             })
             .onClick(async () => {
@@ -298,7 +436,7 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
                   $r('sys.color.comp_background_primary'))
               },
               pressed: {
@@ -311,7 +449,7 @@ export default struct Me {
                 this.hoverId = -1
               }
               if (isHover) {
-                this.hoverId = 3
+                this.hoverId = 4
               }
             })
             .onClick(() => {
@@ -347,7 +485,7 @@ export default struct Me {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
+                  .backgroundColor(this.hoverId === 5 ? $r('sys.color.interactive_hover') :
                     $r('sys.color.comp_background_primary'))
                 },
                 pressed: {
@@ -360,7 +498,7 @@ export default struct Me {
                   this.hoverId = -1
                 }
                 if (isHover) {
-                  this.hoverId = 4
+                  this.hoverId = 5
                 }
               })
               .onClick(() => {
@@ -411,7 +549,7 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 5 ? $r('sys.color.interactive_hover') :
+                .backgroundColor(this.hoverId === 6 ? $r('sys.color.interactive_hover') :
                   $r('sys.color.comp_background_primary'))
               },
               pressed: {
@@ -424,7 +562,7 @@ export default struct Me {
                 this.hoverId = -1
               }
               if (isHover) {
-                this.hoverId = 5
+                this.hoverId = 6
               }
             })
             .onClick(() => {
@@ -477,7 +615,7 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 6 ? $r('sys.color.interactive_hover') :
+                .backgroundColor(this.hoverId === 7 ? $r('sys.color.interactive_hover') :
                   $r('sys.color.comp_background_primary'))
               },
               pressed: {
@@ -490,7 +628,7 @@ export default struct Me {
                 this.hoverId = -1
               }
               if (isHover) {
-                this.hoverId = 6
+                this.hoverId = 7
               }
             })
             .onClick(() => {
@@ -560,7 +698,7 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 7 ? $r('sys.color.interactive_hover') :
+                .backgroundColor(this.hoverId === 8 ? $r('sys.color.interactive_hover') :
                   $r('sys.color.comp_background_primary'))
               },
               pressed: {
@@ -573,7 +711,7 @@ export default struct Me {
                 this.hoverId = -1
               }
               if (isHover) {
-                this.hoverId = 7
+                this.hoverId = 8
               }
             })
             .onClick(() => {
@@ -621,7 +759,7 @@ export default struct Me {
           .padding(12)
           .stateStyles({
             normal: {
-              .backgroundColor(this.hoverId === 8 ? $r('sys.color.interactive_hover') :
+              .backgroundColor(this.hoverId === 9 ? $r('sys.color.interactive_hover') :
                 $r('sys.color.comp_background_primary'))
             },
             pressed: {
@@ -634,7 +772,7 @@ export default struct Me {
               this.hoverId = -1
             }
             if (isHover) {
-              this.hoverId = 8
+              this.hoverId = 9
             }
           })
           .onClick(() => {

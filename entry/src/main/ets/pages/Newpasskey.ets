@@ -408,6 +408,9 @@ struct Newpasskey {
               message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
             })
           }
+          if (err.code === 1021300004) {
+            this.pageInfos.pop()
+          }
         }
       }
     })

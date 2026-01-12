@@ -23,6 +23,7 @@ struct Vipcode {
               placeholder: '请输入兑换码',
               text: this.vipCode!!
             })
+              .defaultFocus(true)
               .enableAutoSpacing(true)
               .maxLength(32)
               .showCounter(true)
