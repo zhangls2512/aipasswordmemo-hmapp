@@ -1,6 +1,7 @@
 import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { batteryInfo, power } from '@kit.BasicServicesKit'
+import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { getInfoList, getPasswordList, getTagList } from './Dataget'
 import { write } from './File'
 import { InfoOutItem, PasswordOutItem, TagOutItem } from '../pages/DataInOut'
@@ -45,7 +46,7 @@ export async function syncTable(context: Context, table: string, networkId: stri
   }
 }
 
-export async function autoSyncTable(context: Context, table: string) {
+export async function autoSyncTable(context: Context, table: string, fromDeviceId?: string) {
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
   })
@@ -68,8 +69,12 @@ export async function autoSyncTable(context: Context, table: string) {
   const autoSyncTables = dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
   if (autoSyncTables.includes(table)) {
     const autoSyncDevices: Item[] = dataSettingDataPreferences.getSync('autoSyncDevices', []) as Item[]
+    const devices =
+      distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo').getAvailableDeviceListSync()
     const promises = autoSyncDevices.map(async (item) => {
-      await syncTable(context, table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+      if (!devices.find(item => item.deviceId === fromDeviceId)) {
+        await syncTable(context, table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+      }
     })
     await Promise.all(promises)
   }

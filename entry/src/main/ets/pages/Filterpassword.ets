@@ -536,14 +536,14 @@ export default struct Filterpassword {
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
         name: 'commonSetting'
       })
-      this.pushItemWhenBlur = commonSettingDataPreferences.getSync('pushItemWhenBlur', false) as boolean
+      this.pushItemWhenBlur = commonSettingDataPreferences.getSync('pushItemWhenBlur', true) as boolean
       const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码', '图标']) as string[]
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
       if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
         this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
       }
-      this.tagArray = await getTagList(this.context)
+      this.tagArray = await getTagList(this.context, 'value')
       this.passwordNameKeyword = this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string
       this.passwordInfoArray = this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[]
       this.passwordTagArray = this.filterPasswordDataPreferences.getSync('tag', []) as string[]

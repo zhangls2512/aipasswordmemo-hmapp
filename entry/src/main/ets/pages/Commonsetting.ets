@@ -712,7 +712,7 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
-                Text('首页显示密码')
+                Text('首页显示密码、MFA')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
@@ -1108,7 +1108,7 @@ struct Commonsetting {
         this.mfaSecondsRemainingStyleValue = '数字'
       }
       this.showMfaInFloatingBall = this.commonSettingDataPreferences.getSync('showMfaInFloatingBall', false) as boolean
-      this.pushItemWhenBlur = this.commonSettingDataPreferences.getSync('pushItemWhenBlur', false) as boolean
+      this.pushItemWhenBlur = this.commonSettingDataPreferences.getSync('pushItemWhenBlur', true) as boolean
       const checkVersionUpdate = this.commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
       this.checkVersionUpdateIndex = checkVersionUpdate as number
       if (checkVersionUpdate === 0) {
