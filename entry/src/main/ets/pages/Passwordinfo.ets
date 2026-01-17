@@ -375,8 +375,12 @@ export default struct Passwordinfo {
             template: floatingBall.FloatingBallTemplate.NORMAL,
             title: '000000'
           })
+          floatingBallController.on('click', async () => {
+            await copy(this.context, this.UIContext, this.mfaValue)
+          })
           this.context.eventHub.on('stopFloatingBall', async () => {
             try {
+              floatingBallController.off('click')
               await floatingBallController.stopFloatingBall()
             } catch {
             }

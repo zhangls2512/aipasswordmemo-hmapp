@@ -337,7 +337,9 @@ struct Huaweiaccount {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title(this.isBind ? '解绑华为账号' : '绑定华为账号')
+    .title(this.isBind ? '解绑华为账号' : '绑定华为账号', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.controller.setEnabled(false)

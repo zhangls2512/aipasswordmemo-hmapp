@@ -1,4 +1,5 @@
 import { preferences } from '@kit.ArkData'
+import { LengthMetrics } from '@kit.ArkUI'
 
 interface Type {
   name: string,
@@ -93,7 +94,9 @@ struct Autocloudbackupsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('云备份自动开启设置')
+    .title('云备份自动开启设置', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onAppear(() => {
       this.getSetting()
     })

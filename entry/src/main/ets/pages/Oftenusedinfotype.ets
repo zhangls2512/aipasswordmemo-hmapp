@@ -1,5 +1,5 @@
 import { preferences } from '@kit.ArkData'
-import { promptAction } from '@kit.ArkUI'
+import { LengthMetrics, promptAction } from '@kit.ArkUI'
 
 @Builder
 export function OftenusedinfotypeBuilder() {
@@ -165,7 +165,9 @@ struct Oftenusedinfotype {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('常用信息类型')
+    .title('常用信息类型', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onAppear(() => {
       this.oftenUsedInfoTypeArray = this.commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码']) as string[]
     })

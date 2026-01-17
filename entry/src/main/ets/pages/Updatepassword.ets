@@ -1166,7 +1166,7 @@ export default struct Updatepassword {
       }
       if (res) {
         if (!key) {
-          this.alertText = '未导入密钥，云备份不可用。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥'
+          this.alertText = '未导入密钥，云备份不可用。请前往“我的”>“设置”>“密钥”导入密钥'
         }
         if (key) {
           this.allowCloudBackup = true

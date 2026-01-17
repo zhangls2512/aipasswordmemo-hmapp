@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
-import { promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
+import { LengthMetrics, promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
 import { fileIo, picker } from '@kit.CoreFileKit'
 import { getInfoList, getPasswordList, getTagList } from '../common/Dataget'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
@@ -1321,7 +1321,9 @@ struct DataBackupRecovery {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('数据备份与恢复')
+    .title('数据备份与恢复', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onAppear(() => {
       this.getSetting()
     })
