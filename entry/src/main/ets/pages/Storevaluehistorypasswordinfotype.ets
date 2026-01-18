@@ -40,7 +40,7 @@ struct Storevaluehistorypasswordinfotype {
                 })
                 return
               }
-              if (this.type === 'MFA') {
+              if (this.type === '图标' || this.type === 'MFA') {
                 await promptAction.openToast({
                   message: '不支持添加此类型'
                 })

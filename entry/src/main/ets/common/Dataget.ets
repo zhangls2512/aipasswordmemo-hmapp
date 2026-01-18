@@ -9,7 +9,13 @@ export interface CloudBackupTimeItem {
 
 export interface PasswordInfoItem {
   type: string,
-  value: string
+  value: string,
+  history?: PasswordInfoTypeValueHistoryItem[]
+}
+
+interface PasswordInfoTypeValueHistoryItem {
+  value: string,
+  updateTime: number
 }
 
 export interface PasswordTagItem {

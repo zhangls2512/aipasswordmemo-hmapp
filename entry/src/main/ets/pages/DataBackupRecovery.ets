@@ -233,7 +233,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoBackupTables.includes(item.value)
                         })
-                          .onChange((isOn) => {
+                          .onChange(async (isOn) => {
                             let autoBackupTables: string[] = []
                             if (!isOn) {
                               autoBackupTables = this.autoBackupTables.filter(inItem => inItem !== item.value)
@@ -243,7 +243,7 @@ struct DataBackupRecovery {
                             }
                             this.dataSettingDataPreferences.putSync('autoBackupTables', autoBackupTables)
                             this.dataSettingDataPreferences.flushSync()
-                            this.getSetting()
+                            await this.getSetting()
                           })
                       }
                       .borderRadius(12)
@@ -310,7 +310,7 @@ struct DataBackupRecovery {
                       await promptAction.openToast({
                         message: '备份成功'
                       })
-                      this.getSetting()
+                      await this.getSetting()
                     })
 
                     Divider()
@@ -355,7 +355,7 @@ struct DataBackupRecovery {
                       await promptAction.openToast({
                         message: '备份成功'
                       })
-                      this.getSetting()
+                      await this.getSetting()
                     })
 
                     Divider()
@@ -400,7 +400,7 @@ struct DataBackupRecovery {
                       await promptAction.openToast({
                         message: '备份成功'
                       })
-                      this.getSetting()
+                      await this.getSetting()
                     })
                   }
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -583,7 +583,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoFileBackupTables.includes(item.value)
                         })
-                          .onChange((isOn) => {
+                          .onChange(async (isOn) => {
                             let autoFileBackupTables: string[] = []
                             if (!isOn) {
                               autoFileBackupTables = this.autoFileBackupTables.filter(inItem => inItem !== item.value)
@@ -593,7 +593,7 @@ struct DataBackupRecovery {
                             }
                             this.dataSettingDataPreferences.putSync('autoFileBackupTables', autoFileBackupTables)
                             this.dataSettingDataPreferences.flushSync()
-                            this.getSetting()
+                            await this.getSetting()
                           })
                       }
                       .borderRadius(12)
@@ -1543,7 +1543,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoWebdavBackupTables.includes(item.value)
                         })
-                          .onChange((isOn) => {
+                          .onChange(async (isOn) => {
                             let autoWebdavBackupTables: string[] = []
                             if (!isOn) {
                               autoWebdavBackupTables =
@@ -1554,7 +1554,7 @@ struct DataBackupRecovery {
                             }
                             this.dataSettingDataPreferences.putSync('autoWebdavBackupTables', autoWebdavBackupTables)
                             this.dataSettingDataPreferences.flushSync()
-                            this.getSetting()
+                            await this.getSetting()
                           })
                       }
                       .borderRadius(12)

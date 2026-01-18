@@ -5,7 +5,6 @@ import { floatingBall, LengthMetrics, promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { getPasswordInfo, Password, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
-import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
 import getTotp from '../common/Totp'
 
@@ -102,6 +101,32 @@ export default struct Passwordinfo {
               .borderRadius(12)
               .padding(12)
               .width('100%')
+              .gesture(
+                LongPressGesture()
+                  .onAction(async () => {
+                    if (!this.hidePasswordInfoType.includes(item.type)) {
+                      const promptAction = this.UIContext.getPromptAction()
+                      if (!item.history || item.history.length < 2) {
+                        await promptAction.openToast({
+                          message: '无历史记录'
+                        })
+                        return
+                      }
+                      await promptAction.showDialog({
+                        title: '内容历史记录',
+                        message: item.history.slice(1)
+                          .map(historyItem => String(new Date(historyItem.updateTime)) + '：' + historyItem.value)
+                          .join('\n'),
+                        buttons: [
+                          {
+                            text: '确定',
+                            color: $r('sys.color.font_emphasize')
+                          }
+                        ]
+                      })
+                    }
+                  })
+              )
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -241,67 +266,6 @@ export default struct Passwordinfo {
                     await copy(this.context, this.UIContext, this.mfaOtpauthUri)
                   })
               )
-            }
-            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-            .padding($r('sys.float.ohos_id_corner_radius_mark'))
-          }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-        }
-        if (item.type === 'URL') {
-          ListItem() {
-            Column() {
-              Row() {
-                Text(item.type)
-                  .fontWeight(FontWeight.Medium)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Text(item.value)
-                  .enableAutoSpacing(true)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .layoutWeight(1)
-                  .textAlign(TextAlign.End)
-              }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onHover((isHover) => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 2
-                }
-              })
-              .bindMenu([
-                {
-                  value: '打开',
-                  action: async () => {
-                    await openLink(this.context, item.value)
-                  }
-                },
-                {
-                  value: '复制',
-                  action: async () => {
-                    await copy(this.context, this.UIContext, item.value)
-                  }
-                }
-              ], {
-                hapticFeedbackMode: HapticFeedbackMode.AUTO
-              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
