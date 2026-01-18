@@ -179,6 +179,11 @@
       "name": "Storevaluehistorypasswordinfotype",
       "pageSourceFile": "src/main/ets/pages/Storevaluehistorypasswordinfotype.ets",
       "buildFunction": "StorevaluehistorypasswordinfotypeBuilder"
+    },
+    {
+      "name": "Webdavserver",
+      "pageSourceFile": "src/main/ets/pages/Webdavserver.ets",
+      "buildFunction": "WebdavserverBuilder"
     }
   ]
 }

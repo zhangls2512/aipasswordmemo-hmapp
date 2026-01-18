@@ -89,7 +89,7 @@ struct DataInOut {
 
         ListItem() {
           Column() {
-            Text('导入')
+            Text('导入 (支持加密备份文件)')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
@@ -145,10 +145,12 @@ struct DataInOut {
                     conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
                   }
                   if (filePath.endsWith('.txt')) {
-                    await importPassword(this.context, filestring, conflictResolution)
-                    await promptAction.openToast({
-                      message: '导入成功'
-                    })
+                    const res = await importPassword(this.context, filestring, conflictResolution)
+                    if (res === 'success') {
+                      await promptAction.openToast({
+                        message: '导入成功'
+                      })
+                    }
                   }
                   if (filePath.endsWith('.csv')) {
                     await importCsvPassword(this.context, filestring)
@@ -287,10 +289,12 @@ struct DataInOut {
                   if (this.index === 1) {
                     conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
                   }
-                  await importInfo(this.context, filestring, conflictResolution)
-                  await promptAction.openToast({
-                    message: '导入成功'
-                  })
+                  const res = await importInfo(this.context, filestring, conflictResolution)
+                  if (res === 'success') {
+                    await promptAction.openToast({
+                      message: '导入成功'
+                    })
+                  }
                 }
               })
 
@@ -344,10 +348,12 @@ struct DataInOut {
                   if (this.index === 1) {
                     conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
                   }
-                  await importTag(this.context, filestring, conflictResolution)
-                  await promptAction.openToast({
-                    message: '导入成功'
-                  })
+                  const res = await importTag(this.context, filestring, conflictResolution)
+                  if (res === 'success') {
+                    await promptAction.openToast({
+                      message: '导入成功'
+                    })
+                  }
                 }
               })
             }
@@ -507,7 +513,7 @@ struct DataInOut {
 
         ListItem() {
           Column() {
-            Text('导出')
+            Text('导出 (未加密，请务必安全存储，保障数据安全。如需加密，请前往“我的”>“设置”>“数据”>“备份与恢复”>“文件”，开启“加密”后手动备份成功之后导出)')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)

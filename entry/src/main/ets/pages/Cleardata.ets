@@ -259,31 +259,21 @@ export default struct Cleardata {
             })
             if (data.index === 1) {
               this.setting.forEach((item) => {
-                if (item === 'dataSetting') {
-                  const keys = [
-                    'autoSyncTables',
-                    'autoSyncDevices',
-                    'autoHuaweiCloudSyncTables',
-                    'autoBackupTables',
-                    'autoFileBackupTables',
-                    'pauseAutoSyncWhenLowBatteryCapacityLevel',
-                    'pauseAutoSyncWhenPowerSave',
-                    'pauseAutoBackupWhenLowBatteryCapacityLevel',
-                    'pauseAutoBackupWhenPowerSave'
-                  ]
-                  const dataPreferences = preferences.getPreferencesSync(this.context, {
-                    name: 'dataSetting'
-                  })
-                  keys.forEach(item => {
-                    dataPreferences.deleteSync(item)
-                    dataPreferences.flushSync()
-                  })
-                  return
-                }
                 const dataPreferences = preferences.getPreferencesSync(this.context, {
                   name: item
                 })
-                dataPreferences.clearSync()
+                if (item === 'dataSetting') {
+                  Object.keys(dataPreferences.getAllSync()).forEach(keyItem => {
+                    const cannotDeleteKeys =
+                      ['onTables', 'huaweiCloudSyncOnTables', 'huaweiCloudSyncNetworkStrategy', 'isBackupTables']
+                    if (!cannotDeleteKeys.includes(keyItem)) {
+                      dataPreferences.deleteSync(keyItem)
+                    }
+                  })
+                } else {
+                  dataPreferences.clearSync()
+                }
+                dataPreferences.flushSync()
               })
               const res = await promptAction.showDialog({
                 title: '提示',

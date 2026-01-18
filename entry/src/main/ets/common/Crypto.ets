@@ -4,7 +4,7 @@ import { asset } from '@kit.AssetStoreKit'
 import { cryptoFramework } from '@kit.CryptoArchitectureKit'
 import { huks } from '@kit.UniversalKeystoreKit'
 
-interface EncryptData {
+export interface EncryptData {
   content: string,
   iv: string
 }

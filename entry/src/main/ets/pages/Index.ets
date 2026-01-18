@@ -6,6 +6,7 @@ import { zlib } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
+import { getKey } from '../common/Crypto'
 import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import getDeviceToken from '../common/Devicetoken'
@@ -158,7 +159,7 @@ struct Index {
       bottom: this.preferType === 0 ? 36 : 0,
       top: this.preferType === 0 ? 12 : 0
     })
-    .onAppear(() => {
+    .onAppear(async () => {
       this.context.eventHub.on('clearData', () => {
         if (!this.isShowCleardataSheet) {
           this.isShowCleardataSheet = true
@@ -433,6 +434,18 @@ struct Index {
         this.backgroundImagePixelMap = this.getBackgroundImage()
       })
       this.backgroundImagePixelMap = this.getBackgroundImage()
+      if (!getKey()) {
+        await promptAction.showDialog({
+          title: '提示',
+          message: '检测到未导入密钥，建议前往“我的”>“设置”>“密钥”导入密钥以加密数据，提高安全性',
+          buttons: [
+            {
+              text: '确定',
+              color: $r('sys.color.font_emphasize')
+            }
+          ]
+        })
+      }
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshIndex')
