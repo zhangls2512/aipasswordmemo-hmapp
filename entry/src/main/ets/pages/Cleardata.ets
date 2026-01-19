@@ -36,11 +36,13 @@ export default struct Cleardata {
   @Local oldaccountNouse: boolean = false
   @Local passwordIconNouse: boolean = false
   @Local passwordIconNouseSize: string = ''
+  @Local oldInvitationQrcodeNouse: boolean = false
+  @Local oldInvitationQrcodeNouseSize: string = ''
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
 
   async getSize() {
-    const invitationQrcodeCacheSize = await getDirectorySize(this.context.filesDir + '/media/invitationqrcode/')
+    const invitationQrcodeCacheSize = await getDirectorySize(this.context.cacheDir + '/media/invitationqrcode/')
     this.invitationQrcodeCacheSize = getSizeString(invitationQrcodeCacheSize)
     const errorLogSize = await getDirectorySize(this.context.filesDir + '/log/error/')
     this.errorLogSize = getSizeString(errorLogSize)
@@ -54,6 +56,8 @@ export default struct Cleardata {
       fileIo.closeSync(file)
     })
     this.passwordIconNouseSize = getSizeString(passwordIconNouseSize)
+    const oldInvitationQrcodeNouseSize = await getDirectorySize(this.context.filesDir + '/media/invitationqrcode/')
+    this.oldInvitationQrcodeNouseSize = getSizeString(oldInvitationQrcodeNouseSize)
   }
 
   async getNousePasswordIconFilePathArray() {
@@ -451,7 +455,7 @@ export default struct Cleardata {
                 }
                 if (item === 'invitationQrcodeCache') {
                   try {
-                    const invitationcodeQrcodeDir = this.context.filesDir + '/media/invitationqrcode/'
+                    const invitationcodeQrcodeDir = this.context.cacheDir + '/media/invitationqrcode/'
                     const fileNames = await fileIo.listFile(invitationcodeQrcodeDir)
                     const promises = fileNames.map(async (item) => {
                       await fileIo.unlink(invitationcodeQrcodeDir + item)
@@ -727,6 +731,35 @@ export default struct Cleardata {
             .borderRadius(12)
             .padding(12)
             .width('100%')
+
+            Divider()
+              .padding({
+                left: 12,
+                right: 12
+              })
+            Row() {
+              Text('旧邀请二维码图片')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Text(this.oldInvitationQrcodeNouseSize)
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                })
+              Checkbox({
+                name: 'invitationQrcodeNouse',
+                group: 'nouse'
+              })
+                .select(this.oldInvitationQrcodeNouse!!)
+                .shape(CheckBoxShape.ROUNDED_SQUARE)
+            }
+            .borderRadius(12)
+            .padding(12)
+            .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -779,6 +812,9 @@ export default struct Cleardata {
                   await fileIo.unlink(item)
                 })
                 await Promise.all(promises)
+              }
+              if (item === 'oldInvitationQrcodeNouse') {
+                await fileIo.rmdir(this.context.filesDir + '/media/invitationqrcode')
               }
             })
             await Promise.all(promises)
