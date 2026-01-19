@@ -793,9 +793,11 @@ export default class EntryAbility extends UIAbility {
       const statusBar = commonSettingDataPreferences.getSync('statusBar', false)
       if (statusBar) {
         const blackFileData = this.context.resourceManager.getRawFileContentSync('iconblack.svg')
-        const blackPixelMap = await image.createImageSource(blackFileData.buffer).createPixelMap()
+        const blackImageSource = image.createImageSource(blackFileData.buffer)
+        const blackPixelMap = await blackImageSource.createPixelMap()
         const whiteFileData = this.context.resourceManager.getRawFileContentSync('iconwhite.svg')
-        const whitePixelMap = await image.createImageSource(whiteFileData.buffer).createPixelMap()
+        const whiteImageSource = image.createImageSource(whiteFileData.buffer)
+        const whitePixelMap = await whiteImageSource.createPixelMap()
         statusBarManager.addToStatusBar(this.context, {
           icons: {
             black: blackPixelMap,
@@ -809,6 +811,10 @@ export default class EntryAbility extends UIAbility {
             loadingStatus: true
           }
         })
+        await blackPixelMap.release()
+        await whitePixelMap.release()
+        await blackImageSource.release()
+        await whiteImageSource.release()
         statusBarManager.updateStatusBarMenu(this.context, [
           [
             {

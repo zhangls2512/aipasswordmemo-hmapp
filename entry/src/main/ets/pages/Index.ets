@@ -34,12 +34,13 @@ struct Index {
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
 
-  getBackgroundImage() {
+  async getBackgroundImage() {
     const backgroundImagePath = this.context.filesDir + '/media/backgroundimage.png'
     const res = fileIo.accessSync(backgroundImagePath)
     if (res) {
       const backgroundImageSource = image.createImageSource(backgroundImagePath)
-      return backgroundImageSource.createPixelMapSync()
+      const backgroundImagePixelMap = await backgroundImageSource.createPixelMap()
+      return backgroundImagePixelMap
     }
     return
   }
@@ -430,10 +431,10 @@ struct Index {
           this.preferType = getPreferType(this.UIContext)
         }, 200)
       })
-      this.context.eventHub.on('refreshIndex', () => {
-        this.backgroundImagePixelMap = this.getBackgroundImage()
+      this.context.eventHub.on('refreshIndex', async () => {
+        this.backgroundImagePixelMap = await this.getBackgroundImage()
       })
-      this.backgroundImagePixelMap = this.getBackgroundImage()
+      this.backgroundImagePixelMap = await this.getBackgroundImage()
       if (!getKey()) {
         await promptAction.showDialog({
           title: '提示',
