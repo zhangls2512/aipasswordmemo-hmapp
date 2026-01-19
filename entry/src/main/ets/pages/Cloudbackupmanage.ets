@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LoadingDialog } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog } from '@kit.ArkUI'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -239,7 +239,9 @@ struct Cloudbackupmanage {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('管理云备份')
+    .title('管理云备份', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()
       await this.getCount()

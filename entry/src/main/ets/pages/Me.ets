@@ -150,17 +150,7 @@ export default struct Me {
             title: {
               title: '登录'
             },
-            onAppear: async () => {
-              const disallowScreenshot =
-                this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-              if (disallowScreenshot) {
-                const lastWindow = await window.getLastWindow(this.context)
-                await lastWindow.setWindowPrivacyMode(true)
-              }
-            },
             onDisappear: async () => {
-              const lastWindow = await window.getLastWindow(this.context)
-              await lastWindow.setWindowPrivacyMode(false)
               await this.get()
             }
           })

@@ -4,7 +4,7 @@ import { asset } from '@kit.AssetStoreKit'
 import { cryptoFramework } from '@kit.CryptoArchitectureKit'
 import { huks } from '@kit.UniversalKeystoreKit'
 
-interface EncryptData {
+export interface EncryptData {
   content: string,
   iv: string
 }
@@ -118,24 +118,24 @@ export async function encrypt(content: string): Promise<EncryptData> {
     inData: stringToArray(content),
     properties: [
       {
-        tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
-        value: huks.HuksKeyAlg.HUKS_ALG_AES
-      },
-      {
         tag: huks.HuksTag.HUKS_TAG_PURPOSE,
         value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_ENCRYPT
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+        value: huks.HuksKeyAlg.HUKS_ALG_AES
       },
       {
         tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
         value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
       },
       {
-        tag: huks.HuksTag.HUKS_TAG_PADDING,
-        value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
-      },
-      {
         tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
         value: huks.HuksCipherMode.HUKS_MODE_CBC
+      },
+      {
+        tag: huks.HuksTag.HUKS_TAG_PADDING,
+        value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
       },
       {
         tag: huks.HuksTag.HUKS_TAG_IV,
@@ -157,24 +157,24 @@ export async function decrypt(encryptData: EncryptData): Promise<string> {
       inData: decodeBase64(encryptData.content),
       properties: [
         {
-          tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
-          value: huks.HuksKeyAlg.HUKS_ALG_AES
-        },
-        {
           tag: huks.HuksTag.HUKS_TAG_PURPOSE,
           value: huks.HuksKeyPurpose.HUKS_KEY_PURPOSE_DECRYPT
+        },
+        {
+          tag: huks.HuksTag.HUKS_TAG_ALGORITHM,
+          value: huks.HuksKeyAlg.HUKS_ALG_AES
         },
         {
           tag: huks.HuksTag.HUKS_TAG_KEY_SIZE,
           value: huks.HuksKeySize.HUKS_AES_KEY_SIZE_256
         },
         {
-          tag: huks.HuksTag.HUKS_TAG_PADDING,
-          value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
-        },
-        {
           tag: huks.HuksTag.HUKS_TAG_BLOCK_MODE,
           value: huks.HuksCipherMode.HUKS_MODE_CBC
+        },
+        {
+          tag: huks.HuksTag.HUKS_TAG_PADDING,
+          value: huks.HuksKeyPadding.HUKS_PADDING_PKCS7
         },
         {
           tag: huks.HuksTag.HUKS_TAG_IV,

@@ -370,7 +370,9 @@ struct Newpasskey {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('新增通行密钥')
+    .title('新增通行密钥', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       const accountInfo = await getAccountInfo()

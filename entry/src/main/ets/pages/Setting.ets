@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { appAccount } from '@kit.BasicServicesKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
-import { promptAction } from '@kit.ArkUI'
+import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { formProvider } from '@kit.FormKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -512,49 +512,6 @@ export default struct Setting {
                       name: 'Cloudbackupimport'
                     })
                   })
-
-                  Divider()
-                    .padding({
-                      left: 12,
-                      right: 12
-                    })
-                  Row() {
-                    Text('密钥')
-                      .fontWeight(FontWeight.Medium)
-                      .layoutWeight(1)
-                      .margin({
-                        right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                      })
-                    Image($r('app.media.right'))
-                      .fillColor($r('sys.color.icon_fourth'))
-                      .height(12)
-                      .width(12)
-                  }
-                  .borderRadius(12)
-                  .padding(12)
-                  .stateStyles({
-                    normal: {
-                      .backgroundColor(this.hoverId === 6 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
-                    },
-                    pressed: {
-                      .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .width('100%')
-                  .onHover((isHover) => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 6
-                    }
-                  })
-                  .onClick(() => {
-                    this.pageInfos.pushPath({
-                      name: 'Key'
-                    })
-                  })
                 }
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -608,6 +565,49 @@ export default struct Setting {
               .padding(12)
               .stateStyles({
                 normal: {
+                  .backgroundColor(this.hoverId === 6 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 6
+                }
+              })
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Tablesync'
+                })
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('导入与导出')
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
                   .backgroundColor(this.hoverId === 7 ? $r('sys.color.interactive_hover') :
                     $r('sys.color.ohos_id_color_card_bg'))
                 },
@@ -626,7 +626,7 @@ export default struct Setting {
               })
               .onClick(() => {
                 this.pageInfos.pushPath({
-                  name: 'Tablesync'
+                  name: 'DataInOut'
                 })
               })
 
@@ -636,7 +636,7 @@ export default struct Setting {
                   right: 12
                 })
               Row() {
-                Text('导入与导出')
+                Text('备份与恢复')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
@@ -669,49 +669,6 @@ export default struct Setting {
               })
               .onClick(() => {
                 this.pageInfos.pushPath({
-                  name: 'DataInOut'
-                })
-              })
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('备份与恢复')
-                  .fontWeight(FontWeight.Medium)
-                  .layoutWeight(1)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Image($r('app.media.right'))
-                  .fillColor($r('sys.color.icon_fourth'))
-                  .height(12)
-                  .width(12)
-              }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor(this.hoverId === 9 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .width('100%')
-              .onHover((isHover) => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 9
-                }
-              })
-              .onClick(() => {
-                this.pageInfos.pushPath({
                   name: 'DataBackupRecovery'
                 })
               })
@@ -736,6 +693,54 @@ export default struct Setting {
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
+
+        ListItem() {
+          Column() {
+            Row() {
+              Text('密钥')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+              Image($r('app.media.right'))
+                .fillColor($r('sys.color.icon_fourth'))
+                .height(12)
+                .width(12)
+            }
+            .borderRadius(12)
+            .padding(12)
+            .stateStyles({
+              normal: {
+                .backgroundColor(this.hoverId === 9 ? $r('sys.color.interactive_hover') :
+                  $r('sys.color.ohos_id_color_card_bg'))
+              },
+              pressed: {
+                .backgroundColor($r('sys.color.interactive_pressed'))
+              }
+            })
+            .width('100%')
+            .onHover((isHover) => {
+              if (!isHover) {
+                this.hoverId = -1
+              }
+              if (isHover) {
+                this.hoverId = 9
+              }
+            })
+            .onClick(() => {
+              this.pageInfos.pushPath({
+                name: 'Key'
+              })
+            })
+          }
+          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+          .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+          .padding($r('sys.float.ohos_id_corner_radius_mark'))
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
 
         ListItem() {
@@ -1450,7 +1455,9 @@ export default struct Setting {
     .padding({
       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
     })
-    .title('设置')
+    .title('设置', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .titleMode(NavigationTitleMode.Mini)
     .onAppear(async () => {
       this.context.eventHub.on('refreshSetting', async () => {

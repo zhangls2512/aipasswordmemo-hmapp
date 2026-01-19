@@ -2,13 +2,13 @@ import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 
 @Builder
-export function DefaulthidepasswordinfotypeBuilder() {
-  Defaulthidepasswordinfotype()
+export function StorevaluehistorypasswordinfotypeBuilder() {
+  Storevaluehistorypasswordinfotype()
 }
 
 @ComponentV2
-struct Defaulthidepasswordinfotype {
-  @Local defaultHidePasswordInfoTypeArray: string[] = []
+struct Storevaluehistorypasswordinfotype {
+  @Local storeValueHistoryPasswordInfoTypeArray: string[] = []
   @Local type: string = ''
   context = this.getUIContext().getHostContext()
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
@@ -23,7 +23,7 @@ struct Defaulthidepasswordinfotype {
             placeholder: '请输入内容',
             text: this.type!!
           })
-            .defaultFocus(this.defaultHidePasswordInfoTypeArray.length === 0 ? true : false)
+            .defaultFocus(this.storeValueHistoryPasswordInfoTypeArray.length === 0 ? true : false)
             .enableAutoSpacing(true)
         }
         .margin({
@@ -46,13 +46,13 @@ struct Defaulthidepasswordinfotype {
                 })
                 return
               }
-              if (this.defaultHidePasswordInfoTypeArray.some(item => item === this.type)) {
+              if (this.storeValueHistoryPasswordInfoTypeArray.some(item => item === this.type)) {
                 await promptAction.openToast({
                   message: '已添加此类型'
                 })
                 return
               }
-              this.defaultHidePasswordInfoTypeArray.push(this.type)
+              this.storeValueHistoryPasswordInfoTypeArray.push(this.type)
               this.type = ''
             })
         }
@@ -60,7 +60,7 @@ struct Defaulthidepasswordinfotype {
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
 
-        ForEach(this.defaultHidePasswordInfoTypeArray, (item: string, index) => {
+        ForEach(this.storeValueHistoryPasswordInfoTypeArray, (item: string, index) => {
           ListItem() {
             Column() {
               Row() {
@@ -73,7 +73,7 @@ struct Defaulthidepasswordinfotype {
                 Image($r('app.media.delete'))
                   .width('8%')
                   .onClick(() => {
-                    this.defaultHidePasswordInfoTypeArray.splice(index, 1)
+                    this.storeValueHistoryPasswordInfoTypeArray.splice(index, 1)
                   })
               }
               .borderRadius(12)
@@ -96,15 +96,16 @@ struct Defaulthidepasswordinfotype {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('默认隐藏内容密码信息类型', {
+    .title('记录内容历史记录密码信息类型', {
       paddingEnd: LengthMetrics.vp(60)
     })
     .onAppear(() => {
-      this.defaultHidePasswordInfoTypeArray =
-        this.commonSettingDataPreferences.getSync('defaultHidePasswordInfoType', []) as string[]
+      this.storeValueHistoryPasswordInfoTypeArray =
+        this.commonSettingDataPreferences.getSync('storeValueHistoryPasswordInfoType', ['密码']) as string[]
     })
     .onDisAppear(() => {
-      this.commonSettingDataPreferences.putSync('defaultHidePasswordInfoType', this.defaultHidePasswordInfoTypeArray)
+      this.commonSettingDataPreferences.putSync('storeValueHistoryPasswordInfoType',
+        this.storeValueHistoryPasswordInfoTypeArray)
     })
   }
 }

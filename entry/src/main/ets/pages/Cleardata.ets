@@ -258,34 +258,44 @@ export default struct Cleardata {
               ]
             })
             if (data.index === 1) {
-              const promises = this.setting.map(async (item) => {
+              this.setting.forEach((item) => {
+                const dataPreferences = preferences.getPreferencesSync(this.context, {
+                  name: item
+                })
                 if (item === 'dataSetting') {
-                  const keys = [
-                    'autoSyncTables',
-                    'autoSyncDevices',
-                    'autoHuaweiCloudSyncTables',
-                    'autoBackupTables',
-                    'autoFileBackupTables',
-                    'pauseAutoSyncWhenLowBatteryCapacityLevel',
-                    'pauseAutoSyncWhenPowerSave',
-                    'pauseAutoBackupWhenLowBatteryCapacityLevel',
-                    'pauseAutoBackupWhenPowerSave'
-                  ]
-                  const dataPreferences = preferences.getPreferencesSync(this.context, {
-                    name: 'dataSetting'
+                  Object.keys(dataPreferences.getAllSync()).forEach(keyItem => {
+                    const cannotDeleteKeys =
+                      ['onTables', 'huaweiCloudSyncOnTables', 'huaweiCloudSyncNetworkStrategy', 'isBackupTables']
+                    if (!cannotDeleteKeys.includes(keyItem)) {
+                      dataPreferences.deleteSync(keyItem)
+                    }
                   })
-                  keys.forEach(item => {
-                    dataPreferences.deleteSync(item)
-                    dataPreferences.flushSync()
-                  })
-                  return
+                } else {
+                  dataPreferences.clearSync()
                 }
-                await preferences.deletePreferences(this.context, item)
+                dataPreferences.flushSync()
               })
-              await Promise.all(promises)
-              await promptAction.openToast({
-                message: '清理成功'
+              const res = await promptAction.showDialog({
+                title: '提示',
+                message: '清理成功，需重启应用生效，是否重启？',
+                buttons: [
+                  {
+                    text: '取消',
+                    color: $r('sys.color.font_primary')
+                  },
+                  {
+                    text: '重启',
+                    color: $r('sys.color.font_emphasize')
+                  }
+                ]
               })
+              if (res.index === 1) {
+                const applicationContext = this.context.getApplicationContext()
+                applicationContext.restartApp({
+                  bundleName: 'com.zhangxm.aipasswordmemo',
+                  abilityName: 'EntryAbility'
+                })
+              }
             }
           })
       }

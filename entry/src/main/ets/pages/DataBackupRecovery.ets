@@ -1,12 +1,15 @@
 import { common } from '@kit.AbilityKit'
 import { preferences, relationalStore } from '@kit.ArkData'
-import { promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
+import { util } from '@kit.ArkTS'
+import { LengthMetrics, LoadingDialog, promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
+import { appAccount } from '@kit.BasicServicesKit'
 import { fileIo, picker } from '@kit.CoreFileKit'
-import { getInfoList, getPasswordList, getTagList } from '../common/Dataget'
+import { rcp } from '@kit.RemoteCommunicationKit'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
-import { read, write } from '../common/File'
-import { backupTable, recoveryTable } from '../common/Table'
-import { InfoOutItem, PasswordOutItem, TagOutItem } from './DataInOut'
+import { read } from '../common/File'
+import { checkPermission } from '../common/Permission'
+import { backupTable, fileBackupTable, recoveryTable, webdavBackupTable } from '../common/Table'
+import { getWebdavServerInfo } from '../common/Webdavserver'
 
 interface Type {
   name: string,
@@ -25,14 +28,25 @@ struct DataBackupRecovery {
   @Local autoBackupTables: string[] = []
   @Local index: number = 0
   @Local value: string = '保留'
+  @Local encryptFileBackup: boolean = true
   @Local autoFileBackupTables: string[] = []
+  @Local accountDataSync: boolean = false
+  @Local accountDataSyncEnabled: boolean = false
+  @Local encryptWebdavBackup: boolean = true
+  @Local autoWebdavBackupTables: string[] = []
   @Local pauseAutoBackupWhenLowBatteryCapacityLevel: boolean = false
   @Local pauseAutoBackupWhenPowerSave: boolean = false
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
+  pageInfos = new NavPathStack()
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
+  })
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '加载中...'
+    })
   })
   typeArray: Type[] = [
     {
@@ -49,16 +63,124 @@ struct DataBackupRecovery {
     }
   ]
 
-  getSetting() {
+  async getSetting() {
     this.isBackupTables = this.dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
     this.autoBackupTables =
       this.dataSettingDataPreferences.getSync('autoBackupTables', ['password', 'info', 'tag']) as string[]
+    this.encryptFileBackup = this.dataSettingDataPreferences.getSync('encryptFileBackup', true) as boolean
     this.autoFileBackupTables =
       this.dataSettingDataPreferences.getSync('autoFileBackupTables', ['password', 'info', 'tag']) as string[]
+    this.encryptWebdavBackup = this.dataSettingDataPreferences.getSync('encryptWebdavBackup', true) as boolean
+    this.autoWebdavBackupTables =
+      this.dataSettingDataPreferences.getSync('autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
     this.pauseAutoBackupWhenLowBatteryCapacityLevel =
       this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false) as boolean
     this.pauseAutoBackupWhenPowerSave =
       this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false) as boolean
+    const webdavServerInfo = await getWebdavServerInfo()
+    if (!webdavServerInfo.path) {
+      this.accountDataSyncEnabled = false
+    }
+    if (webdavServerInfo.path) {
+      const res = await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
+      this.accountDataSyncEnabled = res
+      if (res) {
+        const appAccountManager = appAccount.createAppAccountManager()
+        this.accountDataSync = await appAccountManager.checkDataSyncEnabled('webdavserver')
+      }
+    }
+  }
+
+  async getWebdavBackup(table: string) {
+    const webdavServerInfo = await getWebdavServerInfo()
+    const session = rcp.createSession({
+      requestConfiguration: {
+        security: {
+          tlsRange: {
+            min: 'TlsV1.2'
+          }
+        }
+      },
+      headers: {
+        Authorization: 'Basic ' +
+        new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
+        webdavServerInfo.password))
+      }
+    })
+    try {
+      const response = await session.get(webdavServerInfo.path + '/' + table + '.txt')
+      session.close()
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        let body = ''
+        if (response.toString()) {
+          body = response.toString() as string
+        }
+        if (!body) {
+          await promptAction.openToast({
+            message: '备份文件内容为空，无法恢复'
+          })
+          return 'fail'
+        }
+        return body
+      }
+      if (response.statusCode === 404) {
+        await promptAction.openToast({
+          message: '无备份文件，无法恢复'
+        })
+        return 'fail'
+      }
+      await promptAction.openToast({
+        message: '请求失败，错误码：' + response.statusCode
+      })
+      return 'fail'
+    } catch (err) {
+      session.close()
+      await promptAction.openToast({
+        message: '发生错误，错误码：' + err.code
+      })
+      return 'fail'
+    }
+  }
+
+  async deleteWebdavBackup(table: string) {
+    const webdavServerInfo = await getWebdavServerInfo()
+    const session = rcp.createSession({
+      requestConfiguration: {
+        security: {
+          tlsRange: {
+            min: 'TlsV1.2'
+          }
+        }
+      },
+      headers: {
+        Authorization: 'Basic ' +
+        new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
+        webdavServerInfo.password))
+      }
+    })
+    try {
+      const response = await session.delete(webdavServerInfo.path + '/' + table + '.txt')
+      session.close()
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return 'success'
+      }
+      if (response.statusCode === 404) {
+        await promptAction.openToast({
+          message: '无备份文件，无需删除'
+        })
+        return 'fail'
+      }
+      await promptAction.openToast({
+        message: '请求失败，错误码：' + response.statusCode
+      })
+      return 'fail'
+    } catch (err) {
+      session.close()
+      await promptAction.openToast({
+        message: '发生错误，错误码：' + err.code
+      })
+      return 'fail'
+    }
   }
 
   build() {
@@ -69,7 +191,8 @@ struct DataBackupRecovery {
             items: new SegmentButtonV2Items([
               { text: '数据库' },
               { text: '文件' },
-              { text: '暂停自动备份' }
+              { text: 'WebDAV' },
+              { text: '暂停' }
             ]),
             selectedIndex: this.selectedIndex!!
           })
@@ -110,7 +233,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoBackupTables.includes(item.value)
                         })
-                          .onChange((isOn) => {
+                          .onChange(async (isOn) => {
                             let autoBackupTables: string[] = []
                             if (!isOn) {
                               autoBackupTables = this.autoBackupTables.filter(inItem => inItem !== item.value)
@@ -120,7 +243,7 @@ struct DataBackupRecovery {
                             }
                             this.dataSettingDataPreferences.putSync('autoBackupTables', autoBackupTables)
                             this.dataSettingDataPreferences.flushSync()
-                            this.getSetting()
+                            await this.getSetting()
                           })
                       }
                       .borderRadius(12)
@@ -187,7 +310,7 @@ struct DataBackupRecovery {
                       await promptAction.openToast({
                         message: '备份成功'
                       })
-                      this.getSetting()
+                      await this.getSetting()
                     })
 
                     Divider()
@@ -232,7 +355,7 @@ struct DataBackupRecovery {
                       await promptAction.openToast({
                         message: '备份成功'
                       })
-                      this.getSetting()
+                      await this.getSetting()
                     })
 
                     Divider()
@@ -277,7 +400,7 @@ struct DataBackupRecovery {
                       await promptAction.openToast({
                         message: '备份成功'
                       })
-                      this.getSetting()
+                      await this.getSetting()
                     })
                   }
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -369,6 +492,41 @@ struct DataBackupRecovery {
               ListItem() {
                 Column() {
                   Row() {
+                    Column() {
+                      Text('加密')
+                        .fontWeight(FontWeight.Medium)
+                      Text('在“我的”>“设置”>“密钥”导入密钥后生效')
+                        .fontColor($r('sys.color.font_secondary'))
+                        .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                        .margin({
+                          top: $r('sys.float.ohos_id_text_margin_vertical')
+                        })
+                    }
+                    .alignItems(HorizontalAlign.Start)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+
+                    Toggle({
+                      type: ToggleType.Switch,
+                      isOn: this.encryptFileBackup!!
+                    })
+                      .onChange((isOn) => {
+                        this.dataSettingDataPreferences.putSync('encryptFileBackup', isOn)
+                        this.dataSettingDataPreferences.flushSync()
+                      })
+                  }
+                  .borderRadius(12)
+                  .padding(12)
+                  .width('100%')
+
+                  Divider()
+                    .padding({
+                      left: 12,
+                      right: 12
+                    })
+                  Row() {
                     Text('冲突解决模式')
                       .fontWeight(FontWeight.Medium)
                       .layoutWeight(1)
@@ -425,7 +583,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoFileBackupTables.includes(item.value)
                         })
-                          .onChange((isOn) => {
+                          .onChange(async (isOn) => {
                             let autoFileBackupTables: string[] = []
                             if (!isOn) {
                               autoFileBackupTables = this.autoFileBackupTables.filter(inItem => inItem !== item.value)
@@ -435,7 +593,7 @@ struct DataBackupRecovery {
                             }
                             this.dataSettingDataPreferences.putSync('autoFileBackupTables', autoFileBackupTables)
                             this.dataSettingDataPreferences.flushSync()
-                            this.getSetting()
+                            await this.getSetting()
                           })
                       }
                       .borderRadius(12)
@@ -498,22 +656,7 @@ struct DataBackupRecovery {
                       }
                     })
                     .onClick(async () => {
-                      const array = await getPasswordList(this.context)
-                      const arrayOut = array.map((item): PasswordOutItem => {
-                        let cloudBackupTime = JSON.stringify([])
-                        if (typeof (item.cloudBackupTime) === 'string') {
-                          cloudBackupTime = item.cloudBackupTime
-                        }
-                        return {
-                          id: item.id,
-                          name: item.name,
-                          info: item.info,
-                          tag: item.tag.map(item => item.value),
-                          updateTime: item.updateTime,
-                          cloudBackupTime: cloudBackupTime
-                        }
-                      })
-                      await write(this.context.filesDir + '/backup/password.txt', JSON.stringify(arrayOut))
+                      await fileBackupTable(this.context, 'password')
                       await promptAction.openToast({
                         message: '备份成功'
                       })
@@ -557,21 +700,7 @@ struct DataBackupRecovery {
                       }
                     })
                     .onClick(async () => {
-                      const array = await getInfoList(this.context)
-                      const arrayOut = array.map((item): InfoOutItem => {
-                        let cloudBackupTime = JSON.stringify([])
-                        if (typeof (item.cloudBackupTime) === 'string') {
-                          cloudBackupTime = item.cloudBackupTime
-                        }
-                        return {
-                          id: item.id,
-                          type: item.type,
-                          value: item.value,
-                          updateTime: item.updateTime,
-                          cloudBackupTime: cloudBackupTime
-                        }
-                      })
-                      await write(this.context.filesDir + '/backup/info.txt', JSON.stringify(arrayOut))
+                      await fileBackupTable(this.context, 'info')
                       await promptAction.openToast({
                         message: '备份成功'
                       })
@@ -615,21 +744,7 @@ struct DataBackupRecovery {
                       }
                     })
                     .onClick(async () => {
-                      const array = await getTagList(this.context)
-                      const arrayOut = array.map((item): TagOutItem => {
-                        let cloudBackupTime = JSON.stringify([])
-                        if (typeof (item.cloudBackupTime) === 'string') {
-                          cloudBackupTime = item.cloudBackupTime
-                        }
-                        return {
-                          id: item.id,
-                          value: item.value,
-                          color: item.color,
-                          updateTime: item.updateTime,
-                          cloudBackupTime: cloudBackupTime
-                        }
-                      })
-                      await write(this.context.filesDir + '/backup/tag.txt', JSON.stringify(arrayOut))
+                      await fileBackupTable(this.context, 'tag')
                       await promptAction.openToast({
                         message: '备份成功'
                       })
@@ -702,10 +817,12 @@ struct DataBackupRecovery {
                       if (this.index === 1) {
                         conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
                       }
-                      await importPassword(this.context, filestring, conflictResolution)
-                      await promptAction.openToast({
-                        message: '恢复成功'
-                      })
+                      const res = await importPassword(this.context, filestring, conflictResolution)
+                      if (res === 'success') {
+                        await promptAction.openToast({
+                          message: '恢复成功'
+                        })
+                      }
                     })
 
                     Divider()
@@ -1258,18 +1375,105 @@ struct DataBackupRecovery {
               ListItem() {
                 Column() {
                   Row() {
-                    Text('电池电量低')
+                    Text('WebDAV服务器')
+                      .enableAutoSpacing(true)
                       .fontWeight(FontWeight.Medium)
                       .layoutWeight(1)
                       .margin({
                         right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                       })
+                    Image($r('app.media.right'))
+                      .fillColor($r('sys.color.icon_fourth'))
+                      .height(12)
+                      .width(12)
+                  }
+                  .borderRadius(12)
+                  .padding(12)
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor(this.hoverId === 16 ? $r('sys.color.interactive_hover') :
+                        $r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.interactive_pressed'))
+                    }
+                  })
+                  .width('100%')
+                  .onHover((isHover) => {
+                    if (!isHover) {
+                      this.hoverId = -1
+                    }
+                    if (isHover) {
+                      this.hoverId = 16
+                    }
+                  })
+                  .onClick(() => {
+                    this.pageInfos.pushPath({
+                      name: 'Webdavserver'
+                    })
+                  })
+
+                  if (this.accountDataSyncEnabled) {
+                    Divider()
+                      .padding({
+                        left: 12,
+                        right: 12
+                      })
+                    Row() {
+                      Text('设备间同步')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Toggle({
+                        type: ToggleType.Switch,
+                        isOn: this.accountDataSync!!
+                      })
+                        .onChange(async (isOn) => {
+                          try {
+                            const appAccountManager = appAccount.createAppAccountManager()
+                            await appAccountManager.setDataSyncEnabled('webdavserver', isOn)
+                          } catch (err) {
+                            this.accountDataSync = false
+                            await promptAction.openToast({
+                              message: '发生错误，错误码：' + err.code
+                            })
+                          }
+                        })
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .width('100%')
+                  }
+                  Divider()
+                    .padding({
+                      left: 12,
+                      right: 12
+                    })
+                  Row() {
+                    Column() {
+                      Text('加密')
+                        .fontWeight(FontWeight.Medium)
+                      Text('在“我的”>“设置”>“密钥”导入密钥后生效')
+                        .fontColor($r('sys.color.font_secondary'))
+                        .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                        .margin({
+                          top: $r('sys.float.ohos_id_text_margin_vertical')
+                        })
+                    }
+                    .alignItems(HorizontalAlign.Start)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+
                     Toggle({
                       type: ToggleType.Switch,
-                      isOn: this.pauseAutoBackupWhenLowBatteryCapacityLevel!!
+                      isOn: this.encryptWebdavBackup!!
                     })
                       .onChange((isOn) => {
-                        this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenLowBatteryCapacityLevel', isOn)
+                        this.dataSettingDataPreferences.putSync('encryptWebdavBackup', isOn)
                         this.dataSettingDataPreferences.flushSync()
                       })
                   }
@@ -1283,20 +1487,18 @@ struct DataBackupRecovery {
                       right: 12
                     })
                   Row() {
-                    Text('系统开启 (超级) 省电模式')
+                    Text('冲突解决模式')
                       .fontWeight(FontWeight.Medium)
                       .layoutWeight(1)
                       .margin({
                         right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                       })
-                    Toggle({
-                      type: ToggleType.Switch,
-                      isOn: this.pauseAutoBackupWhenPowerSave!!
-                    })
-                      .onChange((isOn) => {
-                        this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenPowerSave', isOn)
-                        this.dataSettingDataPreferences.flushSync()
-                      })
+                    Select([
+                      { value: '保留' },
+                      { value: '覆盖' }
+                    ])
+                      .selected(this.index!!)
+                      .value(this.value!!)
                   }
                   .borderRadius(12)
                   .padding(12)
@@ -1305,6 +1507,748 @@ struct DataBackupRecovery {
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                 .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
                 .padding($r('sys.float.ohos_id_corner_radius_mark'))
+              }
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+
+              ListItem() {
+                Column() {
+                  Text('自动备份')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .fontWeight(FontWeight.Medium)
+                    .margin({
+                      bottom: 6,
+                      left: 12,
+                      right: 12
+                    })
+                  Column() {
+                    ForEach(this.typeArray, (item: Type, index) => {
+                      if (index !== 0) {
+                        Divider()
+                          .padding({
+                            left: 12,
+                            right: 12
+                          })
+                      }
+                      Row() {
+                        Text(item.name)
+                          .fontWeight(FontWeight.Medium)
+                          .layoutWeight(1)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                        Toggle({
+                          type: ToggleType.Switch,
+                          isOn: this.autoWebdavBackupTables.includes(item.value)
+                        })
+                          .onChange(async (isOn) => {
+                            let autoWebdavBackupTables: string[] = []
+                            if (!isOn) {
+                              autoWebdavBackupTables =
+                                this.autoWebdavBackupTables.filter(inItem => inItem !== item.value)
+                            }
+                            if (isOn) {
+                              autoWebdavBackupTables = [...this.autoWebdavBackupTables, item.value]
+                            }
+                            this.dataSettingDataPreferences.putSync('autoWebdavBackupTables', autoWebdavBackupTables)
+                            this.dataSettingDataPreferences.flushSync()
+                            await this.getSetting()
+                          })
+                      }
+                      .borderRadius(12)
+                      .padding(12)
+                      .width('100%')
+                    })
+                  }
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
+                }
+                .alignItems(HorizontalAlign.Start)
+              }
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
+
+              ListItem() {
+                Column() {
+                  Text('手动备份')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .fontWeight(FontWeight.Medium)
+                    .margin({
+                      bottom: 6,
+                      left: 12,
+                      right: 12
+                    })
+                  Column() {
+                    Row() {
+                      Text('密码')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === 17 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = 17
+                      }
+                    })
+                    .onClick(async () => {
+                      const webdavServerInfo = await getWebdavServerInfo()
+                      if (!webdavServerInfo.path) {
+                        await promptAction.openToast({
+                          message: '未配置 WebDAV 服务器，无法备份'
+                        })
+                        return
+                      }
+                      this.dialogControllerProgress.open()
+                      const res = await webdavBackupTable(this.context, 'password')
+                      this.dialogControllerProgress.close()
+                      if (res !== 'fail') {
+                        await promptAction.openToast({
+                          message: '备份成功'
+                        })
+                      }
+                    })
+
+                    Divider()
+                      .padding({
+                        left: 12,
+                        right: 12
+                      })
+                    Row() {
+                      Text('常用信息')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === 18 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = 18
+                      }
+                    })
+                    .onClick(async () => {
+                      const webdavServerInfo = await getWebdavServerInfo()
+                      if (!webdavServerInfo.path) {
+                        await promptAction.openToast({
+                          message: '未配置 WebDAV 服务器，无法备份'
+                        })
+                        return
+                      }
+                      this.dialogControllerProgress.open()
+                      const res = await webdavBackupTable(this.context, 'info')
+                      this.dialogControllerProgress.close()
+                      if (res !== 'fail') {
+                        await promptAction.openToast({
+                          message: '备份成功'
+                        })
+                      }
+                    })
+
+                    Divider()
+                      .padding({
+                        left: 12,
+                        right: 12
+                      })
+                    Row() {
+                      Text('标签')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === 19 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = 19
+                      }
+                    })
+                    .onClick(async () => {
+                      const webdavServerInfo = await getWebdavServerInfo()
+                      if (!webdavServerInfo.path) {
+                        await promptAction.openToast({
+                          message: '未配置 WebDAV 服务器，无法备份'
+                        })
+                        return
+                      }
+                      this.dialogControllerProgress.open()
+                      const res = await webdavBackupTable(this.context, 'tag')
+                      this.dialogControllerProgress.close()
+                      if (res !== 'fail') {
+                        await promptAction.openToast({
+                          message: '备份成功'
+                        })
+                      }
+                    })
+                  }
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
+                }
+                .alignItems(HorizontalAlign.Start)
+              }
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
+
+              ListItem() {
+                Column() {
+                  Text('恢复')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .fontWeight(FontWeight.Medium)
+                    .margin({
+                      bottom: 6,
+                      left: 12,
+                      right: 12
+                    })
+                  Column() {
+                    Row() {
+                      Text('密码')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === 20 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = 20
+                      }
+                    })
+                    .onClick(async () => {
+                      const webdavServerInfo = await getWebdavServerInfo()
+                      if (!webdavServerInfo.path) {
+                        await promptAction.openToast({
+                          message: '未配置 WebDAV 服务器，无法恢复'
+                        })
+                        return
+                      }
+                      this.dialogControllerProgress.open()
+                      const filestring = await this.getWebdavBackup('password')
+                      this.dialogControllerProgress.close()
+                      if (filestring !== 'fail') {
+                        let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
+                        if (this.index === 1) {
+                          conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
+                        }
+                        const res = await importPassword(this.context, filestring, conflictResolution)
+                        if (res === 'success') {
+                          await promptAction.openToast({
+                            message: '恢复成功'
+                          })
+                        }
+                      }
+                    })
+
+                    Divider()
+                      .padding({
+                        left: 12,
+                        right: 12
+                      })
+                    Row() {
+                      Text('常用信息')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === 21 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = 21
+                      }
+                    })
+                    .onClick(async () => {
+                      const webdavServerInfo = await getWebdavServerInfo()
+                      if (!webdavServerInfo.path) {
+                        await promptAction.openToast({
+                          message: '未配置 WebDAV 服务器，无法恢复'
+                        })
+                        return
+                      }
+                      this.dialogControllerProgress.open()
+                      const filestring = await this.getWebdavBackup('info')
+                      this.dialogControllerProgress.close()
+                      if (filestring !== 'fail') {
+                        let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
+                        if (this.index === 1) {
+                          conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
+                        }
+                        await importInfo(this.context, filestring, conflictResolution)
+                        await promptAction.openToast({
+                          message: '恢复成功'
+                        })
+                      }
+                    })
+
+                    Divider()
+                      .padding({
+                        left: 12,
+                        right: 12
+                      })
+                    Row() {
+                      Text('标签')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === 22 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = 22
+                      }
+                    })
+                    .onClick(async () => {
+                      const webdavServerInfo = await getWebdavServerInfo()
+                      if (!webdavServerInfo.path) {
+                        await promptAction.openToast({
+                          message: '未配置 WebDAV 服务器，无法恢复'
+                        })
+                        return
+                      }
+                      this.dialogControllerProgress.open()
+                      const filestring = await this.getWebdavBackup('tag')
+                      this.dialogControllerProgress.close()
+                      if (filestring !== 'fail') {
+                        let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
+                        if (this.index === 1) {
+                          conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
+                        }
+                        await importTag(this.context, filestring, conflictResolution)
+                        await promptAction.openToast({
+                          message: '恢复成功'
+                        })
+                      }
+                    })
+                  }
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
+                }
+                .alignItems(HorizontalAlign.Start)
+              }
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
+
+              ListItem() {
+                Column() {
+                  Text('删除备份')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .fontWeight(FontWeight.Medium)
+                    .margin({
+                      bottom: 6,
+                      left: 12,
+                      right: 12
+                    })
+                  Column() {
+                    Row() {
+                      Text('密码')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === 23 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = 23
+                      }
+                    })
+                    .onClick(async () => {
+                      const promptAction = this.UIContext.getPromptAction()
+                      const webdavServerInfo = await getWebdavServerInfo()
+                      if (!webdavServerInfo.path) {
+                        await promptAction.openToast({
+                          message: '未配置 WebDAV 服务器，无法删除'
+                        })
+                        return
+                      }
+                      const data = await promptAction.showDialog({
+                        title: '提示',
+                        message: '删除成功后无法恢复，确定删除？',
+                        buttons: [
+                          {
+                            text: '取消',
+                            color: $r('sys.color.font_primary')
+                          },
+                          {
+                            text: '确定',
+                            color: $r('sys.color.warning')
+                          }
+                        ]
+                      })
+                      if (data.index === 1) {
+                        this.dialogControllerProgress.open()
+                        const res = await this.deleteWebdavBackup('password')
+                        this.dialogControllerProgress.close()
+                        if (res !== 'fail') {
+                          await promptAction.openToast({
+                            message: '删除成功'
+                          })
+                        }
+                      }
+                    })
+
+                    Divider()
+                      .padding({
+                        left: 12,
+                        right: 12
+                      })
+                    Row() {
+                      Text('常用信息')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === 24 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = 24
+                      }
+                    })
+                    .onClick(async () => {
+                      const promptAction = this.UIContext.getPromptAction()
+                      const webdavServerInfo = await getWebdavServerInfo()
+                      if (!webdavServerInfo.path) {
+                        await promptAction.openToast({
+                          message: '未配置 WebDAV 服务器，无法删除'
+                        })
+                        return
+                      }
+                      const data = await promptAction.showDialog({
+                        title: '提示',
+                        message: '删除成功后无法恢复，确定删除？',
+                        buttons: [
+                          {
+                            text: '取消',
+                            color: $r('sys.color.font_primary')
+                          },
+                          {
+                            text: '确定',
+                            color: $r('sys.color.warning')
+                          }
+                        ]
+                      })
+                      if (data.index === 1) {
+                        this.dialogControllerProgress.open()
+                        const res = await this.deleteWebdavBackup('info')
+                        this.dialogControllerProgress.close()
+                        if (res !== 'fail') {
+                          await promptAction.openToast({
+                            message: '删除成功'
+                          })
+                        }
+                      }
+                    })
+
+                    Divider()
+                      .padding({
+                        left: 12,
+                        right: 12
+                      })
+                    Row() {
+                      Text('标签')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Image($r('app.media.right'))
+                        .fillColor($r('sys.color.icon_fourth'))
+                        .height(12)
+                        .width(12)
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .stateStyles({
+                      normal: {
+                        .backgroundColor(this.hoverId === 25 ? $r('sys.color.interactive_hover') :
+                          $r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      pressed: {
+                        .backgroundColor($r('sys.color.interactive_pressed'))
+                      }
+                    })
+                    .width('100%')
+                    .onHover((isHover) => {
+                      if (!isHover) {
+                        this.hoverId = -1
+                      }
+                      if (isHover) {
+                        this.hoverId = 25
+                      }
+                    })
+                    .onClick(async () => {
+                      const promptAction = this.UIContext.getPromptAction()
+                      const webdavServerInfo = await getWebdavServerInfo()
+                      if (!webdavServerInfo.path) {
+                        await promptAction.openToast({
+                          message: '未配置 WebDAV 服务器，无法删除'
+                        })
+                        return
+                      }
+                      const data = await promptAction.showDialog({
+                        title: '提示',
+                        message: '删除成功后无法恢复，确定删除？',
+                        buttons: [
+                          {
+                            text: '取消',
+                            color: $r('sys.color.font_primary')
+                          },
+                          {
+                            text: '确定',
+                            color: $r('sys.color.warning')
+                          }
+                        ]
+                      })
+                      if (data.index === 1) {
+                        this.dialogControllerProgress.open()
+                        const res = await this.deleteWebdavBackup('tag')
+                        this.dialogControllerProgress.close()
+                        if (res !== 'fail') {
+                          await promptAction.openToast({
+                            message: '删除成功'
+                          })
+                        }
+                      }
+                    })
+                  }
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
+                }
+                .alignItems(HorizontalAlign.Start)
+              }
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
+            }
+            if (this.selectedIndex === 3) {
+              ListItem() {
+                Column() {
+                  Text('暂停自动备份')
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                    .fontWeight(FontWeight.Medium)
+                    .margin({
+                      bottom: 6,
+                      left: 12,
+                      right: 12
+                    })
+                  Column() {
+                    Row() {
+                      Text('电池电量低')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Toggle({
+                        type: ToggleType.Switch,
+                        isOn: this.pauseAutoBackupWhenLowBatteryCapacityLevel!!
+                      })
+                        .onChange((isOn) => {
+                          this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenLowBatteryCapacityLevel', isOn)
+                          this.dataSettingDataPreferences.flushSync()
+                        })
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .width('100%')
+
+                    Divider()
+                      .padding({
+                        left: 12,
+                        right: 12
+                      })
+                    Row() {
+                      Text('系统开启 (超级) 省电模式')
+                        .fontWeight(FontWeight.Medium)
+                        .layoutWeight(1)
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                      Toggle({
+                        type: ToggleType.Switch,
+                        isOn: this.pauseAutoBackupWhenPowerSave!!
+                      })
+                        .onChange((isOn) => {
+                          this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenPowerSave', isOn)
+                          this.dataSettingDataPreferences.flushSync()
+                        })
+                    }
+                    .borderRadius(12)
+                    .padding(12)
+                    .width('100%')
+                  }
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
+                }
+                .alignItems(HorizontalAlign.Start)
               }
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -1321,9 +2265,15 @@ struct DataBackupRecovery {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('数据备份与恢复')
-    .onAppear(() => {
-      this.getSetting()
+    .title('数据备份与恢复', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
+    .onReady(async (context) => {
+      this.pageInfos = context.pathStack
+      this.context.eventHub.on('refreshDataBackupRecovery', async () => {
+        await this.getSetting()
+      })
+      await this.getSetting()
     })
   }
 }

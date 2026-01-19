@@ -1,8 +1,13 @@
 import { preferences, relationalStore } from '@kit.ArkData'
+import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
 import { batteryInfo, power } from '@kit.BasicServicesKit'
+import { distributedDeviceManager } from '@kit.DistributedServiceKit'
+import { rcp } from '@kit.RemoteCommunicationKit'
+import { encrypt, EncryptData, getKey } from './Crypto'
 import { getInfoList, getPasswordList, getTagList } from './Dataget'
 import { write } from './File'
+import { getWebdavServerInfo } from './Webdavserver'
 import { InfoOutItem, PasswordOutItem, TagOutItem } from '../pages/DataInOut'
 
 interface Item {
@@ -45,7 +50,7 @@ export async function syncTable(context: Context, table: string, networkId: stri
   }
 }
 
-export async function autoSyncTable(context: Context, table: string) {
+export async function autoSyncTable(context: Context, table: string, fromDeviceId?: string) {
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
   })
@@ -68,8 +73,12 @@ export async function autoSyncTable(context: Context, table: string) {
   const autoSyncTables = dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
   if (autoSyncTables.includes(table)) {
     const autoSyncDevices: Item[] = dataSettingDataPreferences.getSync('autoSyncDevices', []) as Item[]
+    const devices =
+      distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo').getAvailableDeviceListSync()
     const promises = autoSyncDevices.map(async (item) => {
-      await syncTable(context, table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+      if (!devices.find(item => item.deviceId === fromDeviceId)) {
+        await syncTable(context, table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+      }
     })
     await Promise.all(promises)
   }
@@ -128,6 +137,194 @@ export async function backupTable(context: Context, table: string) {
   dataSettingDataPreferences.flushSync()
 }
 
+async function getFileBackupString(context: Context, table: string, encrypted: boolean): Promise<string> {
+  if (table === 'password') {
+    const array = await getPasswordList(context)
+    if (array.length > 0) {
+      const arrayOut = array.map((item): PasswordOutItem => {
+        let cloudBackupTime = JSON.stringify([])
+        if (typeof (item.cloudBackupTime) === 'string') {
+          cloudBackupTime = item.cloudBackupTime
+        }
+        return {
+          id: item.id,
+          name: item.name,
+          info: item.info,
+          tag: item.tag.map(item => item.value),
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }
+      })
+      if (!encrypted) {
+        return JSON.stringify({
+          encrypted: false,
+          data: arrayOut
+        })
+      }
+      if (encrypted) {
+        const encryptedArray: EncryptData[] = []
+        const promises = arrayOut.map(async (item: PasswordOutItem) => {
+          const res = await encrypt(JSON.stringify(item))
+          encryptedArray.push({
+            content: res.content,
+            iv: res.iv
+          })
+        })
+        await Promise.all(promises)
+        return JSON.stringify({
+          encrypted: true,
+          data: encryptedArray
+        })
+      }
+    }
+  }
+  if (table === 'info') {
+    const array = await getInfoList(context)
+    if (array.length > 0) {
+      const arrayOut = array.map((item): InfoOutItem => {
+        let cloudBackupTime = JSON.stringify([])
+        if (typeof (item.cloudBackupTime) === 'string') {
+          cloudBackupTime = item.cloudBackupTime
+        }
+        return {
+          id: item.id,
+          type: item.type,
+          value: item.value,
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }
+      })
+      if (!encrypted) {
+        return JSON.stringify({
+          encrypted: false,
+          data: arrayOut
+        })
+      }
+      if (encrypted) {
+        const encryptedArray: EncryptData[] = []
+        const promises = arrayOut.map(async (item: InfoOutItem) => {
+          const res = await encrypt(JSON.stringify(item))
+          encryptedArray.push({
+            content: res.content,
+            iv: res.iv
+          })
+        })
+        await Promise.all(promises)
+        return JSON.stringify({
+          encrypted: true,
+          data: encryptedArray
+        })
+      }
+    }
+  }
+  if (table === 'tag') {
+    const array = await getTagList(context)
+    if (array.length > 0) {
+      const arrayOut = array.map((item): TagOutItem => {
+        let cloudBackupTime = JSON.stringify([])
+        if (typeof (item.cloudBackupTime) === 'string') {
+          cloudBackupTime = item.cloudBackupTime
+        }
+        return {
+          id: item.id,
+          value: item.value,
+          color: item.color,
+          updateTime: item.updateTime,
+          cloudBackupTime: cloudBackupTime
+        }
+      })
+      if (!encrypted) {
+        return JSON.stringify({
+          encrypted: false,
+          data: arrayOut
+        })
+      }
+      if (encrypted) {
+        const encryptedArray: EncryptData[] = []
+        const promises = arrayOut.map(async (item: TagOutItem) => {
+          const res = await encrypt(JSON.stringify(item))
+          encryptedArray.push({
+            content: res.content,
+            iv: res.iv
+          })
+        })
+        await Promise.all(promises)
+        return JSON.stringify({
+          encrypted: true,
+          data: encryptedArray
+        })
+      }
+    }
+  }
+  return 'fail'
+}
+
+export async function fileBackupTable(context: Context, table: string) {
+  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
+    name: 'dataSetting'
+  })
+  const encryptFileBackup = dataSettingDataPreferences.getSync('encryptFileBackup', true)
+  let encrypted = false
+  if (encryptFileBackup && getKey()) {
+    encrypted = true
+  }
+  const datastring = await getFileBackupString(context, table, encrypted)
+  if (datastring !== 'fail') {
+    await write(context.filesDir + '/backup/' + table + '.txt', datastring)
+  }
+}
+
+export async function webdavBackupTable(context: Context, table: string) {
+  const webdavServerInfo = await getWebdavServerInfo()
+  if (!webdavServerInfo.path) {
+    return 'fail'
+  }
+  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
+    name: 'dataSetting'
+  })
+  const encryptWebdavBackup = dataSettingDataPreferences.getSync('encryptWebdavBackup', true)
+  let encrypted = false
+  if (encryptWebdavBackup && getKey()) {
+    encrypted = true
+  }
+  const datastring = await getFileBackupString(context, table, encrypted)
+  if (datastring !== 'fail') {
+    const session = rcp.createSession({
+      requestConfiguration: {
+        security: {
+          tlsRange: {
+            min: 'TlsV1.2'
+          }
+        }
+      },
+      headers: {
+        Authorization: 'Basic ' +
+        new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
+        webdavServerInfo.password))
+      }
+    })
+    try {
+      const response = await session.put(webdavServerInfo.path + '/' + table + '.txt', datastring)
+      session.close()
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return 'success'
+      } else {
+        await promptAction.openToast({
+          message: '请求失败，错误码：' + response.statusCode
+        })
+        return 'fail'
+      }
+    } catch (err) {
+      session.close()
+      await promptAction.openToast({
+        message: '发生错误，错误码：' + err.code
+      })
+      return 'fail'
+    }
+  }
+  return 'success'
+}
+
 export async function autoBackupTable(context: Context, table: string) {
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
@@ -156,64 +353,12 @@ export async function autoBackupTable(context: Context, table: string) {
   const autoFileBackupTables =
     dataSettingDataPreferences.getSync('autoFileBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoFileBackupTables.includes(table)) {
-    if (table === 'password') {
-      const array = await getPasswordList(context)
-      if (array.length > 0) {
-        const arrayOut = array.map((item): PasswordOutItem => {
-          let cloudBackupTime = JSON.stringify([])
-          if (typeof (item.cloudBackupTime) === 'string') {
-            cloudBackupTime = item.cloudBackupTime
-          }
-          return {
-            id: item.id,
-            name: item.name,
-            info: item.info,
-            tag: item.tag.map(item => item.value),
-            updateTime: item.updateTime,
-            cloudBackupTime: cloudBackupTime
-          }
-        })
-        await write(context.filesDir + '/backup/password.txt', JSON.stringify(arrayOut))
-      }
-    }
-    if (table === 'info') {
-      const array = await getInfoList(context)
-      if (array.length > 0) {
-        const arrayOut = array.map((item): InfoOutItem => {
-          let cloudBackupTime = JSON.stringify([])
-          if (typeof (item.cloudBackupTime) === 'string') {
-            cloudBackupTime = item.cloudBackupTime
-          }
-          return {
-            id: item.id,
-            type: item.type,
-            value: item.value,
-            updateTime: item.updateTime,
-            cloudBackupTime: cloudBackupTime
-          }
-        })
-        await write(context.filesDir + '/backup/info.txt', JSON.stringify(arrayOut))
-      }
-    }
-    if (table === 'tag') {
-      const array = await getTagList(context)
-      if (array.length > 0) {
-        const arrayOut = array.map((item): TagOutItem => {
-          let cloudBackupTime = JSON.stringify([])
-          if (typeof (item.cloudBackupTime) === 'string') {
-            cloudBackupTime = item.cloudBackupTime
-          }
-          return {
-            id: item.id,
-            value: item.value,
-            color: item.color,
-            updateTime: item.updateTime,
-            cloudBackupTime: cloudBackupTime
-          }
-        })
-        await write(context.filesDir + '/backup/tag.txt', JSON.stringify(arrayOut))
-      }
-    }
+    await fileBackupTable(context, table)
+  }
+  const autoWebdavBackupTables =
+    dataSettingDataPreferences.getSync('autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
+  if (autoWebdavBackupTables.includes(table)) {
+    await webdavBackupTable(context, table)
   }
 }
 

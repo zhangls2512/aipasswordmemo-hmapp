@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import request from '../common/Request'
 
 @Builder
@@ -110,7 +110,7 @@ struct Feedback {
                 dialogControllerProgress.open()
                 const res = await request(this.context, '/product/sendFeedbackEmail', {
                   product: 'password',
-                  version: '2.0.7.3',
+                  version: '2.0.8.0',
                   content: this.content,
                   contactType: this.contactType,
                   contactValue: this.contactValue
@@ -147,7 +147,9 @@ struct Feedback {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('意见反馈')
+    .title('意见反馈', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady((context) => {
       this.pageInfos = context.pathStack
     })

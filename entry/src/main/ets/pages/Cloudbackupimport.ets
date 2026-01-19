@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
 import { getKey } from '../common/Crypto'
 
@@ -188,7 +188,7 @@ struct Cloudbackupimport {
                   const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: '导入失败',
-                    message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
+                    message: '未导入密钥。请前往“我的”>“设置”>“密钥”导入密钥',
                     buttons: [
                       {
                         text: '确定',
@@ -255,7 +255,7 @@ struct Cloudbackupimport {
                   const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: '导入失败',
-                    message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
+                    message: '未导入密钥。请前往“我的”>“设置”>“密钥”导入密钥',
                     buttons: [
                       {
                         text: '确定',
@@ -322,7 +322,7 @@ struct Cloudbackupimport {
                   const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: '导入失败',
-                    message: '未导入密钥。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥',
+                    message: '未导入密钥。请前往“我的”>“设置”>“密钥”导入密钥',
                     buttons: [
                       {
                         text: '确定',
@@ -364,7 +364,9 @@ struct Cloudbackupimport {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('导入云备份')
+    .title('导入云备份', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onAppear(() => {
       this.getSetting()
     })

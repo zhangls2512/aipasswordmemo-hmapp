@@ -1,15 +1,10 @@
-import { relationalStore } from '@kit.ArkData'
+import { preferences, relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getAccountAccessToken, getAccountInfo } from './Accesstoken'
 import { encrypt } from './Crypto'
-import { CloudBackupTimeItem } from './Dataget'
+import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
 import request from './Request'
 import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
-
-interface PasswordInfoItem {
-  type: string,
-  value: string
-}
 
 interface PasswordInput {
   name: string,
@@ -36,6 +31,77 @@ interface CloudBackupItem {
   content?: string
 }
 
+function getNewInfo(context: Context, oldInfo: PasswordInfoItem[], newInfo: PasswordInfoItem[], updateTime: number) {
+  const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
+    name: 'commonSetting'
+  })
+  const storeValueHistoryPasswordInfoTypeArray =
+    commonSettingDataPreferences.getSync('storeValueHistoryPasswordInfoType', ['密码']) as string[]
+  return newInfo.map((newItem): PasswordInfoItem => {
+    if (!storeValueHistoryPasswordInfoTypeArray.includes(newItem.type)) {
+      return {
+        type: newItem.type,
+        value: newItem.value
+      }
+    }
+    const oldItem = oldInfo.find(oldItem => oldItem.type === newItem.type)
+    if (oldItem) {
+      if (oldItem.value !== newItem.value) {
+        let history = oldItem.history
+        if (history) {
+          history.unshift({
+            value: newItem.value,
+            updateTime: updateTime
+          })
+        }
+        if (!history) {
+          history = [
+            {
+              value: newItem.value,
+              updateTime: updateTime
+            },
+            {
+              value: oldItem.value,
+              updateTime: NaN
+            }
+          ]
+        }
+        if (history.length > 11) {
+          history.splice(11)
+        }
+        return {
+          type: newItem.type,
+          value: newItem.value,
+          history: history
+        }
+      }
+      if (!oldItem.history) {
+        return {
+          type: oldItem.type,
+          value: oldItem.value
+        }
+      }
+      if (oldItem.history) {
+        return {
+          type: oldItem.type,
+          value: oldItem.value,
+          history: oldItem.history
+        }
+      }
+    }
+    return {
+      type: newItem.type,
+      value: newItem.value,
+      history: [
+        {
+          value: newItem.value,
+          updateTime: updateTime
+        }
+      ]
+    }
+  })
+}
+
 export async function newPassword(context: Context, data: PasswordInput) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'password',
@@ -52,7 +118,18 @@ export async function newPassword(context: Context, data: PasswordInput) {
   const updateTime = Date.now()
   const id = rdbStore.insertSync('password', {
     name: data.name,
-    info: JSON.stringify(data.info),
+    info: JSON.stringify(data.info.map((item): PasswordInfoItem => {
+      return {
+        type: item.type,
+        value: item.value,
+        history: [
+          {
+            value: item.value,
+            updateTime: updateTime
+          }
+        ]
+      }
+    })),
     tag: JSON.stringify(data.tag),
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
@@ -108,17 +185,20 @@ export async function updatePassword(context: Context, id: number, data: Passwor
   predicates.equalTo('id', id)
   const updateTime = Date.now()
   const resultSet = await rdbStore.query(predicates)
+  let info: PasswordInfoItem[] = []
   let cloudBackupTime = JSON.stringify([])
   if (resultSet.goToNextRow()) {
+    info = JSON.parse(resultSet.getValue(resultSet.getColumnIndex('info')) as string)
     const oldCloudBackupTime = resultSet.getValue(resultSet.getColumnIndex('cloudBackupTime')) as string | number
     resultSet.close()
     if (typeof (oldCloudBackupTime) === 'string') {
       cloudBackupTime = oldCloudBackupTime
     }
   }
+  info = getNewInfo(context, info, data.info, updateTime)
   rdbStore.updateSync({
     name: data.name,
-    info: JSON.stringify(data.info),
+    info: JSON.stringify(info),
     tag: JSON.stringify(data.tag),
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
@@ -127,7 +207,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
   predicatesb.equalTo('id', String(id))
   huaweiCloudSyncRdbStore.updateSync({
     name: data.name,
-    info: JSON.stringify(data.info),
+    info: JSON.stringify(info),
     tag: JSON.stringify(data.tag),
     updateTime: updateTime,
     cloudBackupTime: cloudBackupTime
@@ -156,7 +236,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
       id: id,
       content: JSON.stringify({
         name: data.name,
-        info: JSON.stringify(data.info),
+        info: JSON.stringify(info),
         tag: JSON.stringify(data.tag),
         updateTime: updateTime,
         cloudBackupTime: JSON.stringify(cloudBackupTimeArray)

@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { cloudData, preferences, relationalStore, uniformTypeDescriptor } from '@kit.ArkData'
-import { LoadingDialog, promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
 import { deviceInfo, zlib } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
@@ -2015,7 +2015,9 @@ struct Tablesync {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('设备间数据同步')
+    .title('设备间数据同步', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onAppear(async () => {
       this.getSetting()
       const res = await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')

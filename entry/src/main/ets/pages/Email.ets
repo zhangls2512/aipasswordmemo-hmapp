@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { getAccountAccessToken, getAccountInfo, removeAccount, setAccount } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -184,7 +184,9 @@ struct Email {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('绑定邮箱')
+    .title('绑定邮箱', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady((context) => {
       this.pageInfos = context.pathStack
     })

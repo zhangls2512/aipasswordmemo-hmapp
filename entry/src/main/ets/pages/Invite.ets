@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { uniformTypeDescriptor } from '@kit.ArkData'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
@@ -318,7 +318,9 @@ struct Invite {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('邀请新用户，免费得会员')
+    .title('邀请新用户，免费得会员', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.accessToken = await getAccountAccessToken()

@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -122,7 +122,9 @@ struct Vipcode {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('兑换会员')
+    .title('兑换会员', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady((context) => {
       this.pageInfos = context.pathStack
     })

@@ -1,7 +1,7 @@
 import { common, ConfigurationConstant } from '@kit.AbilityKit'
 import { appInfoManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
-import { uiAppearance, window } from '@kit.ArkUI'
+import { LengthMetrics, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
@@ -712,7 +712,7 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
-                Text('首页显示密码')
+                Text('首页显示密码、MFA')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
@@ -805,7 +805,7 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
-                Text('默认隐藏内容密码信息类型')
+                Text('记录内容历史记录密码信息类型')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({
@@ -834,6 +834,49 @@ struct Commonsetting {
                 }
                 if (isHover) {
                   this.hoverId = 3
+                }
+              })
+              .onClick(() => {
+                this.pageInfos.pushPath({
+                  name: 'Storevaluehistorypasswordinfotype'
+                })
+              })
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('默认隐藏内容密码信息类型')
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Image($r('app.media.right'))
+                  .fillColor($r('sys.color.icon_fourth'))
+                  .height(12)
+                  .width(12)
+              }
+              .borderRadius(12)
+              .padding(12)
+              .stateStyles({
+                normal: {
+                  .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
+                    $r('sys.color.ohos_id_color_card_bg'))
+                },
+                pressed: {
+                  .backgroundColor($r('sys.color.interactive_pressed'))
+                }
+              })
+              .width('100%')
+              .onHover((isHover) => {
+                if (!isHover) {
+                  this.hoverId = -1
+                }
+                if (isHover) {
+                  this.hoverId = 4
                 }
               })
               .onClick(() => {
@@ -1058,7 +1101,9 @@ struct Commonsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('通用')
+    .title('通用', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       const iconMode = this.commonSettingDataPreferences.getSync('iconMode', 1)
@@ -1108,7 +1153,7 @@ struct Commonsetting {
         this.mfaSecondsRemainingStyleValue = '数字'
       }
       this.showMfaInFloatingBall = this.commonSettingDataPreferences.getSync('showMfaInFloatingBall', false) as boolean
-      this.pushItemWhenBlur = this.commonSettingDataPreferences.getSync('pushItemWhenBlur', false) as boolean
+      this.pushItemWhenBlur = this.commonSettingDataPreferences.getSync('pushItemWhenBlur', true) as boolean
       const checkVersionUpdate = this.commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
       this.checkVersionUpdateIndex = checkVersionUpdate as number
       if (checkVersionUpdate === 0) {
