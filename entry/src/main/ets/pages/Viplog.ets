@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction } from '@kit.ArkUI'
+import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
@@ -220,7 +220,9 @@ struct Viplog {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('会员开通记录')
+    .title('会员开通记录', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {

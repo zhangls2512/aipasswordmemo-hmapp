@@ -1,5 +1,5 @@
 import { preferences } from '@kit.ArkData'
-import { promptAction } from '@kit.ArkUI'
+import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { webview } from '@kit.ArkWeb'
 
 @Builder
@@ -30,6 +30,9 @@ struct Webview {
         .enableDataDetector(true)
         .enableNativeEmbedMode(true)
         .geolocationAccess(false)
+        .margin({
+          bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed')
+        })
         .nestedScroll({
           scrollForward: NestedScrollMode.SELF_ONLY,
           scrollBackward: NestedScrollMode.SELF_ONLY
@@ -53,7 +56,9 @@ struct Webview {
         })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title(this.title)
+    .title(this.title, {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady((context) => {
       this.url = context.pathInfo.param as string
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {

@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit'
+import { LengthMetrics } from '@kit.ArkUI'
 import openLink from '../common/Openlink'
 
 @Builder
@@ -44,6 +45,8 @@ struct Reward {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('获得奖项')
+    .title('获得奖项', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
   }
 }

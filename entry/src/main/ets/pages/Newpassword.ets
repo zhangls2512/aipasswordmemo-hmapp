@@ -42,7 +42,7 @@ export default struct Newpassword {
   @Local passwordTag: string = ''
   @Local tagArray: Tag[] = []
   @Local autoNewInfo: boolean = false
-  @Local autoNewTag: boolean = false
+  @Local autoNewTag: boolean = true
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
@@ -1150,7 +1150,7 @@ export default struct Newpassword {
       const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
         name: 'commonSetting'
       })
-      this.pushItemWhenBlur = commonSettingDataPreferences.getSync('pushItemWhenBlur', false) as boolean
+      this.pushItemWhenBlur = commonSettingDataPreferences.getSync('pushItemWhenBlur', true) as boolean
       const oftenUsedInfoType =
         commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码', 'MFA', '图标']) as string[]
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
@@ -1158,7 +1158,7 @@ export default struct Newpassword {
       if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
         this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
       }
-      this.tagArray = await getTagList(this.context)
+      this.tagArray = await getTagList(this.context, 'value')
       const res = await getCloudServiceStatus(this.context)
       const key = getKey()
       if (!res) {
@@ -1166,7 +1166,7 @@ export default struct Newpassword {
       }
       if (res) {
         if (!key) {
-          this.alertText = '未导入密钥，云备份不可用。请前往“我的”>“设置”>“云备份”>“密钥”导入密钥'
+          this.alertText = '未导入密钥，云备份不可用。请前往“我的”>“设置”>“密钥”导入密钥'
         }
         if (key) {
           this.allowCloudBackup = true

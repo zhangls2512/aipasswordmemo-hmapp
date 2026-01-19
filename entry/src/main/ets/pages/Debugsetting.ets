@@ -1,6 +1,6 @@
 import { appRecovery, common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { promptAction } from '@kit.ArkUI'
+import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { webview } from '@kit.ArkWeb'
 import { batteryInfo, deviceInfo } from '@kit.BasicServicesKit'
 
@@ -1181,7 +1181,9 @@ struct Debugsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('调试设置')
+    .title('调试设置', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady((context) => {
       this.pageInfos = context.pathStack
       this.getSetting()

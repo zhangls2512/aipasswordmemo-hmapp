@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { pushService } from '@kit.PushKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
@@ -1184,7 +1184,9 @@ struct Infolist {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('已收集个人信息清单')
+    .title('已收集个人信息清单', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.accessToken = await getAccountAccessToken()

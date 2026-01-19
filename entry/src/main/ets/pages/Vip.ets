@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction } from '@kit.ArkUI'
+import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { netBoost } from '@kit.NetworkBoostKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
@@ -529,7 +529,9 @@ export default struct Vip {
     .padding({
       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
     })
-    .title('会员中心')
+    .title('会员中心', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .titleMode(NavigationTitleMode.Mini)
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()

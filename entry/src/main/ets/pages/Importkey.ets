@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { promptAction, window } from '@kit.ArkUI'
+import { LengthMetrics, promptAction, window } from '@kit.ArkUI'
 import { setCustomKey } from '../common/Crypto'
 
 @Builder
@@ -58,7 +58,9 @@ struct Importkey {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('导入自定义密钥')
+    .title('导入自定义密钥', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady((context) => {
       this.pageInfos = context.pathStack
     })

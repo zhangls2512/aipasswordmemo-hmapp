@@ -116,16 +116,17 @@ export async function getOldPasswordList(context: Context) {
   const idIndex = resultSet.getColumnIndex('id')
   const nameIndex = resultSet.getColumnIndex('name')
   const infoIndex = resultSet.getColumnIndex('info')
-  const updateTimeIndex = resultSet.getColumnIndex('updateTime')
   const array: ListItem[] = []
   while (resultSet.goToNextRow()) {
     const infoArray = JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[]
-    const updateTime = resultSet.getValue(updateTimeIndex) as number
-    if (infoArray.find(item => item.type === '密码') && updateTime < Date.now() - 31536000000) {
-      array.push({
-        id: resultSet.getValue(idIndex) as number,
-        name: resultSet.getValue(nameIndex) as string
-      })
+    const passwordInfoItem = infoArray.find(item => item.type === '密码')
+    if (passwordInfoItem && passwordInfoItem.history) {
+      if (passwordInfoItem.history[0].updateTime < Date.now() - 31536000000) {
+        array.push({
+          id: resultSet.getValue(idIndex) as number,
+          name: resultSet.getValue(nameIndex) as string
+        })
+      }
     }
   }
   resultSet.close()

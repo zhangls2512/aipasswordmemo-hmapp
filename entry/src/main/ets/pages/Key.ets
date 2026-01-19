@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
-import { window } from '@kit.ArkUI'
+import { LengthMetrics, window } from '@kit.ArkUI'
 import { getKey, removeKey, setRandomKey } from '../common/Crypto'
 import copy from '../common/Pasteboard'
 
@@ -64,7 +64,7 @@ struct Keypage {
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
               .padding($r('sys.float.ohos_id_corner_radius_mark'))
 
-              Text('建议点击上方密钥内容将其复制到剪贴板并妥善备份，防止其丢失导致无法解密使用其加密的云备份数据。')
+              Text('建议点击上方密钥内容将其复制到剪贴板并妥善备份，防止其丢失导致无法解密使用其加密的数据。')
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize($r('sys.float.ohos_id_text_size_body3'))
                 .margin({
@@ -144,7 +144,7 @@ struct Keypage {
               if (this.keyValue) {
                 const confirm = await promptAction.showDialog({
                   title: '提示',
-                  message: '导入成功后新密钥将覆盖当前密钥，当前密钥无法恢复，需重新导入当前密钥才可解密使用当前密钥加密的云备份数据，确定导入？',
+                  message: '导入成功后新密钥将覆盖当前密钥，当前密钥无法恢复，需重新导入当前密钥才可解密使用当前密钥加密的数据，确定导入？',
                   buttons: [
                     {
                       text: '取消',
@@ -226,7 +226,7 @@ struct Keypage {
                 const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showDialog({
                   title: '提示',
-                  message: '删除成功后无法恢复，需重新导入此密钥才可解密使用此密钥加密的云备份数据，确定删除？',
+                  message: '删除成功后无法恢复，需重新导入此密钥才可解密使用此密钥加密的数据，确定删除？',
                   buttons: [
                     {
                       text: '取消',
@@ -260,7 +260,9 @@ struct Keypage {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('密钥')
+    .title('密钥', {
+      paddingEnd: LengthMetrics.vp(60)
+    })
     .onReady((context) => {
       this.pageInfos = context.pathStack
       this.keyValue = getKey()

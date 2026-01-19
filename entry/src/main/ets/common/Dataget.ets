@@ -9,7 +9,13 @@ export interface CloudBackupTimeItem {
 
 export interface PasswordInfoItem {
   type: string,
-  value: string
+  value: string,
+  history?: PasswordInfoTypeValueHistoryItem[]
+}
+
+interface PasswordInfoTypeValueHistoryItem {
+  value: string,
+  updateTime: number
 }
 
 export interface PasswordTagItem {
@@ -392,6 +398,7 @@ export async function getTypeInfoList(context: Context, type: string) {
     })
     const predicates = new relationalStore.RdbPredicates('info')
     predicates.equalTo('type', type)
+    predicates.orderByAsc('value')
     const resultSet = await rdbStore.query(predicates)
     const valueIndex = resultSet.getColumnIndex('value')
     const array: string[] = []

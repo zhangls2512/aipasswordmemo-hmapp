@@ -20,11 +20,17 @@ import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
 import PasswordInfo from './Passwordinfo'
 import UpdatePassword from './Updatepassword'
+import getTotp from '../common/Totp'
 
 interface Data {
   nameKeyword: string,
   info: PasswordInfoItem[],
   tag: string[]
+}
+
+interface MfaItem {
+  id: number,
+  mfa: string
 }
 
 @ComponentV2
@@ -48,6 +54,7 @@ export default struct PasswordPage {
   @Local multipleSelectArray: Password[] = []
   @Local hoverId: number = -1
   @Local buttonHoverId: number = -1
+  @Local mfaArray: MfaItem[] = []
   @Local quickBarPasswordArray: number[] = []
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
@@ -690,19 +697,35 @@ export default struct PasswordPage {
                       Text(item.name)
                         .enableAutoSpacing(true)
                         .fontWeight(FontWeight.Bold)
-                      if (this.showPassword && item.info.find(infoItem => infoItem.type === '密码')) {
-                        Row() {
-                          Text('密码')
-                            .fontWeight(FontWeight.Medium)
-                            .margin({
-                              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                            })
-                          Text(item.info.find(infoItem => infoItem.type === '密码')?.value)
-                            .copyOption(CopyOptions.LocalDevice)
+                      if (this.showPassword) {
+                        if (item.info.find(infoItem => infoItem.type === '密码')) {
+                          Row() {
+                            Text('密码')
+                              .fontWeight(FontWeight.Medium)
+                              .margin({
+                                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                              })
+                            Text(item.info.find(infoItem => infoItem.type === '密码')?.value)
+                              .copyOption(CopyOptions.LocalDevice)
+                          }
+                          .margin({
+                            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                          })
                         }
-                        .margin({
-                          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                        })
+                        if (item.info.find(infoItem => infoItem.type === 'MFA')) {
+                          Row() {
+                            Text('MFA')
+                              .fontWeight(FontWeight.Medium)
+                              .margin({
+                                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                              })
+                            Text(this.mfaArray.find(mfaItem => mfaItem.id === item.id)?.mfa)
+                              .copyOption(CopyOptions.LocalDevice)
+                          }
+                          .margin({
+                            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                          })
+                        }
                       }
                       if (item.tag.length > 0 && !this.hideTag) {
                         Flex({
@@ -865,6 +888,24 @@ export default struct PasswordPage {
         this.passwordId = passwordId
         this.isShowInfoSheet = true
       })
+      setInterval(async () => {
+        const mfaArray: MfaItem[] = []
+        const promises = this.passwordArray.map(async (item) => {
+          const mfaInfo = item.info.find(infoItem => infoItem.type === 'MFA')
+          if (mfaInfo) {
+            const mfaInfoArray = mfaInfo.value.split('\0')
+            const res = await getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
+            if (res.value !== 'fail') {
+              mfaArray.push({
+                id: item.id,
+                mfa: res.value
+              })
+            }
+          }
+        })
+        await Promise.all(promises)
+        this.mfaArray = mfaArray
+      }, 500)
       this.loading = true
       const cloudServiceStatus = await getCloudServiceStatus(this.context)
       if (cloudServiceStatus && getKey()) {

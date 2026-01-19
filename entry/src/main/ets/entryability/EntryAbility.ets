@@ -491,10 +491,10 @@ export default class EntryAbility extends UIAbility {
           }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
         resultSet.close()
+        await autoSyncTable(this.context, 'password', item)
       })
       await Promise.all(promises)
       this.context.eventHub.emit('refreshPassword')
-      await autoSyncTable(this.context, 'password')
       await autoBackupTable(this.context, 'password')
       await autoHuaweiCloudSyncTable(this.context, 'password')
     })
@@ -525,10 +525,10 @@ export default class EntryAbility extends UIAbility {
           }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
         resultSet.close()
+        await autoSyncTable(this.context, 'info', item)
       })
       await Promise.all(promises)
       this.context.eventHub.emit('refreshInfo')
-      await autoSyncTable(this.context, 'info')
       await autoBackupTable(this.context, 'info')
       await autoHuaweiCloudSyncTable(this.context, 'info')
     })
@@ -559,10 +559,10 @@ export default class EntryAbility extends UIAbility {
           }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
         resultSet.close()
+        await autoSyncTable(this.context, 'tag', item)
       })
       await Promise.all(promises)
       this.context.eventHub.emit('refreshTag')
-      await autoSyncTable(this.context, 'tag')
       await autoBackupTable(this.context, 'tag')
       await autoHuaweiCloudSyncTable(this.context, 'tag')
     })
@@ -893,6 +893,40 @@ export default class EntryAbility extends UIAbility {
     return statusBarExist
   }
 
+  async onConfigurationUpdate() {
+    const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
+      name: 'commonSetting'
+    })
+    const iconMode = commonSettingDataPreferences.getSync('iconMode', 1)
+    const colorMode = commonSettingDataPreferences.getSync('colorMode', 0)
+    try {
+      if (iconMode === 0) {
+        if (colorMode === 0) {
+          const systemColorMode = uiAppearance.getDarkMode()
+          if (systemColorMode === 0) {
+            await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+          }
+          if (systemColorMode === 1) {
+            await appInfoManager.disableDynamicIcon()
+          }
+        }
+        if (colorMode === 1) {
+          await appInfoManager.disableDynamicIcon()
+        }
+        if (colorMode === 2) {
+          await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+        }
+      }
+      if (iconMode === 1) {
+        await appInfoManager.disableDynamicIcon()
+      }
+      if (iconMode === 2) {
+        await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+      }
+    } catch {
+    }
+  }
+
   onBackPressed() {
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
       name: 'commonSetting'
@@ -906,7 +940,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 45) {
+    if (wantParam.version !== 46) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })
