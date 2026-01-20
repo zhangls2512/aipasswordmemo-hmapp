@@ -103,6 +103,8 @@ export default struct Ainewinfo {
               const textrecognitionres = await textRecognition.recognizeText({
                 pixelMap: imagePixelMap
               })
+              await imagePixelMap.release()
+              await imageSource.release()
               this.dialogControllerProgress.close()
               this.text = textrecognitionres.value
               await textRecognition.release()
@@ -130,6 +132,8 @@ export default struct Ainewinfo {
               const textrecognitionres = await textRecognition.recognizeText({
                 pixelMap: imagePixelMap
               })
+              await imagePixelMap.release()
+              await imageSource.release()
               this.dialogControllerProgress.close()
               this.text = textrecognitionres.value
               await textRecognition.release()
@@ -181,6 +185,8 @@ export default struct Ainewinfo {
                 const textrecognitionres = await textRecognition.recognizeText({
                   pixelMap: imagePixelMap
                 })
+                await imagePixelMap.release()
+                await imageSource.release()
                 this.dialogControllerProgress.close()
                 this.text = textrecognitionres.value
                 await textRecognition.release()

@@ -654,6 +654,9 @@ struct Commonsetting {
                       format: 'image/png',
                       quality: 100
                     })
+                    await imagePacker.release()
+                    await imagePixelMap.release()
+                    await imageSource.release()
                     fileIo.closeSync(file)
                     this.context.eventHub.emit('refreshIndex')
                   } catch {
@@ -694,6 +697,9 @@ struct Commonsetting {
                         format: 'image/png',
                         quality: 100
                       })
+                      await imagePacker.release()
+                      await imagePixelMap.release()
+                      await imageSource.release()
                       fileIo.closeSync(file)
                       this.context.eventHub.emit('refreshIndex')
                     } catch {

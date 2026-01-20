@@ -116,6 +116,9 @@ export default struct Updatepassword {
               format: 'image/png',
               quality: 100
             })
+            await imagePacker.release()
+            await imagePixelMap.release()
+            await imageSource.release()
             fileIo.closeSync(file)
             this.infoValue = fileUri.getUriFromPath(filePath)
           } catch {
@@ -198,6 +201,9 @@ export default struct Updatepassword {
                 format: 'image/png',
                 quality: 100
               })
+              await imagePacker.release()
+              await imagePixelMap.release()
+              await imageSource.release()
               fileIo.closeSync(file)
               this.infoValue = fileUri.getUriFromPath(filePath)
             }

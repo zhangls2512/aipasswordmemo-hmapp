@@ -81,7 +81,7 @@ struct Invite {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                   .onClick(async () => {
-                    const qrcodeDir = this.context.filesDir + '/media/invitationqrcode/'
+                    const qrcodeDir = this.context.cacheDir + '/media/invitationqrcode/'
                     const qrcodePath = qrcodeDir + this.invitationcode + '.png'
                     if (!fileIo.accessSync(qrcodePath)) {
                       const qrcodePixelMap =
@@ -101,6 +101,7 @@ struct Invite {
                         format: 'image/png',
                         quality: 100
                       })
+                      await imagePacker.release()
                       fileIo.closeSync(qrcodeFile)
                     }
                     const qrcodeUri = fileUri.getUriFromPath(qrcodePath)
@@ -123,7 +124,7 @@ struct Invite {
                     })
                     .buildEffect())
                   .onClick(async () => {
-                    const qrcodeDir = this.context.filesDir + '/media/invitationqrcode/'
+                    const qrcodeDir = this.context.cacheDir + '/media/invitationqrcode/'
                     const qrcodePath = qrcodeDir + this.invitationcode + '.png'
                     if (!fileIo.accessSync(qrcodePath)) {
                       const qrcodePixelMap =
@@ -143,6 +144,7 @@ struct Invite {
                         format: 'image/png',
                         quality: 100
                       })
+                      await imagePacker.release()
                       fileIo.closeSync(qrcodeFile)
                     }
                     const qrcodeUri = fileUri.getUriFromPath(qrcodePath)
