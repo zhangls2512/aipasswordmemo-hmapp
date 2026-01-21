@@ -15,7 +15,7 @@ import {
   PasswordTagItem
 } from '../common/Dataget'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
-import getPreferType from '../common/Prefertype'
+import { getPreferType } from '../common/Prefertype'
 import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
 import PasswordInfo from './Passwordinfo'

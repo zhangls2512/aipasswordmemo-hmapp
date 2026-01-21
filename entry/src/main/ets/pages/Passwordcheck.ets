@@ -7,7 +7,7 @@ import {
   ListItem,
   RepeatItem
 } from '../common/Passwordcheck'
-import getPreferType from '../common/Prefertype'
+import { getPreferType } from '../common/Prefertype'
 import UpdatePassword from './Updatepassword'
 
 @ComponentV2
