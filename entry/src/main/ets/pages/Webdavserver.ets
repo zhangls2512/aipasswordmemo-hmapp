@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { getWebdavServerInfo, setWebdavServer } from '../common/Webdavserver'
 import { appAccount } from '@kit.BasicServicesKit'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 
 @Builder
 export function WebdavserverBuilder() {
@@ -19,7 +20,7 @@ struct Webdavserver {
   accountExist = false
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -132,8 +133,16 @@ struct Webdavserver {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('WebDAV 服务器', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: 'WebDAV 服务器'
+        }
+      },
+      enableComponentSafeArea: true
     })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

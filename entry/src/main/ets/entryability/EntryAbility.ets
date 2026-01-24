@@ -23,6 +23,7 @@ import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { autoLogin } from '../common/Accesstoken'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
+import { deleteData } from '../common/Datachange'
 import { write } from '../common/File'
 import openLink from '../common/Openlink'
 import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from '../common/Table'
@@ -472,7 +473,9 @@ export default class EntryAbility extends UIAbility {
         const tagIndex = resultSet.getColumnIndex('tag')
         const updateTimeIndex = resultSet.getColumnIndex('updateTime')
         const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+        const idsa: number[] = []
         while (resultSet.goToNextRow()) {
+          idsa.push(resultSet.getValue(idIndex) as number)
           passwordRdbStore.insertSync('password', {
             id: resultSet.getValue(idIndex),
             name: String(resultSet.getValue(nameIndex)),
@@ -490,7 +493,19 @@ export default class EntryAbility extends UIAbility {
             cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
           }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
+        const idsb: number[] = []
+        const predicatesb = new relationalStore.RdbPredicates('password')
+        const resultSetb = await passwordRdbStore.query(predicatesb)
+        while (resultSetb.goToNextRow()) {
+          idsb.push(resultSetb.getValue(resultSetb.getColumnIndex('id')) as number)
+        }
         resultSet.close()
+        resultSetb.close()
+        const deleteIds = idsb.filter(item => !idsa.includes(item))
+        const deletepromises = deleteIds.map(async (item) => {
+          await deleteData(this.context, 'password', item)
+        })
+        await Promise.all(deletepromises)
         await autoSyncTable(this.context, 'password', item)
       })
       await Promise.all(promises)
@@ -508,7 +523,9 @@ export default class EntryAbility extends UIAbility {
         const valueIndex = resultSet.getColumnIndex('value')
         const updateTimeIndex = resultSet.getColumnIndex('updateTime')
         const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+        const idsa: number[] = []
         while (resultSet.goToNextRow()) {
+          idsa.push(resultSet.getValue(idIndex) as number)
           infoRdbStore.insertSync('info', {
             id: resultSet.getValue(idIndex),
             type: String(resultSet.getValue(typeIndex)),
@@ -524,7 +541,19 @@ export default class EntryAbility extends UIAbility {
             cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
           }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
+        const idsb: number[] = []
+        const predicatesb = new relationalStore.RdbPredicates('info')
+        const resultSetb = await infoRdbStore.query(predicatesb)
+        while (resultSetb.goToNextRow()) {
+          idsb.push(resultSetb.getValue(resultSetb.getColumnIndex('id')) as number)
+        }
         resultSet.close()
+        resultSetb.close()
+        const deleteIds = idsb.filter(item => !idsa.includes(item))
+        const deletepromises = deleteIds.map(async (item) => {
+          await deleteData(this.context, 'info', item)
+        })
+        await Promise.all(deletepromises)
         await autoSyncTable(this.context, 'info', item)
       })
       await Promise.all(promises)
@@ -542,7 +571,9 @@ export default class EntryAbility extends UIAbility {
         const colorIndex = resultSet.getColumnIndex('color')
         const updateTimeIndex = resultSet.getColumnIndex('updateTime')
         const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+        const idsa: number[] = []
         while (resultSet.goToNextRow()) {
+          idsa.push(resultSet.getValue(idIndex) as number)
           tagRdbStore.insertSync('tag', {
             id: resultSet.getValue(idIndex),
             value: String(resultSet.getValue(valueIndex)),
@@ -558,7 +589,19 @@ export default class EntryAbility extends UIAbility {
             cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex)
           }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
         }
+        const idsb: number[] = []
+        const predicatesb = new relationalStore.RdbPredicates('tag')
+        const resultSetb = await tagRdbStore.query(predicatesb)
+        while (resultSetb.goToNextRow()) {
+          idsb.push(resultSetb.getValue(resultSetb.getColumnIndex('id')) as number)
+        }
         resultSet.close()
+        resultSetb.close()
+        const deleteIds = idsb.filter(item => !idsa.includes(item))
+        const deletepromises = deleteIds.map(async (item) => {
+          await deleteData(this.context, 'tag', item)
+        })
+        await Promise.all(deletepromises)
         await autoSyncTable(this.context, 'tag', item)
       })
       await Promise.all(promises)
@@ -626,9 +669,7 @@ export default class EntryAbility extends UIAbility {
                     })
                     const deletedIdArray = item.deleted as string[]
                     const deletepromises = deletedIdArray.map(async (id) => {
-                      const predicates = new relationalStore.RdbPredicates('password')
-                      predicates.equalTo('id', Number(id))
-                      passwordRdbStore.deleteSync(predicates)
+                      await deleteData(this.context, 'password', Number(id))
                       await huaweiCloudSyncRdbStore.cleanDirtyData(table)
                     })
                     await Promise.all(insertpromises)
@@ -682,9 +723,7 @@ export default class EntryAbility extends UIAbility {
                     })
                     const deletedIdArray = item.deleted as string[]
                     const deletepromises = deletedIdArray.map(async (id) => {
-                      const predicates = new relationalStore.RdbPredicates('info')
-                      predicates.equalTo('id', Number(id))
-                      infoRdbStore.deleteSync(predicates)
+                      await deleteData(this.context, 'info', Number(id))
                       await huaweiCloudSyncRdbStore.cleanDirtyData(table)
                     })
                     await Promise.all(insertpromises)
@@ -738,9 +777,7 @@ export default class EntryAbility extends UIAbility {
                     })
                     const deletedIdArray = item.deleted as string[]
                     const deletepromises = deletedIdArray.map(async (id) => {
-                      const predicates = new relationalStore.RdbPredicates('tag')
-                      predicates.equalTo('id', Number(id))
-                      tagRdbStore.deleteSync(predicates)
+                      await deleteData(this.context, 'tag', Number(id))
                       await huaweiCloudSyncRdbStore.cleanDirtyData(table)
                     })
                     await Promise.all(insertpromises)

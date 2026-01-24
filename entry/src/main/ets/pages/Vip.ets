@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { netBoost } from '@kit.NetworkBoostKit'
+import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -157,7 +158,7 @@ export default struct Vip {
   }
 
   build() {
-    Navigation(this.pageInfos) {
+    HdsNavigation(this.pageInfos) {
       List() {
         ListItem() {
           Column() {
@@ -529,10 +530,18 @@ export default struct Vip {
     .padding({
       top: $r('sys.float.ohos_id_elements_margin_vertical_m')
     })
-    .title('会员中心', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '会员中心'
+        }
+      },
+      enableComponentSafeArea: true
     })
-    .titleMode(NavigationTitleMode.Mini)
+    .titleMode(HdsNavigationTitleMode.MINI)
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {

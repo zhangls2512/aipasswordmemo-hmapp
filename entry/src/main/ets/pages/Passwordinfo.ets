@@ -4,7 +4,7 @@ import { uri } from '@kit.ArkTS'
 import { floatingBall, LengthMetrics, promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
-import { getPasswordInfo, Password, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
+import { getPasswordInfo, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
 import copy from '../common/Pasteboard'
 import getTotp from '../common/Totp'
 
@@ -26,7 +26,7 @@ export default struct Passwordinfo {
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
-  interval = 0
+  interval = -1
 
   build() {
     List() {
@@ -324,82 +324,85 @@ export default struct Passwordinfo {
       if (mfaSecondsRemainingStyleIndex === 1) {
         this.mfaSecondsRemainingStyle = 'number'
       }
-      const passwordInfo = await getPasswordInfo(this.context, this.passwordId) as Password
-      this.passwordName = passwordInfo.name
-      this.passwordInfo = passwordInfo.info
-      this.passwordTag = passwordInfo.tag
-      const mfaInfo = this.passwordInfo.find(item => item.type === 'MFA')
-      if (mfaInfo) {
-        const floatingBallController = await floatingBall.create({
-          context: this.context
-        })
-        const showMfaInFloatingBall = commonSettingDataPreferences.getSync('showMfaInFloatingBall', false)
-        if (showMfaInFloatingBall) {
-          await floatingBallController.startFloatingBall({
-            template: floatingBall.FloatingBallTemplate.NORMAL,
-            title: '000000'
+      const passwordInfo = await getPasswordInfo(this.context, this.passwordId)
+      if (passwordInfo !== 'fail') {
+        this.passwordName = passwordInfo.name
+        this.passwordInfo = passwordInfo.info
+        this.passwordTag = passwordInfo.tag
+        const mfaInfo = this.passwordInfo.find(item => item.type === 'MFA')
+        if (mfaInfo) {
+          const floatingBallController = await floatingBall.create({
+            context: this.context
           })
-          floatingBallController.on('click', async () => {
-            await copy(this.context, this.UIContext, this.mfaValue)
-          })
-          this.context.eventHub.on('stopFloatingBall', async () => {
-            try {
-              floatingBallController.off('click')
-              await floatingBallController.stopFloatingBall()
-            } catch {
+          const showMfaInFloatingBall = commonSettingDataPreferences.getSync('showMfaInFloatingBall', false)
+          if (showMfaInFloatingBall) {
+            await floatingBallController.startFloatingBall({
+              template: floatingBall.FloatingBallTemplate.NORMAL,
+              title: '000000'
+            })
+            floatingBallController.on('click', async () => {
+              await copy(this.context, this.UIContext, this.mfaValue)
+            })
+            this.context.eventHub.on('stopFloatingBall', async () => {
+              try {
+                floatingBallController.off('click')
+                await floatingBallController.stopFloatingBall()
+              } catch {
+              }
+            })
+          }
+          this.interval = setInterval(async () => {
+            const mfaInfoArray = mfaInfo.value.split('\0')
+            let mfaOthauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
+            mfaOthauthUri = mfaOthauthUri.addQueryValue('secret', mfaInfoArray[0])
+            mfaOthauthUri = mfaOthauthUri.addQueryValue('period', mfaInfoArray[1])
+            mfaOthauthUri = mfaOthauthUri.addQueryValue('digits', mfaInfoArray[2])
+            this.mfaOtpauthUri = mfaOthauthUri.toString()
+            this.mfaStep = Number(mfaInfoArray[1])
+            const res = await getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
+            if (res.value !== 'fail') {
+              this.mfaValue = res.value
+              this.mfaSecondsRemaining = res.secondsRemaining
+              if (showMfaInFloatingBall) {
+                await floatingBallController.updateFloatingBall({
+                  template: floatingBall.FloatingBallTemplate.NORMAL,
+                  title: res.value,
+                  content: String(res.secondsRemaining)
+                })
+              }
+              const mfaSecondsRemainingPercent = Number((this.mfaSecondsRemaining / this.mfaStep).toFixed(2))
+              if (mfaSecondsRemainingPercent >= 0.5) {
+                this.mfaSecondsRemainingColor = Color.Green
+              }
+              if (mfaSecondsRemainingPercent < 0.5 && mfaSecondsRemainingPercent >= 0.3) {
+                this.mfaSecondsRemainingColor = Color.Yellow
+              }
+              if (mfaSecondsRemainingPercent < 0.3 && mfaSecondsRemainingPercent >= 0.1) {
+                this.mfaSecondsRemainingColor = Color.Orange
+              }
+              if (mfaSecondsRemainingPercent <= 0.1) {
+                this.mfaSecondsRemainingColor = Color.Red
+              }
             }
-          })
+            if (res.value === 'fail') {
+              clearInterval(this.interval)
+              try {
+                await floatingBallController.stopFloatingBall()
+              } catch {
+              }
+            }
+          }, 500)
         }
-        this.interval = setInterval(async () => {
-          const mfaInfoArray = mfaInfo.value.split('\0')
-          let mfaOthauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
-          mfaOthauthUri = mfaOthauthUri.addQueryValue('secret', mfaInfoArray[0])
-          mfaOthauthUri = mfaOthauthUri.addQueryValue('period', mfaInfoArray[1])
-          mfaOthauthUri = mfaOthauthUri.addQueryValue('digits', mfaInfoArray[2])
-          this.mfaOtpauthUri = mfaOthauthUri.toString()
-          this.mfaStep = Number(mfaInfoArray[1])
-          const res = await getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
-          if (res.value !== 'fail') {
-            this.mfaValue = res.value
-            this.mfaSecondsRemaining = res.secondsRemaining
-            if (showMfaInFloatingBall) {
-              await floatingBallController.updateFloatingBall({
-                template: floatingBall.FloatingBallTemplate.NORMAL,
-                title: res.value,
-                content: String(res.secondsRemaining)
-              })
-            }
-            const mfaSecondsRemainingPercent = Number((this.mfaSecondsRemaining / this.mfaStep).toFixed(2))
-            if (mfaSecondsRemainingPercent >= 0.5) {
-              this.mfaSecondsRemainingColor = Color.Green
-            }
-            if (mfaSecondsRemainingPercent < 0.5 && mfaSecondsRemainingPercent >= 0.3) {
-              this.mfaSecondsRemainingColor = Color.Yellow
-            }
-            if (mfaSecondsRemainingPercent < 0.3 && mfaSecondsRemainingPercent >= 0.1) {
-              this.mfaSecondsRemainingColor = Color.Orange
-            }
-            if (mfaSecondsRemainingPercent <= 0.1) {
-              this.mfaSecondsRemainingColor = Color.Red
-            }
-          }
-          if (res.value === 'fail') {
-            clearInterval(this.interval)
-            try {
-              await floatingBallController.stopFloatingBall()
-            } catch {
-            }
-          }
-        }, 500)
+      }
+      if (passwordInfo === 'fail') {
+        await promptAction.openToast({
+          message: '密码不存在'
+        })
       }
     })
     .onDisAppear(() => {
-      clearInterval(this.interval)
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      const showMfaInFloatingBall = commonSettingDataPreferences.getSync('showMfaInFloatingBall', false)
-      if (showMfaInFloatingBall) {
+      if (this.interval !== -1) {
+        clearInterval(this.interval)
         this.context.eventHub.emit('stopFloatingBall')
       }
     })

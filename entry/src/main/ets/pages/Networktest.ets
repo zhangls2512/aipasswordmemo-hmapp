@@ -1,5 +1,6 @@
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { rcp } from '@kit.RemoteCommunicationKit'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 
 interface Response {
   errCode: number,
@@ -23,7 +24,7 @@ struct Networktest {
   @Local totalTimeMs: number = -1
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -234,8 +235,16 @@ struct Networktest {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('网络测试', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '网络测试'
+        }
+      },
+      enableComponentSafeArea: true
     })
   }
 }

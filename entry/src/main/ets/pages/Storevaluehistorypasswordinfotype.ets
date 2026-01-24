@@ -1,5 +1,6 @@
 import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 
 @Builder
 export function StorevaluehistorypasswordinfotypeBuilder() {
@@ -16,7 +17,7 @@ struct Storevaluehistorypasswordinfotype {
   })
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           TextInput({
@@ -96,8 +97,16 @@ struct Storevaluehistorypasswordinfotype {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('记录内容历史记录密码信息类型', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '记录内容历史记录密码信息类型'
+        }
+      },
+      enableComponentSafeArea: true
     })
     .onAppear(() => {
       this.storeValueHistoryPasswordInfoTypeArray =
