@@ -6,7 +6,7 @@ import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { CloudBackupTimeItem, getTagList, Tag } from '../common/Dataget'
-import getPreferType from '../common/Prefertype'
+import { getPreferType } from '../common/Prefertype'
 import NewTag from './Newtag'
 import UpdateTag from './Updatetag'
 

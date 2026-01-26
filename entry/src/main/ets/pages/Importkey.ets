@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction, window } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { setCustomKey } from '../common/Crypto'
 
 @Builder
@@ -15,7 +16,7 @@ struct Importkey {
   pageInfos = new NavPathStack()
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -58,8 +59,16 @@ struct Importkey {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('导入自定义密钥', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '导入自定义密钥'
+        }
+      },
+      enableComponentSafeArea: true
     })
     .onReady((context) => {
       this.pageInfos = context.pathStack

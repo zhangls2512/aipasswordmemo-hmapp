@@ -7,7 +7,7 @@ import { getAccountAccessToken, getAccountInfo, removeAccount } from '../common/
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
-import getPreferType from '../common/Prefertype'
+import { getPreferType } from '../common/Prefertype'
 import request from '../common/Request'
 import Cloudservice from './Cloudservice'
 import Login from './Login'

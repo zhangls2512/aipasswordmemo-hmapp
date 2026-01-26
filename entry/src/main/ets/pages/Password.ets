@@ -6,6 +6,13 @@ import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
+/*import {
+  deleteQuickBarPassword,
+  getQuickBarPasswordIdList,
+  setQuickBarPassword,
+  syncQuickBarPassword
+} from '../common/Quickbar'*/
+import getTotp from '../common/Totp'
 import {
   CloudBackupTimeItem,
   getFilterPasswordList,
@@ -15,12 +22,11 @@ import {
   PasswordTagItem
 } from '../common/Dataget'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
-import getPreferType from '../common/Prefertype'
+import { getPreferType } from '../common/Prefertype'
 import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
 import PasswordInfo from './Passwordinfo'
 import UpdatePassword from './Updatepassword'
-import getTotp from '../common/Totp'
 
 interface Data {
   nameKeyword: string,
@@ -55,7 +61,7 @@ export default struct PasswordPage {
   @Local hoverId: number = -1
   @Local buttonHoverId: number = -1
   @Local mfaArray: MfaItem[] = []
-  @Local quickBarPasswordArray: number[] = []
+  @Local quickBarPasswordIdArray: number[] = []
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
@@ -98,11 +104,6 @@ export default struct PasswordPage {
     })
   }
 
-  getQuickBarPasswordList() {
-    const quickBarPasswordIds: number[] = []
-    return quickBarPasswordIds
-  }
-
   @Builder
   MenuBuilder(item: Password) {
     Menu() {
@@ -126,7 +127,7 @@ export default struct PasswordPage {
             this.multipleSelectArray.push(item)
           })
         if (deviceInfo.deviceType === '2in1') {
-          if (!this.quickBarPasswordArray.includes(item.id)) {
+          if (!this.quickBarPasswordIdArray.includes(item.id)) {
             MenuItem({
               startIcon: $r('app.media.addcircle'),
               content: '添加至快捷栏'
@@ -136,9 +137,13 @@ export default struct PasswordPage {
                 await promptAction.openToast({
                   message: '敬请期待'
                 })
+                /*await setQuickBarPassword(this.context, item.id, item.name)
+                await promptAction.openToast({
+                  message: '添加成功'
+                })*/
               })
           }
-          if (this.quickBarPasswordArray.includes(item.id)) {
+          if (this.quickBarPasswordIdArray.includes(item.id)) {
             MenuItem({
               startIcon: $r('app.media.removecircle'),
               content: '从快捷栏移除'
@@ -148,6 +153,10 @@ export default struct PasswordPage {
                 await promptAction.openToast({
                   message: '敬请期待'
                 })
+                /*await deleteQuickBarPassword(this.context, item.id)
+                await promptAction.openToast({
+                  message: '移除成功'
+                })*/
               })
           }
         }
@@ -798,7 +807,10 @@ export default struct PasswordPage {
         .onRefreshing(async () => {
           this.passwordArray =
             await getFilterPasswordList(this.context, this.nameKeyword, this.info, this.tag, this.orderColumn)
-          this.quickBarPasswordArray = this.getQuickBarPasswordList()
+          /*if (deviceInfo.deviceType === '2in1') {
+            await syncQuickBarPassword(this.context)
+            this.quickBarPasswordIdArray = await getQuickBarPasswordIdList(this.context)
+          }*/
           this.tags = await getTagList(this.context, 'value')
           this.loading = false
         })
