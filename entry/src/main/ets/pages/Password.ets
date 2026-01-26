@@ -6,12 +6,12 @@ import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
-import {
+/*import {
   deleteQuickBarPassword,
   getQuickBarPasswordIdList,
   setQuickBarPassword,
   syncQuickBarPassword
-} from '../common/Quickbar'
+} from '../common/Quickbar'*/
 import getTotp from '../common/Totp'
 import {
   CloudBackupTimeItem,
@@ -133,10 +133,14 @@ export default struct PasswordPage {
               content: '添加至快捷栏'
             })
               .onClick(async () => {
-                await setQuickBarPassword(this.context, item.id, item.name)
+                const promptAction = this.UIContext.getPromptAction()
+                await promptAction.openToast({
+                  message: '敬请期待'
+                })
+                /*await setQuickBarPassword(this.context, item.id, item.name)
                 await promptAction.openToast({
                   message: '添加成功'
-                })
+                })*/
               })
           }
           if (this.quickBarPasswordIdArray.includes(item.id)) {
@@ -145,10 +149,14 @@ export default struct PasswordPage {
               content: '从快捷栏移除'
             })
               .onClick(async () => {
-                await deleteQuickBarPassword(this.context, item.id)
+                const promptAction = this.UIContext.getPromptAction()
+                await promptAction.openToast({
+                  message: '敬请期待'
+                })
+                /*await deleteQuickBarPassword(this.context, item.id)
                 await promptAction.openToast({
                   message: '移除成功'
-                })
+                })*/
               })
           }
         }
@@ -799,10 +807,10 @@ export default struct PasswordPage {
         .onRefreshing(async () => {
           this.passwordArray =
             await getFilterPasswordList(this.context, this.nameKeyword, this.info, this.tag, this.orderColumn)
-          if (deviceInfo.deviceType === '2in1') {
+          /*if (deviceInfo.deviceType === '2in1') {
             await syncQuickBarPassword(this.context)
             this.quickBarPasswordIdArray = await getQuickBarPasswordIdList(this.context)
-          }
+          }*/
           this.tags = await getTagList(this.context, 'value')
           this.loading = false
         })
