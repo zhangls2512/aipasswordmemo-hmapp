@@ -35,11 +35,11 @@ export default struct TagPage {
     }
     const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
     const accountInfo = await getAccountInfo()
-    const cloudBackupTimeIndex = cloudBackupTimeArray.findIndex(item => item.uid === accountInfo.uid)
-    if (cloudBackupTimeIndex !== -1) {
-      cloudBackupTimeArray[cloudBackupTimeIndex].time = Date.now()
+    const cloudBackupTime = cloudBackupTimeArray.find(item => item.uid === accountInfo.uid)
+    if (cloudBackupTime) {
+      cloudBackupTime.time = Date.now()
     }
-    if (cloudBackupTimeIndex === -1) {
+    if (!cloudBackupTime) {
       cloudBackupTimeArray.push({
         uid: accountInfo.uid,
         time: Date.now()
