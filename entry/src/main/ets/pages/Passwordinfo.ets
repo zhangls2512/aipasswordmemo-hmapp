@@ -73,7 +73,7 @@ export default struct Passwordinfo {
                     })
                   Image($r('app.media.hide'))
                     .fillColor($r('sys.color.icon_secondary'))
-                    .width('8%')
+                    .height(24)
                     .onClick(() => {
                       this.hidePasswordInfoType.push(item.type)
                     })
@@ -92,7 +92,7 @@ export default struct Passwordinfo {
                     })
                   Image($r('app.media.show'))
                     .fillColor($r('sys.color.icon_secondary'))
-                    .width('8%')
+                    .height(24)
                     .onClick(() => {
                       this.hidePasswordInfoType.splice(this.hidePasswordInfoType.indexOf(item.type), 1)
                     })

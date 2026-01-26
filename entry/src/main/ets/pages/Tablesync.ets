@@ -1057,10 +1057,10 @@ struct Tablesync {
                       })
 
                       Image($r('app.media.up'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('password')) {
                             await promptAction.openToast({
@@ -1080,10 +1080,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.down'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('password')) {
                             await promptAction.openToast({
@@ -1103,10 +1103,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.time'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('password')) {
                             await promptAction.openToast({
@@ -1217,10 +1217,10 @@ struct Tablesync {
                       })
 
                       Image($r('app.media.up'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('info')) {
                             await promptAction.openToast({
@@ -1240,10 +1240,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.down'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('info')) {
                             await promptAction.openToast({
@@ -1263,10 +1263,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.time'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('info')) {
                             await promptAction.openToast({
@@ -1377,10 +1377,10 @@ struct Tablesync {
                       })
 
                       Image($r('app.media.up'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('tag')) {
                             await promptAction.openToast({
@@ -1400,10 +1400,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.down'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('tag')) {
                             await promptAction.openToast({
@@ -1423,10 +1423,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.time'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('tag')) {
                             await promptAction.openToast({

@@ -74,10 +74,10 @@ struct Oftenusedinfotype {
                   })
                 if (index !== 0) {
                   Image($r('app.media.up'))
+                    .height(24)
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .width('8%')
                     .onClick(() => {
                       const temp = this.oftenUsedInfoTypeArray[index]
                       this.oftenUsedInfoTypeArray[index] = this.oftenUsedInfoTypeArray[index - 1]
@@ -86,10 +86,10 @@ struct Oftenusedinfotype {
                 }
                 if (index !== this.oftenUsedInfoTypeArray.length - 1) {
                   Image($r('app.media.down'))
+                    .height(24)
                     .margin({
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
-                    .width('8%')
                     .onClick(() => {
                       const temp = this.oftenUsedInfoTypeArray[index]
                       this.oftenUsedInfoTypeArray[index] = this.oftenUsedInfoTypeArray[index + 1]
@@ -97,7 +97,7 @@ struct Oftenusedinfotype {
                     })
                 }
                 Image($r('app.media.delete'))
-                  .width('8%')
+                  .height(24)
                   .onClick(() => {
                     this.oftenUsedInfoTypeArray.splice(index, 1)
                   })
@@ -134,7 +134,7 @@ struct Oftenusedinfotype {
                       right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                     })
                   Image($r('app.media.add'))
-                    .width('8%')
+                    .height(24)
                     .onClick(async () => {
                       if (this.oftenUsedInfoTypeArray.some(typeItem => typeItem === item)) {
                         await promptAction.openToast({
