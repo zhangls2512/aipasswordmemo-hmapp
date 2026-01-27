@@ -5,13 +5,14 @@ import { display, LoadingDialog, window } from '@kit.ArkUI'
 import { zlib } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
+import { HdsTabs, HdsTabsController } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import { getKey } from '../common/Crypto'
 import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import getDeviceToken from '../common/Devicetoken'
 import { readUri } from '../common/File'
-import getPreferType from '../common/Prefertype'
+import { getPreferType } from '../common/Prefertype'
 import request from '../common/Request'
 import Cleardata from './Cleardata'
 import Info from './Info'
@@ -33,6 +34,7 @@ struct Index {
   @Local isShowCleardataSheet: boolean = false
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
+  controller = new HdsTabsController()
 
   async getBackgroundImage() {
     const backgroundImagePath = this.context.filesDir + '/media/backgroundimage.png'
@@ -85,8 +87,8 @@ struct Index {
             left: $r('sys.float.ohos_id_elements_margin_horizontal_l')
           })
       }
-      Tabs({
-        index: $$this.index
+      HdsTabs({
+        controller: this.controller
       }) {
         TabContent() {
           Password()
@@ -111,8 +113,12 @@ struct Index {
       }
       .barBackgroundBlurStyle(BlurStyle.Regular)
       .barPosition(this.preferType === 0 ? BarPosition.End : BarPosition.Start)
+      .barWidth(this.preferType === 0 ? '100%' : 56)
       .scrollable(false)
       .vertical(this.preferType === 0 ? false : true)
+      .onChange((index) => {
+        this.index = index
+      })
       .onAnimationStart(async (index, targetIndex) => {
         if (targetIndex !== 1) {
           const lastWindow = await window.getLastWindow(this.context)

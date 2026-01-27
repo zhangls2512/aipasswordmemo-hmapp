@@ -16,7 +16,7 @@ import getCloudServiceStatus from '../common/Cloudservice'
 import { getKey } from '../common/Crypto'
 import { newInfo, newPassword, newTag } from '../common/Datachange'
 import { getTagList, getTypeInfoList, PasswordInfoItem, Tag } from '../common/Dataget'
-import getPreferType from '../common/Prefertype'
+import { getPreferType } from '../common/Prefertype'
 import Passwordgenerate from './Passwordgenerate'
 
 export interface SelectItem {

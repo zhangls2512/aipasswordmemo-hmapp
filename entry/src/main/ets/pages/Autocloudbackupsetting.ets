@@ -1,5 +1,6 @@
 import { preferences } from '@kit.ArkData'
 import { LengthMetrics } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 
 interface Type {
   name: string,
@@ -38,7 +39,7 @@ struct Autocloudbackupsetting {
   }
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -94,8 +95,16 @@ struct Autocloudbackupsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('云备份自动开启设置', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '云备份自动开启设置'
+        }
+      },
+      enableComponentSafeArea: true
     })
     .onAppear(() => {
       this.getSetting()

@@ -5,6 +5,7 @@ import { LengthMetrics, LoadingDialog, promptAction, SegmentButtonV2Items, TabSe
 import { appAccount } from '@kit.BasicServicesKit'
 import { fileIo, picker } from '@kit.CoreFileKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import { read } from '../common/File'
 import { checkPermission } from '../common/Permission'
@@ -184,7 +185,7 @@ struct DataBackupRecovery {
   }
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       Scroll() {
         Column() {
           TabSegmentButtonV2({
@@ -2265,8 +2266,16 @@ struct DataBackupRecovery {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('数据备份与恢复', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '数据备份与恢复'
+        }
+      },
+      enableComponentSafeArea: true
     })
     .onReady(async (context) => {
       this.pageInfos = context.pathStack

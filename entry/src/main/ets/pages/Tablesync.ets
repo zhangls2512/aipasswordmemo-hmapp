@@ -5,6 +5,7 @@ import { deviceInfo, zlib } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getInfoList, getPasswordList, getTagList } from '../common/Dataget'
 import { write } from '../common/File'
 import { checkPermission } from '../common/Permission'
@@ -98,7 +99,7 @@ struct Tablesync {
   }
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       Scroll() {
         Column() {
           if (deviceInfo.deviceType !== 'tablet') {
@@ -2015,8 +2016,16 @@ struct Tablesync {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('设备间数据同步', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '设备间数据同步'
+        }
+      },
+      enableComponentSafeArea: true
     })
     .onAppear(async () => {
       this.getSetting()

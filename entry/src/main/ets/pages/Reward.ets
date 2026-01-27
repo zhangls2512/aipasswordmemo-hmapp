@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LengthMetrics } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import openLink from '../common/Openlink'
 
 @Builder
@@ -12,7 +13,7 @@ struct Reward {
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Text('《App Linking解锁酷炫链接新玩法》优秀参与奖')
@@ -45,8 +46,16 @@ struct Reward {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('获得奖项', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '获得奖项'
+        }
+      },
+      enableComponentSafeArea: true
     })
   }
 }

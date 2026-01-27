@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo, removeAccount, setAccount } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -71,7 +72,7 @@ struct Email {
       })
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -184,8 +185,16 @@ struct Email {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('绑定邮箱', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '绑定邮箱'
+        }
+      },
+      enableComponentSafeArea: true
     })
     .onReady((context) => {
       this.pageInfos = context.pathStack

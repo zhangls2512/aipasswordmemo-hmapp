@@ -3,6 +3,7 @@ import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { webview } from '@kit.ArkWeb'
 import { batteryInfo, deviceInfo } from '@kit.BasicServicesKit'
+import { HdsNavDestination } from '@kit.UIDesignKit'
 
 @Builder
 export function DebugsettingBuilder() {
@@ -110,7 +111,7 @@ struct Debugsetting {
   }
 
   build() {
-    NavDestination() {
+    HdsNavDestination() {
       List() {
         ListItem() {
           Column() {
@@ -1181,8 +1182,16 @@ struct Debugsetting {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
-    .title('调试设置', {
-      paddingEnd: LengthMetrics.vp(60)
+    .titleBar({
+      padding: {
+        end: LengthMetrics.vp(60)
+      },
+      content: {
+        title: {
+          mainTitle: '调试设置'
+        }
+      },
+      enableComponentSafeArea: true
     })
     .onReady((context) => {
       this.pageInfos = context.pathStack
