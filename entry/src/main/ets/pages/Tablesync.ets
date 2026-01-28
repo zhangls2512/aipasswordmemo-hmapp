@@ -1706,11 +1706,10 @@ struct Tablesync {
                     })
                     const filePath = this.context.tempDir + '/password.txt'
                     await write(filePath, JSON.stringify(arrayOut))
-                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
                       title: 'password.txt',
-                      description: getSizeString(fileIo.statSync(file.fd).size),
+                      description: getSizeString(fileIo.statSync(filePath).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1730,7 +1729,6 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
-                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
@@ -1794,11 +1792,10 @@ struct Tablesync {
                     }
                     const filePath = this.context.tempDir + '/passwordicon.zip'
                     await zlib.compressFiles(passwordIconFilePathArray, filePath, {})
-                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.ZIP_ARCHIVE,
                       title: 'passwordicon.zip',
-                      description: getSizeString(fileIo.statSync(file.fd).size),
+                      description: getSizeString(fileIo.statSync(filePath).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1817,7 +1814,6 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
-                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
@@ -1879,11 +1875,10 @@ struct Tablesync {
                     })
                     const filePath = this.context.tempDir + '/info.txt'
                     await write(filePath, JSON.stringify(arrayOut))
-                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
                       title: 'info.txt',
-                      description: getSizeString(fileIo.statSync(file.fd).size),
+                      description: getSizeString(fileIo.statSync(filePath).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1903,7 +1898,6 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
-                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
@@ -1965,11 +1959,10 @@ struct Tablesync {
                     })
                     const filePath = this.context.tempDir + '/tag.txt'
                     await write(filePath, JSON.stringify(arrayOut))
-                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
                       title: 'tag.txt',
-                      description: getSizeString(fileIo.statSync(file.fd).size),
+                      description: getSizeString(fileIo.statSync(filePath).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1989,7 +1982,6 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
-                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')

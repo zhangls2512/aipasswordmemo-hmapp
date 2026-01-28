@@ -1,3 +1,10 @@
+export function getTimeString(timestamp: number) {
+  const date = new Date(timestamp * 1000)
+  return date.getFullYear() + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' +
+  String(date.getDate()).padStart(2, '0') + ' ' + String(date.getHours()).padStart(2, '0') + ':' +
+  String(date.getMinutes()).padStart(2, '0') + ':' + String(date.getSeconds()).padStart(2, '0')
+}
+
 export function getSizeString(size: number) {
   if (size < Math.pow(1024, 1)) {
     return size + ' B'

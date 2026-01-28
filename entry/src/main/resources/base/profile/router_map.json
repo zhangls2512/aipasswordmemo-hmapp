@@ -151,9 +151,9 @@
       "buildFunction": "ErrorlogBuilder"
     },
     {
-      "name": "Deletefile",
-      "pageSourceFile": "src/main/ets/pages/Deletefile.ets",
-      "buildFunction": "DeletefileBuilder"
+      "name": "Sandboxfilelist",
+      "pageSourceFile": "src/main/ets/pages/Sandboxfilelist.ets",
+      "buildFunction": "SandboxfilelistBuilder"
     },
     {
       "name": "Oftenusedinfotype",
