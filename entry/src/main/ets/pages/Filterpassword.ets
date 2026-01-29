@@ -289,7 +289,7 @@ export default struct Filterpassword {
                     })
                 }
                 Image($r('app.media.add'))
-                  .width('8%')
+                  .height(24)
                   .onClick(async () => {
                     if (this.passwordInfoArray.some(item => item.type === this.getCurrentInfoType())) {
                       await promptAction.openToast({
@@ -380,7 +380,7 @@ export default struct Filterpassword {
               })
 
               Image($r('app.media.delete'))
-                .width('8%')
+                .height(24)
                 .onClick(() => {
                   this.passwordInfoArray.splice(index, 1)
                 })
@@ -436,7 +436,7 @@ export default struct Filterpassword {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                 Image($r('app.media.add'))
-                  .width('8%')
+                  .height(24)
                   .onClick(async () => {
                     if (this.passwordTagArray.some(tagItem => tagItem === item.value)) {
                       await promptAction.openToast({
@@ -495,7 +495,7 @@ export default struct Filterpassword {
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
               Image($r('app.media.delete'))
-                .width('8%')
+                .height(24)
                 .onClick(() => {
                   this.passwordTagArray.splice(index, 1)
                 })
