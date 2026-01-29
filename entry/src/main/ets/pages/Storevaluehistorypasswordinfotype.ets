@@ -72,7 +72,7 @@ struct Storevaluehistorypasswordinfotype {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                 Image($r('app.media.delete'))
-                  .width('8%')
+                  .height(24)
                   .onClick(() => {
                     this.storeValueHistoryPasswordInfoTypeArray.splice(index, 1)
                   })

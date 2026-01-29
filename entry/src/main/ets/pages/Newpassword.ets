@@ -564,7 +564,7 @@ export default struct Newpassword {
                     })
                 }
                 Image($r('app.media.add'))
-                  .width('8%')
+                  .height(24)
                   .onClick(async () => {
                     if (this.passwordInfoArray.some(item => item.type === this.getCurrentInfoType())) {
                       await promptAction.openToast({
@@ -802,10 +802,10 @@ export default struct Newpassword {
 
               if (index !== 0) {
                 Image($r('app.media.up'))
+                  .height(24)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .width('8%')
                   .onClick(() => {
                     const temp = this.passwordInfoArray[index]
                     this.passwordInfoArray[index] = this.passwordInfoArray[index - 1]
@@ -814,10 +814,10 @@ export default struct Newpassword {
               }
               if (index !== this.passwordInfoArray.length - 1) {
                 Image($r('app.media.down'))
+                  .height(24)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .width('8%')
                   .onClick(() => {
                     const temp = this.passwordInfoArray[index]
                     this.passwordInfoArray[index] = this.passwordInfoArray[index + 1]
@@ -825,7 +825,7 @@ export default struct Newpassword {
                   })
               }
               Image($r('app.media.delete'))
-                .width('8%')
+                .height(24)
                 .onClick(() => {
                   this.passwordInfoArray.splice(index, 1)
                 })
@@ -881,7 +881,7 @@ export default struct Newpassword {
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
                 Image($r('app.media.add'))
-                  .width('8%')
+                  .height(24)
                   .onClick(async () => {
                     if (this.passwordTagArray.some(tagItem => tagItem === item.value)) {
                       await promptAction.openToast({
@@ -941,10 +941,10 @@ export default struct Newpassword {
                 })
               if (index !== 0) {
                 Image($r('app.media.up'))
+                  .height(24)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .width('8%')
                   .onClick(() => {
                     const temp = this.passwordTagArray[index]
                     this.passwordTagArray[index] = this.passwordTagArray[index - 1]
@@ -953,10 +953,10 @@ export default struct Newpassword {
               }
               if (index !== this.passwordTagArray.length - 1) {
                 Image($r('app.media.down'))
+                  .height(24)
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                  .width('8%')
                   .onClick(() => {
                     const temp = this.passwordTagArray[index]
                     this.passwordTagArray[index] = this.passwordTagArray[index + 1]
@@ -964,7 +964,7 @@ export default struct Newpassword {
                   })
               }
               Image($r('app.media.delete'))
-                .width('8%')
+                .height(24)
                 .onClick(() => {
                   this.passwordTagArray.splice(index, 1)
                 })

@@ -61,7 +61,7 @@ export default struct Urlcheck {
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                 })
               Image($r('app.media.delete'))
-                .width('8%')
+                .height(24)
                 .onClick(() => {
                   this.urlArray.splice(index, 1)
                 })

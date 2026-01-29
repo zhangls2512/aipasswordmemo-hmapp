@@ -1057,10 +1057,10 @@ struct Tablesync {
                       })
 
                       Image($r('app.media.up'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('password')) {
                             await promptAction.openToast({
@@ -1080,10 +1080,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.down'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('password')) {
                             await promptAction.openToast({
@@ -1103,10 +1103,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.time'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('password')) {
                             await promptAction.openToast({
@@ -1217,10 +1217,10 @@ struct Tablesync {
                       })
 
                       Image($r('app.media.up'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('info')) {
                             await promptAction.openToast({
@@ -1240,10 +1240,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.down'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('info')) {
                             await promptAction.openToast({
@@ -1263,10 +1263,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.time'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('info')) {
                             await promptAction.openToast({
@@ -1377,10 +1377,10 @@ struct Tablesync {
                       })
 
                       Image($r('app.media.up'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('tag')) {
                             await promptAction.openToast({
@@ -1400,10 +1400,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.down'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('tag')) {
                             await promptAction.openToast({
@@ -1423,10 +1423,10 @@ struct Tablesync {
                             })
                         })
                       Image($r('app.media.time'))
+                        .height(24)
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .width('8%')
                         .onClick(async () => {
                           if (!this.huaweiCloudSyncOnTables.includes('tag')) {
                             await promptAction.openToast({
@@ -1706,11 +1706,10 @@ struct Tablesync {
                     })
                     const filePath = this.context.tempDir + '/password.txt'
                     await write(filePath, JSON.stringify(arrayOut))
-                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
                       title: 'password.txt',
-                      description: getSizeString(fileIo.statSync(file.fd).size),
+                      description: getSizeString(fileIo.statSync(filePath).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1730,7 +1729,6 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
-                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
@@ -1794,11 +1792,10 @@ struct Tablesync {
                     }
                     const filePath = this.context.tempDir + '/passwordicon.zip'
                     await zlib.compressFiles(passwordIconFilePathArray, filePath, {})
-                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.ZIP_ARCHIVE,
                       title: 'passwordicon.zip',
-                      description: getSizeString(fileIo.statSync(file.fd).size),
+                      description: getSizeString(fileIo.statSync(filePath).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1817,7 +1814,6 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
-                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
@@ -1879,11 +1875,10 @@ struct Tablesync {
                     })
                     const filePath = this.context.tempDir + '/info.txt'
                     await write(filePath, JSON.stringify(arrayOut))
-                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
                       title: 'info.txt',
-                      description: getSizeString(fileIo.statSync(file.fd).size),
+                      description: getSizeString(fileIo.statSync(filePath).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1903,7 +1898,6 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
-                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
@@ -1965,11 +1959,10 @@ struct Tablesync {
                     })
                     const filePath = this.context.tempDir + '/tag.txt'
                     await write(filePath, JSON.stringify(arrayOut))
-                    const file = fileIo.openSync(filePath)
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
                       title: 'tag.txt',
-                      description: getSizeString(fileIo.statSync(file.fd).size),
+                      description: getSizeString(fileIo.statSync(filePath).size),
                       uri: fileUri.getUriFromPath(filePath)
                     })
                     harmonyShare.on('knockShare', async (sharableTarget) => {
@@ -1989,7 +1982,6 @@ struct Tablesync {
                         }
                       ],
                       onDidDisappear: async () => {
-                        fileIo.closeSync(file)
                         await fileIo.unlink(filePath)
                         harmonyShare.off('knockShare')
                         harmonyShare.off('gesturesShare')
