@@ -51,9 +51,7 @@ export default struct Cleardata {
     const nousePasswordIconFilePathArray = await this.getNousePasswordIconFilePathArray()
     let passwordIconNouseSize = 0
     nousePasswordIconFilePathArray.forEach(item => {
-      const file = fileIo.openSync(item)
-      passwordIconNouseSize += fileIo.statSync(file.fd).size
-      fileIo.closeSync(file)
+      passwordIconNouseSize += fileIo.statSync(item).size
     })
     this.passwordIconNouseSize = getSizeString(passwordIconNouseSize)
     const oldInvitationQrcodeNouseSize = await getDirectorySize(this.context.filesDir + '/media/invitationqrcode/')
