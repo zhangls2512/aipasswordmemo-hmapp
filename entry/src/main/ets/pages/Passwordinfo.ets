@@ -183,6 +183,7 @@ export default struct Passwordinfo {
                     fileNameExtension: 'png',
                     photoType: photoAccessHelper.PhotoType.IMAGE
                   }])
+                  await phAccessHelper.release()
                   const srcFile = fileIo.openSync(item.value)
                   const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
                   await fileIo.copyFile(srcFile.fd, destFile.fd)
@@ -192,6 +193,7 @@ export default struct Passwordinfo {
                     message: '保存成功'
                   })
                 } catch {
+                  await phAccessHelper.release()
                 }
               })
             }
