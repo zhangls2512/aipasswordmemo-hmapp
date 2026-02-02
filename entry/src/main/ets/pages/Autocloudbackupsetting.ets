@@ -63,16 +63,14 @@ struct Autocloudbackupsetting {
                   isOn: this.autoOn.includes(item.value)
                 })
                   .onChange((isOn) => {
-                    let autoOn: string[] = []
                     if (!isOn) {
-                      autoOn = this.autoOn.filter(inItem => inItem !== item.value)
+                      this.autoOn = this.autoOn.filter(inItem => inItem !== item.value)
                     }
                     if (isOn) {
-                      autoOn = [...this.autoOn, item.value]
+                      this.autoOn = Array.from(new Set([...this.autoOn, item.value]))
                     }
-                    this.cloudbackupSettingDataPreferences.putSync('autoOn', autoOn)
+                    this.cloudbackupSettingDataPreferences.putSync('autoOn', this.autoOn)
                     this.cloudbackupSettingDataPreferences.flushSync()
-                    this.getSetting()
                   })
               }
               .borderRadius(12)
