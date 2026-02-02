@@ -234,7 +234,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoBackupTables.includes(item.value)
                         })
-                          .onChange(async (isOn) => {
+                          .onChange((isOn) => {
                             if (!isOn) {
                               this.autoBackupTables = this.autoBackupTables.filter(inItem => inItem !== item.value)
                             }
@@ -582,7 +582,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoFileBackupTables.includes(item.value)
                         })
-                          .onChange(async (isOn) => {
+                          .onChange((isOn) => {
                             if (!isOn) {
                               this.autoFileBackupTables =
                                 this.autoFileBackupTables.filter(inItem => inItem !== item.value)
@@ -1542,7 +1542,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoWebdavBackupTables.includes(item.value)
                         })
-                          .onChange(async (isOn) => {
+                          .onChange((isOn) => {
                             if (!isOn) {
                               this.autoWebdavBackupTables =
                                 this.autoWebdavBackupTables.filter(inItem => inItem !== item.value)
