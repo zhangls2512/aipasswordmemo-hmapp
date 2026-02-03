@@ -96,7 +96,7 @@ export default struct Urlcheck {
             dialogControllerProgress.open()
             try {
               const res = await safetyDetect.checkUrlThreat({
-                urls: this.urlArray
+                urls: [...this.urlArray]
               })
               dialogControllerProgress.close()
               this.resultArray = res.results
