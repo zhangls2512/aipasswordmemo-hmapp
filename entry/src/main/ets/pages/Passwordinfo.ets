@@ -26,7 +26,7 @@ export default struct Passwordinfo {
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
-  interval = -1
+  intervalId = -1
 
   build() {
     List() {
@@ -353,7 +353,7 @@ export default struct Passwordinfo {
               }
             })
           }
-          this.interval = setInterval(async () => {
+          this.intervalId = setInterval(async () => {
             const mfaInfoArray = mfaInfo.value.split('\0')
             let mfaOthauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
             mfaOthauthUri = mfaOthauthUri.addQueryValue('secret', mfaInfoArray[0])
@@ -387,7 +387,8 @@ export default struct Passwordinfo {
               }
             }
             if (res.value === 'fail') {
-              clearInterval(this.interval)
+              clearInterval(this.intervalId)
+              this.intervalId = -1
               try {
                 await floatingBallController.stopFloatingBall()
               } catch {
@@ -403,8 +404,8 @@ export default struct Passwordinfo {
       }
     })
     .onDisAppear(() => {
-      if (this.interval !== -1) {
-        clearInterval(this.interval)
+      if (this.intervalId !== -1) {
+        clearInterval(this.intervalId)
         this.context.eventHub.emit('stopFloatingBall')
       }
     })
