@@ -173,11 +173,10 @@ struct Tablesync {
                                   relationalStore.DistributedType.DISTRIBUTED_DEVICE, {
                                     autoSync: false
                                   })
-                                const onTables = [...this.onTables, item.value]
-                                this.dataSettingDataPreferences.putSync('onTables', onTables)
+                                this.onTables = Array.from(new Set([...this.onTables, item.value]))
+                                this.dataSettingDataPreferences.putSync('onTables', this.onTables)
                                 this.dataSettingDataPreferences.flushSync()
                               }
-                              this.getSetting()
                             }
                           })
                       }
@@ -229,16 +228,14 @@ struct Tablesync {
                         })
                           .enabled(this.onTables.includes(item.value))
                           .onChange((isOn) => {
-                            let autoSyncTables: string[] = []
                             if (!isOn) {
-                              autoSyncTables = this.autoSyncTables.filter(inItem => inItem !== item.value)
+                              this.autoSyncTables = this.autoSyncTables.filter(inItem => inItem !== item.value)
                             }
                             if (isOn) {
-                              autoSyncTables = [...this.autoSyncTables, item.value]
+                              this.autoSyncTables = Array.from(new Set([...this.autoSyncTables, item.value]))
                             }
-                            this.dataSettingDataPreferences.putSync('autoSyncTables', autoSyncTables)
+                            this.dataSettingDataPreferences.putSync('autoSyncTables', this.autoSyncTables)
                             this.dataSettingDataPreferences.flushSync()
-                            this.getSetting()
                           })
                       }
                       .borderRadius(12)
@@ -563,13 +560,12 @@ struct Tablesync {
                         }
                       })
                       .onClick(async () => {
-                        const autoSyncDevices = [...this.autoSyncDevices, item]
-                        this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
+                        this.autoSyncDevices = Array.from(new Set([...this.autoSyncDevices, item]))
+                        this.dataSettingDataPreferences.putSync('autoSyncDevices', this.autoSyncDevices)
                         this.dataSettingDataPreferences.flushSync()
                         await promptAction.openToast({
                           message: '已开启'
                         })
-                        this.getSetting()
                       })
                     }
                     Divider()
@@ -859,11 +855,11 @@ struct Tablesync {
                                 relationalStore.DistributedType.DISTRIBUTED_CLOUD, {
                                   autoSync: false
                                 })
-                              const huaweiCloudSyncOnTables = [...this.huaweiCloudSyncOnTables, item.value]
+                              this.huaweiCloudSyncOnTables =
+                                Array.from(new Set([...this.huaweiCloudSyncOnTables, item.value]))
                               this.dataSettingDataPreferences.putSync('huaweiCloudSyncOnTables',
-                                huaweiCloudSyncOnTables)
+                                this.huaweiCloudSyncOnTables)
                               this.dataSettingDataPreferences.flushSync()
-                              this.getSetting()
                             }
                           })
                       }
@@ -934,18 +930,17 @@ struct Tablesync {
                         })
                           .enabled(this.huaweiCloudSyncOnTables.includes(item.value))
                           .onChange((isOn) => {
-                            let autoHuaweiCloudSyncTables: string[] = []
                             if (!isOn) {
-                              autoHuaweiCloudSyncTables =
+                              this.autoHuaweiCloudSyncTables =
                                 this.autoHuaweiCloudSyncTables.filter(inItem => inItem !== item.value)
                             }
                             if (isOn) {
-                              autoHuaweiCloudSyncTables = [...this.autoHuaweiCloudSyncTables, item.value]
+                              this.autoHuaweiCloudSyncTables =
+                                Array.from(new Set([...this.autoHuaweiCloudSyncTables, item.value]))
                             }
                             this.dataSettingDataPreferences.putSync('autoHuaweiCloudSyncTables',
-                              autoHuaweiCloudSyncTables)
+                              this.autoHuaweiCloudSyncTables)
                             this.dataSettingDataPreferences.flushSync()
-                            this.getSetting()
                           })
                       }
                       .borderRadius(12)
