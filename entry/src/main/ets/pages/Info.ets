@@ -99,6 +99,7 @@ export default struct InfoPage {
                 fileNameExtension: 'png',
                 photoType: photoAccessHelper.PhotoType.IMAGE
               }])
+              await phAccessHelper.release()
               if (uris.length === 1) {
                 const srcFile = fileIo.openSync(item.value)
                 const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)

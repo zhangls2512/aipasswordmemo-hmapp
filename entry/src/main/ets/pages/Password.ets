@@ -66,6 +66,7 @@ export default struct PasswordPage {
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
   passwordId = 0
+  intervalId = -1
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })
@@ -900,7 +901,7 @@ export default struct PasswordPage {
         this.passwordId = passwordId
         this.isShowInfoSheet = true
       })
-      setInterval(async () => {
+      this.intervalId = setInterval(async () => {
         const mfaArray: MfaItem[] = []
         const promises = this.passwordArray.map(async (item) => {
           const mfaInfo = item.info.find(infoItem => infoItem.type === 'MFA')
@@ -925,6 +926,9 @@ export default struct PasswordPage {
       }
     })
     .onDisAppear(() => {
+      if (this.intervalId !== -1) {
+        clearInterval(this.intervalId)
+      }
       this.context.eventHub.off('passwordInfo')
       this.context.eventHub.off('refreshFilterPassword')
       this.context.eventHub.off('refreshPassword')

@@ -113,16 +113,14 @@ struct Cloudbackupimport {
                     isOn: this.autoImport.includes(item.value)
                   })
                     .onChange((isOn) => {
-                      let autoImport: string[] = []
                       if (!isOn) {
-                        autoImport = this.autoImport.filter(inItem => inItem !== item.value)
+                        this.autoImport = this.autoImport.filter(inItem => inItem !== item.value)
                       }
                       if (isOn) {
-                        autoImport = [...this.autoImport, item.value]
+                        this.autoImport = Array.from(new Set([...this.autoImport, item.value]))
                       }
-                      this.cloudbackupSettingDataPreferences.putSync('autoImport', autoImport)
+                      this.cloudbackupSettingDataPreferences.putSync('autoImport', this.autoImport)
                       this.cloudbackupSettingDataPreferences.flushSync()
-                      this.getSetting()
                     })
                 }
                 .borderRadius(12)

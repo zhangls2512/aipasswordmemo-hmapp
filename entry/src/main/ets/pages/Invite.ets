@@ -153,6 +153,7 @@ struct Invite {
                       fileNameExtension: 'png',
                       photoType: photoAccessHelper.PhotoType.IMAGE
                     }])
+                    await phAccessHelper.release()
                     if (uris.length === 1) {
                       const srcFile = fileIo.openSync(qrcodeUri)
                       const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)

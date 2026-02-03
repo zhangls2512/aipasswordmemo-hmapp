@@ -234,17 +234,15 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoBackupTables.includes(item.value)
                         })
-                          .onChange(async (isOn) => {
-                            let autoBackupTables: string[] = []
+                          .onChange((isOn) => {
                             if (!isOn) {
-                              autoBackupTables = this.autoBackupTables.filter(inItem => inItem !== item.value)
+                              this.autoBackupTables = this.autoBackupTables.filter(inItem => inItem !== item.value)
                             }
                             if (isOn) {
-                              autoBackupTables = [...this.autoBackupTables, item.value]
+                              this.autoBackupTables = Array.from(new Set([...this.autoBackupTables, item.value]))
                             }
-                            this.dataSettingDataPreferences.putSync('autoBackupTables', autoBackupTables)
+                            this.dataSettingDataPreferences.putSync('autoBackupTables', this.autoBackupTables)
                             this.dataSettingDataPreferences.flushSync()
-                            await this.getSetting()
                           })
                       }
                       .borderRadius(12)
@@ -584,17 +582,17 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoFileBackupTables.includes(item.value)
                         })
-                          .onChange(async (isOn) => {
-                            let autoFileBackupTables: string[] = []
+                          .onChange((isOn) => {
                             if (!isOn) {
-                              autoFileBackupTables = this.autoFileBackupTables.filter(inItem => inItem !== item.value)
+                              this.autoFileBackupTables =
+                                this.autoFileBackupTables.filter(inItem => inItem !== item.value)
                             }
                             if (isOn) {
-                              autoFileBackupTables = [...this.autoFileBackupTables, item.value]
+                              this.autoFileBackupTables =
+                                Array.from(new Set([...this.autoFileBackupTables, item.value]))
                             }
-                            this.dataSettingDataPreferences.putSync('autoFileBackupTables', autoFileBackupTables)
+                            this.dataSettingDataPreferences.putSync('autoFileBackupTables', this.autoFileBackupTables)
                             this.dataSettingDataPreferences.flushSync()
-                            await this.getSetting()
                           })
                       }
                       .borderRadius(12)
@@ -1544,18 +1542,18 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoWebdavBackupTables.includes(item.value)
                         })
-                          .onChange(async (isOn) => {
-                            let autoWebdavBackupTables: string[] = []
+                          .onChange((isOn) => {
                             if (!isOn) {
-                              autoWebdavBackupTables =
+                              this.autoWebdavBackupTables =
                                 this.autoWebdavBackupTables.filter(inItem => inItem !== item.value)
                             }
                             if (isOn) {
-                              autoWebdavBackupTables = [...this.autoWebdavBackupTables, item.value]
+                              this.autoWebdavBackupTables =
+                                Array.from(new Set([...this.autoWebdavBackupTables, item.value]))
                             }
-                            this.dataSettingDataPreferences.putSync('autoWebdavBackupTables', autoWebdavBackupTables)
+                            this.dataSettingDataPreferences.putSync('autoWebdavBackupTables',
+                              this.autoWebdavBackupTables)
                             this.dataSettingDataPreferences.flushSync()
-                            await this.getSetting()
                           })
                       }
                       .borderRadius(12)
