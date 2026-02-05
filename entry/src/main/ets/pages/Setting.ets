@@ -882,9 +882,7 @@ export default struct Setting {
               }
             })
             .onClick(() => {
-              this.pageInfos.pushPath({
-                name: 'Notice'
-              })
+              this.context.eventHub.emit('notice')
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

@@ -97,17 +97,17 @@ export default struct Ainewinfo {
             const fileSource = fileIo.openSync(pickerres.resultUri)
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
+            await imageSource.release()
             const initres = await textRecognition.init()
             if (initres) {
               this.dialogControllerProgress.open()
               const textrecognitionres = await textRecognition.recognizeText({
                 pixelMap: imagePixelMap
               })
+              await textRecognition.release()
               await imagePixelMap.release()
-              await imageSource.release()
               this.dialogControllerProgress.close()
               this.text = textrecognitionres.value
-              await textRecognition.release()
               await this.getList(this.text)
             }
           } catch {
@@ -126,17 +126,17 @@ export default struct Ainewinfo {
             const fileSource = fileIo.openSync(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
+            await imageSource.release()
             const initres = await textRecognition.init()
             if (initres) {
               this.dialogControllerProgress.open()
               const textrecognitionres = await textRecognition.recognizeText({
                 pixelMap: imagePixelMap
               })
+              await textRecognition.release()
               await imagePixelMap.release()
-              await imageSource.release()
               this.dialogControllerProgress.close()
               this.text = textrecognitionres.value
-              await textRecognition.release()
               await this.getList(this.text)
             }
           } catch {
@@ -179,17 +179,17 @@ export default struct Ainewinfo {
               }
               const imageSource = image.createImageSource(buffer)
               const imagePixelMap = await imageSource.createPixelMap()
+              await imageSource.release()
               const initres = await textRecognition.init()
               if (initres) {
                 this.dialogControllerProgress.open()
                 const textrecognitionres = await textRecognition.recognizeText({
                   pixelMap: imagePixelMap
                 })
+                await textRecognition.release()
                 await imagePixelMap.release()
-                await imageSource.release()
                 this.dialogControllerProgress.close()
                 this.text = textrecognitionres.value
-                await textRecognition.release()
                 this.getList(this.text)
               }
             }

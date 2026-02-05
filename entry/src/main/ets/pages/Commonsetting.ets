@@ -644,6 +644,7 @@ struct Commonsetting {
                     const fileSource = fileIo.openSync(pickerres.photoUris[0])
                     const imageSource = image.createImageSource(fileSource.fd)
                     const imagePixelMap = await imageSource.createPixelMap()
+                    await imageSource.release()
                     if (!fileIo.accessSync(this.context.filesDir + '/media')) {
                       await fileIo.mkdir(this.context.filesDir + '/media')
                     }
@@ -656,7 +657,6 @@ struct Commonsetting {
                     })
                     await imagePacker.release()
                     await imagePixelMap.release()
-                    await imageSource.release()
                     fileIo.closeSync(file)
                     this.context.eventHub.emit('refreshIndex')
                   } catch {
@@ -689,6 +689,7 @@ struct Commonsetting {
                       const fileSource = fileIo.openSync(pickerres.photoUris[0])
                       const imageSource = image.createImageSource(fileSource.fd)
                       const imagePixelMap = await imageSource.createPixelMap()
+                      await imageSource.release()
                       const file =
                         fileIo.openSync(backgroundImagePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
                       const imagePacker = image.createImagePacker()
@@ -698,7 +699,6 @@ struct Commonsetting {
                       })
                       await imagePacker.release()
                       await imagePixelMap.release()
-                      await imageSource.release()
                       fileIo.closeSync(file)
                       this.context.eventHub.emit('refreshIndex')
                     } catch {

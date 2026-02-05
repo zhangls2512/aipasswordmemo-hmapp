@@ -92,12 +92,17 @@ export default class EntryAbility extends UIAbility {
       const fileUri = uriList[0] as string
       this.context.eventHub.emit('wantUri', fileUri)
     }
-    if (want.uri) {
-      if (want.uri === 'storage:///clearcache') {
+    if (want.parameters?.linkFeature) {
+      const linkFeature = want.parameters.linkFeature
+      if (linkFeature === 'AppStorageMgmt') {
         this.context.eventHub.emit('clearData')
-      } else {
-        this.context.eventHub.emit('wantUri', want.uri)
       }
+      if (linkFeature === 'AppNotificationMgmt') {
+        this.context.eventHub.emit('notice')
+      }
+    }
+    if (want.uri && !want.parameters?.linkFeature) {
+      this.context.eventHub.emit('wantUri', want.uri)
     }
     try {
       const sharedData = await systemShare.getSharedData(want)
@@ -832,9 +837,11 @@ export default class EntryAbility extends UIAbility {
         const blackFileData = this.context.resourceManager.getRawFileContentSync('iconblack.svg')
         const blackImageSource = image.createImageSource(blackFileData.buffer)
         const blackPixelMap = await blackImageSource.createPixelMap()
+        await blackImageSource.release()
         const whiteFileData = this.context.resourceManager.getRawFileContentSync('iconwhite.svg')
         const whiteImageSource = image.createImageSource(whiteFileData.buffer)
         const whitePixelMap = await whiteImageSource.createPixelMap()
+        await whiteImageSource.release()
         statusBarManager.addToStatusBar(this.context, {
           icons: {
             black: blackPixelMap,
@@ -850,8 +857,6 @@ export default class EntryAbility extends UIAbility {
         })
         await blackPixelMap.release()
         await whitePixelMap.release()
-        await blackImageSource.release()
-        await whiteImageSource.release()
         statusBarManager.updateStatusBarMenu(this.context, [
           [
             {
@@ -983,7 +988,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 50) {
+    if (wantParam.version !== 51) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

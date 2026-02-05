@@ -53,6 +53,7 @@ export default struct Newinfo {
             const fileSource = fileIo.openSync(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
+            await imageSource.release()
             const imageSize = imagePixelMap.getImageInfoSync().size
             if (imageSize.width !== imageSize.height) {
               await promptAction.openToast({
@@ -73,7 +74,6 @@ export default struct Newinfo {
             })
             await imagePacker.release()
             await imagePixelMap.release()
-            await imageSource.release()
             fileIo.closeSync(file)
             this.infoValue = fileUri.getUriFromPath(filePath)
           } catch {
@@ -115,6 +115,7 @@ export default struct Newinfo {
               }
               const imageSource = image.createImageSource(buffer)
               const imagePixelMap = await imageSource.createPixelMap()
+              await imageSource.release()
               const imageSize = imagePixelMap.getImageInfoSync().size
               if (imageSize.width !== imageSize.height) {
                 await promptAction.openToast({
@@ -135,7 +136,6 @@ export default struct Newinfo {
               })
               await imagePacker.release()
               await imagePixelMap.release()
-              await imageSource.release()
               fileIo.closeSync(file)
               this.infoValue = fileUri.getUriFromPath(filePath)
             }
