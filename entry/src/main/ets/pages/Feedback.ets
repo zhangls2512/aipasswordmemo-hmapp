@@ -90,17 +90,12 @@ struct Feedback {
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
-          }
-          .alignItems(HorizontalAlign.Start)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
 
-        ListItem() {
-          Column() {
             Button('提交')
               .enabled(this.content !== '')
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
               .width('100%')
               .onClick(async () => {
                 const dialogControllerProgress = new CustomDialogController({
@@ -124,21 +119,16 @@ struct Feedback {
                   this.pageInfos.pop()
                 }
               })
-          }
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
-          Column() {
             Text('建议填写联系方式，以便开发人员在需要时联系您。')
               .fontWeight(FontWeight.Medium)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
           }
           .alignItems(HorizontalAlign.Start)
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
       .padding({

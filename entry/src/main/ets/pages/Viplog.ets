@@ -242,7 +242,7 @@ struct Viplog {
         })
         this.loading = false
         if (res !== 'fail') {
-          this.viplogArray = JSON.parse(res).data as Item[]
+          this.viplogArray = JSON.parse(res).data
           this.empty = false
         }
       }

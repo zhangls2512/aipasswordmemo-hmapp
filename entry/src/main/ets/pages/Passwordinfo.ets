@@ -31,19 +31,19 @@ export default struct Passwordinfo {
   build() {
     List() {
       ListItem() {
-        Text(this.passwordName)
-          .enableAutoSpacing(true)
-          .fontWeight(FontWeight.Bold)
+        Column() {
+          Text(this.passwordName)
+            .enableAutoSpacing(true)
+            .fontWeight(FontWeight.Bold)
+          Text('信息')
+            .fontWeight(FontWeight.Medium)
+            .margin({
+              bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
+        }
+        .alignItems(HorizontalAlign.Start)
       }
-
-      ListItem() {
-        Text('信息')
-          .fontWeight(FontWeight.Medium)
-      }
-      .margin({
-        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
 
       ForEach(this.passwordInfo, (item: PasswordInfoItem) => {
         if (item.type !== '图标' && item.type !== 'MFA' && item.type !== 'URL') {
@@ -280,32 +280,33 @@ export default struct Passwordinfo {
       })
       if (this.passwordTag.length > 0) {
         ListItem() {
-          Text('标签')
-            .fontWeight(FontWeight.Medium)
+          Column() {
+            Text('标签')
+              .fontWeight(FontWeight.Medium)
+            Flex({
+              wrap: FlexWrap.Wrap,
+              space: {
+                main: LengthMetrics.vp(8),
+                cross: LengthMetrics.vp(8)
+              }
+            }) {
+              ForEach(this.passwordTag, (item: PasswordTagItem) => {
+                Text(item.value)
+                  .enableAutoSpacing(true)
+                  .fontColor(item.color)
+                  .fontWeight(FontWeight.Medium)
+              })
+            }
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
+          }
+          .alignItems(HorizontalAlign.Start)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
       }
-      ListItem() {
-        Flex({
-          wrap: FlexWrap.Wrap,
-          space: {
-            main: LengthMetrics.vp(8),
-            cross: LengthMetrics.vp(8)
-          }
-        }) {
-          ForEach(this.passwordTag, (item: PasswordTagItem) => {
-            Text(item.value)
-              .enableAutoSpacing(true)
-              .fontColor(item.color)
-              .fontWeight(FontWeight.Medium)
-          })
-        }
-      }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

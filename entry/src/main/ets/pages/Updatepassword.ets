@@ -150,23 +150,17 @@ export default struct Updatepassword {
   build() {
     List() {
       ListItem() {
-        TextInput({
-          placeholder: '请输入名称',
-          text: this.passwordName!!
-        })
-          .enableAutoSpacing(true)
-      }
-
-      ListItem() {
-        Text('信息')
-          .fontWeight(FontWeight.Medium)
-      }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
-
-      ListItem() {
         Column() {
+          TextInput({
+            placeholder: '请输入名称',
+            text: this.passwordName!!
+          })
+            .enableAutoSpacing(true)
+          Text('信息')
+            .fontWeight(FontWeight.Medium)
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
           CollaborationServiceStateDialog({
             async onState(stateCode: number, bufferType: string, buffer: ArrayBuffer) {
               if (stateCode !== 0) {
@@ -213,6 +207,9 @@ export default struct Updatepassword {
               value: item
             }
           }))
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
             .selected(this.infoTypeIndex!!)
             .value(this.infoTypeValue!!)
             .onSelect(async (index, value) => {
@@ -528,9 +525,6 @@ export default struct Updatepassword {
         }
         .alignItems(HorizontalAlign.Start)
       }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
 
       ForEach(this.infoArray, (item: string) => {
         if (!this.passwordInfoArray.some(infoItem => infoItem.value === item)) {
@@ -839,26 +833,26 @@ export default struct Updatepassword {
         })
       })
       ListItem() {
-        Text('标签')
-          .fontWeight(FontWeight.Medium)
-      }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
-
-      ListItem() {
-        TextInput({
-          placeholder: '请输入内容',
-          text: this.passwordTag!!
-        })
-          .enableAutoSpacing(true)
-          .onBlur(() => {
-            if (this.pushItemWhenBlur && this.passwordTag &&
-              !this.passwordTagArray.some(item => item === this.passwordTag)) {
-              this.passwordTagArray.push(this.passwordTag)
-              this.passwordTag = ''
-            }
+        Column() {
+          Text('标签')
+            .fontWeight(FontWeight.Medium)
+          TextInput({
+            placeholder: '请输入内容',
+            text: this.passwordTag!!
           })
+            .enableAutoSpacing(true)
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
+            .onBlur(() => {
+              if (this.pushItemWhenBlur && this.passwordTag &&
+                !this.passwordTagArray.some(item => item === this.passwordTag)) {
+                this.passwordTagArray.push(this.passwordTag)
+                this.passwordTag = ''
+              }
+            })
+        }
+        .alignItems(HorizontalAlign.Start)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')

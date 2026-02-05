@@ -10,42 +10,41 @@ export default struct Urlcheck {
   build() {
     List() {
       ListItem() {
-        TextInput({
-          placeholder: '请输入URL',
-          text: this.url!!
-        })
-          .defaultFocus(true)
-          .enableAutoSpacing(true)
-      }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-      })
-
-      ListItem() {
-        Button('添加')
-          .width('100%')
-          .onClick(async () => {
-            if (this.urlArray.length >= 10) {
-              await promptAction.openToast({
-                message: '数量达到上限'
-              })
-              return
-            }
-            if (!this.url) {
-              await promptAction.openToast({
-                message: '请输入 URL'
-              })
-              return
-            }
-            if (this.urlArray.includes(this.url)) {
-              await promptAction.openToast({
-                message: '已添加此 URL'
-              })
-              return
-            }
-            this.urlArray.push(this.url)
-            this.url = ''
+        Column() {
+          TextInput({
+            placeholder: '请输入URL',
+            text: this.url!!
           })
+            .defaultFocus(true)
+            .enableAutoSpacing(true)
+          Button('添加')
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .width('100%')
+            .onClick(async () => {
+              if (this.urlArray.length >= 10) {
+                await promptAction.openToast({
+                  message: '数量达到上限'
+                })
+                return
+              }
+              if (!this.url) {
+                await promptAction.openToast({
+                  message: '请输入 URL'
+                })
+                return
+              }
+              if (this.urlArray.includes(this.url)) {
+                await promptAction.openToast({
+                  message: '已添加此 URL'
+                })
+                return
+              }
+              this.urlArray.push(this.url)
+              this.url = ''
+            })
+        }
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')

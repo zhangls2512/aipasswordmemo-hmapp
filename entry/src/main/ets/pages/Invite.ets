@@ -189,20 +189,14 @@ struct Invite {
                 .height(20)
                 .width(20)
             }
-          }
-          .alignItems(HorizontalAlign.Start)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
-
-        ListItem() {
-          Column() {
             TextArea({
               placeholder: '请输入邀请码',
               text: this.inputInvitationcode!!
             })
               .enableAutoSpacing(true)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
               .maxLength(62)
               .showCounter(true)
             Button('提交')
@@ -233,16 +227,11 @@ struct Invite {
                   this.context.eventHub.emit('refreshVip')
                 }
               })
-          }
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
-          Column() {
             Text('参与活动')
               .fontWeight(FontWeight.Bold)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
             Text('1. 点击复制蓝色的邀请码，发送给新用户，让其进入本页面输入邀请码并提交。')
               .fontWeight(FontWeight.Medium)
               .margin({
@@ -275,17 +264,11 @@ struct Invite {
                 top: $r('sys.float.ohos_id_text_paragraph_margin_s')
               })
             }
-          }
-          .alignItems(HorizontalAlign.Start)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
-          Column() {
             Text('活动说明')
               .fontWeight(FontWeight.Bold)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
             Text('1. 其他账号每使用本账号邀请码一次，本账号获得7天会员，其他账号获得30天会员。')
               .enableAutoSpacing(true)
               .fontWeight(FontWeight.Medium)
@@ -311,7 +294,7 @@ struct Invite {
           .alignItems(HorizontalAlign.Start)
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
       .padding({
@@ -343,7 +326,7 @@ struct Invite {
           product: 'password'
         })
         if (userres !== 'fail') {
-          this.invitationcode = JSON.parse(userres).data.invitationCode as string
+          this.invitationcode = JSON.parse(userres).data.invitationCode
           if (deviceInfo.deviceType !== 'tablet') {
             const shareData = new systemShare.SharedData({
               utd: uniformTypeDescriptor.UniformDataType.HYPERLINK,
@@ -366,7 +349,7 @@ struct Invite {
         })
         this.loading = false
         if (countres !== 'fail') {
-          this.inviteusercount = JSON.parse(countres).count as number
+          this.inviteusercount = JSON.parse(countres).count
         }
       }
     })
