@@ -17,6 +17,7 @@ import request from '../common/Request'
 import Cleardata from './Cleardata'
 import Info from './Info'
 import Me from './Me'
+import Notice from './Notice'
 import Password from './Password'
 import Tag from './Tag'
 import Uploaderrorlog from './Uploaderrorlog'
@@ -32,6 +33,7 @@ struct Index {
   @Local index: number = 0
   @Local title: string = '密码'
   @Local isShowCleardataSheet: boolean = false
+  @Local isShowNoticeSheet: boolean = false
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   controller = new HdsTabsController()
@@ -69,6 +71,11 @@ struct Index {
   }
 
   @Builder
+  NoticeSheetBuilder() {
+    Notice()
+  }
+
+  @Builder
   UploaderrorlogSheetBuilder() {
     Uploaderrorlog({
       errorType: this.errorType,
@@ -94,6 +101,12 @@ struct Index {
           Password()
         }
         .tabBar(this.tabBuilder(0, $r('app.media.password'), '密码'))
+        .bindSheet(this.isShowNoticeSheet!!, this.NoticeSheetBuilder(), {
+          preferType: this.preferType,
+          title: {
+            title: '消息通知'
+          }
+        })
 
         TabContent() {
           Info()
@@ -170,6 +183,11 @@ struct Index {
       this.context.eventHub.on('clearData', () => {
         if (!this.isShowCleardataSheet) {
           this.isShowCleardataSheet = true
+        }
+      })
+      this.context.eventHub.on('notice', () => {
+        if (!this.isShowNoticeSheet) {
+          this.isShowNoticeSheet = true
         }
       })
       const promptAction = this.UIContext.getPromptAction()
@@ -459,6 +477,7 @@ struct Index {
       this.context.eventHub.off('uploadErrorLog')
       this.context.eventHub.off('dialog')
       this.context.eventHub.off('wantUri')
+      this.context.eventHub.off('notice')
       this.context.eventHub.off('clearData')
       display.off('change')
     })
