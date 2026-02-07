@@ -87,7 +87,8 @@ export default class EntryAbility extends UIAbility {
     if (want.parameters?.action === 'passwordInfo') {
       this.context.eventHub.emit('passwordInfo', Number(want.parameters.passwordId))
     }
-    if (want.parameters?.menuHandler === 'clickMenu') {
+    if (want.parameters?.menuHandler === 'clickMenu1' || want.parameters?.menuHandler === 'clickMenu2' ||
+      want.parameters?.menuHandler === 'clickMenu3') {
       const uriList = want.parameters.uriList as string[]
       const fileUri = uriList[0] as string
       this.context.eventHub.emit('wantUri', fileUri)
