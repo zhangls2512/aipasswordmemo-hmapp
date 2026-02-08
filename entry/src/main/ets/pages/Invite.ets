@@ -202,7 +202,7 @@ struct Invite {
             Button('提交')
               .enabled(this.accessToken !== '' && this.deviceToken !== '' && this.inputInvitationcode.length === 62)
               .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .width('100%')
               .onClick(async () => {

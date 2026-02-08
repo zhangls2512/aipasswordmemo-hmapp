@@ -37,7 +37,7 @@ struct DataBackupRecovery {
   @Local autoWebdavBackupTables: string[] = []
   @Local pauseAutoBackupWhenLowBatteryCapacityLevel: boolean = false
   @Local pauseAutoBackupWhenPowerSave: boolean = false
-  @Local hoverId: number = -1
+  @Local hoverId: number | string = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
@@ -272,134 +272,53 @@ struct DataBackupRecovery {
                       right: 12
                     })
                   Column() {
-                    Row() {
-                      Text('密码')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    ForEach(this.typeArray, (item: Type, index) => {
+                      if (index !== 0) {
+                        Divider()
+                          .padding({
+                            left: 12,
+                            right: 12
+                          })
+                      }
+                      Row() {
+                        Text(item.name)
+                          .fontWeight(FontWeight.Medium)
+                          .layoutWeight(1)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                        Image($r('app.media.right'))
+                          .fillColor($r('sys.color.icon_fourth'))
+                          .height(12)
+                          .width(12)
+                      }
+                      .borderRadius(12)
+                      .padding(12)
+                      .stateStyles({
+                        normal: {
+                          .backgroundColor(this.hoverId === '0,' + index ? $r('sys.color.interactive_hover') :
+                            $r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        pressed: {
+                          .backgroundColor($r('sys.color.interactive_pressed'))
+                        }
+                      })
+                      .width('100%')
+                      .onHover((isHover) => {
+                        if (!isHover) {
+                          this.hoverId = -1
+                        }
+                        if (isHover) {
+                          this.hoverId = '0,' + index
+                        }
+                      })
+                      .onClick(async () => {
+                        await backupTable(this.context, item.value)
+                        await promptAction.openToast({
+                          message: '备份成功'
                         })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 0
-                      }
-                    })
-                    .onClick(async () => {
-                      await backupTable(this.context, 'password')
-                      await promptAction.openToast({
-                        message: '备份成功'
+                        await this.getSetting()
                       })
-                      await this.getSetting()
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('常用信息')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 1
-                      }
-                    })
-                    .onClick(async () => {
-                      await backupTable(this.context, 'info')
-                      await promptAction.openToast({
-                        message: '备份成功'
-                      })
-                      await this.getSetting()
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('标签')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 2
-                      }
-                    })
-                    .onClick(async () => {
-                      await backupTable(this.context, 'tag')
-                      await promptAction.openToast({
-                        message: '备份成功'
-                      })
-                      await this.getSetting()
                     })
                   }
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -436,8 +355,7 @@ struct DataBackupRecovery {
                         Row() {
                           Text(item === 'password' ? '密码' :
                             item === 'info' ? '常用信息' :
-                              item === 'tag' ? '标签' :
-                                'undefined')
+                              item === 'tag' ? '标签' : 'undefined')
                             .fontWeight(FontWeight.Medium)
                             .layoutWeight(1)
                             .margin({
@@ -452,7 +370,7 @@ struct DataBackupRecovery {
                         .padding(12)
                         .stateStyles({
                           normal: {
-                            .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                            .backgroundColor(this.hoverId === '1,' + index ? $r('sys.color.interactive_hover') :
                               $r('sys.color.ohos_id_color_card_bg'))
                           },
                           pressed: {
@@ -465,7 +383,7 @@ struct DataBackupRecovery {
                             this.hoverId = -1
                           }
                           if (isHover) {
-                            this.hoverId = 3
+                            this.hoverId = '1,' + index
                           }
                         })
                         .onClick(async () => {
@@ -622,130 +540,51 @@ struct DataBackupRecovery {
                       right: 12
                     })
                   Column() {
-                    Row() {
-                      Text('密码')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    ForEach(this.typeArray, (item: Type, index) => {
+                      if (index !== 0) {
+                        Divider()
+                          .padding({
+                            left: 12,
+                            right: 12
+                          })
+                      }
+                      Row() {
+                        Text(item.name)
+                          .fontWeight(FontWeight.Medium)
+                          .layoutWeight(1)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                        Image($r('app.media.right'))
+                          .fillColor($r('sys.color.icon_fourth'))
+                          .height(12)
+                          .width(12)
+                      }
+                      .borderRadius(12)
+                      .padding(12)
+                      .stateStyles({
+                        normal: {
+                          .backgroundColor(this.hoverId === '2,' + index ? $r('sys.color.interactive_hover') :
+                            $r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        pressed: {
+                          .backgroundColor($r('sys.color.interactive_pressed'))
+                        }
+                      })
+                      .width('100%')
+                      .onHover((isHover) => {
+                        if (!isHover) {
+                          this.hoverId = -1
+                        }
+                        if (isHover) {
+                          this.hoverId = '2,' + index
+                        }
+                      })
+                      .onClick(async () => {
+                        await fileBackupTable(this.context, item.value)
+                        await promptAction.openToast({
+                          message: '备份成功'
                         })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 4
-                      }
-                    })
-                    .onClick(async () => {
-                      await fileBackupTable(this.context, 'password')
-                      await promptAction.openToast({
-                        message: '备份成功'
-                      })
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('常用信息')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 5 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 5
-                      }
-                    })
-                    .onClick(async () => {
-                      await fileBackupTable(this.context, 'info')
-                      await promptAction.openToast({
-                        message: '备份成功'
-                      })
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('标签')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 6 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 6
-                      }
-                    })
-                    .onClick(async () => {
-                      await fileBackupTable(this.context, 'tag')
-                      await promptAction.openToast({
-                        message: '备份成功'
                       })
                     })
                   }
@@ -771,168 +610,74 @@ struct DataBackupRecovery {
                       right: 12
                     })
                   Column() {
-                    Row() {
-                      Text('密码')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 7 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
+                    ForEach(this.typeArray, (item: Type, index) => {
+                      if (index !== 0) {
+                        Divider()
+                          .padding({
+                            left: 12,
+                            right: 12
+                          })
                       }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
+                      Row() {
+                        Text(item.name)
+                          .fontWeight(FontWeight.Medium)
+                          .layoutWeight(1)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                        Image($r('app.media.right'))
+                          .fillColor($r('sys.color.icon_fourth'))
+                          .height(12)
+                          .width(12)
                       }
-                      if (isHover) {
-                        this.hoverId = 7
-                      }
-                    })
-                    .onClick(async () => {
-                      const filePath = this.context.filesDir + '/backup/password.txt'
-                      if (!fileIo.accessSync(filePath)) {
-                        await promptAction.openToast({
-                          message: '无备份文件，无法恢复'
-                        })
-                        return
-                      }
-                      const filestring = await read(filePath)
-                      let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
-                      if (this.index === 1) {
-                        conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
-                      }
-                      const res = await importPassword(this.context, filestring, conflictResolution)
-                      if (res === 'success') {
-                        await promptAction.openToast({
-                          message: '恢复成功'
-                        })
-                      }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
+                      .borderRadius(12)
+                      .padding(12)
+                      .stateStyles({
+                        normal: {
+                          .backgroundColor(this.hoverId === '3,' + index ? $r('sys.color.interactive_hover') :
+                            $r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        pressed: {
+                          .backgroundColor($r('sys.color.interactive_pressed'))
+                        }
                       })
-                    Row() {
-                      Text('常用信息')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 8 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 8
-                      }
-                    })
-                    .onClick(async () => {
-                      const filePath = this.context.filesDir + '/backup/info.txt'
-                      if (!fileIo.accessSync(filePath)) {
-                        await promptAction.openToast({
-                          message: '无备份文件，无法恢复'
-                        })
-                        return
-                      }
-                      const filestring = await read(filePath)
-                      let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
-                      if (this.index === 1) {
-                        conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
-                      }
-                      await importInfo(this.context, filestring, conflictResolution)
-                      await promptAction.openToast({
-                        message: '恢复成功'
+                      .width('100%')
+                      .onHover((isHover) => {
+                        if (!isHover) {
+                          this.hoverId = -1
+                        }
+                        if (isHover) {
+                          this.hoverId = '3,' + index
+                        }
                       })
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('标签')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 9 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 9
-                      }
-                    })
-                    .onClick(async () => {
-                      const filePath = this.context.filesDir + '/backup/tag.txt'
-                      if (!fileIo.accessSync(filePath)) {
-                        await promptAction.openToast({
-                          message: '无备份文件，无法恢复'
-                        })
-                        return
-                      }
-                      const filestring = await read(filePath)
-                      let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
-                      if (this.index === 1) {
-                        conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
-                      }
-                      await importTag(this.context, filestring, conflictResolution)
-                      await promptAction.openToast({
-                        message: '恢复成功'
+                      .onClick(async () => {
+                        const filePath = this.context.filesDir + '/backup/' + item.value + '.txt'
+                        if (!fileIo.accessSync(filePath)) {
+                          await promptAction.openToast({
+                            message: '无备份文件，无法恢复'
+                          })
+                          return
+                        }
+                        const filestring = await read(filePath)
+                        let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
+                        if (this.index === 1) {
+                          conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
+                        }
+                        let res = ''
+                        if (item.name === '密码') {
+                          res = await importPassword(this.context, filestring, conflictResolution)
+                        }
+                        if (item.name === '常用信息') {
+                          res = await importInfo(this.context, filestring, conflictResolution)
+                        }
+                        if (item.name === '标签') {
+                          res = await importTag(this.context, filestring, conflictResolution)
+                        }
+                        if (res === 'success') {
+                          await promptAction.openToast({
+                            message: '恢复成功'
+                          })
+                        }
                       })
                     })
                   }
@@ -958,185 +703,70 @@ struct DataBackupRecovery {
                       right: 12
                     })
                   Column() {
-                    Row() {
-                      Text('密码')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 10 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
+                    ForEach(this.typeArray, (item: Type, index) => {
+                      if (index !== 0) {
+                        Divider()
+                          .padding({
+                            left: 12,
+                            right: 12
+                          })
                       }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
+                      Row() {
+                        Text(item.name)
+                          .fontWeight(FontWeight.Medium)
+                          .layoutWeight(1)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                        Image($r('app.media.right'))
+                          .fillColor($r('sys.color.icon_fourth'))
+                          .height(12)
+                          .width(12)
                       }
-                      if (isHover) {
-                        this.hoverId = 10
-                      }
-                    })
-                    .onClick(async () => {
-                      const filePath = this.context.filesDir + '/backup/password.txt'
-                      if (!fileIo.accessSync(filePath)) {
-                        await promptAction.openToast({
-                          message: '无备份文件，无需导出'
-                        })
-                        return
-                      }
-                      const documentSaveOptions = new picker.DocumentSaveOptions()
-                      documentSaveOptions.newFileNames = ['password']
-                      documentSaveOptions.fileSuffixChoices = ['.txt']
-                      const documentViewPicker = new picker.DocumentViewPicker(this.context)
-                      const uris = await documentViewPicker.save(documentSaveOptions)
-                      if (uris.length === 1) {
-                        const srcFile = fileIo.openSync(filePath)
-                        const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
-                        await fileIo.copyFile(srcFile.fd, destFile.fd)
-                        fileIo.closeSync(srcFile)
-                        fileIo.closeSync(destFile)
-                        await promptAction.openToast({
-                          message: '导出成功'
-                        })
-                      }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
+                      .borderRadius(12)
+                      .padding(12)
+                      .stateStyles({
+                        normal: {
+                          .backgroundColor(this.hoverId === '4,' + index ? $r('sys.color.interactive_hover') :
+                            $r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        pressed: {
+                          .backgroundColor($r('sys.color.interactive_pressed'))
+                        }
                       })
-                    Row() {
-                      Text('常用信息')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 11 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 11
-                      }
-                    })
-                    .onClick(async () => {
-                      const filePath = this.context.filesDir + '/backup/info.txt'
-                      if (!fileIo.accessSync(filePath)) {
-                        await promptAction.openToast({
-                          message: '无备份文件，无需导出'
-                        })
-                        return
-                      }
-                      const documentSaveOptions = new picker.DocumentSaveOptions()
-                      documentSaveOptions.newFileNames = ['info']
-                      documentSaveOptions.fileSuffixChoices = ['.txt']
-                      const documentViewPicker = new picker.DocumentViewPicker(this.context)
-                      const uris = await documentViewPicker.save(documentSaveOptions)
-                      if (uris.length === 1) {
-                        const srcFile = fileIo.openSync(filePath)
-                        const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
-                        await fileIo.copyFile(srcFile.fd, destFile.fd)
-                        fileIo.closeSync(srcFile)
-                        fileIo.closeSync(destFile)
-                        await promptAction.openToast({
-                          message: '导出成功'
-                        })
-                      }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
+                      .width('100%')
+                      .onHover((isHover) => {
+                        if (!isHover) {
+                          this.hoverId = -1
+                        }
+                        if (isHover) {
+                          this.hoverId = '4,' + index
+                        }
                       })
-                    Row() {
-                      Text('标签')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 12 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 12
-                      }
-                    })
-                    .onClick(async () => {
-                      const filePath = this.context.filesDir + '/backup/tag.txt'
-                      if (!fileIo.accessSync(filePath)) {
-                        await promptAction.openToast({
-                          message: '无备份文件，无需导出'
-                        })
-                        return
-                      }
-                      const documentSaveOptions = new picker.DocumentSaveOptions()
-                      documentSaveOptions.newFileNames = ['tag']
-                      documentSaveOptions.fileSuffixChoices = ['.txt']
-                      const documentViewPicker = new picker.DocumentViewPicker(this.context)
-                      const uris = await documentViewPicker.save(documentSaveOptions)
-                      if (uris.length === 1) {
-                        const srcFile = fileIo.openSync(filePath)
-                        const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
-                        await fileIo.copyFile(srcFile.fd, destFile.fd)
-                        fileIo.closeSync(srcFile)
-                        fileIo.closeSync(destFile)
-                        await promptAction.openToast({
-                          message: '导出成功'
-                        })
-                      }
+                      .onClick(async () => {
+                        const filePath = this.context.filesDir + '/backup/' + item.value + '.txt'
+                        if (!fileIo.accessSync(filePath)) {
+                          await promptAction.openToast({
+                            message: '无备份文件，无需导出'
+                          })
+                          return
+                        }
+                        const documentSaveOptions = new picker.DocumentSaveOptions()
+                        documentSaveOptions.newFileNames = [item.value]
+                        documentSaveOptions.fileSuffixChoices = ['.txt']
+                        const documentViewPicker = new picker.DocumentViewPicker(this.context)
+                        const uris = await documentViewPicker.save(documentSaveOptions)
+                        if (uris.length === 1) {
+                          const srcFile = fileIo.openSync(filePath)
+                          const destFile = fileIo.openSync(uris[0], fileIo.OpenMode.WRITE_ONLY)
+                          await fileIo.copyFile(srcFile.fd, destFile.fd)
+                          fileIo.closeSync(srcFile)
+                          fileIo.closeSync(destFile)
+                          await promptAction.openToast({
+                            message: '导出成功'
+                          })
+                        }
+                      })
                     })
                   }
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1161,203 +791,76 @@ struct DataBackupRecovery {
                       right: 12
                     })
                   Column() {
-                    Row() {
-                      Text('密码')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 13 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
+                    ForEach(this.typeArray, (item: Type, index) => {
+                      if (index !== 0) {
+                        Divider()
+                          .padding({
+                            left: 12,
+                            right: 12
+                          })
                       }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
+                      Row() {
+                        Text(item.name)
+                          .fontWeight(FontWeight.Medium)
+                          .layoutWeight(1)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                        Image($r('app.media.right'))
+                          .fillColor($r('sys.color.icon_fourth'))
+                          .height(12)
+                          .width(12)
                       }
-                      if (isHover) {
-                        this.hoverId = 13
-                      }
-                    })
-                    .onClick(async () => {
-                      const promptAction = this.UIContext.getPromptAction()
-                      const filePath = this.context.filesDir + '/backup/password.txt'
-                      if (!fileIo.accessSync(filePath)) {
-                        await promptAction.openToast({
-                          message: '无备份文件，无需删除'
-                        })
-                        return
-                      }
-                      const data = await promptAction.showDialog({
-                        title: '提示',
-                        message: '删除成功后无法恢复，确定删除？',
-                        buttons: [
-                          {
-                            text: '取消',
-                            color: $r('sys.color.font_primary')
-                          },
-                          {
-                            text: '确定',
-                            color: $r('sys.color.warning')
-                          }
-                        ]
+                      .borderRadius(12)
+                      .padding(12)
+                      .stateStyles({
+                        normal: {
+                          .backgroundColor(this.hoverId === '5,' + index ? $r('sys.color.interactive_hover') :
+                            $r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        pressed: {
+                          .backgroundColor($r('sys.color.interactive_pressed'))
+                        }
                       })
-                      if (data.index === 1) {
-                        await fileIo.unlink(filePath)
-                        await promptAction.openToast({
-                          message: '删除成功'
-                        })
-                      }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
+                      .width('100%')
+                      .onHover((isHover) => {
+                        if (!isHover) {
+                          this.hoverId = -1
+                        }
+                        if (isHover) {
+                          this.hoverId = '5,' + index
+                        }
                       })
-                    Row() {
-                      Text('常用信息')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                      .onClick(async () => {
+                        const promptAction = this.UIContext.getPromptAction()
+                        const filePath = this.context.filesDir + '/backup/' + item.value + '.txt'
+                        if (!fileIo.accessSync(filePath)) {
+                          await promptAction.openToast({
+                            message: '无备份文件，无需删除'
+                          })
+                          return
+                        }
+                        const data = await promptAction.showDialog({
+                          title: '提示',
+                          message: '删除成功后无法恢复，确定删除？',
+                          buttons: [
+                            {
+                              text: '取消',
+                              color: $r('sys.color.font_primary')
+                            },
+                            {
+                              text: '确定',
+                              color: $r('sys.color.warning')
+                            }
+                          ]
                         })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 14 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 14
-                      }
-                    })
-                    .onClick(async () => {
-                      const promptAction = this.UIContext.getPromptAction()
-                      const filePath = this.context.filesDir + '/backup/info.txt'
-                      if (!fileIo.accessSync(filePath)) {
-                        await promptAction.openToast({
-                          message: '无备份文件，无需删除'
-                        })
-                        return
-                      }
-                      const data = await promptAction.showDialog({
-                        title: '提示',
-                        message: '删除成功后无法恢复，确定删除？',
-                        buttons: [
-                          {
-                            text: '取消',
-                            color: $r('sys.color.font_primary')
-                          },
-                          {
-                            text: '确定',
-                            color: $r('sys.color.warning')
-                          }
-                        ]
+                        if (data.index === 1) {
+                          await fileIo.unlink(filePath)
+                          await promptAction.openToast({
+                            message: '删除成功'
+                          })
+                        }
                       })
-                      if (data.index === 1) {
-                        await fileIo.unlink(filePath)
-                        await promptAction.openToast({
-                          message: '删除成功'
-                        })
-                      }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('标签')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 15 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 15
-                      }
-                    })
-                    .onClick(async () => {
-                      const promptAction = this.UIContext.getPromptAction()
-                      const filePath = this.context.filesDir + '/backup/tag.txt'
-                      if (!fileIo.accessSync(filePath)) {
-                        await promptAction.openToast({
-                          message: '无备份文件，无需删除'
-                        })
-                        return
-                      }
-                      const data = await promptAction.showDialog({
-                        title: '提示',
-                        message: '删除成功后无法恢复，确定删除？',
-                        buttons: [
-                          {
-                            text: '取消',
-                            color: $r('sys.color.font_primary')
-                          },
-                          {
-                            text: '确定',
-                            color: $r('sys.color.warning')
-                          }
-                        ]
-                      })
-                      if (data.index === 1) {
-                        await fileIo.unlink(filePath)
-                        await promptAction.openToast({
-                          message: '删除成功'
-                        })
-                      }
                     })
                   }
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1390,7 +893,7 @@ struct DataBackupRecovery {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 16 ? $r('sys.color.interactive_hover') :
+                      .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
                         $r('sys.color.ohos_id_color_card_bg'))
                     },
                     pressed: {
@@ -1403,7 +906,7 @@ struct DataBackupRecovery {
                       this.hoverId = -1
                     }
                     if (isHover) {
-                      this.hoverId = 16
+                      this.hoverId = 0
                     }
                   })
                   .onClick(() => {
@@ -1583,164 +1086,63 @@ struct DataBackupRecovery {
                       right: 12
                     })
                   Column() {
-                    Row() {
-                      Text('密码')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 17 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
+                    ForEach(this.typeArray, (item: Type, index) => {
+                      if (index !== 0) {
+                        Divider()
+                          .padding({
+                            left: 12,
+                            right: 12
+                          })
                       }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
+                      Row() {
+                        Text(item.name)
+                          .fontWeight(FontWeight.Medium)
+                          .layoutWeight(1)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                        Image($r('app.media.right'))
+                          .fillColor($r('sys.color.icon_fourth'))
+                          .height(12)
+                          .width(12)
                       }
-                      if (isHover) {
-                        this.hoverId = 17
-                      }
-                    })
-                    .onClick(async () => {
-                      const webdavServerInfo = await getWebdavServerInfo()
-                      if (!webdavServerInfo.path) {
-                        await promptAction.openToast({
-                          message: '未配置 WebDAV 服务器，无法备份'
-                        })
-                        return
-                      }
-                      this.dialogControllerProgress.open()
-                      const res = await webdavBackupTable(this.context, 'password')
-                      this.dialogControllerProgress.close()
-                      if (res !== 'fail') {
-                        await promptAction.openToast({
-                          message: '备份成功'
-                        })
-                      }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
+                      .borderRadius(12)
+                      .padding(12)
+                      .stateStyles({
+                        normal: {
+                          .backgroundColor(this.hoverId === '6,' + index ? $r('sys.color.interactive_hover') :
+                            $r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        pressed: {
+                          .backgroundColor($r('sys.color.interactive_pressed'))
+                        }
                       })
-                    Row() {
-                      Text('常用信息')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 18 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 18
-                      }
-                    })
-                    .onClick(async () => {
-                      const webdavServerInfo = await getWebdavServerInfo()
-                      if (!webdavServerInfo.path) {
-                        await promptAction.openToast({
-                          message: '未配置 WebDAV 服务器，无法备份'
-                        })
-                        return
-                      }
-                      this.dialogControllerProgress.open()
-                      const res = await webdavBackupTable(this.context, 'info')
-                      this.dialogControllerProgress.close()
-                      if (res !== 'fail') {
-                        await promptAction.openToast({
-                          message: '备份成功'
-                        })
-                      }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
+                      .width('100%')
+                      .onHover((isHover) => {
+                        if (!isHover) {
+                          this.hoverId = -1
+                        }
+                        if (isHover) {
+                          this.hoverId = '6,' + index
+                        }
                       })
-                    Row() {
-                      Text('标签')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 19 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 19
-                      }
-                    })
-                    .onClick(async () => {
-                      const webdavServerInfo = await getWebdavServerInfo()
-                      if (!webdavServerInfo.path) {
-                        await promptAction.openToast({
-                          message: '未配置 WebDAV 服务器，无法备份'
-                        })
-                        return
-                      }
-                      this.dialogControllerProgress.open()
-                      const res = await webdavBackupTable(this.context, 'tag')
-                      this.dialogControllerProgress.close()
-                      if (res !== 'fail') {
-                        await promptAction.openToast({
-                          message: '备份成功'
-                        })
-                      }
+                      .onClick(async () => {
+                        const webdavServerInfo = await getWebdavServerInfo()
+                        if (!webdavServerInfo.path) {
+                          await promptAction.openToast({
+                            message: '未配置 WebDAV 服务器，无法备份'
+                          })
+                          return
+                        }
+                        this.dialogControllerProgress.open()
+                        const res = await webdavBackupTable(this.context, item.value)
+                        this.dialogControllerProgress.close()
+                        if (res !== 'fail') {
+                          await promptAction.openToast({
+                            message: '备份成功'
+                          })
+                        }
+                      })
                     })
                   }
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1765,181 +1167,79 @@ struct DataBackupRecovery {
                       right: 12
                     })
                   Column() {
-                    Row() {
-                      Text('密码')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 20 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 20
-                      }
-                    })
-                    .onClick(async () => {
-                      const webdavServerInfo = await getWebdavServerInfo()
-                      if (!webdavServerInfo.path) {
-                        await promptAction.openToast({
-                          message: '未配置 WebDAV 服务器，无法恢复'
-                        })
-                        return
-                      }
-                      this.dialogControllerProgress.open()
-                      const filestring = await this.getWebdavBackup('password')
-                      this.dialogControllerProgress.close()
-                      if (filestring !== 'fail') {
-                        let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
-                        if (this.index === 1) {
-                          conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
-                        }
-                        const res = await importPassword(this.context, filestring, conflictResolution)
-                        if (res === 'success') {
-                          await promptAction.openToast({
-                            message: '恢复成功'
+                    ForEach(this.typeArray, (item: Type, index) => {
+                      if (index !== 0) {
+                        Divider()
+                          .padding({
+                            left: 12,
+                            right: 12
                           })
-                        }
                       }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
+                      Row() {
+                        Text(item.name)
+                          .fontWeight(FontWeight.Medium)
+                          .layoutWeight(1)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                          })
+                        Image($r('app.media.right'))
+                          .fillColor($r('sys.color.icon_fourth'))
+                          .height(12)
+                          .width(12)
+                      }
+                      .borderRadius(12)
+                      .padding(12)
+                      .stateStyles({
+                        normal: {
+                          .backgroundColor(this.hoverId === '7,' + index ? $r('sys.color.interactive_hover') :
+                            $r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        pressed: {
+                          .backgroundColor($r('sys.color.interactive_pressed'))
+                        }
                       })
-                    Row() {
-                      Text('常用信息')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 21 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 21
-                      }
-                    })
-                    .onClick(async () => {
-                      const webdavServerInfo = await getWebdavServerInfo()
-                      if (!webdavServerInfo.path) {
-                        await promptAction.openToast({
-                          message: '未配置 WebDAV 服务器，无法恢复'
-                        })
-                        return
-                      }
-                      this.dialogControllerProgress.open()
-                      const filestring = await this.getWebdavBackup('info')
-                      this.dialogControllerProgress.close()
-                      if (filestring !== 'fail') {
-                        let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
-                        if (this.index === 1) {
-                          conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
+                      .width('100%')
+                      .onHover((isHover) => {
+                        if (!isHover) {
+                          this.hoverId = -1
                         }
-                        await importInfo(this.context, filestring, conflictResolution)
-                        await promptAction.openToast({
-                          message: '恢复成功'
-                        })
-                      }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
+                        if (isHover) {
+                          this.hoverId = '7,' + index
+                        }
                       })
-                    Row() {
-                      Text('标签')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 22 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 22
-                      }
-                    })
-                    .onClick(async () => {
-                      const webdavServerInfo = await getWebdavServerInfo()
-                      if (!webdavServerInfo.path) {
-                        await promptAction.openToast({
-                          message: '未配置 WebDAV 服务器，无法恢复'
-                        })
-                        return
-                      }
-                      this.dialogControllerProgress.open()
-                      const filestring = await this.getWebdavBackup('tag')
-                      this.dialogControllerProgress.close()
-                      if (filestring !== 'fail') {
-                        let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
-                        if (this.index === 1) {
-                          conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
+                      .onClick(async () => {
+                        const webdavServerInfo = await getWebdavServerInfo()
+                        if (!webdavServerInfo.path) {
+                          await promptAction.openToast({
+                            message: '未配置 WebDAV 服务器，无法恢复'
+                          })
+                          return
                         }
-                        await importTag(this.context, filestring, conflictResolution)
-                        await promptAction.openToast({
-                          message: '恢复成功'
-                        })
-                      }
+                        this.dialogControllerProgress.open()
+                        const filestring = await this.getWebdavBackup(item.value)
+                        this.dialogControllerProgress.close()
+                        if (filestring !== 'fail') {
+                          let conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_IGNORE
+                          if (this.index === 1) {
+                            conflictResolution = relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
+                          }
+                          let res = ''
+                          if (item.name === '密码') {
+                            res = await importPassword(this.context, filestring, conflictResolution)
+                          }
+                          if (item.name === '常用信息') {
+                            res = await importInfo(this.context, filestring, conflictResolution)
+                          }
+                          if (item.name === '标签') {
+                            res = await importTag(this.context, filestring, conflictResolution)
+                          }
+                          if (res === 'success') {
+                            await promptAction.openToast({
+                              message: '恢复成功'
+                            })
+                          }
+                        }
+                      })
                     })
                   }
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -1964,215 +1264,80 @@ struct DataBackupRecovery {
                       right: 12
                     })
                   Column() {
-                    Row() {
-                      Text('密码')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 23 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 23
-                      }
-                    })
-                    .onClick(async () => {
-                      const promptAction = this.UIContext.getPromptAction()
-                      const webdavServerInfo = await getWebdavServerInfo()
-                      if (!webdavServerInfo.path) {
-                        await promptAction.openToast({
-                          message: '未配置 WebDAV 服务器，无法删除'
-                        })
-                        return
-                      }
-                      const data = await promptAction.showDialog({
-                        title: '提示',
-                        message: '删除成功后无法恢复，确定删除？',
-                        buttons: [
-                          {
-                            text: '取消',
-                            color: $r('sys.color.font_primary')
-                          },
-                          {
-                            text: '确定',
-                            color: $r('sys.color.warning')
-                          }
-                        ]
-                      })
-                      if (data.index === 1) {
-                        this.dialogControllerProgress.open()
-                        const res = await this.deleteWebdavBackup('password')
-                        this.dialogControllerProgress.close()
-                        if (res !== 'fail') {
-                          await promptAction.openToast({
-                            message: '删除成功'
+                    ForEach(this.typeArray, (item: Type, index) => {
+                      if (index !== 0) {
+                        Divider()
+                          .padding({
+                            left: 12,
+                            right: 12
                           })
-                        }
                       }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('常用信息')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 24 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 24
-                      }
-                    })
-                    .onClick(async () => {
-                      const promptAction = this.UIContext.getPromptAction()
-                      const webdavServerInfo = await getWebdavServerInfo()
-                      if (!webdavServerInfo.path) {
-                        await promptAction.openToast({
-                          message: '未配置 WebDAV 服务器，无法删除'
-                        })
-                        return
-                      }
-                      const data = await promptAction.showDialog({
-                        title: '提示',
-                        message: '删除成功后无法恢复，确定删除？',
-                        buttons: [
-                          {
-                            text: '取消',
-                            color: $r('sys.color.font_primary')
-                          },
-                          {
-                            text: '确定',
-                            color: $r('sys.color.warning')
-                          }
-                        ]
-                      })
-                      if (data.index === 1) {
-                        this.dialogControllerProgress.open()
-                        const res = await this.deleteWebdavBackup('info')
-                        this.dialogControllerProgress.close()
-                        if (res !== 'fail') {
-                          await promptAction.openToast({
-                            message: '删除成功'
+                      Row() {
+                        Text(item.name)
+                          .fontWeight(FontWeight.Medium)
+                          .layoutWeight(1)
+                          .margin({
+                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                           })
+                        Image($r('app.media.right'))
+                          .fillColor($r('sys.color.icon_fourth'))
+                          .height(12)
+                          .width(12)
+                      }
+                      .borderRadius(12)
+                      .padding(12)
+                      .stateStyles({
+                        normal: {
+                          .backgroundColor(this.hoverId === '8,' + index ? $r('sys.color.interactive_hover') :
+                            $r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        pressed: {
+                          .backgroundColor($r('sys.color.interactive_pressed'))
                         }
-                      }
-                    })
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
                       })
-                    Row() {
-                      Text('标签')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Image($r('app.media.right'))
-                        .fillColor($r('sys.color.icon_fourth'))
-                        .height(12)
-                        .width(12)
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor(this.hoverId === 25 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .width('100%')
-                    .onHover((isHover) => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 25
-                      }
-                    })
-                    .onClick(async () => {
-                      const promptAction = this.UIContext.getPromptAction()
-                      const webdavServerInfo = await getWebdavServerInfo()
-                      if (!webdavServerInfo.path) {
-                        await promptAction.openToast({
-                          message: '未配置 WebDAV 服务器，无法删除'
-                        })
-                        return
-                      }
-                      const data = await promptAction.showDialog({
-                        title: '提示',
-                        message: '删除成功后无法恢复，确定删除？',
-                        buttons: [
-                          {
-                            text: '取消',
-                            color: $r('sys.color.font_primary')
-                          },
-                          {
-                            text: '确定',
-                            color: $r('sys.color.warning')
-                          }
-                        ]
+                      .width('100%')
+                      .onHover((isHover) => {
+                        if (!isHover) {
+                          this.hoverId = -1
+                        }
+                        if (isHover) {
+                          this.hoverId = '8,' + index
+                        }
                       })
-                      if (data.index === 1) {
-                        this.dialogControllerProgress.open()
-                        const res = await this.deleteWebdavBackup('tag')
-                        this.dialogControllerProgress.close()
-                        if (res !== 'fail') {
+                      .onClick(async () => {
+                        const promptAction = this.UIContext.getPromptAction()
+                        const webdavServerInfo = await getWebdavServerInfo()
+                        if (!webdavServerInfo.path) {
                           await promptAction.openToast({
-                            message: '删除成功'
+                            message: '未配置 WebDAV 服务器，无法删除'
                           })
+                          return
                         }
-                      }
+                        const data = await promptAction.showDialog({
+                          title: '提示',
+                          message: '删除成功后无法恢复，确定删除？',
+                          buttons: [
+                            {
+                              text: '取消',
+                              color: $r('sys.color.font_primary')
+                            },
+                            {
+                              text: '确定',
+                              color: $r('sys.color.warning')
+                            }
+                          ]
+                        })
+                        if (data.index === 1) {
+                          this.dialogControllerProgress.open()
+                          const res = await this.deleteWebdavBackup(item.value)
+                          this.dialogControllerProgress.close()
+                          if (res !== 'fail') {
+                            await promptAction.openToast({
+                              message: '删除成功'
+                            })
+                          }
+                        }
+                      })
                     })
                   }
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

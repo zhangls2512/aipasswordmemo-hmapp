@@ -488,8 +488,7 @@ struct Tablesync {
                         })
                       Text(item.deviceType === 'PHONE' ? '手机' :
                         item.deviceType === 'TABLET' ? '平板' :
-                          item.deviceType === '2IN1' ? '电脑' :
-                            'undefined')
+                          item.deviceType === '2IN1' ? '电脑' : 'undefined')
                         .fontColor($r('sys.color.font_secondary'))
                         .fontSize($r('sys.float.ohos_id_text_size_body2'))
                         .layoutWeight(1)

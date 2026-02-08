@@ -73,8 +73,7 @@ struct Viplog {
                 Text(item.type === 'pay' ? '付费' :
                   item.type === 'vipcode' ? '兑换码' :
                     item.type === 'invitationcode' ? '邀请码' :
-                      item.type === 'invitenewuser' ? '邀请新用户' :
-                        'undefined')
+                      item.type === 'invitenewuser' ? '邀请新用户' : 'undefined')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .layoutWeight(1)

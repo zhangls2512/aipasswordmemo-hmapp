@@ -31,7 +31,7 @@ struct Vipcode {
             Button('兑换')
               .enabled(this.vipCode.length === 32 ? true : false)
               .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .width('100%')
               .onClick(async () => {
