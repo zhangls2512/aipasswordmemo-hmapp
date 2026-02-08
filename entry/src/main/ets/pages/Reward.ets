@@ -16,24 +16,24 @@ struct Reward {
     HdsNavDestination() {
       List() {
         ListItem() {
-          Text('《App Linking解锁酷炫链接新玩法》优秀参与奖')
-            .enableAutoSpacing(true)
-            .fontColor($r('sys.color.font_emphasize'))
-            .onClick(async () => {
-              await openLink(this.context, 'https://developer.huawei.com/consumer/cn/blog/topic/03194438986554058')
-            })
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
-
-        ListItem() {
-          Text('《HarmonyOS Codelabs校园挑战汇（第三期）》成长奖')
-            .enableAutoSpacing(true)
-            .fontColor($r('sys.color.font_emphasize'))
-            .onClick(async () => {
-              await openLink(this.context, 'https://developer.huawei.com/consumer/cn/forum/topic/0203198763060850022')
-            })
+          Column() {
+            Text('《App Linking解锁酷炫链接新玩法》优秀参与奖')
+              .enableAutoSpacing(true)
+              .fontColor($r('sys.color.font_emphasize'))
+              .onClick(async () => {
+                await openLink(this.context, 'https://developer.huawei.com/consumer/cn/blog/topic/03194438986554058')
+              })
+            Text('《HarmonyOS Codelabs校园挑战汇（第三期）》成长奖')
+              .enableAutoSpacing(true)
+              .fontColor($r('sys.color.font_emphasize'))
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .onClick(async () => {
+                await openLink(this.context, 'https://developer.huawei.com/consumer/cn/forum/topic/0203198763060850022')
+              })
+          }
+          .alignItems(HorizontalAlign.Start)
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')

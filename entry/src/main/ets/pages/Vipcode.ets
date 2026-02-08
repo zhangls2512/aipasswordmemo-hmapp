@@ -31,7 +31,7 @@ struct Vipcode {
             Button('兑换')
               .enabled(this.vipCode.length === 32 ? true : false)
               .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .width('100%')
               .onClick(async () => {
@@ -57,16 +57,11 @@ struct Vipcode {
                   }
                 }
               })
-          }
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
-
-        ListItem() {
-          Column() {
             Text('如何获取兑换码？')
               .fontWeight(FontWeight.Bold)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
             Text('· 应用市场评论')
               .fontColor($r('sys.color.font_emphasize'))
               .fontWeight(FontWeight.Medium)
@@ -113,7 +108,7 @@ struct Vipcode {
           .alignItems(HorizontalAlign.Start)
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
       .padding({

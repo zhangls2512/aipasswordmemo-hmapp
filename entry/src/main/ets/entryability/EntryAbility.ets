@@ -87,7 +87,8 @@ export default class EntryAbility extends UIAbility {
     if (want.parameters?.action === 'passwordInfo') {
       this.context.eventHub.emit('passwordInfo', Number(want.parameters.passwordId))
     }
-    if (want.parameters?.menuHandler === 'clickMenu') {
+    if (want.parameters?.menuHandler === 'clickMenu1' || want.parameters?.menuHandler === 'clickMenu2' ||
+      want.parameters?.menuHandler === 'clickMenu3') {
       const uriList = want.parameters.uriList as string[]
       const fileUri = uriList[0] as string
       this.context.eventHub.emit('wantUri', fileUri)
@@ -988,7 +989,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 51) {
+    if (wantParam.version !== 52) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

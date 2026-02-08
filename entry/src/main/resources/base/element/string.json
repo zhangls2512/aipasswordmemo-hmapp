@@ -5,6 +5,18 @@
       "value": "轩铭密码智能备忘录"
     },
     {
+      "name": "importData",
+      "value": "导入密码/常用信息/标签"
+    },
+    {
+      "name": "importPassword",
+      "value": "导入密码"
+    },
+    {
+      "name": "importPasswordIcon",
+      "value": "导入密码图标"
+    },
+    {
       "name": "USE_FLOAT_BALL_reason",
       "value": "用于展示MFA动态码，便于用户切换到其他应用时实时查看当前MFA。"
     },
