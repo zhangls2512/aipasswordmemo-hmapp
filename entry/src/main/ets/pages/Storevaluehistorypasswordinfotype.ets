@@ -20,42 +20,41 @@ struct Storevaluehistorypasswordinfotype {
     HdsNavDestination() {
       List() {
         ListItem() {
-          TextInput({
-            placeholder: '请输入内容',
-            text: this.type!!
-          })
-            .defaultFocus(this.storeValueHistoryPasswordInfoTypeArray.length === 0 ? true : false)
-            .enableAutoSpacing(true)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
-
-        ListItem() {
-          Button('添加')
-            .width('100%')
-            .onClick(async () => {
-              if (!this.type) {
-                await promptAction.openToast({
-                  message: '请输入内容'
-                })
-                return
-              }
-              if (this.type === '图标' || this.type === 'MFA') {
-                await promptAction.openToast({
-                  message: '不支持添加此类型'
-                })
-                return
-              }
-              if (this.storeValueHistoryPasswordInfoTypeArray.some(item => item === this.type)) {
-                await promptAction.openToast({
-                  message: '已添加此类型'
-                })
-                return
-              }
-              this.storeValueHistoryPasswordInfoTypeArray.push(this.type)
-              this.type = ''
+          Column() {
+            TextInput({
+              placeholder: '请输入内容',
+              text: this.type!!
             })
+              .defaultFocus(this.storeValueHistoryPasswordInfoTypeArray.length === 0 ? true : false)
+              .enableAutoSpacing(true)
+            Button('添加')
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .width('100%')
+              .onClick(async () => {
+                if (!this.type) {
+                  await promptAction.openToast({
+                    message: '请输入内容'
+                  })
+                  return
+                }
+                if (this.type === '图标' || this.type === 'MFA') {
+                  await promptAction.openToast({
+                    message: '不支持添加此类型'
+                  })
+                  return
+                }
+                if (this.storeValueHistoryPasswordInfoTypeArray.some(item => item === this.type)) {
+                  await promptAction.openToast({
+                    message: '已添加此类型'
+                  })
+                  return
+                }
+                this.storeValueHistoryPasswordInfoTypeArray.push(this.type)
+                this.type = ''
+              })
+          }
         }
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')

@@ -2,15 +2,41 @@
   "fileContextMenu": [
     {
       "abilityName": "EntryAbility",
-      "menuItem": "$string:app_name",
-      "menuHandler": "clickMenu",
+      "menuItem": "$string:importData",
+      "menuHandler": "clickMenu1",
       "menuContext": [
         {
           "menuKind": 1,
           "menuRule": "single",
           "fileSupportType": [
-            ".txt",
-            ".csv",
+            ".txt"
+          ]
+        }
+      ]
+    },
+    {
+      "abilityName": "EntryAbility",
+      "menuItem": "$string:importPassword",
+      "menuHandler": "clickMenu2",
+      "menuContext": [
+        {
+          "menuKind": 1,
+          "menuRule": "single",
+          "fileSupportType": [
+            ".csv"
+          ]
+        }
+      ]
+    },
+    {
+      "abilityName": "EntryAbility",
+      "menuItem": "$string:importPasswordIcon",
+      "menuHandler": "clickMenu3",
+      "menuContext": [
+        {
+          "menuKind": 1,
+          "menuRule": "single",
+          "fileSupportType": [
             ".zip"
           ]
         }

@@ -35,33 +35,11 @@ export default struct Cloudservice {
                 .margin({
                   top: $r('sys.float.ohos_id_text_paragraph_margin_m')
                 })
-            }
-            if (this.cloudService) {
-              Text('取消开通云服务前，需：')
-                .fontWeight(FontWeight.Bold)
-              Text('· 清空云备份')
-                .fontWeight(FontWeight.Medium)
-                .margin({
-                  top: $r('sys.float.ohos_id_text_paragraph_margin_m')
-                })
-              Text('· 无会员开通记录')
-                .fontWeight(FontWeight.Medium)
-                .margin({
-                  top: $r('sys.float.ohos_id_text_paragraph_margin_s')
-                })
-            }
-          }
-          .alignItems(HorizontalAlign.Start)
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
-
-        ListItem() {
-          Column() {
-            if (!this.cloudService) {
               Button('开通')
                 .enabled(this.accessToken !== '')
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                })
                 .width('100%')
                 .onClick(async () => {
                   const dialogControllerProgress = new CustomDialogController({
@@ -86,8 +64,23 @@ export default struct Cloudservice {
                 })
             }
             if (this.cloudService) {
+              Text('取消开通云服务前，需：')
+                .fontWeight(FontWeight.Bold)
+              Text('· 清空云备份')
+                .fontWeight(FontWeight.Medium)
+                .margin({
+                  top: $r('sys.float.ohos_id_text_paragraph_margin_m')
+                })
+              Text('· 无会员开通记录')
+                .fontWeight(FontWeight.Medium)
+                .margin({
+                  top: $r('sys.float.ohos_id_text_paragraph_margin_s')
+                })
               Button('取消开通')
                 .enabled(this.accessToken !== '')
+                .margin({
+                  top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+                })
                 .role(ButtonRole.ERROR)
                 .width('100%')
                 .onClick(async () => {
@@ -113,10 +106,10 @@ export default struct Cloudservice {
                 })
             }
           }
-          .width('100%')
+          .alignItems(HorizontalAlign.Start)
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
     }

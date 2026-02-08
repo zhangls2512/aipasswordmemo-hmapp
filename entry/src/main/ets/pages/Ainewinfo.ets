@@ -267,20 +267,26 @@ export default struct Ainewinfo {
             .onChange(async (value) => {
               await this.getList(value)
             })
+          Text('AI识别结果')
+            .enableAutoSpacing(true)
+            .fontWeight(FontWeight.Medium)
+            .margin({
+              bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
+              top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+            })
         }
         .alignItems(HorizontalAlign.Start)
       }
 
-      ListItem() {
-        Text('AI识别结果')
-          .enableAutoSpacing(true)
-          .fontWeight(FontWeight.Medium)
+      if (this.list.length === 0) {
+        ListItem() {
+          Text('无数据')
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
+        .width('100%')
       }
-      .margin({
-        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-        top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
-
       ForEach(this.list, (item: Item, index) => {
         ListItem() {
           Column() {
@@ -375,15 +381,6 @@ export default struct Ainewinfo {
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       })
-      if (this.list.length === 0) {
-        ListItem() {
-          Text('无数据')
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
-        .width('100%')
-      }
     }
     .padding({
       bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),

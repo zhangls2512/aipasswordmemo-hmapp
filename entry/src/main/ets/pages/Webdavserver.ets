@@ -1,8 +1,8 @@
 import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
-import { getWebdavServerInfo, setWebdavServer } from '../common/Webdavserver'
 import { appAccount } from '@kit.BasicServicesKit'
 import { HdsNavDestination } from '@kit.UIDesignKit'
+import { getWebdavServerInfo, setWebdavServer } from '../common/Webdavserver'
 
 @Builder
 export function WebdavserverBuilder() {
@@ -47,15 +47,10 @@ struct Webdavserver {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .type(InputType.Password)
-          }
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
-
-        ListItem() {
-          Column() {
             Button('保存')
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
               .width('100%')
               .onClick(async () => {
                 if (!this.path) {
@@ -109,21 +104,16 @@ struct Webdavserver {
                 this.pageInfos.pop()
                 this.context.eventHub.emit('refreshDataBackupRecovery')
               })
-          }
-        }
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-        })
-
-        ListItem() {
-          Column() {
             Text('地址示例：https://example.com:5006/passwordbackup')
               .fontWeight(FontWeight.Medium)
+              .margin({
+                top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+              })
           }
           .alignItems(HorizontalAlign.Start)
         }
         .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
       }
       .padding({

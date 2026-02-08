@@ -231,75 +231,73 @@ export default struct Cleardata {
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
-        }
-        .alignItems(HorizontalAlign.Start)
-      }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-      })
 
-      ListItem() {
-        Button('清理设置')
-          .enabled(this.setting.length > 0)
-          .role(ButtonRole.ERROR)
-          .width('100%')
-          .onClick(async () => {
-            const promptAction = this.UIContext.getPromptAction()
-            const data = await promptAction.showDialog({
-              title: '提示',
-              message: '清理成功后将恢复所选设置为默认，无法恢复。确定清理？',
-              buttons: [
-                {
-                  text: '取消',
-                  color: $r('sys.color.font_primary')
-                },
-                {
-                  text: '清理',
-                  color: $r('sys.color.warning')
-                }
-              ]
+          Button('清理设置')
+            .enabled(this.setting.length > 0)
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
-            if (data.index === 1) {
-              this.setting.forEach((item) => {
-                const dataPreferences = preferences.getPreferencesSync(this.context, {
-                  name: item
-                })
-                if (item === 'dataSetting') {
-                  Object.keys(dataPreferences.getAllSync()).forEach(keyItem => {
-                    const cannotDeleteKeys =
-                      ['onTables', 'huaweiCloudSyncOnTables', 'huaweiCloudSyncNetworkStrategy', 'isBackupTables']
-                    if (!cannotDeleteKeys.includes(keyItem)) {
-                      dataPreferences.deleteSync(keyItem)
-                    }
-                  })
-                } else {
-                  dataPreferences.clearSync()
-                }
-                dataPreferences.flushSync()
-              })
-              const res = await promptAction.showDialog({
+            .role(ButtonRole.ERROR)
+            .width('100%')
+            .onClick(async () => {
+              const promptAction = this.UIContext.getPromptAction()
+              const data = await promptAction.showDialog({
                 title: '提示',
-                message: '清理成功，需重启应用生效，是否重启？',
+                message: '清理成功后将恢复所选设置为默认，无法恢复。确定清理？',
                 buttons: [
                   {
                     text: '取消',
                     color: $r('sys.color.font_primary')
                   },
                   {
-                    text: '重启',
-                    color: $r('sys.color.font_emphasize')
+                    text: '清理',
+                    color: $r('sys.color.warning')
                   }
                 ]
               })
-              if (res.index === 1) {
-                const applicationContext = this.context.getApplicationContext()
-                applicationContext.restartApp({
-                  bundleName: 'com.zhangxm.aipasswordmemo',
-                  abilityName: 'EntryAbility'
+              if (data.index === 1) {
+                this.setting.forEach((item) => {
+                  const dataPreferences = preferences.getPreferencesSync(this.context, {
+                    name: item
+                  })
+                  if (item === 'dataSetting') {
+                    Object.keys(dataPreferences.getAllSync()).forEach(keyItem => {
+                      const cannotDeleteKeys =
+                        ['onTables', 'huaweiCloudSyncOnTables', 'huaweiCloudSyncNetworkStrategy', 'isBackupTables']
+                      if (!cannotDeleteKeys.includes(keyItem)) {
+                        dataPreferences.deleteSync(keyItem)
+                      }
+                    })
+                  } else {
+                    dataPreferences.clearSync()
+                  }
+                  dataPreferences.flushSync()
                 })
+                const res = await promptAction.showDialog({
+                  title: '提示',
+                  message: '清理成功，需重启应用生效，是否重启？',
+                  buttons: [
+                    {
+                      text: '取消',
+                      color: $r('sys.color.font_primary')
+                    },
+                    {
+                      text: '重启',
+                      color: $r('sys.color.font_emphasize')
+                    }
+                  ]
+                })
+                if (res.index === 1) {
+                  const applicationContext = this.context.getApplicationContext()
+                  applicationContext.restartApp({
+                    bundleName: 'com.zhangxm.aipasswordmemo',
+                    abilityName: 'EntryAbility'
+                  })
+                }
               }
-            }
-          })
+            })
+        }
+        .alignItems(HorizontalAlign.Start)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -415,63 +413,61 @@ export default struct Cleardata {
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+          Button('清理缓存')
+            .enabled(this.cache.length > 0)
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .role(ButtonRole.ERROR)
+            .width('100%')
+            .onClick(async () => {
+              const promptAction = this.UIContext.getPromptAction()
+              const data = await promptAction.showDialog({
+                title: '提示',
+                message: '清理成功后性能可能略微降低，但不会影响正常使用。确定清理？',
+                buttons: [
+                  {
+                    text: '取消',
+                    color: $r('sys.color.font_primary')
+                  },
+                  {
+                    text: '清理',
+                    color: $r('sys.color.warning')
+                  }
+                ]
+              })
+              if (data.index === 1) {
+                const promises = this.cache.map(async (item) => {
+                  if (item === 'appCache') {
+                    await bundleManager.cleanBundleCacheFilesForSelf()
+                  }
+                  if (item === 'webviewCache') {
+                    webview.WebviewController.removeAllCache(true)
+                  }
+                  if (item === 'invitationQrcodeCache') {
+                    const invitationcodeQrcodeDir = this.context.cacheDir + '/media/invitationqrcode/'
+                    if (fileIo.accessSync(invitationcodeQrcodeDir)) {
+                      const fileNames = await fileIo.listFile(invitationcodeQrcodeDir)
+                      const promises = fileNames.map(async (item) => {
+                        await fileIo.unlink(invitationcodeQrcodeDir + item)
+                      })
+                      await Promise.all(promises)
+                    }
+                  }
+                })
+                await Promise.all(promises)
+                await promptAction.openToast({
+                  message: '清理成功'
+                })
+                await this.getSize()
+              }
+            })
         }
         .alignItems(HorizontalAlign.Start)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
-
-      ListItem() {
-        Button('清理缓存')
-          .enabled(this.cache.length > 0)
-          .role(ButtonRole.ERROR)
-          .width('100%')
-          .onClick(async () => {
-            const promptAction = this.UIContext.getPromptAction()
-            const data = await promptAction.showDialog({
-              title: '提示',
-              message: '清理成功后性能可能略微降低，但不会影响正常使用。确定清理？',
-              buttons: [
-                {
-                  text: '取消',
-                  color: $r('sys.color.font_primary')
-                },
-                {
-                  text: '清理',
-                  color: $r('sys.color.warning')
-                }
-              ]
-            })
-            if (data.index === 1) {
-              const promises = this.cache.map(async (item) => {
-                if (item === 'appCache') {
-                  await bundleManager.cleanBundleCacheFilesForSelf()
-                }
-                if (item === 'webviewCache') {
-                  webview.WebviewController.removeAllCache(true)
-                }
-                if (item === 'invitationQrcodeCache') {
-                  const invitationcodeQrcodeDir = this.context.cacheDir + '/media/invitationqrcode/'
-                  if (fileIo.accessSync(invitationcodeQrcodeDir)) {
-                    const fileNames = await fileIo.listFile(invitationcodeQrcodeDir)
-                    const promises = fileNames.map(async (item) => {
-                      await fileIo.unlink(invitationcodeQrcodeDir + item)
-                    })
-                    await Promise.all(promises)
-                  }
-                }
-              })
-              await Promise.all(promises)
-              await promptAction.openToast({
-                message: '清理成功'
-              })
-              await this.getSize()
-            }
-          })
-      }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
 
       ListItem() {
@@ -538,57 +534,55 @@ export default struct Cleardata {
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+          Button('清理日志')
+            .enabled(this.log.length > 0)
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .role(ButtonRole.ERROR)
+            .width('100%')
+            .onClick(async () => {
+              const promptAction = this.UIContext.getPromptAction()
+              const data = await promptAction.showDialog({
+                title: '提示',
+                message: '日志有助于开发者定位问题。清理成功后无法恢复，确定清理？',
+                buttons: [
+                  {
+                    text: '取消',
+                    color: $r('sys.color.font_primary')
+                  },
+                  {
+                    text: '清理',
+                    color: $r('sys.color.warning')
+                  }
+                ]
+              })
+              if (data.index === 1) {
+                const promises = this.log.map(async (item) => {
+                  if (item === 'errorLog') {
+                    const errorLogDir = this.context.filesDir + '/log/error/'
+                    if (fileIo.accessSync(errorLogDir)) {
+                      const fileNames = await fileIo.listFile(errorLogDir)
+                      const promises = fileNames.map(async (item) => {
+                        await fileIo.unlink(errorLogDir + item)
+                      })
+                      await Promise.all(promises)
+                    }
+                  }
+                })
+                await Promise.all(promises)
+                await promptAction.openToast({
+                  message: '清理成功'
+                })
+                await this.getSize()
+              }
+            })
         }
         .alignItems(HorizontalAlign.Start)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
-
-      ListItem() {
-        Button('清理日志')
-          .enabled(this.log.length > 0)
-          .role(ButtonRole.ERROR)
-          .width('100%')
-          .onClick(async () => {
-            const promptAction = this.UIContext.getPromptAction()
-            const data = await promptAction.showDialog({
-              title: '提示',
-              message: '日志有助于开发者定位问题。清理成功后无法恢复，确定清理？',
-              buttons: [
-                {
-                  text: '取消',
-                  color: $r('sys.color.font_primary')
-                },
-                {
-                  text: '清理',
-                  color: $r('sys.color.warning')
-                }
-              ]
-            })
-            if (data.index === 1) {
-              const promises = this.log.map(async (item) => {
-                if (item === 'errorLog') {
-                  const errorLogDir = this.context.filesDir + '/log/error/'
-                  if (fileIo.accessSync(errorLogDir)) {
-                    const fileNames = await fileIo.listFile(errorLogDir)
-                    const promises = fileNames.map(async (item) => {
-                      await fileIo.unlink(errorLogDir + item)
-                    })
-                    await Promise.all(promises)
-                  }
-                }
-              })
-              await Promise.all(promises)
-              await promptAction.openToast({
-                message: '清理成功'
-              })
-              await this.getSize()
-            }
-          })
-      }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
 
       ListItem() {
@@ -760,68 +754,66 @@ export default struct Cleardata {
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
           .padding($r('sys.float.ohos_id_corner_radius_mark'))
+
+          Button('清理无用数据')
+            .enabled(this.nouse.length > 0)
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .role(ButtonRole.ERROR)
+            .width('100%')
+            .onClick(async () => {
+              const promises = this.nouse.map(async (item) => {
+                if (item === 'tempFileNouse') {
+                  const tempDir = this.context.tempDir
+                  const tempFiles = await fileIo.listFile(tempDir)
+                  tempFiles.forEach(async (item) => {
+                    const path = tempDir + '/' + item
+                    const isDirectory = fileIo.statSync(path)
+                    if (!isDirectory) {
+                      await fileIo.unlink(path)
+                    }
+                    if (isDirectory) {
+                      await fileIo.rmdir(path)
+                    }
+                  })
+                }
+                if (item === 'oldaccountNouse') {
+                  try {
+                    const query: asset.AssetMap = new Map()
+                    query.set(asset.Tag.ALIAS, stringToArray('accessToken'))
+                    asset.removeSync(query)
+                    await preferences.deletePreferences(this.context, {
+                      name: 'login'
+                    })
+                  } catch {
+                  }
+                }
+                if (item === 'speakSettingNouse') {
+                  await preferences.deletePreferences(this.context, 'speakSetting')
+                }
+                if (item === 'passwordIconNouse') {
+                  const nousePasswordIconFilePathArray = await this.getNousePasswordIconFilePathArray()
+                  const promises = nousePasswordIconFilePathArray.map(async (item) => {
+                    await fileIo.unlink(item)
+                  })
+                  await Promise.all(promises)
+                }
+                if (item === 'oldInvitationQrcodeNouse') {
+                  await fileIo.rmdir(this.context.filesDir + '/media/invitationqrcode')
+                }
+              })
+              await Promise.all(promises)
+              await promptAction.openToast({
+                message: '清理成功'
+              })
+              await this.getSize()
+            })
         }
         .alignItems(HorizontalAlign.Start)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-      })
-
-      ListItem() {
-        Button('清理无用数据')
-          .enabled(this.nouse.length > 0)
-          .role(ButtonRole.ERROR)
-          .width('100%')
-          .onClick(async () => {
-            const promises = this.nouse.map(async (item) => {
-              if (item === 'tempFileNouse') {
-                const tempDir = this.context.tempDir
-                const tempFiles = await fileIo.listFile(tempDir)
-                tempFiles.forEach(async (item) => {
-                  const path = tempDir + '/' + item
-                  const isDirectory = fileIo.statSync(path)
-                  if (!isDirectory) {
-                    await fileIo.unlink(path)
-                  }
-                  if (isDirectory) {
-                    await fileIo.rmdir(path)
-                  }
-                })
-              }
-              if (item === 'oldaccountNouse') {
-                try {
-                  const query: asset.AssetMap = new Map()
-                  query.set(asset.Tag.ALIAS, stringToArray('accessToken'))
-                  asset.removeSync(query)
-                  await preferences.deletePreferences(this.context, {
-                    name: 'login'
-                  })
-                } catch {
-                }
-              }
-              if (item === 'speakSettingNouse') {
-                await preferences.deletePreferences(this.context, 'speakSetting')
-              }
-              if (item === 'passwordIconNouse') {
-                const nousePasswordIconFilePathArray = await this.getNousePasswordIconFilePathArray()
-                const promises = nousePasswordIconFilePathArray.map(async (item) => {
-                  await fileIo.unlink(item)
-                })
-                await Promise.all(promises)
-              }
-              if (item === 'oldInvitationQrcodeNouse') {
-                await fileIo.rmdir(this.context.filesDir + '/media/invitationqrcode')
-              }
-            })
-            await Promise.all(promises)
-            await promptAction.openToast({
-              message: '清理成功'
-            })
-            await this.getSize()
-          })
-      }
-      .margin({
-        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
       })
     }
     .padding({
