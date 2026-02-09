@@ -37,7 +37,15 @@ struct Networktest {
                   })
                 })
                 dialogControllerProgress.open()
-                const session = rcp.createSession()
+                const session = rcp.createSession({
+                  requestConfiguration: {
+                    security: {
+                      tlsRange: {
+                        min: 'TlsV1.2'
+                      }
+                    }
+                  }
+                })
                 try {
                   const startTime = Date.now()
                   const response = await session.get('https://api.zhangls2512.cn/test')
