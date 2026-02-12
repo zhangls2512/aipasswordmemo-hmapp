@@ -6,6 +6,7 @@ import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { getPasswordInfo, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
 import copy from '../common/Pasteboard'
+import { getTimeStringFromTimeStamp } from '../common/Stringformat'
 import getTotp from '../common/Totp'
 
 @ComponentV2
@@ -115,7 +116,8 @@ export default struct Passwordinfo {
                       await promptAction.showDialog({
                         title: '内容历史记录',
                         message: item.history.slice(1)
-                          .map(historyItem => String(new Date(historyItem.updateTime)) + '：' + historyItem.value)
+                          .map(historyItem => getTimeStringFromTimeStamp(historyItem.updateTime) + '：' +
+                          historyItem.value)
                           .join('\n'),
                         buttons: [
                           {

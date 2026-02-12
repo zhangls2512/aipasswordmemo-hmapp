@@ -4,6 +4,7 @@ import { iap } from '@kit.IAPKit'
 import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
+import { getTimeStringFromTimeStamp } from '../common/Stringformat'
 
 interface Item {
   duration: number,
@@ -21,7 +22,7 @@ export function ViplogBuilder() {
 struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
-  @Local hoverId: number = -1
+  @Local hoverId: number | string = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   accessToken = ''
@@ -115,7 +116,7 @@ struct Viplog {
                   .margin({
                     right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                   })
-                Text(String(new Date(item.date)))
+                Text(getTimeStringFromTimeStamp(item.date))
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .layoutWeight(1)
@@ -147,7 +148,7 @@ struct Viplog {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
+                    .backgroundColor(this.hoverId === index + ',0' ? $r('sys.color.interactive_hover') :
                       $r('sys.color.ohos_id_color_card_bg'))
                   },
                   pressed: {
@@ -160,7 +161,7 @@ struct Viplog {
                     this.hoverId = -1
                   }
                   if (isHover) {
-                    this.hoverId = index
+                    this.hoverId = index + ',0'
                   }
                 })
                 .onClick(async () => {
@@ -172,6 +173,53 @@ struct Viplog {
                         message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
                       })
                     }
+                  }
+                })
+
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  Text('申请发票')
+                    .fontWeight(FontWeight.Medium)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+                  Image($r('app.media.right'))
+                    .fillColor($r('sys.color.icon_fourth'))
+                    .height(12)
+                    .width(12)
+                }
+                .borderRadius(12)
+                .padding(12)
+                .stateStyles({
+                  normal: {
+                    .backgroundColor(this.hoverId === index + ',1' ? $r('sys.color.interactive_hover') :
+                      $r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  pressed: {
+                    .backgroundColor($r('sys.color.interactive_pressed'))
+                  }
+                })
+                .width('100%')
+                .onHover((isHover) => {
+                  if (!isHover) {
+                    this.hoverId = -1
+                  }
+                  if (isHover) {
+                    this.hoverId = index + ',1'
+                  }
+                })
+                .onClick(async () => {
+                  try {
+                    await iap.showManagedInvoices(this.UIContext.getHostContext(), item.info)
+                  } catch (err) {
+                    await promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+                    })
                   }
                 })
               }

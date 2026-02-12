@@ -31,15 +31,10 @@ export default async function request(context: Context, path: string, body: rcp.
     const response = await session.post('https://api.zhangls2512.cn' + path, body)
     session.close()
     if (response.statusCode === 200) {
-      let body = ''
-      if (response.toString()) {
-        body = response.toString() as string
+      const res = response.toJSON() as ErrorResponse
+      if (res.errCode === 0) {
+        return JSON.stringify(res)
       }
-      const errCode = JSON.parse(body).errCode as number
-      if (errCode === 0) {
-        return body
-      }
-      const res = JSON.parse(body) as ErrorResponse
       context.eventHub.emit('dialog', '接口调用失败',
         '错误码：' + res.errCode + '\n错误信息：' + res.errMsg + '\n修复方法：' + res.errFix)
       return 'fail'

@@ -187,14 +187,8 @@ export default class EntryAbility extends UIAbility {
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
-          if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
-            'JS_ERROR',
-            'APP_CRASH',
-            'APP_FREEZE',
-            'APP_KILLED',
-            'RESOURCE_OVERLIMIT',
-            'ADDRESS_SANITIZER'
-          ]) as string[]).includes('JS_ERROR')) {
+          if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType',
+            ['JS_ERROR', 'APP_CRASH']) as string[]).includes('JS_ERROR')) {
             context.eventHub.emit('uploadErrorLog', object.name, JSON.stringify(object))
           }
         }
@@ -223,14 +217,8 @@ export default class EntryAbility extends UIAbility {
         }
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
-          if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
-            'JS_ERROR',
-            'APP_CRASH',
-            'APP_FREEZE',
-            'APP_KILLED',
-            'RESOURCE_OVERLIMIT',
-            'ADDRESS_SANITIZER'
-          ]) as string[]).includes('JS_ERROR')) {
+          if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType',
+            ['JS_ERROR', 'APP_CRASH']) as string[]).includes('JS_ERROR')) {
             this.context.eventHub.emit('uploadErrorLog', object.name, JSON.stringify(object))
           }
         }
@@ -254,14 +242,8 @@ export default class EntryAbility extends UIAbility {
         if (debugSettingDataPreferences.getSync('autoUploadErrorLog', true) &&
         commonSettingDataPreferences.getSync('allService', true)) {
           appEventGroups.forEach(item => {
-            if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType', [
-              'JS_ERROR',
-              'APP_CRASH',
-              'APP_FREEZE',
-              'APP_KILLED',
-              'RESOURCE_OVERLIMIT',
-              'ADDRESS_SANITIZER'
-            ]) as string[]).includes(item.name)) {
+            if ((debugSettingDataPreferences.getSync('autoUploadErrorLogType',
+              ['JS_ERROR', 'APP_CRASH']) as string[]).includes(item.name)) {
               this.context.eventHub.emit('uploadErrorLog', item.name, JSON.stringify(item))
             }
           })

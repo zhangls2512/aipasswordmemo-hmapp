@@ -52,11 +52,7 @@ struct Networktest {
                   session.close()
                   dialogControllerProgress.close()
                   if (response.statusCode === 200) {
-                    let body = ''
-                    if (response.toString()) {
-                      body = response.toString() as string
-                    }
-                    const res = JSON.parse(body) as Response
+                    const res = response.toJSON() as Response
                     this.errCode = res.errCode
                     this.errMsg = res.errMsg
                     this.requestIp = res.requestIp
@@ -68,7 +64,7 @@ struct Networktest {
                     })
                   } else {
                     await promptAction.openToast({
-                      message: '请求失败，错误码：' + response.statusCode + '，错误信息：' + response.reasonPhrase
+                      message: 'HTTP 请求失败，状态码：' + response.statusCode
                     })
                   }
                 } catch (err) {

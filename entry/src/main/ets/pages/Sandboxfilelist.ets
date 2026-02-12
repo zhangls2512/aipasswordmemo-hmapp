@@ -6,7 +6,7 @@ import { filePreview } from '@kit.PreviewKit'
 import { systemShare } from '@kit.ShareKit'
 import { HdsNavDestination } from '@kit.UIDesignKit'
 import { getFileTypeIcon } from '../common/File'
-import { getTimeString, getSizeString } from '../common/Stringformat'
+import { getSizeString, getTimeStringFromSecond } from '../common/Stringformat'
 
 interface FileItem {
   path: string,
@@ -283,7 +283,7 @@ struct Sandboxfilelist {
                         .fontWeight(FontWeight.Medium)
                         .width('85%')
                       Text() {
-                        Span(item.mtime !== -1 ? getTimeString(item.mtime) : '')
+                        Span(item.mtime !== -1 ? getTimeStringFromSecond(item.mtime) : '')
                         if (!item.isdir) {
                           Span(item.size !== -1 ? ' - ' + getSizeString(item.size) : '')
                         }

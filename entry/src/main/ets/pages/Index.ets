@@ -5,7 +5,7 @@ import { display, LoadingDialog, window } from '@kit.ArkUI'
 import { zlib } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
-import { HdsTabs, HdsTabsController } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsTabs, HdsTabsController } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import { getKey } from '../common/Crypto'
 import { importCsvPassword } from '../common/Csv'
@@ -125,8 +125,18 @@ struct Index {
         .tabBar(this.tabBuilder(3, $r('app.media.me'), '我的'))
       }
       .barBackgroundBlurStyle(BlurStyle.Regular)
+      .barFloatingStyle({
+        barBottomMargin: 8,
+        adaptToHandedness: true,
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      })
+      .barOverlap(this.preferType === 0 ? true : false)
       .barPosition(this.preferType === 0 ? BarPosition.End : BarPosition.Start)
-      .barWidth(this.preferType === 0 ? '100%' : 56)
+      .barWidth(this.preferType === 0 ? 320 : 56)
       .scrollable(false)
       .vertical(this.preferType === 0 ? false : true)
       .onChange((index) => {

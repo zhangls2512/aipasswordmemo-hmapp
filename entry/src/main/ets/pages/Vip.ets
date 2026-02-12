@@ -6,6 +6,7 @@ import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
+import { getTimeStringFromTimeStamp } from '../common/Stringformat'
 
 interface VipItem {
   id: string,
@@ -93,7 +94,7 @@ export default struct Vip {
         this.vipEndDate = '终身'
       }
       if (vipenddate > 0) {
-        this.vipEndDate = String(new Date(vipenddate))
+        this.vipEndDate = getTimeStringFromTimeStamp(vipenddate)
         if (vipenddate >= Date.now()) {
           this.vipStatus = '已开通 '
           this.vipStatusColor = '#FFD700'

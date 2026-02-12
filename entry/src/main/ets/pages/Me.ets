@@ -9,6 +9,7 @@ import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
 import { getPreferType } from '../common/Prefertype'
 import request from '../common/Request'
+import { getTimeStringFromTimeStamp } from '../common/Stringformat'
 import Cloudservice from './Cloudservice'
 import Login from './Login'
 import Passwordcheck from './Passwordcheck'
@@ -43,7 +44,7 @@ export default struct Me {
     const accountInfo = await getAccountInfo()
     this.uid = accountInfo.uid
     this.email = accountInfo.email
-    this.endDate = String(new Date(accountInfo.endDate))
+    this.endDate = getTimeStringFromTimeStamp(accountInfo.endDate)
     const accessToken = await getAccountAccessToken()
     if (accessToken) {
       this.cloudServiceLoading = true
