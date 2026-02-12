@@ -18,7 +18,15 @@ export default async function request(context: Context, path: string, body: rcp.
       '全量模式未开启，无法使用在线功能。如需使用在线功能，请前往“我的”>“设置”>“更多”>“应用服务模式”，开启全量模式。')
     return 'fail'
   }
-  const session = rcp.createSession()
+  const session = rcp.createSession({
+    requestConfiguration: {
+      security: {
+        tlsRange: {
+          min: 'TlsV1.2'
+        }
+      }
+    }
+  })
   try {
     const response = await session.post('https://api.zhangls2512.cn' + path, body)
     session.close()
