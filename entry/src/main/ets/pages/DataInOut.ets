@@ -3,7 +3,7 @@ import { relationalStore } from '@kit.ArkData'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { zlib } from '@kit.BasicServicesKit'
 import { fileIo, picker } from '@kit.CoreFileKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { importCsvPassword, parseCsvLine } from '../common/Csv'
 import { getInfoList, getPasswordList, getPasswordMaxId, getTagList, PasswordInfoItem } from '../common/Dataget'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
@@ -869,6 +869,13 @@ struct DataInOut {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

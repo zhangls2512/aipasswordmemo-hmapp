@@ -4,7 +4,7 @@ import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { filePreview } from '@kit.PreviewKit'
 import { systemShare } from '@kit.ShareKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { getFileTypeIcon } from '../common/File'
 import { getSizeString, getTimeStringFromSecond } from '../common/Stringformat'
 
@@ -378,6 +378,13 @@ struct Sandboxfilelist {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

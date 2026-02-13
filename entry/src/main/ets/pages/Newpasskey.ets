@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { util } from '@kit.ArkTS'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -374,6 +374,13 @@ struct Newpasskey {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

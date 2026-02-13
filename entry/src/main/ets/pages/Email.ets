@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo, removeAccount, setAccount } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -186,6 +186,13 @@ struct Email {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

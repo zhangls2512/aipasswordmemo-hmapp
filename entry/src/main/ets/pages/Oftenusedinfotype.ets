@@ -1,6 +1,6 @@
 import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 
 @Builder
 export function OftenusedinfotypeBuilder() {
@@ -168,6 +168,13 @@ struct Oftenusedinfotype {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

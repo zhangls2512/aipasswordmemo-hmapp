@@ -5,7 +5,7 @@ import { LengthMetrics, LoadingDialog, promptAction, SegmentButtonV2Items, TabSe
 import { appAccount } from '@kit.BasicServicesKit'
 import { fileIo, picker } from '@kit.CoreFileKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import { read } from '../common/File'
 import { checkPermission } from '../common/Permission'
@@ -1438,6 +1438,13 @@ struct DataBackupRecovery {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

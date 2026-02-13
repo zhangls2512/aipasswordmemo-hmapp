@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { netBoost } from '@kit.NetworkBoostKit'
-import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -534,6 +534,13 @@ export default struct Vip {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

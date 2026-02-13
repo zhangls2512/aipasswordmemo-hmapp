@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 import { getTimeStringFromTimeStamp } from '../common/Stringformat'
@@ -271,6 +271,13 @@ struct Viplog {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

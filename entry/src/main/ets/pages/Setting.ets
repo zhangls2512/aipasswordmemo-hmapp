@@ -4,7 +4,7 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { formProvider } from '@kit.FormKit'
-import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
@@ -1457,6 +1457,13 @@ export default struct Setting {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

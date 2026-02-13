@@ -1,6 +1,6 @@
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { rcp } from '@kit.RemoteCommunicationKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 
 interface Response {
   errCode: number,
@@ -242,6 +242,13 @@ struct Networktest {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

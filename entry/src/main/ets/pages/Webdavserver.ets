@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { appAccount } from '@kit.BasicServicesKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { getWebdavServerInfo, setWebdavServer } from '../common/Webdavserver'
 
 @Builder
@@ -126,6 +126,13 @@ struct Webdavserver {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

@@ -5,7 +5,7 @@ import { deviceInfo, zlib } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { getInfoList, getPasswordList, getTagList } from '../common/Dataget'
 import { write } from '../common/File'
 import { checkPermission } from '../common/Permission'
@@ -2005,6 +2005,13 @@ struct Tablesync {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

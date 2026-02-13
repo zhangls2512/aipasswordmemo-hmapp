@@ -7,7 +7,7 @@ import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { generateBarcode, scanCore } from '@kit.ScanKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
-import { hdsEffect, HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsEffect, hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
 import copy from '../common/Pasteboard'
@@ -307,6 +307,13 @@ struct Invite {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {

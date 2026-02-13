@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { picker } from '@kit.CoreFileKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
 import { getKeyAlg, removeKey, importRandomKey, exportKey, importCustomKey } from '../common/Crypto'
 import { readUri, writeUri } from '../common/File'
 
@@ -292,6 +292,13 @@ struct Keypage {
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {
