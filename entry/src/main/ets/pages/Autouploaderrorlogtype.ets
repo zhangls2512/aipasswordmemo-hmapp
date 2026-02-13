@@ -14,8 +14,8 @@ export function AutouploaderrorlogtypeBuilder() {
 
 @ComponentV2
 struct Autouploaderrorlogtype {
-  @Local autoUploadErrorLogType: string[] = []
   context = this.getUIContext().getHostContext()
+  autoUploadErrorLogType: string[] = []
   debugSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'debugSetting'
   })

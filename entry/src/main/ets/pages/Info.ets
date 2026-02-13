@@ -5,7 +5,7 @@ import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { CloudBackupTimeItem, getInfoList, getInfoTypeList, Info } from '../common/Dataget'
 import copy from '../common/Pasteboard'
@@ -22,7 +22,6 @@ export default struct InfoPage {
   @Local preferType: number = 1
   @Local infoArray: Info[] = []
   @Local loading: boolean = false
-  @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
   @Local types: string[] = []
   @Local selectType: string = ''
@@ -635,13 +634,13 @@ export default struct InfoPage {
         this.enableCloudBackup = false
         this.loading = true
         const cloudServiceStatus = await getCloudServiceStatus(this.context)
-        if (cloudServiceStatus && getKey()) {
+        if (cloudServiceStatus && getKeyAlg()) {
           this.enableCloudBackup = true
         }
       })
       this.loading = true
       const cloudServiceStatus = await getCloudServiceStatus(this.context)
-      if (cloudServiceStatus && getKey()) {
+      if (cloudServiceStatus && getKeyAlg()) {
         this.enableCloudBackup = true
       }
     })

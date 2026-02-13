@@ -34,21 +34,21 @@ export function TablesyncBuilder() {
 struct Tablesync {
   @Local selectedIndex: number = 0
   @Local onTables: string[] = []
-  @Local autoSyncTables: string[] = []
+  @Local huaweiCloudSyncOnTables: string[] = []
   @Local autoSyncDevices: Item[] = []
   @Local availableDeviceArray: Item[] = []
-  @Local index: number = 0
-  @Local value: string = '始终'
-  @Local huaweiCloudSyncOnTables: string[] = []
-  @Local autoHuaweiCloudSyncTables: string[] = []
   @Local passwordHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
   @Local infoHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
   @Local tagHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
-  @Local pauseAutoSyncWhenLowBatteryCapacityLevel: boolean = false
-  @Local pauseAutoSyncWhenPowerSave: boolean = false
   @Local hoverId: number | string = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
+  index = 0
+  value = '始终'
+  autoSyncTables: string[] = []
+  autoHuaweiCloudSyncTables: string[] = []
+  pauseAutoSyncWhenLowBatteryCapacityLevel = false
+  pauseAutoSyncWhenPowerSave = false
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })

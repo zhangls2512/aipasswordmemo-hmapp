@@ -87,13 +87,11 @@ struct Email {
                 text: this.email!!
               })
                 .contentType(ContentType.EMAIL_ADDRESS)
+                .defaultFocus(true)
                 .enableAutoSpacing(true)
                 .layoutWeight(1)
                 .type(InputType.Email)
             }
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
 
             Row() {
               Text('验证码')

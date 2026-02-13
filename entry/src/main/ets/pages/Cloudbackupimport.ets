@@ -3,7 +3,7 @@ import { preferences } from '@kit.ArkData'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { HdsNavDestination } from '@kit.UIDesignKit'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 
 interface Type {
   name: string,
@@ -19,9 +19,9 @@ export function CloudbackupimportBuilder() {
 struct Cloudbackupimport {
   @Local index: number = 0
   @Local value: string = '保留'
-  @Local autoImport: string[] = []
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
+  autoImport: string[] = []
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'cloudbackupSetting'
@@ -183,7 +183,7 @@ struct Cloudbackupimport {
                 }
               })
               .onClick(async () => {
-                if (!getKey()) {
+                if (!getKeyAlg()) {
                   const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: '导入失败',
@@ -250,7 +250,7 @@ struct Cloudbackupimport {
                 }
               })
               .onClick(async () => {
-                if (!getKey()) {
+                if (!getKeyAlg()) {
                   const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: '导入失败',
@@ -317,7 +317,7 @@ struct Cloudbackupimport {
                 }
               })
               .onClick(async () => {
-                if (!getKey()) {
+                if (!getKeyAlg()) {
                   const promptAction = this.UIContext.getPromptAction()
                   await promptAction.showDialog({
                     title: '导入失败',

@@ -14,8 +14,8 @@ export function AutocloudbackupsettingBuilder() {
 
 @ComponentV2
 struct Autocloudbackupsetting {
-  @Local autoOn: string[] = []
   context = this.getUIContext().getHostContext()
+  autoOn: string[] = []
   cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'cloudbackupSetting'
   })

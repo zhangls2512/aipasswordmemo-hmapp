@@ -15,7 +15,7 @@ import {
 } from '@kit.ServiceCollaborationKit'
 import { CardRecognition, CardSide, CardType } from '@kit.VisionKit'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { newInfo } from '../common/Datachange'
 
 interface Item {
@@ -25,7 +25,6 @@ interface Item {
 
 @ComponentV2
 export default struct Ainewinfo {
-  @Consumer() isShowAinewSheet: boolean = false
   @Local list: Item[] = []
   @Local text: string = ''
   @Local showCard: boolean = false
@@ -390,7 +389,7 @@ export default struct Ainewinfo {
     .onAppear(async () => {
       await textProcessing.init()
       const res = await getCloudServiceStatus(this.context)
-      const key = getKey()
+      const key = getKeyAlg()
       if (res && key) {
         const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
           name: 'cloudbackupSetting'

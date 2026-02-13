@@ -18,10 +18,6 @@ export function CloudbackupmanageBuilder() {
 @ComponentV2
 struct Cloudbackupmanage {
   @Local loading: boolean = false
-  @Local total: string = ''
-  @Local password: string = ''
-  @Local info: string = ''
-  @Local tag: string = ''
   @Local allSelected: boolean = false
   @Local passwordSelected: boolean = false
   @Local infoSelected: boolean = false
@@ -30,6 +26,10 @@ struct Cloudbackupmanage {
   @Local accessToken: string = ''
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
+  total = ''
+  password = ''
+  info = ''
+  tag = ''
 
   async getCount() {
     if (this.accessToken) {

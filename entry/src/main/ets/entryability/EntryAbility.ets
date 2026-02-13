@@ -22,7 +22,9 @@ import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { autoLogin } from '../common/Accesstoken'
+import { clearNouseData } from '../common/Clearnousedata'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
+import { importOldKey } from '../common/Crypto'
 import { deleteData } from '../common/Datachange'
 import { write } from '../common/File'
 import openLink from '../common/Openlink'
@@ -899,6 +901,8 @@ export default class EntryAbility extends UIAbility {
       applicationContext.setSupportedProcessCache(processCache)
     }
     await this.appInit(want)
+    await importOldKey()
+    await clearNouseData(this.context)
   }
 
   async onNewWant(want: Want) {
@@ -971,7 +975,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 53) {
+    if (wantParam.version !== 54) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

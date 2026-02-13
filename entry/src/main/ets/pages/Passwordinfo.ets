@@ -11,22 +11,21 @@ import getTotp from '../common/Totp'
 
 @ComponentV2
 export default struct Passwordinfo {
-  @Consumer() isShowInfoSheet: boolean = false
   @Param passwordId: number = 0
   @Local passwordName: string = ''
   @Local passwordInfo: PasswordInfoItem[] = []
   @Local hidePasswordInfoType: string[] = []
   @Local passwordInfoValueDataDetector: boolean = false
   @Local mfaValue: string = ''
-  @Local mfaStep: number = 30
   @Local mfaSecondsRemaining: number = 0
-  @Local mfaOtpauthUri: string = ''
-  @Local mfaSecondsRemainingColor: Color = Color.Transparent
   @Local mfaSecondsRemainingStyle: string = ''
   @Local passwordTag: PasswordTagItem[] = []
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
+  mfaStep = 30
+  mfaOtpauthUri = ''
+  mfaSecondsRemainingColor = Color.Transparent
   intervalId = -1
 
   build() {

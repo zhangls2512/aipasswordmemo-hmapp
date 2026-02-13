@@ -20,15 +20,15 @@ export default struct Setting {
   @Local isBindHuaweiAccount: boolean = false
   @Local cloudService: boolean = false
   @Local accountLoading: boolean = false
-  @Local accountDataSync: boolean = false
   @Local accountDataSyncEnabled: boolean = false
-  @Local autoLoginByHuaweiAccount: boolean = false
-  @Local autoLoginByPasskey: boolean = false
   @Local accessToken: string = ''
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  accountDataSync = false
+  autoLoginByHuaweiAccount = false
+  autoLoginByPasskey = false
   commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'commonSetting'
   })

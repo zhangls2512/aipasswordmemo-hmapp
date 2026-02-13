@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction, window } from '@kit.ArkUI'
 import { HdsNavDestination } from '@kit.UIDesignKit'
-import { setCustomKey } from '../common/Crypto'
+import { importOldCustomKey } from '../common/Crypto'
 
 @Builder
 export function ImportkeyBuilder() {
@@ -36,7 +36,7 @@ struct Importkey {
               .width('100%')
               .onClick(async () => {
                 try {
-                  await setCustomKey(this.keyValue)
+                  await importOldCustomKey(this.keyValue)
                   this.pageInfos.pop()
                   this.context.eventHub.emit('refreshKey')
                 } catch (err) {

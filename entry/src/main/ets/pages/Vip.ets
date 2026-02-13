@@ -17,16 +17,16 @@ interface VipItem {
 
 @ComponentV2
 export default struct Vip {
-  @Local vipStatus: string = '未开通'
-  @Local vipStatusColor: string = 'red'
   @Local vipStatusLoading: boolean = false
   @Local vipEndDate: string = ''
   @Local iapStatus: boolean = false
   @Local iapStatusLoading: boolean = false
-  @Local agree: boolean = false
   @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  vipStatus = '未开通'
+  vipStatusColor = 'red'
+  agree = false
   accessToken = ''
   uid = ''
   vipArray: VipItem[] = [

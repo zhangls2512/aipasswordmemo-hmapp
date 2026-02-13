@@ -213,35 +213,31 @@ struct Sandboxfilelist {
     HdsNavDestination() {
       Scroll() {
         Column() {
-          if (this.dirnames.length > 0) {
-            Text() {
-              ForEach(this.dirnames, (item: string, index) => {
-                if (index !== 0) {
-                  Span('/ ')
-                }
-                if (index === 0) {
-                  Span('根目录')
-                    .fontColor($r('sys.color.font_emphasize'))
-                    .onClick(async () => {
-                      this.dirnames = []
-                      await this.get()
-                    })
-                  Span(' / ')
-                }
-                Span(item + ' ')
-                  .fontColor($r('sys.color.font_emphasize'))
-                  .onClick(async () => {
-                    this.dirnames = this.dirnames.slice(0, index + 1)
-                    await this.get()
-                  })
+          Text() {
+            Span(' / ')
+              .fontColor($r('sys.color.font_emphasize'))
+              .onClick(async () => {
+                this.dirnames = []
+                await this.get()
               })
-            }
-            .enableAutoSpacing(true)
-            .margin({
-              bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            ForEach(this.dirnames, (item: string, index) => {
+              if (index !== 0) {
+                Span('/ ')
+              }
+              Span(item + ' ')
+                .fontColor($r('sys.color.font_emphasize'))
+                .onClick(async () => {
+                  this.dirnames = this.dirnames.slice(0, index + 1)
+                  await this.get()
+                })
             })
           }
+          .enableAutoSpacing(true)
+          .margin({
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
+            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+          })
+
           List() {
             if (this.fileArray.length === 0) {
               ListItem() {

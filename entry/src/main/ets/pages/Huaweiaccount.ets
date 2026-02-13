@@ -21,13 +21,13 @@ struct Huaweiaccount {
   @Local loading: boolean = false
   @Local isBind: boolean = false
   @Local type: string = 'mfa'
-  @Local mfa: string = ''
-  @Local emailcode: string = ''
-  @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  mfa = ''
+  emailcode = ''
+  agree = false
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err, response) => {
@@ -229,7 +229,6 @@ struct Huaweiaccount {
                   },
                   controller: this.controller
                 })
-                  .enabled(this.agree)
                   .height(40)
                   .margin({
                     top: $r('sys.float.ohos_id_elements_margin_vertical_l')

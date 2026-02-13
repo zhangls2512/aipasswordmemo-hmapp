@@ -5,13 +5,13 @@ import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
-/*import {
+import { getKeyAlg } from '../common/Crypto'
+import {
   deleteQuickBarPassword,
   getQuickBarPasswordIdList,
   setQuickBarPassword,
   syncQuickBarPassword
-} from '../common/Quickbar'*/
+} from '../common/Quickbar'
 import getTotp from '../common/Totp'
 import {
   CloudBackupTimeItem,
@@ -48,7 +48,6 @@ export default struct PasswordPage {
   @Local preferType: number = 1
   @Local passwordArray: Password[] = []
   @Local loading: boolean = false
-  @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
   @Local nameKeyword: string = ''
   @Local info: PasswordInfoItem[] = []
@@ -133,15 +132,18 @@ export default struct PasswordPage {
               startIcon: $r('app.media.addcircle'),
               content: '添加至快捷栏'
             })
-              .onClick(async () => {
-                const promptAction = this.UIContext.getPromptAction()
-                await promptAction.openToast({
-                  message: '敬请期待'
-                })
-                /*await setQuickBarPassword(this.context, item.id, item.name)
-                await promptAction.openToast({
-                  message: '添加成功'
-                })*/
+              .onClick(() => {
+                setQuickBarPassword(this.context, item.id, item.name)
+                setTimeout(async () => {
+                  await syncQuickBarPassword(this.context)
+                  this.quickBarPasswordIdArray = await getQuickBarPasswordIdList(this.context)
+                  if (this.quickBarPasswordIdArray.includes(item.id)) {
+                    const promptAction = this.UIContext.getPromptAction()
+                    await promptAction.openToast({
+                      message: '添加成功'
+                    })
+                  }
+                }, 200)
               })
           }
           if (this.quickBarPasswordIdArray.includes(item.id)) {
@@ -149,15 +151,18 @@ export default struct PasswordPage {
               startIcon: $r('app.media.removecircle'),
               content: '从快捷栏移除'
             })
-              .onClick(async () => {
-                const promptAction = this.UIContext.getPromptAction()
-                await promptAction.openToast({
-                  message: '敬请期待'
-                })
-                /*await deleteQuickBarPassword(this.context, item.id)
-                await promptAction.openToast({
-                  message: '移除成功'
-                })*/
+              .onClick(() => {
+                deleteQuickBarPassword(this.context, item.id)
+                setTimeout(async () => {
+                  await syncQuickBarPassword(this.context)
+                  this.quickBarPasswordIdArray = await getQuickBarPasswordIdList(this.context)
+                  if (!this.quickBarPasswordIdArray.includes(item.id)) {
+                    const promptAction = this.UIContext.getPromptAction()
+                    await promptAction.openToast({
+                      message: '移除成功'
+                    })
+                  }
+                }, 200)
               })
           }
         }
@@ -808,10 +813,10 @@ export default struct PasswordPage {
         .onRefreshing(async () => {
           this.passwordArray =
             await getFilterPasswordList(this.context, this.nameKeyword, this.info, this.tag, this.orderColumn)
-          /*if (deviceInfo.deviceType === '2in1') {
+          if (deviceInfo.deviceType === '2in1') {
             await syncQuickBarPassword(this.context)
             this.quickBarPasswordIdArray = await getQuickBarPasswordIdList(this.context)
-          }*/
+          }
           this.tags = await getTagList(this.context, 'value')
           this.loading = false
         })
@@ -879,7 +884,7 @@ export default struct PasswordPage {
         }
         this.loading = true
         const cloudServiceStatus = await getCloudServiceStatus(this.context)
-        if (cloudServiceStatus && getKey()) {
+        if (cloudServiceStatus && getKeyAlg()) {
           this.enableCloudBackup = true
         }
       })
@@ -921,7 +926,7 @@ export default struct PasswordPage {
       }, 500)
       this.loading = true
       const cloudServiceStatus = await getCloudServiceStatus(this.context)
-      if (cloudServiceStatus && getKey()) {
+      if (cloudServiceStatus && getKeyAlg()) {
         this.enableCloudBackup = true
       }
     })

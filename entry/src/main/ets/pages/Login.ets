@@ -335,7 +335,6 @@ export default struct Login {
             },
             controller: this.controller
           })
-            .enabled(this.agree)
             .height(40)
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')

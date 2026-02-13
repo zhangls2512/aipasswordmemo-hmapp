@@ -11,7 +11,7 @@ import {
   createCollaborationServiceMenuItems
 } from '@kit.ServiceCollaborationKit'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { newInfo } from '../common/Datachange'
 import { SelectItem } from './Newpassword'
 
@@ -412,7 +412,7 @@ export default struct Newinfo {
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
       const res = await getCloudServiceStatus(this.context)
-      const key = getKey()
+      const key = getKeyAlg()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'
       }

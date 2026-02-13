@@ -7,7 +7,7 @@ import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
 import { hdsMaterial, HdsTabs, HdsTabsController } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import getDeviceToken from '../common/Devicetoken'
@@ -99,6 +99,9 @@ struct Index {
       }) {
         TabContent() {
           Password()
+            .padding({
+              bottom: this.preferType === 0 ? 64 : 0
+            })
         }
         .tabBar(this.tabBuilder(0, $r('app.media.password'), '密码'))
         .bindSheet(this.isShowNoticeSheet!!, this.NoticeSheetBuilder(), {
@@ -110,17 +113,26 @@ struct Index {
 
         TabContent() {
           Info()
+            .padding({
+              bottom: this.preferType === 0 ? 64 : 0
+            })
         }
         .tabBar(this.tabBuilder(1, $r('app.media.info'), '常用信息'))
 
         TabContent() {
           Tag()
+            .padding({
+              bottom: this.preferType === 0 ? 64 : 0
+            })
         }
         .tabBar(this.tabBuilder(2, $r('app.media.tag'), '标签'))
 
         TabContent() {
           Me()
             .height('100%')
+            .padding({
+              bottom: this.preferType === 0 ? 64 : 0
+            })
         }
         .tabBar(this.tabBuilder(3, $r('app.media.me'), '我的'))
       }
@@ -469,7 +481,7 @@ struct Index {
         this.backgroundImagePixelMap = await this.getBackgroundImage()
       })
       this.backgroundImagePixelMap = await this.getBackgroundImage()
-      if (!getKey()) {
+      if (!getKeyAlg()) {
         await promptAction.showDialog({
           title: '提示',
           message: '检测到未导入密钥，建议前往“我的”>“设置”>“密钥”导入密钥以加密数据，提高安全性',

@@ -17,12 +17,12 @@ struct Newpasskey {
   @Local credentialId: string = ''
   @Local publicKey: string = ''
   @Local type: string = 'mfa'
-  @Local mfa: string = ''
-  @Local emailcode: string = ''
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  mfa = ''
+  emailcode = ''
 
   getNumber(data: number, start: number, end: number) {
     const binarystring = data.toString(2).padStart(8, '0')

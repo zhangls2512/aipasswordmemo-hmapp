@@ -28,7 +28,7 @@ struct License {
     { property: '主体类型', value: '个人' },
     { property: '开办者名称', value: '张**' },
     { property: '注册地公安机关', value: '萨尔图区网安大队' },
-    { property: '注册时间', value: '2025-05-14' }
+    { property: '注册时间', value: '2026-02-13' }
   ]
   tscjInfoArray: ItemWithDesc[] = [
     {

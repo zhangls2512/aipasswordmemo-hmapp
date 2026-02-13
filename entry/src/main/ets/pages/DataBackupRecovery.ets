@@ -26,21 +26,21 @@ export function DataBackupRecoveryBuilder() {
 struct DataBackupRecovery {
   @Local selectedIndex: number = 0
   @Local isBackupTables: string[] = []
-  @Local autoBackupTables: string[] = []
-  @Local index: number = 0
-  @Local value: string = '保留'
-  @Local encryptFileBackup: boolean = true
-  @Local autoFileBackupTables: string[] = []
-  @Local accountDataSync: boolean = false
-  @Local accountDataSyncEnabled: boolean = false
-  @Local encryptWebdavBackup: boolean = true
-  @Local autoWebdavBackupTables: string[] = []
-  @Local pauseAutoBackupWhenLowBatteryCapacityLevel: boolean = false
-  @Local pauseAutoBackupWhenPowerSave: boolean = false
   @Local hoverId: number | string = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  autoBackupTables: string[] = []
+  index = 0
+  value = '保留'
+  encryptFileBackup = true
+  autoFileBackupTables: string[] = []
+  accountDataSync = false
+  accountDataSyncEnabled = false
+  encryptWebdavBackup = true
+  autoWebdavBackupTables: string[] = []
+  pauseAutoBackupWhenLowBatteryCapacityLevel = false
+  pauseAutoBackupWhenPowerSave = false
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
@@ -65,7 +65,13 @@ struct DataBackupRecovery {
   ]
 
   async getSetting() {
-    this.isBackupTables = this.dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
+    const isBackupTables: string[] = []
+    this.typeArray.forEach(item => {
+      if (fileIo.accessSync(this.context.databaseDir + '/rdb/' + item.value + 'backup.db')) {
+        isBackupTables.push(item.value)
+      }
+    })
+    this.isBackupTables = isBackupTables
     this.autoBackupTables =
       this.dataSettingDataPreferences.getSync('autoBackupTables', ['password', 'info', 'tag']) as string[]
     this.encryptFileBackup = this.dataSettingDataPreferences.getSync('encryptFileBackup', true) as boolean

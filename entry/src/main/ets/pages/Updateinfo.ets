@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { updateInfo } from '../common/Datachange'
 import { getInfoInfo, Info } from '../common/Dataget'
 
@@ -225,7 +225,7 @@ export default struct Updateinfo {
       this.infoType = infoInfo.type
       this.infoValue = infoInfo.value
       const res = await getCloudServiceStatus(this.context)
-      const key = getKey()
+      const key = getKeyAlg()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'
       }

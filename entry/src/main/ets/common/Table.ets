@@ -2,9 +2,10 @@ import { preferences, relationalStore } from '@kit.ArkData'
 import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
 import { batteryInfo, power } from '@kit.BasicServicesKit'
+import { fileIo } from '@kit.CoreFileKit'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
-import { encrypt, EncryptData, getKey } from './Crypto'
+import { encrypt, EncryptData, getKeyAlg } from './Crypto'
 import { getInfoList, getPasswordList, getTagList } from './Dataget'
 import { write } from './File'
 import { getWebdavServerInfo } from './Webdavserver'
@@ -128,7 +129,11 @@ export async function backupTable(context: Context, table: string) {
     encrypt: true,
     allowRebuild: true
   })
-  await rdbStore.backup(table + 'Backup.db')
+  await rdbStore.backup(table + 'backup.db')
+  const oldFilePath = context.databaseDir + '/rdb/' + table + 'Backup.db'
+  if (fileIo.accessSync(oldFilePath)) {
+    await fileIo.unlink(oldFilePath)
+  }
   const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
     name: 'dataSetting'
   })
@@ -265,7 +270,7 @@ export async function fileBackupTable(context: Context, table: string) {
   })
   const encryptFileBackup = dataSettingDataPreferences.getSync('encryptFileBackup', true)
   let encrypted = false
-  if (encryptFileBackup && getKey()) {
+  if (encryptFileBackup && getKeyAlg()) {
     encrypted = true
   }
   const datastring = await getFileBackupString(context, table, encrypted)
@@ -284,7 +289,7 @@ export async function webdavBackupTable(context: Context, table: string) {
   })
   const encryptWebdavBackup = dataSettingDataPreferences.getSync('encryptWebdavBackup', true)
   let encrypted = false
-  if (encryptWebdavBackup && getKey()) {
+  if (encryptWebdavBackup && getKeyAlg()) {
     encrypted = true
   }
   const datastring = await getFileBackupString(context, table, encrypted)
@@ -373,5 +378,5 @@ export async function recoveryTable(context: Context, table: string) {
     encrypt: true,
     allowRebuild: true
   })
-  await rdbStore.restore(table + 'Backup.db')
+  await rdbStore.restore(table + 'backup.db')
 }

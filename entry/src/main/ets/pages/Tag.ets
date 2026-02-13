@@ -3,7 +3,7 @@ import { display, LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { CloudBackupTimeItem, getTagList, Tag } from '../common/Dataget'
 import { getPreferType } from '../common/Prefertype'
@@ -17,7 +17,6 @@ export default struct TagPage {
   @Local preferType: number = 1
   @Local tagArray: Tag[] = []
   @Local loading: boolean = false
-  @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Tag[] = []
@@ -524,13 +523,13 @@ export default struct TagPage {
         this.enableCloudBackup = false
         this.loading = true
         const cloudServiceStatus = await getCloudServiceStatus(this.context)
-        if (cloudServiceStatus && getKey()) {
+        if (cloudServiceStatus && getKeyAlg()) {
           this.enableCloudBackup = true
         }
       })
       this.loading = true
       const cloudServiceStatus = await getCloudServiceStatus(this.context)
-      if (cloudServiceStatus && getKey()) {
+      if (cloudServiceStatus && getKeyAlg()) {
         this.enableCloudBackup = true
       }
     })
