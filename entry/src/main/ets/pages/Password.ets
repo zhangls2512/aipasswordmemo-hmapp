@@ -42,9 +42,9 @@ interface MfaItem {
 @ComponentV2
 export default struct PasswordPage {
   @Provider() isShowNewSheet: boolean = false
-  @Provider() isShowInfoSheet: boolean = false
   @Provider() isShowUpdateSheet: boolean = false
   @Provider() isShowFilterSheet: boolean = false
+  @Local isShowInfoSheet: boolean = false
   @Local preferType: number = 1
   @Local passwordArray: Password[] = []
   @Local loading: boolean = false

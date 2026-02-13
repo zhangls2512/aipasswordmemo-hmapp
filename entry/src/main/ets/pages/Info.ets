@@ -18,7 +18,7 @@ import UpdateInfo from './Updateinfo'
 export default struct InfoPage {
   @Provider() isShowNewSheet: boolean = false
   @Provider() isShowUpdateSheet: boolean = false
-  @Provider() isShowAinewSheet: boolean = false
+  @Local isShowAinewSheet: boolean = false
   @Local preferType: number = 1
   @Local infoArray: Info[] = []
   @Local loading: boolean = false
