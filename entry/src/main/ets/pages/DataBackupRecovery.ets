@@ -26,6 +26,7 @@ export function DataBackupRecoveryBuilder() {
 struct DataBackupRecovery {
   @Local selectedIndex: number = 0
   @Local isBackupTables: string[] = []
+  @Local accountDataSyncEnabled: boolean = false
   @Local hoverId: number | string = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
@@ -36,7 +37,6 @@ struct DataBackupRecovery {
   encryptFileBackup = true
   autoFileBackupTables: string[] = []
   accountDataSync = false
-  accountDataSyncEnabled = false
   encryptWebdavBackup = true
   autoWebdavBackupTables: string[] = []
   pauseAutoBackupWhenLowBatteryCapacityLevel = false
@@ -130,9 +130,15 @@ struct DataBackupRecovery {
         }
         return body
       }
-      if (response.statusCode === 404) {
+      const statusCodeMap: Record<number, string> = {
+        401: '账号密码错误',
+        404: '无备份文件',
+        405: '目录不存在或无权限'
+      }
+      const reason = statusCodeMap[response.statusCode]
+      if (reason) {
         await promptAction.openToast({
-          message: '无备份文件，无法恢复'
+          message: '恢复失败，原因：' + reason
         })
         return 'fail'
       }
@@ -171,9 +177,15 @@ struct DataBackupRecovery {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return 'success'
       }
-      if (response.statusCode === 404) {
+      const statusCodeMap: Record<number, string> = {
+        401: '账号密码错误',
+        404: '无备份文件',
+        405: '目录不存在或无权限'
+      }
+      const reason = statusCodeMap[response.statusCode]
+      if (reason) {
         await promptAction.openToast({
-          message: '无备份文件，无需删除'
+          message: '删除失败，原因：' + reason
         })
         return 'fail'
       }

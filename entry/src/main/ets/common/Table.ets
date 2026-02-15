@@ -314,6 +314,17 @@ export async function webdavBackupTable(context: Context, table: string) {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return 'success'
       } else {
+        const statusCodeMap: Record<number, string> = {
+          401: '账号密码错误',
+          405: '目录不存在或无权限'
+        }
+        const reason = statusCodeMap[response.statusCode]
+        if (reason) {
+          await promptAction.openToast({
+            message: '备份失败，原因：' + reason
+          })
+          return 'fail'
+        }
         await promptAction.openToast({
           message: '请求失败，错误码：' + response.statusCode
         })

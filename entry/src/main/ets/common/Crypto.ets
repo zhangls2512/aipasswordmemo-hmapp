@@ -130,9 +130,16 @@ export async function importCustomKey(key: string) {
       message: '导入成功'
     })
   } catch (err) {
-    await promptAction.openToast({
-      message: '导入失败' + JSON.stringify(err)
-    })
+    if (!err.code) {
+      await promptAction.openToast({
+        message: '导入失败'
+      })
+    }
+    if (err.code) {
+      await promptAction.openToast({
+        message: '导入失败，错误码：' + err.code
+      })
+    }
   }
 }
 

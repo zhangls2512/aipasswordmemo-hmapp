@@ -899,7 +899,7 @@ struct Commonsetting {
                 Column() {
                   Text('密码信息内容特殊实体识别')
                     .fontWeight(FontWeight.Medium)
-                  Text('图标、MFA、URL类型除外')
+                  Text('图标、MFA类型除外')
                     .enableAutoSpacing(true)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -987,23 +987,12 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
-                Column() {
-                  Text('密码信息内容、标签输入框失焦时自动添加信息、标签')
-                    .fontWeight(FontWeight.Medium)
-                  Text('MFA信息类型仅对输入otpauthUri时生效')
-                    .enableAutoSpacing(true)
-                    .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                    .margin({
-                      top: $r('sys.float.ohos_id_text_margin_vertical')
-                    })
-                }
-                .alignItems(HorizontalAlign.Start)
-                .layoutWeight(1)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-
+                Text('密码信息内容、标签输入框失焦时自动添加信息、标签')
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
                 Toggle({
                   type: ToggleType.Switch,
                   isOn: this.pushItemWhenBlur!!

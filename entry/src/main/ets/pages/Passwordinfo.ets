@@ -108,7 +108,7 @@ export default struct Passwordinfo {
                       const promptAction = this.UIContext.getPromptAction()
                       if (!item.history || item.history.length < 2) {
                         await promptAction.openToast({
-                          message: '无历史记录'
+                          message: '无内容历史记录'
                         })
                         return
                       }

@@ -13,7 +13,7 @@ export default struct Newtag {
   @Local red: number = 0
   @Local green: number = 0
   @Local blue: number = 0
-  @Local alpha: number = 0
+  @Local alpha: number = 1
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''

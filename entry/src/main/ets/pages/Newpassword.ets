@@ -123,6 +123,7 @@ export default struct Newpassword {
             await imagePixelMap.release()
             fileIo.closeSync(file)
             this.infoValue = fileUri.getUriFromPath(filePath)
+            await this.inputBlur()
           } catch {
           }
         })
@@ -203,6 +204,7 @@ export default struct Newpassword {
               await imagePixelMap.release()
               fileIo.closeSync(file)
               this.infoValue = fileUri.getUriFromPath(filePath)
+              await this.inputBlur()
             }
           })
           Select(this.oftenUsedInfoTypes.map((item): SelectItem => {
@@ -324,8 +326,9 @@ export default struct Newpassword {
                   title: '密码随机生成'
                 },
                 onAppear: () => {
-                  this.context.eventHub.on('inputPassword', (password: string) => {
+                  this.context.eventHub.on('inputPassword', async (password: string) => {
                     this.infoValue = password
+                    await this.inputBlur()
                   })
                 },
                 onDisappear: () => {
@@ -405,6 +408,27 @@ export default struct Newpassword {
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                 })
                 .type(InputType.Password)
+                .onBlur(async () => {
+                  const infoType = this.getCurrentInfoType()
+                  if (this.pushItemWhenBlur && infoType &&
+                    !this.passwordInfoArray.some(item => item.type === infoType) &&
+                  this.infoValue && this.mfaStep && this.mfaDigits) {
+                    this.passwordInfoArray.push({
+                      type: infoType,
+                      value: this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits
+                    })
+                    this.infoType = ''
+                    this.infoTypeIndex = 0
+                    this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                    this.infoValue = ''
+                    this.otpauthUri = ''
+                    this.mfaStep = '30'
+                    this.mfaDigits = '6'
+                    if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
+                      this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
+                    }
+                  }
+                })
               TextInput({
                 placeholder: '请输入步长 (单位：秒)',
                 text: this.mfaStep!!

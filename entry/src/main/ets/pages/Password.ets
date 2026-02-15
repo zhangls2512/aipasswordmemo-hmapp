@@ -132,18 +132,16 @@ export default struct PasswordPage {
               startIcon: $r('app.media.addcircle'),
               content: '添加至快捷栏'
             })
-              .onClick(() => {
-                setQuickBarPassword(this.context, item.id, item.name)
-                setTimeout(async () => {
-                  await syncQuickBarPassword(this.context)
-                  this.quickBarPasswordIdArray = await getQuickBarPasswordIdList(this.context)
-                  if (this.quickBarPasswordIdArray.includes(item.id)) {
-                    const promptAction = this.UIContext.getPromptAction()
-                    await promptAction.openToast({
-                      message: '添加成功'
-                    })
-                  }
-                }, 200)
+              .onClick(async () => {
+                await setQuickBarPassword(this.context, item.id, item.name)
+                await syncQuickBarPassword(this.context)
+                this.quickBarPasswordIdArray = await getQuickBarPasswordIdList(this.context)
+                if (this.quickBarPasswordIdArray.includes(item.id)) {
+                  const promptAction = this.UIContext.getPromptAction()
+                  await promptAction.openToast({
+                    message: '添加成功'
+                  })
+                }
               })
           }
           if (this.quickBarPasswordIdArray.includes(item.id)) {
@@ -151,18 +149,16 @@ export default struct PasswordPage {
               startIcon: $r('app.media.removecircle'),
               content: '从快捷栏移除'
             })
-              .onClick(() => {
-                deleteQuickBarPassword(this.context, item.id)
-                setTimeout(async () => {
-                  await syncQuickBarPassword(this.context)
-                  this.quickBarPasswordIdArray = await getQuickBarPasswordIdList(this.context)
-                  if (!this.quickBarPasswordIdArray.includes(item.id)) {
-                    const promptAction = this.UIContext.getPromptAction()
-                    await promptAction.openToast({
-                      message: '移除成功'
-                    })
-                  }
-                }, 200)
+              .onClick(async () => {
+                await deleteQuickBarPassword(this.context, item.id)
+                await syncQuickBarPassword(this.context)
+                this.quickBarPasswordIdArray = await getQuickBarPasswordIdList(this.context)
+                if (!this.quickBarPasswordIdArray.includes(item.id)) {
+                  const promptAction = this.UIContext.getPromptAction()
+                  await promptAction.openToast({
+                    message: '移除成功'
+                  })
+                }
               })
           }
         }
