@@ -253,6 +253,9 @@ export default struct Filterpassword {
         }
         .alignItems(HorizontalAlign.Start)
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
 
       ForEach(this.infoArray, (item: string) => {
         if (!this.passwordInfoArray.some(infoItem => infoItem.value === item)) {

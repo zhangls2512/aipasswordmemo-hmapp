@@ -24,8 +24,8 @@ import Passwordgenerate from './Passwordgenerate'
 export default struct Updatepassword {
   @Consumer() isShowUpdateSheet: boolean = false
   @Provider() isShowPasswordgenerateSheet: boolean = false
-  @Local preferType: number = 1
   @Param passwordId: number = 0
+  @Local preferType: number = 1
   @Local passwordName: string = ''
   @Local passwordInfoArray: PasswordInfoItem[] = []
   @Local infoType: string = ''
@@ -549,6 +549,9 @@ export default struct Updatepassword {
         }
         .alignItems(HorizontalAlign.Start)
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
 
       ForEach(this.infoArray, (item: string) => {
         if (!this.passwordInfoArray.some(infoItem => infoItem.value === item)) {

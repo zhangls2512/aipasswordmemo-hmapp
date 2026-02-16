@@ -276,6 +276,9 @@ export default struct Ainewinfo {
         }
         .alignItems(HorizontalAlign.Start)
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
 
       if (this.list.length === 0) {
         ListItem() {
