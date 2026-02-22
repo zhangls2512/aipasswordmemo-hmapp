@@ -23,6 +23,11 @@ struct Newpasskey {
   pageInfos = new NavPathStack()
   mfa = ''
   emailcode = ''
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '请求中...'
+    })
+  })
 
   getNumber(data: number, start: number, end: number) {
     const binarystring = data.toString(2).padStart(8, '0')
@@ -279,16 +284,11 @@ struct Newpasskey {
                   })
                   .width('100%')
                   .onClick(async () => {
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '发送中...'
-                      })
-                    })
-                    dialogControllerProgress.open()
+                    this.dialogControllerProgress.open()
                     const res = await request(this.context, '/account/sendEmailCode', {
                       email: this.email
                     })
-                    dialogControllerProgress.close()
+                    this.dialogControllerProgress.close()
                     if (res !== 'fail') {
                       await promptAction.openToast({
                         message: '验证码已成功发送到邮箱：' + this.email
@@ -333,12 +333,7 @@ struct Newpasskey {
                   if (this.type === 'emailcode') {
                     code = this.emailcode
                   }
-                  const dialogControllerProgress = new CustomDialogController({
-                    builder: LoadingDialog({
-                      content: '新增中...'
-                    })
-                  })
-                  dialogControllerProgress.open()
+                  this.dialogControllerProgress.open()
                   const res = await request(this.context, '/account/bindExternalAccount', {
                     email: this.email,
                     verifyType: this.type,
@@ -347,7 +342,7 @@ struct Newpasskey {
                     credentialId: this.credentialId,
                     publicKey: this.publicKey
                   })
-                  dialogControllerProgress.close()
+                  this.dialogControllerProgress.close()
                   if (res !== 'fail') {
                     await promptAction.openToast({
                       message: '新增成功'

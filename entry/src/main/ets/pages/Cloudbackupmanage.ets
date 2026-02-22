@@ -208,7 +208,7 @@ struct Cloudbackupmanage {
                   if (data.index === 1) {
                     const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
-                        content: '清理中...'
+                        content: '请求中...'
                       })
                     })
                     dialogControllerProgress.open()

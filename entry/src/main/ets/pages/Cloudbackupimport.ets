@@ -28,7 +28,7 @@ struct Cloudbackupimport {
   })
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
-      content: '导入中...'
+      content: '请求中...'
     })
   })
   typeArray: Type[] = [

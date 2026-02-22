@@ -72,6 +72,11 @@ export default struct PasswordPage {
   filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'filterPassword'
   })
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '请求中...'
+    })
+  })
 
   async cloudBackup(item: Password) {
     let cloudBackupTime = JSON.stringify([])
@@ -201,14 +206,9 @@ export default struct PasswordPage {
             content: '云备份'
           })
             .onClick(async () => {
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '云备份中...'
-                })
-              })
-              dialogControllerProgress.open()
+              this.dialogControllerProgress.open()
               await this.cloudBackup(item)
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.loading = true
             })
         }
@@ -218,17 +218,12 @@ export default struct PasswordPage {
             content: '取消云备份'
           })
             .onClick(async () => {
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '取消云备份中...'
-                })
-              })
-              dialogControllerProgress.open()
+              this.dialogControllerProgress.open()
               await deleteCloudBackup(this.context, {
                 type: 'password',
                 id: item.id
               })
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.loading = true
             })
         }

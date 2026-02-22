@@ -52,14 +52,9 @@ struct Tablesync {
   dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'dataSetting'
   })
-  pushDialogControllerProgress = new CustomDialogController({
+  dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
-      content: '推送中...'
-    })
-  })
-  pullDialogControllerProgress = new CustomDialogController({
-    builder: LoadingDialog({
-      content: '拉取中...'
+      content: '进行中...'
     })
   })
   typeArray: Type[] = [
@@ -630,10 +625,10 @@ struct Tablesync {
                           })
                           return
                         }
-                        this.pushDialogControllerProgress.open()
+                        this.dialogControllerProgress.open()
                         await syncTable(this.context, 'password', item.networkId,
                           relationalStore.SyncMode.SYNC_MODE_PUSH)
-                        this.pushDialogControllerProgress.close()
+                        this.dialogControllerProgress.close()
                       }
                       if (data.index === 1) {
                         if (!this.onTables.includes('info')) {
@@ -642,9 +637,9 @@ struct Tablesync {
                           })
                           return
                         }
-                        this.pushDialogControllerProgress.open()
+                        this.dialogControllerProgress.open()
                         await syncTable(this.context, 'info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
-                        this.pushDialogControllerProgress.close()
+                        this.dialogControllerProgress.close()
                       }
                       if (data.index === 2) {
                         if (!this.onTables.includes('tag')) {
@@ -653,9 +648,9 @@ struct Tablesync {
                           })
                           return
                         }
-                        this.pushDialogControllerProgress.open()
+                        this.dialogControllerProgress.open()
                         await syncTable(this.context, 'tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
-                        this.pushDialogControllerProgress.close()
+                        this.dialogControllerProgress.close()
                       }
                     })
 
@@ -722,10 +717,10 @@ struct Tablesync {
                           })
                           return
                         }
-                        this.pullDialogControllerProgress.open()
+                        this.dialogControllerProgress.open()
                         await syncTable(this.context, 'password', item.networkId,
                           relationalStore.SyncMode.SYNC_MODE_PULL)
-                        this.pullDialogControllerProgress.close()
+                        this.dialogControllerProgress.close()
                       }
                       if (data.index === 1) {
                         if (!this.onTables.includes('info')) {
@@ -734,9 +729,9 @@ struct Tablesync {
                           })
                           return
                         }
-                        this.pullDialogControllerProgress.open()
+                        this.dialogControllerProgress.open()
                         await syncTable(this.context, 'info', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
-                        this.pullDialogControllerProgress.close()
+                        this.dialogControllerProgress.close()
                       }
                       if (data.index === 2) {
                         if (!this.onTables.includes('tag')) {
@@ -745,9 +740,9 @@ struct Tablesync {
                           })
                           return
                         }
-                        this.pullDialogControllerProgress.open()
+                        this.dialogControllerProgress.open()
                         await syncTable(this.context, 'tag', item.networkId, relationalStore.SyncMode.SYNC_MODE_PULL)
-                        this.pullDialogControllerProgress.close()
+                        this.dialogControllerProgress.close()
                       }
                     })
                   }

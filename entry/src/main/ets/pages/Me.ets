@@ -259,7 +259,7 @@ export default struct Me {
                     if (confirm.index === 1) {
                       const dialogControllerProgress = new CustomDialogController({
                         builder: LoadingDialog({
-                          content: '加载中...'
+                          content: '请求中...'
                         })
                       })
                       dialogControllerProgress.open()

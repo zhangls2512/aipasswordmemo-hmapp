@@ -11,6 +11,11 @@ export default struct Cloudservice {
   @Local loading: boolean = false
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   accessToken = ''
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '请求中...'
+    })
+  })
 
   build() {
     List() {
@@ -42,17 +47,12 @@ export default struct Cloudservice {
                 })
                 .width('100%')
                 .onClick(async () => {
-                  const dialogControllerProgress = new CustomDialogController({
-                    builder: LoadingDialog({
-                      content: '开通中...'
-                    })
-                  })
-                  dialogControllerProgress.open()
+                  this.dialogControllerProgress.open()
                   const res = await request(this.context, '/account/openService', {
                     accessToken: this.accessToken,
                     service: 'password'
                   })
-                  dialogControllerProgress.close()
+                  this.dialogControllerProgress.close()
                   if (res !== 'fail') {
                     await promptAction.openToast({
                       message: '开通成功'
@@ -84,17 +84,12 @@ export default struct Cloudservice {
                 .role(ButtonRole.ERROR)
                 .width('100%')
                 .onClick(async () => {
-                  const dialogControllerProgress = new CustomDialogController({
-                    builder: LoadingDialog({
-                      content: '取消开通中...'
-                    })
-                  })
-                  dialogControllerProgress.open()
+                  this.dialogControllerProgress.open()
                   const res = await request(this.context, '/account/closeService', {
                     accessToken: this.accessToken,
                     service: 'password'
                   })
-                  dialogControllerProgress.close()
+                  this.dialogControllerProgress.close()
                   if (res !== 'fail') {
                     await promptAction.openToast({
                       message: '取消开通成功'

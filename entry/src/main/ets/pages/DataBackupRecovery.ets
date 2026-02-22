@@ -46,7 +46,7 @@ struct DataBackupRecovery {
   })
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
-      content: '加载中...'
+      content: '请求中...'
     })
   })
   typeArray: Type[] = [

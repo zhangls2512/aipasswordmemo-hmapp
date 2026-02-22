@@ -26,6 +26,11 @@ export default struct TagPage {
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
   updateId = 0
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '请求中...'
+    })
+  })
 
   async cloudBackup(item: Tag) {
     let cloudBackupTime = JSON.stringify([])
@@ -109,14 +114,9 @@ export default struct TagPage {
             content: '云备份'
           })
             .onClick(async () => {
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '云备份中...'
-                })
-              })
-              dialogControllerProgress.open()
+              this.dialogControllerProgress.open()
               await this.cloudBackup(item)
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.loading = true
             })
         }
@@ -126,17 +126,12 @@ export default struct TagPage {
             content: '取消云备份'
           })
             .onClick(async () => {
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '取消云备份中...'
-                })
-              })
-              dialogControllerProgress.open()
+              this.dialogControllerProgress.open()
               await deleteCloudBackup(this.context, {
                 type: 'tag',
                 id: item.id
               })
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.loading = true
             })
         }

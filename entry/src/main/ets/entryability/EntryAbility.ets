@@ -371,7 +371,7 @@ export default class EntryAbility extends UIAbility {
     if (netConnected) {
       const checkVersionUpdate = commonSettingDataPreferences.getSync('checkVersionUpdate', 1)
       if (checkVersionUpdate === 2 ||
-        (checkVersionUpdate === 1 && currentNetworkBearerType !== connection.NetBearType.BEARER_WIFI)) {
+        (checkVersionUpdate === 1 && currentNetworkBearerType !== connection.NetBearType.BEARER_CELLULAR)) {
         try {
           const res = await updateManager.checkAppUpdate(this.context)
           if (res.updateAvailable === updateManager.UpdateAvailableCode.LATER_VERSION_EXIST) {

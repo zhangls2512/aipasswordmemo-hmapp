@@ -39,7 +39,7 @@ struct Vipcode {
                 if (accessToken) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
-                      content: '验证中...'
+                      content: '请求中...'
                     })
                   })
                   dialogControllerProgress.open()

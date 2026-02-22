@@ -23,7 +23,7 @@ export default struct Login {
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
-      content: '登录中...'
+      content: '请求中...'
     })
   })
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
@@ -223,16 +223,11 @@ export default struct Login {
                   })
                   return
                 }
-                const dialogControllerProgress = new CustomDialogController({
-                  builder: LoadingDialog({
-                    content: '发送中...'
-                  })
-                })
-                dialogControllerProgress.open()
+                this.dialogControllerProgress.open()
                 const res = await request(this.context, '/account/sendEmailCode', {
                   email: this.email
                 })
-                dialogControllerProgress.close()
+                this.dialogControllerProgress.close()
                 if (res !== 'fail') {
                   await promptAction.openToast({
                     message: '验证码已成功发送到邮箱：' + this.email

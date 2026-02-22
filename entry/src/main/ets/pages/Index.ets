@@ -293,7 +293,7 @@ struct Index {
         const accessToken = await getAccountAccessToken()
         const dialogControllerProgress = new CustomDialogController({
           builder: LoadingDialog({
-            content: '加载中...'
+            content: '请求中...'
           })
         })
         if (wantUri.startsWith('https://www.zhangls2512.cn/product/password')) {

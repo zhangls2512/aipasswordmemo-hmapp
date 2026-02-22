@@ -18,6 +18,11 @@ struct Email {
   @Local buttonEnabled: boolean = true
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '请求中...'
+    })
+  })
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err, response) => {
@@ -34,19 +39,14 @@ struct Email {
           return
         }
         if (response) {
-          const dialogControllerProgress = new CustomDialogController({
-            builder: LoadingDialog({
-              content: '绑定中...'
-            })
-          })
-          dialogControllerProgress.open()
+          this.dialogControllerProgress.open()
           const res = await request(this.context, '/account/updateEmail', {
             verifyType: 'huaweiaipasswordmemoapp',
             verifyCode: response.authorizationCode,
             newEmail: this.email,
             newEmailCode: this.emailcode
           })
-          dialogControllerProgress.close()
+          this.dialogControllerProgress.close()
           if (res !== 'fail') {
             await promptAction.openToast({
               message: '绑定成功'
@@ -126,16 +126,11 @@ struct Email {
                   })
                   return
                 }
-                const dialogControllerProgress = new CustomDialogController({
-                  builder: LoadingDialog({
-                    content: '发送中...'
-                  })
-                })
-                dialogControllerProgress.open()
+                this.dialogControllerProgress.open()
                 const res = await request(this.context, '/account/sendEmailCode', {
                   email: this.email
                 })
-                dialogControllerProgress.close()
+                this.dialogControllerProgress.close()
                 if (res !== 'fail') {
                   await promptAction.openToast({
                     message: '验证码已成功发送到邮箱：' + this.email
