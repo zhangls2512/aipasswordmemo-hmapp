@@ -21,8 +21,8 @@ struct Cloudbackupimport {
   @Local value: string = '保留'
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
-  autoImport: string[] = []
   context = this.UIContext.getHostContext() as common.UIAbilityContext
+  autoImport: string[] = []
   cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
     name: 'cloudbackupSetting'
   })

@@ -145,6 +145,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async windowInit(windowStage: window.WindowStage) {
+    await windowStage.getMainWindowSync().setWindowLayoutFullScreen(true)
     await windowStage.loadContent('pages/Index')
     const context = this.context
     const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
@@ -975,7 +976,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 54) {
+    if (wantParam.version !== 56) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })
