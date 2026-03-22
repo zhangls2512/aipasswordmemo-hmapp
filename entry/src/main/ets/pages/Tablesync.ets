@@ -1981,7 +1981,7 @@ struct Tablesync {
           .layoutWeight(1)
         }
         .margin({
-          bottom:28,
+          bottom: 28,
           top: 64
         })
       }

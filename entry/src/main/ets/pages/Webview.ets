@@ -31,7 +31,7 @@ struct Webview {
         .geolocationAccess(false)
         .margin({
           bottom: 28,
-            top: 64
+          top: 64
         })
         .nestedScroll({
           scrollForward: NestedScrollMode.SELF_ONLY,

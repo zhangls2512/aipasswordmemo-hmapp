@@ -323,7 +323,6 @@ struct Huaweiaccount {
           })
           .width('100%')
         }
-
         ListItem()
           .margin({
             bottom: 28

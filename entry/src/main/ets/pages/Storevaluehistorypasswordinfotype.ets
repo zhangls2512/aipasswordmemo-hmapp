@@ -90,7 +90,6 @@ struct Storevaluehistorypasswordinfotype {
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
-
         ListItem()
           .margin({
             bottom: 28

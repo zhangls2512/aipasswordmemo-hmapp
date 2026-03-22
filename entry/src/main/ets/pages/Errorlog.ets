@@ -348,10 +348,10 @@ struct Errorlog {
           .layoutWeight(1)
         }
         .alignItems(HorizontalAlign.Start)
-          .margin({
-            bottom:28,
-            top: 64
-          })
+        .margin({
+          bottom: 28,
+          top: 64
+        })
       }
       .padding({
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),

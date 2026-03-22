@@ -159,7 +159,6 @@ struct Oftenusedinfotype {
             })
           }
         })
-
         ListItem()
           .margin({
             bottom: 28

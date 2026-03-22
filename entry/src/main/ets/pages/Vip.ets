@@ -131,29 +131,10 @@ export default struct Vip {
       await promptAction.openToast({
         message: '服务器正在验证，大约需要 5-20 秒，请稍候'
       })
-    } catch (err) {
+    } catch {
       netBoost.setSceneDesc({
         scene: 'transaction',
         sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
-      })
-      const errCode = err.code as number
-      if (errCode === 1001860000) {
-        return
-      }
-      if (errCode === 1001860050) {
-        await promptAction.openToast({
-          message: '系统未登录华为账号，无法购买'
-        })
-        return
-      }
-      if (errCode === 1001860051) {
-        await promptAction.openToast({
-          message: '已购买，无需重复购买'
-        })
-        return
-      }
-      await promptAction.openToast({
-        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
   }

@@ -238,7 +238,6 @@ struct Viplog {
           })
           .width('100%')
         }
-
         ListItem()
           .margin({
             bottom: 28
