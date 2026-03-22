@@ -7,7 +7,13 @@ import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { generateBarcode, scanCore } from '@kit.ScanKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
-import { hdsEffect, hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
+import {
+  hdsEffect,
+  hdsMaterial,
+  HdsNavDestination,
+  HdsNavDestinationTitleMode,
+  ScrollEffectType
+} from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import getDeviceToken from '../common/Devicetoken'
 import copy from '../common/Pasteboard'
@@ -33,6 +39,10 @@ struct Invite {
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             if (!this.loading && this.invitationcode && this.inviteusercount !== -1) {
@@ -86,7 +96,7 @@ struct Invite {
                     if (!fileIo.accessSync(qrcodePath)) {
                       const qrcodePixelMap =
                         await generateBarcode.createBarcode('https://www.zhangls2512.cn/product/password?invitationcode=' +
-                        this.invitationcode, {
+                          this.invitationcode, {
                           scanType: scanCore.ScanType.QR_CODE,
                           width: 200,
                           height: 200
@@ -129,7 +139,7 @@ struct Invite {
                     if (!fileIo.accessSync(qrcodePath)) {
                       const qrcodePixelMap =
                         await generateBarcode.createBarcode('https://www.zhangls2512.cn/product/password?invitationcode=' +
-                        this.invitationcode, {
+                          this.invitationcode, {
                           scanType: scanCore.ScanType.QR_CODE,
                           width: 200,
                           height: 200
@@ -296,9 +306,13 @@ struct Invite {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -309,6 +323,28 @@ struct Invite {
         end: LengthMetrics.vp(60)
       },
       style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
         thermoCtrl: true,
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
@@ -319,9 +355,9 @@ struct Invite {
         title: {
           mainTitle: '邀请新用户，免费得会员'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.accessToken = await getAccountAccessToken()

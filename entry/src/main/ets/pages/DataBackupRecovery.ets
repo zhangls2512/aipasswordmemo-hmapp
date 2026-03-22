@@ -1,14 +1,15 @@
 import { common } from '@kit.AbilityKit'
-import { preferences, relationalStore } from '@kit.ArkData'
+import { relationalStore } from '@kit.ArkData'
 import { util } from '@kit.ArkTS'
 import { LengthMetrics, LoadingDialog, promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
 import { appAccount } from '@kit.BasicServicesKit'
 import { fileIo, picker } from '@kit.CoreFileKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
-import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import { read } from '../common/File'
 import { checkPermission } from '../common/Permission'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 import { backupTable, fileBackupTable, recoveryTable, webdavBackupTable } from '../common/Table'
 import { getWebdavServerInfo } from '../common/Webdavserver'
 
@@ -41,9 +42,6 @@ struct DataBackupRecovery {
   autoWebdavBackupTables: string[] = []
   pauseAutoBackupWhenLowBatteryCapacityLevel = false
   pauseAutoBackupWhenPowerSave = false
-  dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'dataSetting'
-  })
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'
@@ -73,17 +71,17 @@ struct DataBackupRecovery {
     })
     this.isBackupTables = isBackupTables
     this.autoBackupTables =
-      this.dataSettingDataPreferences.getSync('autoBackupTables', ['password', 'info', 'tag']) as string[]
-    this.encryptFileBackup = this.dataSettingDataPreferences.getSync('encryptFileBackup', true) as boolean
+      getFlushPreference(this.context, 'dataSetting', 'autoBackupTables', ['password', 'info', 'tag']) as string[]
+    this.encryptFileBackup = getFlushPreference(this.context, 'dataSetting', 'encryptFileBackup', true) as boolean
     this.autoFileBackupTables =
-      this.dataSettingDataPreferences.getSync('autoFileBackupTables', ['password', 'info', 'tag']) as string[]
-    this.encryptWebdavBackup = this.dataSettingDataPreferences.getSync('encryptWebdavBackup', true) as boolean
+      getFlushPreference(this.context, 'dataSetting', 'autoFileBackupTables', ['password', 'info', 'tag']) as string[]
+    this.encryptWebdavBackup = getFlushPreference(this.context, 'dataSetting', 'encryptWebdavBackup', true) as boolean
     this.autoWebdavBackupTables =
-      this.dataSettingDataPreferences.getSync('autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
+      getFlushPreference(this.context, 'dataSetting', 'autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
     this.pauseAutoBackupWhenLowBatteryCapacityLevel =
-      this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false) as boolean
+      getFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenLowBatteryCapacityLevel', false) as boolean
     this.pauseAutoBackupWhenPowerSave =
-      this.dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false) as boolean
+      getFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenPowerSave', false) as boolean
     const webdavServerInfo = await getWebdavServerInfo()
     if (!webdavServerInfo.path) {
       this.accountDataSyncEnabled = false
@@ -110,8 +108,8 @@ struct DataBackupRecovery {
       },
       headers: {
         Authorization: 'Basic ' +
-        new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
-        webdavServerInfo.password))
+          new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
+            webdavServerInfo.password))
       }
     })
     try {
@@ -167,8 +165,8 @@ struct DataBackupRecovery {
       },
       headers: {
         Authorization: 'Basic ' +
-        new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
-        webdavServerInfo.password))
+          new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
+            webdavServerInfo.password))
       }
     })
     try {
@@ -259,8 +257,7 @@ struct DataBackupRecovery {
                             if (isOn) {
                               this.autoBackupTables = Array.from(new Set([...this.autoBackupTables, item.value]))
                             }
-                            this.dataSettingDataPreferences.putSync('autoBackupTables', this.autoBackupTables)
-                            this.dataSettingDataPreferences.flushSync()
+                            setFlushPreference(this.context, 'dataSetting', 'autoBackupTables', this.autoBackupTables)
                           })
                       }
                       .borderRadius(12)
@@ -448,8 +445,7 @@ struct DataBackupRecovery {
                       isOn: this.encryptFileBackup!!
                     })
                       .onChange((isOn) => {
-                        this.dataSettingDataPreferences.putSync('encryptFileBackup', isOn)
-                        this.dataSettingDataPreferences.flushSync()
+                        setFlushPreference(this.context, 'dataSetting', 'encryptFileBackup', isOn)
                       })
                   }
                   .borderRadius(12)
@@ -527,8 +523,8 @@ struct DataBackupRecovery {
                               this.autoFileBackupTables =
                                 Array.from(new Set([...this.autoFileBackupTables, item.value]))
                             }
-                            this.dataSettingDataPreferences.putSync('autoFileBackupTables', this.autoFileBackupTables)
-                            this.dataSettingDataPreferences.flushSync()
+                            setFlushPreference(this.context, 'dataSetting', 'autoFileBackupTables',
+                              this.autoFileBackupTables)
                           })
                       }
                       .borderRadius(12)
@@ -993,8 +989,7 @@ struct DataBackupRecovery {
                       isOn: this.encryptWebdavBackup!!
                     })
                       .onChange((isOn) => {
-                        this.dataSettingDataPreferences.putSync('encryptWebdavBackup', isOn)
-                        this.dataSettingDataPreferences.flushSync()
+                        setFlushPreference(this.context, 'dataSetting', 'encryptWebdavBackup', isOn)
                       })
                   }
                   .borderRadius(12)
@@ -1072,9 +1067,8 @@ struct DataBackupRecovery {
                               this.autoWebdavBackupTables =
                                 Array.from(new Set([...this.autoWebdavBackupTables, item.value]))
                             }
-                            this.dataSettingDataPreferences.putSync('autoWebdavBackupTables',
+                            setFlushPreference(this.context, 'dataSetting', 'autoWebdavBackupTables',
                               this.autoWebdavBackupTables)
-                            this.dataSettingDataPreferences.flushSync()
                           })
                       }
                       .borderRadius(12)
@@ -1393,8 +1387,8 @@ struct DataBackupRecovery {
                         isOn: this.pauseAutoBackupWhenLowBatteryCapacityLevel!!
                       })
                         .onChange((isOn) => {
-                          this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenLowBatteryCapacityLevel', isOn)
-                          this.dataSettingDataPreferences.flushSync()
+                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenLowBatteryCapacityLevel',
+                            isOn)
                         })
                     }
                     .borderRadius(12)
@@ -1418,8 +1412,7 @@ struct DataBackupRecovery {
                         isOn: this.pauseAutoBackupWhenPowerSave!!
                       })
                         .onChange((isOn) => {
-                          this.dataSettingDataPreferences.putSync('pauseAutoBackupWhenPowerSave', isOn)
-                          this.dataSettingDataPreferences.flushSync()
+                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenPowerSave', isOn)
                         })
                     }
                     .borderRadius(12)
@@ -1439,9 +1432,12 @@ struct DataBackupRecovery {
           }
           .layoutWeight(1)
         }
+          .margin({
+            bottom:28,
+            top: 64
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -1452,6 +1448,28 @@ struct DataBackupRecovery {
         end: LengthMetrics.vp(60)
       },
       style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
         thermoCtrl: true,
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
@@ -1462,9 +1480,9 @@ struct DataBackupRecovery {
         title: {
           mainTitle: '数据备份与恢复'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.context.eventHub.on('refreshDataBackupRecovery', async () => {

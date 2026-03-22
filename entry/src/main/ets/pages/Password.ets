@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { display, LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
@@ -27,6 +26,7 @@ import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
 import PasswordInfo from './Passwordinfo'
 import UpdatePassword from './Updatepassword'
+import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
 
 interface Data {
   nameKeyword: string,
@@ -66,12 +66,6 @@ export default struct PasswordPage {
   orderColumn = 'updateTime'
   passwordId = 0
   intervalId = -1
-  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'commonSetting'
-  })
-  filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'filterPassword'
-  })
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'
@@ -439,7 +433,7 @@ export default struct PasswordPage {
               },
               onAppear: async () => {
                 const disallowScreenshot =
-                  this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                  getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)
@@ -550,7 +544,7 @@ export default struct PasswordPage {
               },
               onAppear: async () => {
                 const disallowScreenshot =
-                  this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                  getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)
@@ -592,7 +586,7 @@ export default struct PasswordPage {
           })
             .searchButton('搜索')
             .onChange((value) => {
-              this.filterPasswordDataPreferences.putSync('nameKeyword', value)
+              setTempPreference(this.context, 'filterPassword', 'nameKeyword', value)
             })
             .onSubmit(() => {
               this.loading = true
@@ -611,7 +605,7 @@ export default struct PasswordPage {
                     .padding(12)
                     .onClick(() => {
                       this.tag.push(item.value)
-                      this.filterPasswordDataPreferences.putSync('tag', this.tag)
+                      setTempPreference(this.context, 'filterPassword', 'tag', this.tag)
                       this.loading = true
                     })
                   }
@@ -632,7 +626,7 @@ export default struct PasswordPage {
                     .padding(12)
                     .onClick(() => {
                       this.tag.splice(this.tag.indexOf(item.value), 1)
-                      this.filterPasswordDataPreferences.putSync('tag', this.tag)
+                      setTempPreference(this.context, 'filterPassword', 'tag', this.tag)
                       this.loading = true
                     })
                   }
@@ -671,7 +665,7 @@ export default struct PasswordPage {
                         .onChange((isOn) => {
                           if (!isOn) {
                             this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                            item.id), 1)
+                              item.id), 1)
                           }
                           if (isOn) {
                             this.multipleSelectArray.push(item)
@@ -798,6 +792,10 @@ export default struct PasswordPage {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
             })
+            ListItem()
+              .margin({
+                bottom: this.preferType === 0 ? 80 : 0
+              })
           }
         }
         .layoutWeight(1)
@@ -818,7 +816,8 @@ export default struct PasswordPage {
             title: '密码详情'
           },
           onAppear: async () => {
-            const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+            const disallowScreenshot =
+              getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
             if (disallowScreenshot) {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(true)
@@ -847,9 +846,10 @@ export default struct PasswordPage {
           this.preferType = getPreferType(this.UIContext)
         }, 200)
       })
-      this.showPassword = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
-      this.hideTag = this.commonSettingDataPreferences.getSync('hideTagInIndex', false) as boolean
-      const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+      this.showPassword = getFlushPreference(this.context, 'commonSetting', 'showPasswordInIndex', false) as boolean
+      this.hideTag = getFlushPreference(this.context, 'commonSetting', 'hideTagInIndex', false) as boolean
+      const disallowScreenshot =
+        getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
       if (disallowScreenshot) {
         const lastWindow = await window.getLastWindow(this.context)
         await lastWindow.setWindowPrivacyMode(this.showPassword)
@@ -866,9 +866,10 @@ export default struct PasswordPage {
       })
       this.context.eventHub.on('refreshPassword', async () => {
         this.enableCloudBackup = false
-        this.showPassword = this.commonSettingDataPreferences.getSync('showPasswordInIndex', false) as boolean
-        this.hideTag = this.commonSettingDataPreferences.getSync('hideTagInIndex', false) as boolean
-        const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+        this.showPassword = getFlushPreference(this.context, 'commonSetting', 'showPasswordInIndex', false) as boolean
+        this.hideTag = getFlushPreference(this.context, 'commonSetting', 'hideTagInIndex', false) as boolean
+        const disallowScreenshot =
+          getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
         if (disallowScreenshot) {
           const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(this.showPassword)
@@ -881,9 +882,9 @@ export default struct PasswordPage {
       })
       this.context.eventHub.on('refreshFilterPassword', () => {
         const data: Data = {
-          nameKeyword: this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string,
-          info: this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[],
-          tag: this.filterPasswordDataPreferences.getSync('tag', []) as string[]
+          nameKeyword: getTempPreference(this.context, 'filterPassword', 'nameKeyword', '') as string,
+          info: getTempPreference(this.context, 'filterPassword', 'info', []) as PasswordInfoItem[],
+          tag: getTempPreference(this.context, 'filterPassword', 'tag', []) as string[]
         }
         this.nameKeyword = data.nameKeyword
         this.info = data.info
@@ -939,7 +940,8 @@ export default struct PasswordPage {
         title: '修改密码'
       },
       onAppear: async () => {
-        const disallowScreenshot = this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+        const disallowScreenshot =
+          getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
         if (disallowScreenshot) {
           const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(true)

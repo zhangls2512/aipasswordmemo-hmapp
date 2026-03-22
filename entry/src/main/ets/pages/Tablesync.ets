@@ -1,14 +1,15 @@
 import { common } from '@kit.AbilityKit'
-import { cloudData, preferences, relationalStore, uniformTypeDescriptor } from '@kit.ArkData'
+import { cloudData, relationalStore, uniformTypeDescriptor } from '@kit.ArkData'
 import { LengthMetrics, LoadingDialog, promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
 import { deviceInfo, zlib } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
-import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getInfoList, getPasswordList, getTagList } from '../common/Dataget'
 import { write } from '../common/File'
 import { checkPermission } from '../common/Permission'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 import { getSizeString } from '../common/Stringformat'
 import { syncTable } from '../common/Table'
 import { InfoOutItem, PasswordOutItem, TagOutItem } from './DataInOut'
@@ -49,9 +50,6 @@ struct Tablesync {
   autoHuaweiCloudSyncTables: string[] = []
   pauseAutoSyncWhenLowBatteryCapacityLevel = false
   pauseAutoSyncWhenPowerSave = false
-  dataSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'dataSetting'
-  })
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '进行中...'
@@ -73,10 +71,10 @@ struct Tablesync {
   ]
 
   getSetting() {
-    this.onTables = this.dataSettingDataPreferences.getSync('onTables', []) as string[]
-    this.autoSyncTables = this.dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
-    this.autoSyncDevices = this.dataSettingDataPreferences.getSync('autoSyncDevices', []) as Item[]
-    const index = this.dataSettingDataPreferences.getSync('huaweiCloudSyncNetworkStrategy', 0)
+    this.onTables = getFlushPreference(this.context, 'dataSetting', 'onTables', []) as string[]
+    this.autoSyncTables = getFlushPreference(this.context, 'dataSetting', 'autoSyncTables', []) as string[]
+    this.autoSyncDevices = getFlushPreference(this.context, 'dataSetting', 'autoSyncDevices', []) as Item[]
+    const index = getFlushPreference(this.context, 'dataSetting', 'huaweiCloudSyncNetworkStrategy', 0)
     this.index = index as number
     if (index === 0) {
       this.value = '始终'
@@ -84,13 +82,14 @@ struct Tablesync {
     if (index === 1) {
       this.value = '仅 WLAN 下'
     }
-    this.huaweiCloudSyncOnTables = this.dataSettingDataPreferences.getSync('huaweiCloudSyncOnTables', []) as string[]
+    this.huaweiCloudSyncOnTables =
+      getFlushPreference(this.context, 'dataSetting', 'huaweiCloudSyncOnTables', []) as string[]
     this.autoHuaweiCloudSyncTables =
-      this.dataSettingDataPreferences.getSync('autoHuaweiCloudSyncTables', []) as string[]
+      getFlushPreference(this.context, 'dataSetting', 'autoHuaweiCloudSyncTables', []) as string[]
     this.pauseAutoSyncWhenLowBatteryCapacityLevel =
-      this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false) as boolean
+      getFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false) as boolean
     this.pauseAutoSyncWhenPowerSave =
-      this.dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false) as boolean
+      getFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false) as boolean
   }
 
   build() {
@@ -169,8 +168,7 @@ struct Tablesync {
                                     autoSync: false
                                   })
                                 this.onTables = Array.from(new Set([...this.onTables, item.value]))
-                                this.dataSettingDataPreferences.putSync('onTables', this.onTables)
-                                this.dataSettingDataPreferences.flushSync()
+                                setFlushPreference(this.context, 'dataSetting', 'onTables', this.onTables)
                               }
                             }
                           })
@@ -229,8 +227,7 @@ struct Tablesync {
                             if (isOn) {
                               this.autoSyncTables = Array.from(new Set([...this.autoSyncTables, item.value]))
                             }
-                            this.dataSettingDataPreferences.putSync('autoSyncTables', this.autoSyncTables)
-                            this.dataSettingDataPreferences.flushSync()
+                            setFlushPreference(this.context, 'dataSetting', 'autoSyncTables', this.autoSyncTables)
                           })
                       }
                       .borderRadius(12)
@@ -382,8 +379,7 @@ struct Tablesync {
                     })
                     .onClick(async () => {
                       const autoSyncDevices = this.autoSyncDevices.filter(device => device.deviceId !== item.deviceId)
-                      this.dataSettingDataPreferences.putSync('autoSyncDevices', autoSyncDevices)
-                      this.dataSettingDataPreferences.flushSync()
+                      setFlushPreference(this.context, 'dataSetting', 'autoSyncDevices', autoSyncDevices)
                       await promptAction.openToast({
                         message: '已关闭'
                       })
@@ -555,8 +551,7 @@ struct Tablesync {
                       })
                       .onClick(async () => {
                         this.autoSyncDevices = Array.from(new Set([...this.autoSyncDevices, item]))
-                        this.dataSettingDataPreferences.putSync('autoSyncDevices', this.autoSyncDevices)
-                        this.dataSettingDataPreferences.flushSync()
+                        setFlushPreference(this.context, 'dataSetting', 'autoSyncDevices', this.autoSyncDevices)
                         await promptAction.openToast({
                           message: '已开启'
                         })
@@ -789,8 +784,7 @@ struct Tablesync {
                           await cloudData.setCloudStrategy(cloudData.StrategyType.NETWORK,
                             [cloudData.NetWorkStrategy.WIFI])
                         }
-                        this.dataSettingDataPreferences.putSync('huaweiCloudSyncNetworkStrategy', index)
-                        this.dataSettingDataPreferences.flushSync()
+                        setFlushPreference(this.context, 'dataSetting', 'huaweiCloudSyncNetworkStrategy', index)
                       })
                   }
                   .borderRadius(12)
@@ -851,9 +845,8 @@ struct Tablesync {
                                 })
                               this.huaweiCloudSyncOnTables =
                                 Array.from(new Set([...this.huaweiCloudSyncOnTables, item.value]))
-                              this.dataSettingDataPreferences.putSync('huaweiCloudSyncOnTables',
+                              setFlushPreference(this.context, 'dataSetting', 'huaweiCloudSyncOnTables',
                                 this.huaweiCloudSyncOnTables)
-                              this.dataSettingDataPreferences.flushSync()
                             }
                           })
                       }
@@ -932,9 +925,8 @@ struct Tablesync {
                               this.autoHuaweiCloudSyncTables =
                                 Array.from(new Set([...this.autoHuaweiCloudSyncTables, item.value]))
                             }
-                            this.dataSettingDataPreferences.putSync('autoHuaweiCloudSyncTables',
+                            setFlushPreference(this.context, 'dataSetting', 'autoHuaweiCloudSyncTables',
                               this.autoHuaweiCloudSyncTables)
-                            this.dataSettingDataPreferences.flushSync()
                           })
                       }
                       .borderRadius(12)
@@ -971,37 +963,37 @@ struct Tablesync {
                         if (this.passwordHuaweiCloudSyncProgressDetails) {
                           Text() {
                             Span(this.passwordHuaweiCloudSyncProgressDetails.schedule ===
-                            relationalStore.Progress.SYNC_BEGIN ? '同步开始\n' :
+                              relationalStore.Progress.SYNC_BEGIN ? '同步开始\n' :
                               this.passwordHuaweiCloudSyncProgressDetails.schedule ===
-                              relationalStore.Progress.SYNC_IN_PROGRESS ? '同步中\n' :
+                                relationalStore.Progress.SYNC_IN_PROGRESS ? '同步中\n' :
                                 this.passwordHuaweiCloudSyncProgressDetails.schedule ===
-                                relationalStore.Progress.SYNC_FINISH ? '同步完成\n' : 'undefined\n')
+                                  relationalStore.Progress.SYNC_FINISH ? '同步完成\n' : 'undefined\n')
                               .fontColor(this.passwordHuaweiCloudSyncProgressDetails.schedule ===
-                              relationalStore.Progress.SYNC_BEGIN ? $r('sys.color.font_secondary') :
+                                relationalStore.Progress.SYNC_BEGIN ? $r('sys.color.font_secondary') :
                                 this.passwordHuaweiCloudSyncProgressDetails.schedule ===
-                                relationalStore.Progress.SYNC_IN_PROGRESS ? Color.Orange : Color.Green)
+                                  relationalStore.Progress.SYNC_IN_PROGRESS ? Color.Orange : Color.Green)
                             Span(this.passwordHuaweiCloudSyncProgressDetails.code ===
-                            relationalStore.ProgressCode.SUCCESS ? '同步成功' :
+                              relationalStore.ProgressCode.SUCCESS ? '同步成功' :
                               this.passwordHuaweiCloudSyncProgressDetails.code ===
-                              relationalStore.ProgressCode.UNKNOWN_ERROR ? '同步过程遇到未知错误' :
+                                relationalStore.ProgressCode.UNKNOWN_ERROR ? '同步过程遇到未知错误' :
                                 this.passwordHuaweiCloudSyncProgressDetails.code ===
-                                relationalStore.ProgressCode.NETWORK_ERROR ? '同步过程遇到网络错误' :
+                                  relationalStore.ProgressCode.NETWORK_ERROR ? '同步过程遇到网络错误' :
                                   this.passwordHuaweiCloudSyncProgressDetails.code ===
-                                  relationalStore.ProgressCode.CLOUD_DISABLED ? '云端不可用' :
+                                    relationalStore.ProgressCode.CLOUD_DISABLED ? '云端不可用' :
                                     this.passwordHuaweiCloudSyncProgressDetails.code ===
-                                    relationalStore.ProgressCode.LOCKED_BY_OTHERS ?
+                                      relationalStore.ProgressCode.LOCKED_BY_OTHERS ?
                                       '有其他设备正在同步，本设备当前无法进行同步' :
                                       this.passwordHuaweiCloudSyncProgressDetails.code ===
-                                      relationalStore.ProgressCode.RECORD_LIMIT_EXCEEDED ?
+                                        relationalStore.ProgressCode.RECORD_LIMIT_EXCEEDED ?
                                         '本次同步条目或大小超出最大值' :
                                         this.passwordHuaweiCloudSyncProgressDetails.code ===
-                                        relationalStore.ProgressCode.NO_SPACE_FOR_ASSET ?
+                                          relationalStore.ProgressCode.NO_SPACE_FOR_ASSET ?
                                           '云空间剩余空间小于待同步大小' :
                                           this.passwordHuaweiCloudSyncProgressDetails.code ===
-                                          relationalStore.ProgressCode.BLOCKED_BY_NETWORK_STRATEGY ?
+                                            relationalStore.ProgressCode.BLOCKED_BY_NETWORK_STRATEGY ?
                                             '同步被网络策略限制' : 'undefined')
                               .fontColor(this.passwordHuaweiCloudSyncProgressDetails.code ===
-                              relationalStore.ProgressCode.SUCCESS ? Color.Green : Color.Red)
+                                relationalStore.ProgressCode.SUCCESS ? Color.Green : Color.Red)
                             if (this.passwordHuaweiCloudSyncProgressDetails.details['password']) {
                               Span('\n上传：')
                               Span(String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].upload.total))
@@ -1131,37 +1123,37 @@ struct Tablesync {
                         if (this.infoHuaweiCloudSyncProgressDetails) {
                           Text() {
                             Span(this.infoHuaweiCloudSyncProgressDetails.schedule ===
-                            relationalStore.Progress.SYNC_BEGIN ? '同步开始\n' :
+                              relationalStore.Progress.SYNC_BEGIN ? '同步开始\n' :
                               this.infoHuaweiCloudSyncProgressDetails.schedule ===
-                              relationalStore.Progress.SYNC_IN_PROGRESS ? '同步中\n' :
+                                relationalStore.Progress.SYNC_IN_PROGRESS ? '同步中\n' :
                                 this.infoHuaweiCloudSyncProgressDetails.schedule ===
-                                relationalStore.Progress.SYNC_FINISH ? '同步完成\n' : 'undefined\n')
+                                  relationalStore.Progress.SYNC_FINISH ? '同步完成\n' : 'undefined\n')
                               .fontColor(this.infoHuaweiCloudSyncProgressDetails.schedule ===
-                              relationalStore.Progress.SYNC_BEGIN ? $r('sys.color.font_secondary') :
+                                relationalStore.Progress.SYNC_BEGIN ? $r('sys.color.font_secondary') :
                                 this.infoHuaweiCloudSyncProgressDetails.schedule ===
-                                relationalStore.Progress.SYNC_IN_PROGRESS ? Color.Orange : Color.Green)
+                                  relationalStore.Progress.SYNC_IN_PROGRESS ? Color.Orange : Color.Green)
                             Span(this.infoHuaweiCloudSyncProgressDetails.code ===
-                            relationalStore.ProgressCode.SUCCESS ? '同步成功' :
+                              relationalStore.ProgressCode.SUCCESS ? '同步成功' :
                               this.infoHuaweiCloudSyncProgressDetails.code ===
-                              relationalStore.ProgressCode.UNKNOWN_ERROR ? '同步过程遇到未知错误' :
+                                relationalStore.ProgressCode.UNKNOWN_ERROR ? '同步过程遇到未知错误' :
                                 this.infoHuaweiCloudSyncProgressDetails.code ===
-                                relationalStore.ProgressCode.NETWORK_ERROR ? '同步过程遇到网络错误' :
+                                  relationalStore.ProgressCode.NETWORK_ERROR ? '同步过程遇到网络错误' :
                                   this.infoHuaweiCloudSyncProgressDetails.code ===
-                                  relationalStore.ProgressCode.CLOUD_DISABLED ? '云端不可用' :
+                                    relationalStore.ProgressCode.CLOUD_DISABLED ? '云端不可用' :
                                     this.infoHuaweiCloudSyncProgressDetails.code ===
-                                    relationalStore.ProgressCode.LOCKED_BY_OTHERS ?
+                                      relationalStore.ProgressCode.LOCKED_BY_OTHERS ?
                                       '有其他设备正在同步，本设备当前无法进行同步' :
                                       this.infoHuaweiCloudSyncProgressDetails.code ===
-                                      relationalStore.ProgressCode.RECORD_LIMIT_EXCEEDED ?
+                                        relationalStore.ProgressCode.RECORD_LIMIT_EXCEEDED ?
                                         '本次同步条目或大小超出最大值' :
                                         this.infoHuaweiCloudSyncProgressDetails.code ===
-                                        relationalStore.ProgressCode.NO_SPACE_FOR_ASSET ?
+                                          relationalStore.ProgressCode.NO_SPACE_FOR_ASSET ?
                                           '云空间剩余空间小于待同步大小' :
                                           this.infoHuaweiCloudSyncProgressDetails.code ===
-                                          relationalStore.ProgressCode.BLOCKED_BY_NETWORK_STRATEGY ?
+                                            relationalStore.ProgressCode.BLOCKED_BY_NETWORK_STRATEGY ?
                                             '同步被网络策略限制' : 'undefined')
                               .fontColor(this.infoHuaweiCloudSyncProgressDetails.code ===
-                              relationalStore.ProgressCode.SUCCESS ? Color.Green : Color.Red)
+                                relationalStore.ProgressCode.SUCCESS ? Color.Green : Color.Red)
                             if (this.infoHuaweiCloudSyncProgressDetails.details['info']) {
                               Span('\n上传：')
                               Span(String(this.infoHuaweiCloudSyncProgressDetails.details['info'].upload.total))
@@ -1291,37 +1283,37 @@ struct Tablesync {
                         if (this.tagHuaweiCloudSyncProgressDetails) {
                           Text() {
                             Span(this.tagHuaweiCloudSyncProgressDetails.schedule ===
-                            relationalStore.Progress.SYNC_BEGIN ? '同步开始\n' :
+                              relationalStore.Progress.SYNC_BEGIN ? '同步开始\n' :
                               this.tagHuaweiCloudSyncProgressDetails.schedule ===
-                              relationalStore.Progress.SYNC_IN_PROGRESS ? '同步中\n' :
+                                relationalStore.Progress.SYNC_IN_PROGRESS ? '同步中\n' :
                                 this.tagHuaweiCloudSyncProgressDetails.schedule ===
-                                relationalStore.Progress.SYNC_FINISH ? '同步完成\n' : 'undefined\n')
+                                  relationalStore.Progress.SYNC_FINISH ? '同步完成\n' : 'undefined\n')
                               .fontColor(this.tagHuaweiCloudSyncProgressDetails.schedule ===
-                              relationalStore.Progress.SYNC_BEGIN ? $r('sys.color.font_secondary') :
+                                relationalStore.Progress.SYNC_BEGIN ? $r('sys.color.font_secondary') :
                                 this.tagHuaweiCloudSyncProgressDetails.schedule ===
-                                relationalStore.Progress.SYNC_IN_PROGRESS ? Color.Orange : Color.Green)
+                                  relationalStore.Progress.SYNC_IN_PROGRESS ? Color.Orange : Color.Green)
                             Span(this.tagHuaweiCloudSyncProgressDetails.code ===
-                            relationalStore.ProgressCode.SUCCESS ? '同步成功' :
+                              relationalStore.ProgressCode.SUCCESS ? '同步成功' :
                               this.tagHuaweiCloudSyncProgressDetails.code ===
-                              relationalStore.ProgressCode.UNKNOWN_ERROR ? '同步过程遇到未知错误' :
+                                relationalStore.ProgressCode.UNKNOWN_ERROR ? '同步过程遇到未知错误' :
                                 this.tagHuaweiCloudSyncProgressDetails.code ===
-                                relationalStore.ProgressCode.NETWORK_ERROR ? '同步过程遇到网络错误' :
+                                  relationalStore.ProgressCode.NETWORK_ERROR ? '同步过程遇到网络错误' :
                                   this.tagHuaweiCloudSyncProgressDetails.code ===
-                                  relationalStore.ProgressCode.CLOUD_DISABLED ? '云端不可用' :
+                                    relationalStore.ProgressCode.CLOUD_DISABLED ? '云端不可用' :
                                     this.tagHuaweiCloudSyncProgressDetails.code ===
-                                    relationalStore.ProgressCode.LOCKED_BY_OTHERS ?
+                                      relationalStore.ProgressCode.LOCKED_BY_OTHERS ?
                                       '有其他设备正在同步，本设备当前无法进行同步' :
                                       this.tagHuaweiCloudSyncProgressDetails.code ===
-                                      relationalStore.ProgressCode.RECORD_LIMIT_EXCEEDED ?
+                                        relationalStore.ProgressCode.RECORD_LIMIT_EXCEEDED ?
                                         '本次同步条目或大小超出最大值' :
                                         this.tagHuaweiCloudSyncProgressDetails.code ===
-                                        relationalStore.ProgressCode.NO_SPACE_FOR_ASSET ?
+                                          relationalStore.ProgressCode.NO_SPACE_FOR_ASSET ?
                                           '云空间剩余空间小于待同步大小' :
                                           this.tagHuaweiCloudSyncProgressDetails.code ===
-                                          relationalStore.ProgressCode.BLOCKED_BY_NETWORK_STRATEGY ?
+                                            relationalStore.ProgressCode.BLOCKED_BY_NETWORK_STRATEGY ?
                                             '同步被网络策略限制' : 'undefined')
                               .fontColor(this.tagHuaweiCloudSyncProgressDetails.code ===
-                              relationalStore.ProgressCode.SUCCESS ? Color.Green : Color.Red)
+                                relationalStore.ProgressCode.SUCCESS ? Color.Green : Color.Red)
                             if (this.tagHuaweiCloudSyncProgressDetails.details['tag']) {
                               Span('\n上传：')
                               Span(String(this.tagHuaweiCloudSyncProgressDetails.details['tag'].upload.total))
@@ -1599,8 +1591,8 @@ struct Tablesync {
                         isOn: this.pauseAutoSyncWhenLowBatteryCapacityLevel!!
                       })
                         .onChange((isOn) => {
-                          this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenLowBatteryCapacityLevel', isOn)
-                          this.dataSettingDataPreferences.flushSync()
+                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel',
+                            isOn)
                         })
                     }
                     .borderRadius(12)
@@ -1624,8 +1616,7 @@ struct Tablesync {
                         isOn: this.pauseAutoSyncWhenPowerSave!!
                       })
                         .onChange((isOn) => {
-                          this.dataSettingDataPreferences.putSync('pauseAutoSyncWhenPowerSave', isOn)
-                          this.dataSettingDataPreferences.flushSync()
+                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', isOn)
                         })
                     }
                     .borderRadius(12)
@@ -1989,9 +1980,12 @@ struct Tablesync {
           }
           .layoutWeight(1)
         }
+        .margin({
+          bottom:28,
+          top: 64
+        })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -2002,6 +1996,28 @@ struct Tablesync {
         end: LengthMetrics.vp(60)
       },
       style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
         thermoCtrl: true,
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
@@ -2012,9 +2028,9 @@ struct Tablesync {
         title: {
           mainTitle: '设备间数据同步'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onAppear(async () => {
       this.getSetting()
       const res = await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')

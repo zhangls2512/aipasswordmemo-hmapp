@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { camera, cameraPicker as picker } from '@kit.CameraKit'
@@ -17,6 +16,7 @@ import { CardRecognition, CardSide, CardType } from '@kit.VisionKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { newInfo } from '../common/Datachange'
+import { getFlushPreference } from '../common/Preference'
 
 interface Item {
   type: string,
@@ -394,10 +394,7 @@ export default struct Ainewinfo {
       const res = await getCloudServiceStatus(this.context)
       const key = getKeyAlg()
       if (res && key) {
-        const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-          name: 'cloudbackupSetting'
-        })
-        const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+        const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
         if (autoOn.includes('info')) {
           this.cloudBackup = true
         }

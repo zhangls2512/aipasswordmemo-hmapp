@@ -34,11 +34,11 @@ export default struct Cleardata {
   context = this.UIContext.getHostContext() as common.UIAbilityContext
 
   async getSize() {
-    this.cloudbackupSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/cloudbackupSetting'))
-    this.dataSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/dataSetting'))
-    this.commonSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/commonSetting'))
-    this.permissionSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/permissionSetting'))
-    this.debugSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/debugSetting'))
+    this.cloudbackupSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/cloudbackupSetting.db'))
+    this.dataSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/dataSetting.db'))
+    this.commonSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/commonSetting.db'))
+    this.permissionSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/permissionSetting.db'))
+    this.debugSettingSize = getSizeString(getFileSize(this.context.preferencesDir + '/debugSetting.db'))
     const appCacheSize = await getDirectorySize(this.context.cacheDir)
     this.appCacheSize = getSizeString(appCacheSize)
     const invitationQrcodeCacheSize = await getDirectorySize(this.context.cacheDir + '/media/invitationqrcode/')
@@ -256,7 +256,8 @@ export default struct Cleardata {
               if (data.index === 1) {
                 this.setting.forEach((item) => {
                   const dataPreferences = preferences.getPreferencesSync(this.context, {
-                    name: item
+                    name: item,
+                    storageType: preferences.StorageType.GSKV
                   })
                   if (item === 'dataSetting') {
                     Object.keys(dataPreferences.getAllSync()).forEach(keyItem => {
@@ -268,7 +269,6 @@ export default struct Cleardata {
                   } else {
                     dataPreferences.clearSync()
                   }
-                  dataPreferences.flushSync()
                 })
                 const res = await promptAction.showDialog({
                   title: '提示',

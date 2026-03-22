@@ -430,7 +430,7 @@ export default struct TagPage {
                           .onChange((isOn) => {
                             if (!isOn) {
                               this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                              item.id), 1)
+                                item.id), 1)
                             }
                             if (isOn) {
                               this.multipleSelectArray.push(item)
@@ -489,6 +489,11 @@ export default struct TagPage {
                 })
               }
             }
+
+            ListItem()
+              .margin({
+                bottom: this.preferType === 0 ? 80 : 0
+              })
           }
         }
         .layoutWeight(1)

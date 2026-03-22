@@ -1,15 +1,7 @@
-import { preferences } from '@kit.ArkData'
-import { asset } from '@kit.AssetStoreKit'
 import { fileIo } from '@kit.CoreFileKit'
-import { stringToArray } from './Crypto'
 import { getPasswordList, getTypeInfoList } from './Dataget'
 
 export async function clearNouseData(context: Context) {
-  const dataPreferences = preferences.getPreferencesSync(context, {
-    name: 'dataSetting'
-  })
-  dataPreferences.deleteSync('isBackupTables')
-  await preferences.deletePreferences(context, 'speakSetting')
   const tempDir = context.tempDir
   const tempFiles = await fileIo.listFile(tempDir)
   tempFiles.forEach(async (item) => {
@@ -22,15 +14,6 @@ export async function clearNouseData(context: Context) {
       await fileIo.rmdir(path)
     }
   })
-  try {
-    const query: asset.AssetMap = new Map()
-    query.set(asset.Tag.ALIAS, stringToArray('accessToken'))
-    asset.removeSync(query)
-    await preferences.deletePreferences(context, {
-      name: 'login'
-    })
-  } catch {
-  }
   const nousePasswordIconFilePathArray = await getNousePasswordIconFilePathArray(context)
   const promises = nousePasswordIconFilePathArray.map(async (item) => {
     await fileIo.unlink(item)

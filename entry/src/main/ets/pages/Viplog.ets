@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
-import { LengthMetrics, promptAction } from '@kit.ArkUI'
+import { LengthMetrics } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
-import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 import { getTimeStringFromTimeStamp } from '../common/Stringformat'
@@ -31,6 +31,10 @@ struct Viplog {
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         if (this.viplogArray.length === 0 && !this.loading) {
           ListItem() {
             Text('无数据')
@@ -167,12 +171,7 @@ struct Viplog {
                 .onClick(async () => {
                   try {
                     await iap.createRefundRequest(this.UIContext.getHostContext(), item.info)
-                  } catch (err) {
-                    if (err.code !== 1001860000) {
-                      await promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                      })
-                    }
+                  } catch {
                   }
                 })
 
@@ -216,10 +215,7 @@ struct Viplog {
                 .onClick(async () => {
                   try {
                     await iap.showManagedInvoices(this.UIContext.getHostContext(), item.info)
-                  } catch (err) {
-                    await promptAction.openToast({
-                      message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
-                    })
+                  } catch {
                   }
                 })
               }
@@ -242,9 +238,13 @@ struct Viplog {
           })
           .width('100%')
         }
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -273,6 +273,28 @@ struct Viplog {
         end: LengthMetrics.vp(60)
       },
       style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
         thermoCtrl: true,
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
@@ -283,9 +305,9 @@ struct Viplog {
         title: {
           mainTitle: '会员开通记录'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {

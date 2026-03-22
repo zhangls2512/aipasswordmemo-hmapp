@@ -1,6 +1,7 @@
-import { preferences } from '@kit.ArkData'
+import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
-import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 
 @Builder
 export function DefaulthidepasswordinfotypeBuilder() {
@@ -11,14 +12,15 @@ export function DefaulthidepasswordinfotypeBuilder() {
 struct Defaulthidepasswordinfotype {
   @Local defaultHidePasswordInfoTypeArray: string[] = []
   @Local type: string = ''
-  context = this.getUIContext().getHostContext()
-  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'commonSetting'
-  })
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             TextInput({
@@ -88,9 +90,13 @@ struct Defaulthidepasswordinfotype {
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -101,6 +107,28 @@ struct Defaulthidepasswordinfotype {
         end: LengthMetrics.vp(60)
       },
       style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
         thermoCtrl: true,
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
@@ -111,15 +139,16 @@ struct Defaulthidepasswordinfotype {
         title: {
           mainTitle: '默认隐藏内容密码信息类型'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onAppear(() => {
       this.defaultHidePasswordInfoTypeArray =
-        this.commonSettingDataPreferences.getSync('defaultHidePasswordInfoType', []) as string[]
+        getFlushPreference(this.context, 'commonSetting', 'defaultHidePasswordInfoType', []) as string[]
     })
     .onDisAppear(() => {
-      this.commonSettingDataPreferences.putSync('defaultHidePasswordInfoType', this.defaultHidePasswordInfoTypeArray)
+      setFlushPreference(this.context, 'commonSetting', 'defaultHidePasswordInfoType',
+        this.defaultHidePasswordInfoTypeArray)
     })
   }
 }

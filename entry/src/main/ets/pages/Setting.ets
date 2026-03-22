@@ -1,16 +1,16 @@
 import { common } from '@kit.AbilityKit'
 import { appAccount } from '@kit.BasicServicesKit'
 import { privacyManager } from '@kit.AppGalleryKit'
-import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { formProvider } from '@kit.FormKit'
-import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import { checkPermission } from '../common/Permission'
 import request from '../common/Request'
 import { Account } from './Huaweiaccount'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 
 @ComponentV2
 export default struct Setting {
@@ -18,6 +18,8 @@ export default struct Setting {
   @Local agreedPrivacyAgreement: number | undefined = undefined
   @Local email: string = ''
   @Local isBindHuaweiAccount: boolean = false
+  @Local autoLoginByHuaweiAccount: boolean = false
+  @Local autoLoginByPasskey: boolean = false
   @Local cloudService: boolean = false
   @Local accountLoading: boolean = false
   @Local accountDataSyncEnabled: boolean = false
@@ -27,14 +29,9 @@ export default struct Setting {
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
   accountDataSync = false
-  autoLoginByHuaweiAccount = false
-  autoLoginByPasskey = false
-  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'commonSetting'
-  })
 
   async getSetting() {
-    this.allService = this.commonSettingDataPreferences.getSync('allService', true) as boolean
+    this.allService = getFlushPreference(this.context, 'commonSetting', 'allService', true) as boolean
     try {
       const appPrivacyResults: privacyManager.AppPrivacyResult[] = privacyManager.getAppPrivacyResult()
       this.agreedPrivacyAgreement =
@@ -55,7 +52,9 @@ export default struct Setting {
         this.accountDataSync = await appAccountManager.checkDataSyncEnabled('default')
       }
       this.autoLoginByHuaweiAccount =
-        this.commonSettingDataPreferences.getSync('autoLoginByHuaweiAccount', false) as boolean
+        getFlushPreference(this.context, 'commonSetting', 'autoLoginByHuaweiAccount', false) as boolean
+      this.autoLoginByPasskey =
+        getFlushPreference(this.context, 'commonSetting', 'autoLoginByPasskey', false) as boolean
       if (this.allService) {
         this.accountLoading = true
         const accountres = await request(this.context, '/account/getExternalAccount', {
@@ -74,6 +73,10 @@ export default struct Setting {
   build() {
     HdsNavigation(this.pageInfos) {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         if (this.accessToken) {
           ListItem() {
             Column() {
@@ -217,8 +220,7 @@ export default struct Setting {
                   })
                     .enabled(!this.autoLoginByPasskey)
                     .onChange((isOn) => {
-                      this.commonSettingDataPreferences.putSync('autoLoginByHuaweiAccount', isOn)
-                      this.commonSettingDataPreferences.flushSync()
+                      setFlushPreference(this.context, 'commonSetting', 'autoLoginByHuaweiAccount', isOn)
                     })
                 }
                 .borderRadius(12)
@@ -303,8 +305,7 @@ export default struct Setting {
                   })
                     .enabled(!this.autoLoginByHuaweiAccount)
                     .onChange((isOn) => {
-                      this.commonSettingDataPreferences.putSync('autoLoginByPasskey', isOn)
-                      this.commonSettingDataPreferences.flushSync()
+                      setFlushPreference(this.context, 'commonSetting', 'autoLoginByPasskey', isOn)
                     })
                 }
                 .borderRadius(12)
@@ -1442,23 +1443,34 @@ export default struct Setting {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
     .hideBackButton(true)
-    .padding({
-      top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-    })
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
       },
       style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            }
+          }
+        },
         thermoCtrl: true,
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
@@ -1469,10 +1481,9 @@ export default struct Setting {
         title: {
           mainTitle: '设置'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
-    .titleMode(HdsNavigationTitleMode.MINI)
+    .titleMode(HdsNavigationTitleMode.MODAL)
     .onAppear(async () => {
       this.context.eventHub.on('refreshSetting', async () => {
         await this.getSetting()

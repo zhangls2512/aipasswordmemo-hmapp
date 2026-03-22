@@ -1,17 +1,27 @@
 import { common } from '@kit.AbilityKit'
-import { preferences, relationalStore } from '@kit.ArkData'
+import { relationalStore } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { display, LoadingDialog, window } from '@kit.ArkUI'
-import { zlib } from '@kit.BasicServicesKit'
+import { deviceInfo, zlib } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
-import { hdsMaterial, HdsTabs, HdsTabsController } from '@kit.UIDesignKit'
+import {
+  hdsMaterial,
+  HdsNavigation,
+  HdsNavigationTitleMode,
+  HdsSideMenu,
+  HdsSideMenuMainItem,
+  HdsTabs,
+  HdsTabsController,
+  ScrollEffectType
+} from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import { getKeyAlg } from '../common/Crypto'
 import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import getDeviceToken from '../common/Devicetoken'
 import { readUri } from '../common/File'
+import { getFlushPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
 import request from '../common/Request'
 import Cleardata from './Cleardata'
@@ -31,7 +41,6 @@ struct Index {
   @Local backgroundImagePixelMap: PixelMap | undefined = undefined
   @Local preferType: number = 1
   @Local index: number = 0
-  @Local title: string = '密码'
   @Local isShowCleardataSheet: boolean = false
   @Local isShowNoticeSheet: boolean = false
   UIContext = this.getUIContext()
@@ -85,122 +94,269 @@ struct Index {
 
   build() {
     Column() {
-      if (this.preferType === 0) {
-        Text(this.title)
-          .fontSize(24)
-          .fontWeight(FontWeight.Bold)
-          .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_l'),
-            left: $r('sys.float.ohos_id_elements_margin_horizontal_l')
+      if (deviceInfo.deviceType !== '2in1') {
+        HdsTabs({
+          controller: this.controller
+        }) {
+          TabContent() {
+            if (this.preferType !== 0) {
+              Password()
+            } else {
+              HdsNavigation() {
+                Password()
+                  .padding({
+                    top: 56
+                  })
+              }
+              .hideBackButton(true)
+              .padding({
+                top: 36
+              })
+              .titleBar({
+                content: {
+                  title: {
+                    mainTitle: '密码'
+                  }
+                }
+              })
+              .titleMode(HdsNavigationTitleMode.MINI)
+            }
+          }
+          .tabBar(this.tabBuilder(0, $r('app.media.password'), '密码'))
+          .bindSheet(this.isShowNoticeSheet!!, this.NoticeSheetBuilder(), {
+            preferType: this.preferType,
+            title: {
+              title: '消息通知'
+            }
           })
-      }
-      HdsTabs({
-        controller: this.controller
-      }) {
-        TabContent() {
-          Password()
-            .padding({
-              bottom: this.preferType === 0 ? 64 : 0
-            })
+
+          TabContent() {
+            if (this.preferType !== 0) {
+              Info()
+            } else {
+              HdsNavigation() {
+                Info()
+                  .padding({
+                    top: 56
+                  })
+              }
+              .hideBackButton(true)
+              .padding({
+                top: 36
+              })
+              .titleBar({
+                content: {
+                  title: {
+                    mainTitle: '常用信息'
+                  }
+                }
+              })
+              .titleMode(HdsNavigationTitleMode.MINI)
+            }
+          }
+          .tabBar(this.tabBuilder(1, $r('app.media.info'), '常用信息'))
+
+          TabContent() {
+            if (this.preferType !== 0) {
+              Tag()
+            } else {
+              HdsNavigation() {
+                Tag()
+                  .padding({
+                    top: 56
+                  })
+              }
+              .hideBackButton(true)
+              .padding({
+                top: 36
+              })
+              .titleBar({
+                content: {
+                  title: {
+                    mainTitle: '标签'
+                  }
+                }
+              })
+              .titleMode(HdsNavigationTitleMode.MINI)
+            }
+          }
+          .tabBar(this.tabBuilder(2, $r('app.media.tag'), '标签'))
+
+          TabContent() {
+            if (this.preferType !== 0) {
+              Me()
+                .height('100%')
+            } else {
+              HdsNavigation() {
+                Me()
+              }
+              .hideBackButton(true)
+              .padding({
+                top: 36
+              })
+              .titleBar({
+                style: {
+                  scrollEffectOpts: {
+                    scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+                  },
+                  originalStyle: {
+                    contentStyle: {
+                      titleStyle: {
+                        mainTitleColor: $r('sys.color.font_primary')
+                      }
+                    }
+                  },
+                  thermoCtrl: true,
+                  systemMaterialEffect: {
+                    materialType: hdsMaterial.MaterialType.ADAPTIVE,
+                    materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+                  }
+                },
+                content: {
+                  title: {
+                    mainTitle: '我的'
+                  }
+                }
+              })
+              .titleMode(HdsNavigationTitleMode.MINI)
+            }
+          }
+          .tabBar(this.tabBuilder(3, $r('app.media.me'), '我的'))
         }
-        .tabBar(this.tabBuilder(0, $r('app.media.password'), '密码'))
+        .barBackgroundBlurStyle(BlurStyle.Regular)
+        .barFloatingStyle({
+          barBottomMargin: 24,
+          adaptToHandedness: true,
+          thermoCtrl: true,
+          systemMaterialEffect: {
+            materialType: hdsMaterial.MaterialType.ADAPTIVE,
+            materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+          }
+        })
+        .barOverlap(this.preferType === 0 ? true : false)
+        .barPosition(this.preferType === 0 ? BarPosition.End : BarPosition.Start)
+        .barWidth(this.preferType === 0 ? 320 : 56)
+        .scrollable(false)
+        .vertical(this.preferType === 0 ? false : true)
+        .onChange((index) => {
+          this.index = index
+        })
+        .onAnimationStart(async (index, targetIndex) => {
+          if (targetIndex !== 1) {
+            const lastWindow = await window.getLastWindow(this.context)
+            await lastWindow.setWindowPrivacyMode(false)
+          }
+          if (targetIndex === 0) {
+            this.context.eventHub.emit('refreshPassword')
+          }
+          if (targetIndex === 1) {
+            const disallowScreenshot =
+              getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
+            if (disallowScreenshot) {
+              const lastWindow = await window.getLastWindow(this.context)
+              await lastWindow.setWindowPrivacyMode(true)
+            }
+            this.context.eventHub.emit('refreshInfo')
+          }
+          if (targetIndex === 2) {
+            this.context.eventHub.emit('refreshTag')
+          }
+          if (targetIndex === 3) {
+            this.context.eventHub.emit('refreshMe')
+          }
+        })
+        .bindSheet(this.isShowUploaderrorlogSheet!!, this.UploaderrorlogSheetBuilder(), {
+          height: SheetSize.FIT_CONTENT,
+          preferType: this.preferType,
+          title: {
+            title: '上传故障日志'
+          }
+        })
+      }
+      if (deviceInfo.deviceType === '2in1') {
+        Row() {
+          HdsSideMenu({
+            items: [
+              new HdsSideMenuMainItem({
+                icon: $r('app.media.password_tab'),
+                label: '密码'
+              }),
+              new HdsSideMenuMainItem({
+                icon: $r('app.media.info'),
+                label: '常用信息'
+              }),
+              new HdsSideMenuMainItem({
+                icon: $r('app.media.tag_tab'),
+                label: '标签'
+              }),
+              new HdsSideMenuMainItem({
+                icon: $r('app.media.me_tab'),
+                label: '我的'
+              })
+            ],
+            selectedIndex: 0,
+            $selectedIndex: async (index) => {
+              this.index = index
+              if (index !== 1) {
+                const lastWindow = await window.getLastWindow(this.context)
+                await lastWindow.setWindowPrivacyMode(false)
+              }
+              if (index === 0) {
+                this.context.eventHub.emit('refreshPassword')
+              }
+              if (index === 1) {
+                const disallowScreenshot =
+                  getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
+                if (disallowScreenshot) {
+                  const lastWindow = await window.getLastWindow(this.context)
+                  await lastWindow.setWindowPrivacyMode(true)
+                }
+                this.context.eventHub.emit('refreshInfo')
+              }
+              if (index === 2) {
+                this.context.eventHub.emit('refreshTag')
+              }
+              if (index === 3) {
+                this.context.eventHub.emit('refreshMe')
+              }
+            }
+          })
+            .padding({
+              top: $r('sys.float.ohos_id_default_padding_top')
+            })
+            .width(240)
+          Divider()
+            .vertical(true)
+          if (this.index === 0) {
+            Password()
+              .layoutWeight(1)
+          }
+          if (this.index === 1) {
+            Info()
+              .layoutWeight(1)
+          }
+          if (this.index === 2) {
+            Tag()
+              .layoutWeight(1)
+          }
+          if (this.index === 3) {
+            Me()
+              .layoutWeight(1)
+          }
+        }
+        .alignItems(VerticalAlign.Top)
         .bindSheet(this.isShowNoticeSheet!!, this.NoticeSheetBuilder(), {
           preferType: this.preferType,
           title: {
             title: '消息通知'
           }
         })
-
-        TabContent() {
-          Info()
-            .padding({
-              bottom: this.preferType === 0 ? 64 : 0
-            })
-        }
-        .tabBar(this.tabBuilder(1, $r('app.media.info'), '常用信息'))
-
-        TabContent() {
-          Tag()
-            .padding({
-              bottom: this.preferType === 0 ? 64 : 0
-            })
-        }
-        .tabBar(this.tabBuilder(2, $r('app.media.tag'), '标签'))
-
-        TabContent() {
-          Me()
-            .height('100%')
-            .padding({
-              bottom: this.preferType === 0 ? 64 : 0
-            })
-        }
-        .tabBar(this.tabBuilder(3, $r('app.media.me'), '我的'))
       }
-      .barBackgroundBlurStyle(BlurStyle.Regular)
-      .barFloatingStyle({
-        barBottomMargin: 8,
-        adaptToHandedness: true,
-        thermoCtrl: true,
-        systemMaterialEffect: {
-          materialType: hdsMaterial.MaterialType.ADAPTIVE,
-          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
-        }
-      })
-      .barOverlap(this.preferType === 0 ? true : false)
-      .barPosition(this.preferType === 0 ? BarPosition.End : BarPosition.Start)
-      .barWidth(this.preferType === 0 ? 320 : 56)
-      .scrollable(false)
-      .vertical(this.preferType === 0 ? false : true)
-      .onChange((index) => {
-        this.index = index
-      })
-      .onAnimationStart(async (index, targetIndex) => {
-        if (targetIndex !== 1) {
-          const lastWindow = await window.getLastWindow(this.context)
-          await lastWindow.setWindowPrivacyMode(false)
-        }
-        if (targetIndex === 0) {
-          this.title = '密码'
-          this.context.eventHub.emit('refreshPassword')
-        }
-        if (targetIndex === 1) {
-          const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-            name: 'commonSetting'
-          })
-          const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
-          if (disallowScreenshot) {
-            const lastWindow = await window.getLastWindow(this.context)
-            await lastWindow.setWindowPrivacyMode(true)
-          }
-          this.title = '常用信息'
-          this.context.eventHub.emit('refreshInfo')
-        }
-        if (targetIndex === 2) {
-          this.title = '标签'
-          this.context.eventHub.emit('refreshTag')
-        }
-        if (targetIndex === 3) {
-          this.title = '我的'
-          this.context.eventHub.emit('refreshMe')
-        }
-      })
-      .bindSheet(this.isShowUploaderrorlogSheet!!, this.UploaderrorlogSheetBuilder(), {
-        height: SheetSize.FIT_CONTENT,
-        preferType: this.preferType,
-        title: {
-          title: '上传故障日志'
-        }
-      })
     }
     .alignItems(HorizontalAlign.Start)
     .backgroundColor($r('sys.color.background_secondary'))
     .backgroundImage(this.backgroundImagePixelMap)
     .backgroundImageSize(ImageSize.FILL)
-    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
-    .padding({
-      bottom: this.preferType === 0 ? 36 : 0,
-      top: this.preferType === 0 ? 12 : 0
-    })
     .onAppear(async () => {
       this.context.eventHub.on('clearData', () => {
         if (!this.isShowCleardataSheet) {

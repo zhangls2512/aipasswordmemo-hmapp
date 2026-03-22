@@ -1,10 +1,10 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { updateTag } from '../common/Datachange'
 import { getTagInfo, Tag } from '../common/Dataget'
+import { getFlushPreference } from '../common/Preference'
 
 @ComponentV2
 export default struct Updatetag {
@@ -226,10 +226,7 @@ export default struct Updatetag {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-            name: 'cloudbackupSetting'
-          })
-          const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
           if (autoOn.includes('tag')) {
             this.cloudBackup = true
           }

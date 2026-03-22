@@ -1,4 +1,4 @@
-import { preferences, relationalStore } from '@kit.ArkData'
+import { relationalStore } from '@kit.ArkData'
 import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
 import { batteryInfo, power } from '@kit.BasicServicesKit'
@@ -8,6 +8,7 @@ import { rcp } from '@kit.RemoteCommunicationKit'
 import { encrypt, EncryptData, getKeyAlg } from './Crypto'
 import { getInfoList, getPasswordList, getTagList } from './Dataget'
 import { write } from './File'
+import { getFlushPreference, setFlushPreference } from './Preference'
 import { getWebdavServerInfo } from './Webdavserver'
 import { InfoOutItem, PasswordOutItem, TagOutItem } from '../pages/DataInOut'
 
@@ -52,17 +53,11 @@ export async function syncTable(context: Context, table: string, networkId: stri
 }
 
 export async function autoSyncTable(context: Context, table: string, fromDeviceId?: string) {
-  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'dataSetting'
-  })
-  const debugSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'debugSetting'
-  })
   const pauseAutoSyncWhenLowBatteryCapacityLevel =
-    dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-  const pauseAutoSyncWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
+    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
+  const pauseAutoSyncWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
   const lowBatteryCapacityLevel =
-    debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
+    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
   if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
     return
   }
@@ -71,9 +66,9 @@ export async function autoSyncTable(context: Context, table: string, fromDeviceI
     currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
     return
   }
-  const autoSyncTables = dataSettingDataPreferences.getSync('autoSyncTables', []) as string[]
+  const autoSyncTables = getFlushPreference(context, 'dataSetting', 'autoSyncTables', []) as string[]
   if (autoSyncTables.includes(table)) {
-    const autoSyncDevices: Item[] = dataSettingDataPreferences.getSync('autoSyncDevices', []) as Item[]
+    const autoSyncDevices: Item[] = getFlushPreference(context, 'dataSetting', 'autoSyncDevices', []) as Item[]
     const devices =
       distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo').getAvailableDeviceListSync()
     const promises = autoSyncDevices.map(async (item) => {
@@ -86,17 +81,11 @@ export async function autoSyncTable(context: Context, table: string, fromDeviceI
 }
 
 export async function autoHuaweiCloudSyncTable(context: Context, table: string) {
-  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'dataSetting'
-  })
-  const debugSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'debugSetting'
-  })
   const pauseAutoSyncWhenLowBatteryCapacityLevel =
-    dataSettingDataPreferences.getSync('pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-  const pauseAutoSyncWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoSyncWhenPowerSave', false)
+    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
+  const pauseAutoSyncWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
   const lowBatteryCapacityLevel =
-    debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
+    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
   if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
     return
   }
@@ -105,7 +94,8 @@ export async function autoHuaweiCloudSyncTable(context: Context, table: string) 
     currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
     return
   }
-  const autoHuaweiCloudSyncTables = dataSettingDataPreferences.getSync('autoHuaweiCloudSyncTables', []) as string[]
+  const autoHuaweiCloudSyncTables =
+    getFlushPreference(context, 'dataSetting', 'autoHuaweiCloudSyncTables', []) as string[]
   if (autoHuaweiCloudSyncTables.includes(table)) {
     const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(context, {
       name: 'huaweicloudsync',
@@ -134,12 +124,8 @@ export async function backupTable(context: Context, table: string) {
   if (fileIo.accessSync(oldFilePath)) {
     await fileIo.unlink(oldFilePath)
   }
-  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'dataSetting'
-  })
-  const isBackupTables = dataSettingDataPreferences.getSync('isBackupTables', []) as string[]
-  dataSettingDataPreferences.putSync('isBackupTables', Array.from(new Set([...isBackupTables, table])))
-  dataSettingDataPreferences.flushSync()
+  const isBackupTables = getFlushPreference(context, 'dataSetting', 'isBackupTables', []) as string[]
+  setFlushPreference(context, 'dataSetting', 'isBackupTables', Array.from(new Set([...isBackupTables, table])))
 }
 
 async function getFileBackupString(context: Context, table: string, encrypted: boolean): Promise<string> {
@@ -265,10 +251,7 @@ async function getFileBackupString(context: Context, table: string, encrypted: b
 }
 
 export async function fileBackupTable(context: Context, table: string) {
-  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'dataSetting'
-  })
-  const encryptFileBackup = dataSettingDataPreferences.getSync('encryptFileBackup', true)
+  const encryptFileBackup = getFlushPreference(context, 'dataSetting', 'encryptFileBackup', true)
   let encrypted = false
   if (encryptFileBackup && getKeyAlg()) {
     encrypted = true
@@ -284,10 +267,7 @@ export async function webdavBackupTable(context: Context, table: string) {
   if (!webdavServerInfo.path) {
     return 'fail'
   }
-  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'dataSetting'
-  })
-  const encryptWebdavBackup = dataSettingDataPreferences.getSync('encryptWebdavBackup', true)
+  const encryptWebdavBackup = getFlushPreference(context, 'dataSetting', 'encryptWebdavBackup', true)
   let encrypted = false
   if (encryptWebdavBackup && getKeyAlg()) {
     encrypted = true
@@ -304,8 +284,8 @@ export async function webdavBackupTable(context: Context, table: string) {
       },
       headers: {
         Authorization: 'Basic ' +
-        new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
-        webdavServerInfo.password))
+          new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
+            webdavServerInfo.password))
       }
     })
     try {
@@ -342,17 +322,11 @@ export async function webdavBackupTable(context: Context, table: string) {
 }
 
 export async function autoBackupTable(context: Context, table: string) {
-  const dataSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'dataSetting'
-  })
-  const debugSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'debugSetting'
-  })
   const pauseAutoBackupWhenLowBatteryCapacityLevel =
-    dataSettingDataPreferences.getSync('pauseAutoBackupWhenLowBatteryCapacityLevel', false)
-  const pauseAutoBackupWhenPowerSave = dataSettingDataPreferences.getSync('pauseAutoBackupWhenPowerSave', false)
+    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
+  const pauseAutoBackupWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
   const lowBatteryCapacityLevel =
-    debugSettingDataPreferences.getSync('lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
+    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
   if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
     return
   }
@@ -362,17 +336,17 @@ export async function autoBackupTable(context: Context, table: string) {
     return
   }
   const autoBackupTables =
-    dataSettingDataPreferences.getSync('autoBackupTables', ['password', 'info', 'tag']) as string[]
+    getFlushPreference(context, 'dataSetting', 'autoBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoBackupTables.includes(table)) {
     await backupTable(context, table)
   }
   const autoFileBackupTables =
-    dataSettingDataPreferences.getSync('autoFileBackupTables', ['password', 'info', 'tag']) as string[]
+    getFlushPreference(context, 'dataSetting', 'autoFileBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoFileBackupTables.includes(table)) {
     await fileBackupTable(context, table)
   }
   const autoWebdavBackupTables =
-    dataSettingDataPreferences.getSync('autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
+    getFlushPreference(context, 'dataSetting', 'autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoWebdavBackupTables.includes(table)) {
     await webdavBackupTable(context, table)
   }

@@ -1,9 +1,9 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
-import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
 import { getKeyAlg } from '../common/Crypto'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 
 interface Type {
   name: string,
@@ -23,9 +23,6 @@ struct Cloudbackupimport {
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   autoImport: string[] = []
-  cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'cloudbackupSetting'
-  })
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'
@@ -46,13 +43,13 @@ struct Cloudbackupimport {
     }
   ]
 
-  getSetting() {
-    this.autoImport = this.cloudbackupSettingDataPreferences.getSync('autoImport', []) as string[]
-  }
-
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             Row() {
@@ -119,8 +116,7 @@ struct Cloudbackupimport {
                       if (isOn) {
                         this.autoImport = Array.from(new Set([...this.autoImport, item.value]))
                       }
-                      this.cloudbackupSettingDataPreferences.putSync('autoImport', this.autoImport)
-                      this.cloudbackupSettingDataPreferences.flushSync()
+                      setFlushPreference(this.context, 'cloudbackupSetting', 'autoImport', this.autoImport)
                     })
                 }
                 .borderRadius(12)
@@ -355,9 +351,13 @@ struct Cloudbackupimport {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -368,6 +368,28 @@ struct Cloudbackupimport {
         end: LengthMetrics.vp(60)
       },
       style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
         thermoCtrl: true,
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
@@ -378,11 +400,11 @@ struct Cloudbackupimport {
         title: {
           mainTitle: '导入云备份'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onAppear(() => {
-      this.getSetting()
+      this.autoImport = getFlushPreference(this.context, 'cloudbackupSetting', 'autoImport', []) as string[]
     })
   }
 }

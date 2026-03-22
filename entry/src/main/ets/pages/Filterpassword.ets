@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getTagList, getTypeInfoList, PasswordInfoItem, Tag } from '../common/Dataget'
+import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
 import { SelectItem } from './Newpassword'
 
 @ComponentV2
@@ -21,9 +21,6 @@ export default struct Filterpassword {
   pushItemWhenBlur = false
   oftenUsedInfoTypes = ['自定义']
   specialInfoTypes = ['图标', '昵称', '用户名', '密码', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
-  filterPasswordDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'filterPassword'
-  })
 
   getCurrentInfoType() {
     let infoType = this.infoType
@@ -36,7 +33,7 @@ export default struct Filterpassword {
   async inputBlur() {
     const infoType = this.getCurrentInfoType()
     if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-    this.infoValue) {
+      this.infoValue) {
       this.passwordInfoArray.push({
         type: infoType,
         value: this.infoValue
@@ -514,9 +511,9 @@ export default struct Filterpassword {
           .width('100%')
           .onClick(() => {
             this.isShowFilterSheet = false
-            this.filterPasswordDataPreferences.putSync('nameKeyword', this.passwordNameKeyword)
-            this.filterPasswordDataPreferences.putSync('info', this.passwordInfoArray)
-            this.filterPasswordDataPreferences.putSync('tag', this.passwordTagArray)
+            setTempPreference(this.context, 'filterPassword', 'nameKeyword', this.passwordNameKeyword)
+            setTempPreference(this.context, 'filterPassword', 'info', this.passwordInfoArray)
+            setTempPreference(this.context, 'filterPassword', 'tag', this.passwordTagArray)
             this.context.eventHub.emit('refreshFilterPassword')
           })
       }
@@ -530,20 +527,18 @@ export default struct Filterpassword {
       right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
     })
     .onAppear(async () => {
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      this.pushItemWhenBlur = commonSettingDataPreferences.getSync('pushItemWhenBlur', true) as boolean
-      const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码', '图标']) as string[]
+      this.pushItemWhenBlur = getFlushPreference(this.context, 'commonSetting', 'pushItemWhenBlur', true) as boolean
+      const oftenUsedInfoType =
+        getFlushPreference(this.context, 'commonSetting', 'oftenUsedInfoType', ['密码', '图标']) as string[]
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
       if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
         this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
       }
       this.tagArray = await getTagList(this.context, 'value')
-      this.passwordNameKeyword = this.filterPasswordDataPreferences.getSync('nameKeyword', '') as string
-      this.passwordInfoArray = this.filterPasswordDataPreferences.getSync('info', []) as PasswordInfoItem[]
-      this.passwordTagArray = this.filterPasswordDataPreferences.getSync('tag', []) as string[]
+      this.passwordNameKeyword = getTempPreference(this.context, 'filterPassword', 'nameKeyword', '') as string
+      this.passwordInfoArray = getTempPreference(this.context, 'filterPassword', 'info', []) as PasswordInfoItem[]
+      this.passwordTagArray = getTempPreference(this.context, 'filterPassword', 'tag', []) as string[]
     })
   }
 }

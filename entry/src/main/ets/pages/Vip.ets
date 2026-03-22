@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { netBoost } from '@kit.NetworkBoostKit'
-import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
@@ -161,6 +161,10 @@ export default struct Vip {
   build() {
     HdsNavigation(this.pageInfos) {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             if (!this.vipStatusLoading) {
@@ -519,23 +523,34 @@ export default struct Vip {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
     .hideBackButton(true)
-    .padding({
-      top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-    })
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
       },
       style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            }
+          }
+        },
         thermoCtrl: true,
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
@@ -546,10 +561,9 @@ export default struct Vip {
         title: {
           mainTitle: '会员中心'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
-    .titleMode(HdsNavigationTitleMode.MINI)
+    .titleMode(HdsNavigationTitleMode.MODAL)
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {

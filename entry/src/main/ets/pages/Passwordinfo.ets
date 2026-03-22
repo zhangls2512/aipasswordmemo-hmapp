@@ -1,11 +1,11 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { floatingBall, LengthMetrics, promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { getPasswordInfo, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
 import copy from '../common/Pasteboard'
+import { getFlushPreference } from '../common/Preference'
 import { getTimeStringFromTimeStamp } from '../common/Stringformat'
 import getTotp from '../common/Totp'
 
@@ -116,7 +116,7 @@ export default struct Passwordinfo {
                         title: '内容历史记录',
                         message: item.history.slice(1)
                           .map(historyItem => getTimeStringFromTimeStamp(historyItem.updateTime) + '：' +
-                          historyItem.value)
+                            historyItem.value)
                           .join('\n'),
                         buttons: [
                           {
@@ -315,13 +315,12 @@ export default struct Passwordinfo {
       right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
     })
     .onAppear(async () => {
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      this.hidePasswordInfoType = commonSettingDataPreferences.getSync('defaultHidePasswordInfoType', []) as string[]
+      this.hidePasswordInfoType =
+        getFlushPreference(this.context, 'commonSetting', 'defaultHidePasswordInfoType', []) as string[]
       this.passwordInfoValueDataDetector =
-        commonSettingDataPreferences.getSync('passwordInfoValueDataDetector', true) as boolean
-      const mfaSecondsRemainingStyleIndex = commonSettingDataPreferences.getSync('mfaSecondsRemainingStyle', 0)
+        getFlushPreference(this.context, 'commonSetting', 'passwordInfoValueDataDetector', true) as boolean
+      const mfaSecondsRemainingStyleIndex =
+        getFlushPreference(this.context, 'commonSetting', 'mfaSecondsRemainingStyle', 0)
       if (mfaSecondsRemainingStyleIndex === 0) {
         this.mfaSecondsRemainingStyle = 'progress'
       }
@@ -338,7 +337,8 @@ export default struct Passwordinfo {
           const floatingBallController = await floatingBall.create({
             context: this.context
           })
-          const showMfaInFloatingBall = commonSettingDataPreferences.getSync('showMfaInFloatingBall', false)
+          const showMfaInFloatingBall =
+            getFlushPreference(this.context, 'commonSetting', 'showMfaInFloatingBall', false)
           if (showMfaInFloatingBall) {
             await floatingBallController.startFloatingBall({
               template: floatingBall.FloatingBallTemplate.NORMAL,

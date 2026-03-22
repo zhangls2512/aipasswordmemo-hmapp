@@ -1,6 +1,6 @@
-import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { rcp } from '@kit.RemoteCommunicationKit'
+import { getFlushPreference } from './Preference'
 
 interface ErrorResponse {
   errCode: number,
@@ -9,10 +9,7 @@ interface ErrorResponse {
 }
 
 export default async function request(context: Context, path: string, body: rcp.RequestContent) {
-  const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'commonSetting'
-  })
-  const allService = commonSettingDataPreferences.getSync('allService', true)
+  const allService = getFlushPreference(context, 'commonSetting', 'allService', true)
   if (!allService) {
     context.eventHub.emit('dialog', '全量模式未开启',
       '全量模式未开启，无法使用在线功能。如需使用在线功能，请前往“我的”>“设置”>“更多”>“应用服务模式”，开启全量模式。')

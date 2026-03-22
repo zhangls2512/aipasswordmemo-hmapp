@@ -1,6 +1,7 @@
-import { preferences } from '@kit.ArkData'
+import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
-import { hdsMaterial, HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 
 @Builder
 export function OftenusedinfotypeBuilder() {
@@ -11,16 +12,17 @@ export function OftenusedinfotypeBuilder() {
 struct Oftenusedinfotype {
   @Local oftenUsedInfoTypeArray: string[] = []
   @Local type: string = ''
-  context = this.getUIContext().getHostContext()
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
   defaultInfoTypeArray =
     ['图标', '昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
-  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'commonSetting'
-  })
 
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             TextInput({
@@ -157,9 +159,13 @@ struct Oftenusedinfotype {
             })
           }
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -170,6 +176,28 @@ struct Oftenusedinfotype {
         end: LengthMetrics.vp(60)
       },
       style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
         thermoCtrl: true,
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.ADAPTIVE,
@@ -180,14 +208,15 @@ struct Oftenusedinfotype {
         title: {
           mainTitle: '常用信息类型'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onAppear(() => {
-      this.oftenUsedInfoTypeArray = this.commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码']) as string[]
+      this.oftenUsedInfoTypeArray =
+        getFlushPreference(this.context, 'commonSetting', 'oftenUsedInfoType', ['密码']) as string[]
     })
     .onDisAppear(() => {
-      this.commonSettingDataPreferences.putSync('oftenUsedInfoType', this.oftenUsedInfoTypeArray)
+      setFlushPreference(this.context, 'commonSetting', 'oftenUsedInfoType', this.oftenUsedInfoTypeArray)
     })
   }
 }
