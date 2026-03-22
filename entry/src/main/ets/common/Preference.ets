@@ -1,12 +1,12 @@
 import { preferences } from '@kit.ArkData'
 import { fileIo } from '@kit.CoreFileKit'
 
-interface PreferenceItem {
+export interface PreferenceItem {
   name: string,
   kvs: KvItem[]
 }
 
-interface KvItem {
+export interface KvItem {
   key: string,
   value: string
 }
@@ -55,8 +55,8 @@ export async function getFlushPreferences(context: Context) {
   const filenames = await fileIo.listFile(context.preferencesDir)
   const names: string[] = []
   filenames.forEach((item) => {
-    if (!item.includes('.')) {
-      names.push(item)
+    if (item.endsWith('.db')) {
+      names.push(item.replace('.db', ''))
     }
   })
   return names.map(name => {
