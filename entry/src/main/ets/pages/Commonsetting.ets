@@ -31,9 +31,9 @@ struct Commonsetting {
   @Local disallowScreenshot: boolean = true
   @Local showPasswordInIndex: boolean = false
   @Local hideTagInIndex: boolean = false
-  @Local passwordInfoValueDataDetector: boolean = true
   @Local mfaSecondsRemainingStyleIndex: number = 0
   @Local mfaSecondsRemainingStyleValue: string = 'progress'
+  @Local passwordInfoValueDataDetector: boolean = true
   @Local showMfaInFloatingBall: boolean = true
   @Local pushItemWhenBlur: boolean = false
   @Local checkVersionUpdateIndex: number = 1
@@ -755,6 +755,50 @@ struct Commonsetting {
                   right: 12
                 })
               Row() {
+                Text('MFA倒计时样式')
+                  .enableAutoSpacing(true)
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Select([
+                  { value: '进度条' },
+                  { value: '数字' }
+                ])
+                  .selected(this.mfaSecondsRemainingStyleIndex!!)
+                  .value(this.mfaSecondsRemainingStyleValue!!)
+                  .onSelect((index) => {
+                    setFlushPreference(this.context, 'commonSetting', 'mfaSecondsRemainingStyle', index)
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+              .width('100%')
+            }
+            .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+            .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+            .padding($r('sys.float.ohos_id_corner_radius_mark'))
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_l')
+        })
+
+        ListItem() {
+          Column() {
+            Text('功能')
+              .fontColor($r('sys.color.font_secondary'))
+              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontWeight(FontWeight.Medium)
+              .margin({
+                bottom: 6,
+                left: 12,
+                right: 12
+              })
+            Column() {
+              Row() {
                 Text('常用信息类型')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
@@ -907,33 +951,6 @@ struct Commonsetting {
                 })
                   .onChange((isOn) => {
                     setFlushPreference(this.context, 'commonSetting', 'passwordInfoValueDataDetector', isOn)
-                  })
-              }
-              .borderRadius(12)
-              .padding(12)
-              .width('100%')
-
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('MFA倒计时样式')
-                  .enableAutoSpacing(true)
-                  .fontWeight(FontWeight.Medium)
-                  .layoutWeight(1)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                  })
-                Select([
-                  { value: '进度条' },
-                  { value: '数字' }
-                ])
-                  .selected(this.mfaSecondsRemainingStyleIndex!!)
-                  .value(this.mfaSecondsRemainingStyleValue!!)
-                  .onSelect((index) => {
-                    setFlushPreference(this.context, 'commonSetting', 'mfaSecondsRemainingStyle', index)
                   })
               }
               .borderRadius(12)
@@ -1161,8 +1178,6 @@ struct Commonsetting {
       this.showPasswordInIndex =
         getFlushPreference(this.context, 'commonSetting', 'showPasswordInIndex', false) as boolean
       this.hideTagInIndex = getFlushPreference(this.context, 'commonSetting', 'hideTagInIndex', false) as boolean
-      this.passwordInfoValueDataDetector =
-        getFlushPreference(this.context, 'commonSetting', 'passwordInfoValueDataDetector', true) as boolean
       const mfaSecondsRemainingStyle = getFlushPreference(this.context, 'commonSetting', 'mfaSecondsRemainingStyle', 0)
       this.mfaSecondsRemainingStyleIndex = mfaSecondsRemainingStyle as number
       if (mfaSecondsRemainingStyle === 0) {
@@ -1171,6 +1186,8 @@ struct Commonsetting {
       if (mfaSecondsRemainingStyle === 1) {
         this.mfaSecondsRemainingStyleValue = '数字'
       }
+      this.passwordInfoValueDataDetector =
+        getFlushPreference(this.context, 'commonSetting', 'passwordInfoValueDataDetector', true) as boolean
       this.showMfaInFloatingBall =
         getFlushPreference(this.context, 'commonSetting', 'showMfaInFloatingBall', false) as boolean
       this.pushItemWhenBlur = getFlushPreference(this.context, 'commonSetting', 'pushItemWhenBlur', true) as boolean
