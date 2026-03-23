@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
@@ -11,8 +10,9 @@ import {
   createCollaborationServiceMenuItems
 } from '@kit.ServiceCollaborationKit'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { newInfo } from '../common/Datachange'
+import { getFlushPreference } from '../common/Preference'
 import { SelectItem } from './Newpassword'
 
 @ComponentV2
@@ -326,6 +326,9 @@ export default struct Newinfo {
         }
         .alignItems(HorizontalAlign.Start)
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
 
       ListItem() {
         Column() {
@@ -405,14 +408,12 @@ export default struct Newinfo {
       right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
     })
     .onAppear(async () => {
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      const oftenUsedInfoType = commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码', '图标']) as string[]
+      const oftenUsedInfoType =
+        getFlushPreference(this.context, 'commonSetting', 'oftenUsedInfoType', ['密码', '图标']) as string[]
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
       const res = await getCloudServiceStatus(this.context)
-      const key = getKey()
+      const key = getKeyAlg()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'
       }
@@ -423,10 +424,7 @@ export default struct Newinfo {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-            name: 'cloudbackupSetting'
-          })
-          const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
           if (autoOn.includes('info')) {
             this.cloudBackup = true
           }

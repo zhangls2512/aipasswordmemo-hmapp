@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { display, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
@@ -13,9 +12,10 @@ import {
   createCollaborationServiceMenuItems
 } from '@kit.ServiceCollaborationKit'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { newInfo, newPassword, newTag } from '../common/Datachange'
 import { getTagList, getTypeInfoList, PasswordInfoItem, Tag } from '../common/Dataget'
+import { getFlushPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
 import Passwordgenerate from './Passwordgenerate'
 
@@ -51,9 +51,6 @@ export default struct Newpassword {
   pushItemWhenBlur = false
   oftenUsedInfoTypes = ['自定义']
   specialInfoTypes = ['图标', '昵称', '用户名', '密码', 'MFA', '姓名', '手机号', '邮箱', '银行卡号', '身份证号', 'URL']
-  cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'cloudbackupSetting'
-  })
 
   getCurrentInfoType() {
     let infoType = this.infoType
@@ -66,7 +63,7 @@ export default struct Newpassword {
   async inputBlur() {
     const infoType = this.getCurrentInfoType()
     if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-    this.infoValue) {
+      this.infoValue) {
       this.passwordInfoArray.push({
         type: infoType,
         value: this.infoValue
@@ -123,6 +120,7 @@ export default struct Newpassword {
             await imagePixelMap.release()
             fileIo.closeSync(file)
             this.infoValue = fileUri.getUriFromPath(filePath)
+            await this.inputBlur()
           } catch {
           }
         })
@@ -203,6 +201,7 @@ export default struct Newpassword {
               await imagePixelMap.release()
               fileIo.closeSync(file)
               this.infoValue = fileUri.getUriFromPath(filePath)
+              await this.inputBlur()
             }
           })
           Select(this.oftenUsedInfoTypes.map((item): SelectItem => {
@@ -324,8 +323,9 @@ export default struct Newpassword {
                   title: '密码随机生成'
                 },
                 onAppear: () => {
-                  this.context.eventHub.on('inputPassword', (password: string) => {
+                  this.context.eventHub.on('inputPassword', async (password: string) => {
                     this.infoValue = password
+                    await this.inputBlur()
                   })
                 },
                 onDisappear: () => {
@@ -359,7 +359,7 @@ export default struct Newpassword {
               .onBlur(async () => {
                 const infoType = this.getCurrentInfoType()
                 if (this.pushItemWhenBlur && infoType && !this.passwordInfoArray.some(item => item.type === infoType) &&
-                this.otpauthUri) {
+                  this.otpauthUri) {
                   const uriInstance = new uri.URI(this.otpauthUri)
                   if (uriInstance.scheme !== 'otpauth') {
                     return
@@ -405,6 +405,27 @@ export default struct Newpassword {
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
                 })
                 .type(InputType.Password)
+                .onBlur(async () => {
+                  const infoType = this.getCurrentInfoType()
+                  if (this.pushItemWhenBlur && infoType &&
+                    !this.passwordInfoArray.some(item => item.type === infoType) &&
+                    this.infoValue && this.mfaStep && this.mfaDigits) {
+                    this.passwordInfoArray.push({
+                      type: infoType,
+                      value: this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits
+                    })
+                    this.infoType = ''
+                    this.infoTypeIndex = 0
+                    this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                    this.infoValue = ''
+                    this.otpauthUri = ''
+                    this.mfaStep = '30'
+                    this.mfaDigits = '6'
+                    if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
+                      this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
+                    }
+                  }
+                })
               TextInput({
                 placeholder: '请输入步长 (单位：秒)',
                 text: this.mfaStep!!
@@ -528,6 +549,9 @@ export default struct Newpassword {
         }
         .alignItems(HorizontalAlign.Start)
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
 
       ForEach(this.infoArray, (item: string) => {
         if (!this.passwordInfoArray.some(infoItem => infoItem.value === item)) {
@@ -772,7 +796,7 @@ export default struct Newpassword {
                 }
                 if (item.type === 'MFA') {
                   Text('密钥：' + item.value.split('\0')[0] + '\n步长：' + item.value.split('\0')[1] + '\n位数：' +
-                  item.value.split('\0')[2])
+                    item.value.split('\0')[2])
                     .fontWeight(FontWeight.Medium)
                 }
                 if (item.type !== '图标' && item.type !== 'MFA') {
@@ -1099,7 +1123,7 @@ export default struct Newpassword {
             })
             let infoCloudBackup = false
             let tagCloudBackup = false
-            const autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+            const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
             if (this.allowCloudBackup && autoOn.includes('info')) {
               infoCloudBackup = true
             }
@@ -1113,7 +1137,7 @@ export default struct Newpassword {
                     type: item.type,
                     value: item.value,
                     cloudBackup: infoCloudBackup
-                  })
+                  }, true)
                 }
               })
               await Promise.all(promises)
@@ -1124,7 +1148,7 @@ export default struct Newpassword {
                   value: item,
                   color: '',
                   cloudBackup: tagCloudBackup
-                })
+                }, true)
               })
               await Promise.all(promises)
             }
@@ -1147,12 +1171,9 @@ export default struct Newpassword {
           this.preferType = getPreferType(this.UIContext)
         }, 200)
       })
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      this.pushItemWhenBlur = commonSettingDataPreferences.getSync('pushItemWhenBlur', true) as boolean
+      this.pushItemWhenBlur = getFlushPreference(this.context, 'commonSetting', 'pushItemWhenBlur', true) as boolean
       const oftenUsedInfoType =
-        commonSettingDataPreferences.getSync('oftenUsedInfoType', ['密码', 'MFA', '图标']) as string[]
+        getFlushPreference(this.context, 'commonSetting', 'oftenUsedInfoType', ['密码', 'MFA', '图标']) as string[]
       this.oftenUsedInfoTypes = oftenUsedInfoType.concat(this.oftenUsedInfoTypes)
       this.infoTypeValue = this.oftenUsedInfoTypes[0]
       if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
@@ -1160,7 +1181,7 @@ export default struct Newpassword {
       }
       this.tagArray = await getTagList(this.context, 'value')
       const res = await getCloudServiceStatus(this.context)
-      const key = getKey()
+      const key = getKeyAlg()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'
       }
@@ -1171,7 +1192,7 @@ export default struct Newpassword {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
           if (autoOn.includes('password')) {
             this.cloudBackup = true
           }

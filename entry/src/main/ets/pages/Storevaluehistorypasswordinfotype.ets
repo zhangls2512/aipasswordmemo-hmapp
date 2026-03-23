@@ -1,6 +1,7 @@
-import { preferences } from '@kit.ArkData'
+import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 
 @Builder
 export function StorevaluehistorypasswordinfotypeBuilder() {
@@ -11,14 +12,15 @@ export function StorevaluehistorypasswordinfotypeBuilder() {
 struct Storevaluehistorypasswordinfotype {
   @Local storeValueHistoryPasswordInfoTypeArray: string[] = []
   @Local type: string = ''
-  context = this.getUIContext().getHostContext()
-  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'commonSetting'
-  })
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
 
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             TextInput({
@@ -88,9 +90,12 @@ struct Storevaluehistorypasswordinfotype {
             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
         })
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -100,19 +105,48 @@ struct Storevaluehistorypasswordinfotype {
       padding: {
         end: LengthMetrics.vp(60)
       },
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      },
       content: {
         title: {
           mainTitle: '记录内容历史记录密码信息类型'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onAppear(() => {
       this.storeValueHistoryPasswordInfoTypeArray =
-        this.commonSettingDataPreferences.getSync('storeValueHistoryPasswordInfoType', ['密码']) as string[]
+        getFlushPreference(this.context, 'commonSetting', 'storeValueHistoryPasswordInfoType', ['密码']) as string[]
     })
     .onDisAppear(() => {
-      this.commonSettingDataPreferences.putSync('storeValueHistoryPasswordInfoType',
+      setFlushPreference(this.context, 'commonSetting', 'storeValueHistoryPasswordInfoType',
         this.storeValueHistoryPasswordInfoTypeArray)
     })
   }

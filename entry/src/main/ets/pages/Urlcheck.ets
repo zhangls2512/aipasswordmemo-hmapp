@@ -89,7 +89,7 @@ export default struct Urlcheck {
             }
             const dialogControllerProgress = new CustomDialogController({
               builder: LoadingDialog({
-                content: '检测中...'
+                content: '请求中...'
               })
             })
             dialogControllerProgress.open()

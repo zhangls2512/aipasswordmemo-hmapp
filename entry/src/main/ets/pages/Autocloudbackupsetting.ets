@@ -1,6 +1,7 @@
-import { preferences } from '@kit.ArkData'
+import { common } from '@kit.AbilityKit'
 import { LengthMetrics } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 
 interface Type {
   name: string,
@@ -14,11 +15,8 @@ export function AutocloudbackupsettingBuilder() {
 
 @ComponentV2
 struct Autocloudbackupsetting {
-  @Local autoOn: string[] = []
-  context = this.getUIContext().getHostContext()
-  cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'cloudbackupSetting'
-  })
+  context = this.getUIContext().getHostContext() as common.UIAbilityContext
+  autoOn: string[] = []
   typeArray: Type[] = [
     {
       name: '密码',
@@ -34,13 +32,13 @@ struct Autocloudbackupsetting {
     }
   ]
 
-  getSetting() {
-    this.autoOn = this.cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
-  }
-
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             ForEach(this.typeArray, (item: Type, index) => {
@@ -69,8 +67,7 @@ struct Autocloudbackupsetting {
                     if (isOn) {
                       this.autoOn = Array.from(new Set([...this.autoOn, item.value]))
                     }
-                    this.cloudbackupSettingDataPreferences.putSync('autoOn', this.autoOn)
-                    this.cloudbackupSettingDataPreferences.flushSync()
+                    setFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', this.autoOn)
                   })
               }
               .borderRadius(12)
@@ -85,9 +82,13 @@ struct Autocloudbackupsetting {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -97,15 +98,44 @@ struct Autocloudbackupsetting {
       padding: {
         end: LengthMetrics.vp(60)
       },
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      },
       content: {
         title: {
           mainTitle: '云备份自动开启设置'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onAppear(() => {
-      this.getSetting()
+      this.autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
     })
   }
 }

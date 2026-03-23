@@ -94,13 +94,13 @@ export default struct Uploaderrorlog {
             .onClick(async () => {
               const dialogControllerProgress = new CustomDialogController({
                 builder: LoadingDialog({
-                  content: '上传中...'
+                  content: '请求中...'
                 })
               })
               dialogControllerProgress.open()
               const res = await request(this.context, '/product/newErrorLog', {
                 product: 'password',
-                version: '2.0.8.7',
+                version: '2.0.9.0',
                 errorObject: JSON.parse(this.errorObject),
                 contactType: this.contactType,
                 contactValue: this.contactValue

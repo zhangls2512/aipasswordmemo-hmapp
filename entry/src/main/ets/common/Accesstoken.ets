@@ -1,10 +1,10 @@
 import { authentication } from '@kit.AccountKit'
-import { preferences } from '@kit.ArkData'
 import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
 import { appAccount } from '@kit.BasicServicesKit'
 import { netBoost } from '@kit.NetworkBoostKit'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
+import { getFlushPreference } from './Preference'
 import request from './Request'
 
 interface AccountInfo {
@@ -89,11 +89,8 @@ export async function removeAccount() {
 export async function autoLogin(context: Context) {
   const accessToken = await getAccountAccessToken()
   if (!accessToken) {
-    const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
-      name: 'commonSetting'
-    })
-    const autoLoginByHuaweiAccount = commonSettingDataPreferences.getSync('autoLoginByHuaweiAccount', false)
-    const autoLoginByPasskey = commonSettingDataPreferences.getSync('autoLoginByPasskey', false)
+    const autoLoginByHuaweiAccount = getFlushPreference(context, 'commonSetting', 'autoLoginByHuaweiAccount', false)
+    const autoLoginByPasskey = getFlushPreference(context, 'commonSetting', 'autoLoginByPasskey', false)
     try {
       if (autoLoginByHuaweiAccount && !autoLoginByPasskey) {
         const loginRequest = new authentication.HuaweiIDProvider().createLoginWithHuaweiIDRequest()

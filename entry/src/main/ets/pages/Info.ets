@@ -5,7 +5,7 @@ import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { CloudBackupTimeItem, getInfoList, getInfoTypeList, Info } from '../common/Dataget'
 import copy from '../common/Pasteboard'
@@ -18,11 +18,10 @@ import UpdateInfo from './Updateinfo'
 export default struct InfoPage {
   @Provider() isShowNewSheet: boolean = false
   @Provider() isShowUpdateSheet: boolean = false
-  @Provider() isShowAinewSheet: boolean = false
+  @Local isShowAinewSheet: boolean = false
   @Local preferType: number = 1
   @Local infoArray: Info[] = []
   @Local loading: boolean = false
-  @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
   @Local types: string[] = []
   @Local selectType: string = ''
@@ -33,6 +32,11 @@ export default struct InfoPage {
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   updateId = 0
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '请求中...'
+    })
+  })
 
   async cloudBackup(item: Info) {
     let cloudBackupTime = JSON.stringify([])
@@ -143,14 +147,9 @@ export default struct InfoPage {
             content: '云备份'
           })
             .onClick(async () => {
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '云备份中...'
-                })
-              })
-              dialogControllerProgress.open()
+              this.dialogControllerProgress.open()
               await this.cloudBackup(item)
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.loading = true
             })
         }
@@ -160,17 +159,12 @@ export default struct InfoPage {
             content: '取消云备份'
           })
             .onClick(async () => {
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '取消云备份中...'
-                })
-              })
-              dialogControllerProgress.open()
+              this.dialogControllerProgress.open()
               await deleteCloudBackup(this.context, {
                 type: 'info',
                 id: item.id
               })
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.loading = true
             })
         }
@@ -517,7 +511,7 @@ export default struct InfoPage {
                           .onChange((isOn) => {
                             if (!isOn) {
                               this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                              item.id), 1)
+                                item.id), 1)
                             }
                             if (isOn) {
                               this.multipleSelectArray.push(item)
@@ -608,6 +602,10 @@ export default struct InfoPage {
                 })
               }
             })
+            ListItem()
+              .margin({
+                bottom: this.preferType === 0 ? 80 : 0
+              })
           }
         }
         .layoutWeight(1)
@@ -635,13 +633,13 @@ export default struct InfoPage {
         this.enableCloudBackup = false
         this.loading = true
         const cloudServiceStatus = await getCloudServiceStatus(this.context)
-        if (cloudServiceStatus && getKey()) {
+        if (cloudServiceStatus && getKeyAlg()) {
           this.enableCloudBackup = true
         }
       })
       this.loading = true
       const cloudServiceStatus = await getCloudServiceStatus(this.context)
-      if (cloudServiceStatus && getKey()) {
+      if (cloudServiceStatus && getKeyAlg()) {
         this.enableCloudBackup = true
       }
     })

@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -18,6 +18,10 @@ struct Vipcode {
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             TextArea({
@@ -39,7 +43,7 @@ struct Vipcode {
                 if (accessToken) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
-                      content: '验证中...'
+                      content: '请求中...'
                     })
                   })
                   dialogControllerProgress.open()
@@ -110,9 +114,13 @@ struct Vipcode {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -122,13 +130,42 @@ struct Vipcode {
       padding: {
         end: LengthMetrics.vp(60)
       },
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      },
       content: {
         title: {
           mainTitle: '兑换会员'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onReady((context) => {
       this.pageInfos = context.pathStack
     })

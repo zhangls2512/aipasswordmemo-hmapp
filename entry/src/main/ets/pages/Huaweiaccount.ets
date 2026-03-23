@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -21,13 +21,18 @@ struct Huaweiaccount {
   @Local loading: boolean = false
   @Local isBind: boolean = false
   @Local type: string = 'mfa'
-  @Local mfa: string = ''
-  @Local emailcode: string = ''
-  @Local agree: boolean = false
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  mfa = ''
+  emailcode = ''
+  agree = false
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '请求中...'
+    })
+  })
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .onClickLoginWithHuaweiIDButton(async (err, response) => {
@@ -51,12 +56,7 @@ struct Huaweiaccount {
           code = this.emailcode
         }
         if (response) {
-          const dialogControllerProgress = new CustomDialogController({
-            builder: LoadingDialog({
-              content: '绑定中...'
-            })
-          })
-          dialogControllerProgress.open()
+          this.dialogControllerProgress.open()
           const res = await request(this.context, '/account/bindExternalAccount', {
             verifyType: this.type,
             verifyCode: code,
@@ -64,7 +64,7 @@ struct Huaweiaccount {
             platform: 'huaweiaipasswordmemoapp',
             code: response.authorizationCode
           })
-          dialogControllerProgress.close()
+          this.dialogControllerProgress.close()
           if (res !== 'fail') {
             await promptAction.openToast({
               message: '绑定成功'
@@ -83,6 +83,10 @@ struct Huaweiaccount {
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         if (this.loading) {
           ListItem() {
             LoadingProgress()
@@ -188,16 +192,11 @@ struct Huaweiaccount {
                   })
                   .width('100%')
                   .onClick(async () => {
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '发送中...'
-                      })
-                    })
-                    dialogControllerProgress.open()
+                    this.dialogControllerProgress.open()
                     const res = await request(this.context, '/account/sendEmailCode', {
                       email: this.email
                     })
-                    dialogControllerProgress.close()
+                    this.dialogControllerProgress.close()
                     if (res !== 'fail') {
                       await promptAction.openToast({
                         message: '验证码已成功发送到邮箱：' + this.email
@@ -229,7 +228,6 @@ struct Huaweiaccount {
                   },
                   controller: this.controller
                 })
-                  .enabled(this.agree)
                   .height(40)
                   .margin({
                     top: $r('sys.float.ohos_id_elements_margin_vertical_l')
@@ -262,19 +260,14 @@ struct Huaweiaccount {
                     if (this.type === 'emailcode') {
                       code = this.emailcode
                     }
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '解绑中...'
-                      })
-                    })
-                    dialogControllerProgress.open()
+                    this.dialogControllerProgress.open()
                     const res = await request(this.context, '/account/unbindExternalAccount', {
                       verifyType: this.type,
                       verifyCode: code,
                       email: this.email,
                       platform: 'huawei'
                     })
-                    dialogControllerProgress.close()
+                    this.dialogControllerProgress.close()
                     if (res !== 'fail') {
                       await promptAction.openToast({
                         message: '解绑成功'
@@ -330,9 +323,12 @@ struct Huaweiaccount {
           })
           .width('100%')
         }
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -342,13 +338,42 @@ struct Huaweiaccount {
       padding: {
         end: LengthMetrics.vp(60)
       },
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      },
       content: {
         title: {
           mainTitle: this.isBind ? '解绑华为账号' : '绑定华为账号'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       this.controller.setEnabled(false)

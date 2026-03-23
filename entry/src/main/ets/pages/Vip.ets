@@ -2,10 +2,11 @@ import { common } from '@kit.AbilityKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { netBoost } from '@kit.NetworkBoostKit'
-import { HdsNavigation, HdsNavigationTitleMode } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
+import { getTimeStringFromTimeStamp } from '../common/Stringformat'
 
 interface VipItem {
   id: string,
@@ -16,16 +17,16 @@ interface VipItem {
 
 @ComponentV2
 export default struct Vip {
-  @Local vipStatus: string = '未开通'
-  @Local vipStatusColor: string = 'red'
   @Local vipStatusLoading: boolean = false
   @Local vipEndDate: string = ''
   @Local iapStatus: boolean = false
   @Local iapStatusLoading: boolean = false
-  @Local agree: boolean = false
   @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  vipStatus = '未开通'
+  vipStatusColor = 'red'
+  agree = false
   accessToken = ''
   uid = ''
   vipArray: VipItem[] = [
@@ -93,7 +94,7 @@ export default struct Vip {
         this.vipEndDate = '终身'
       }
       if (vipenddate > 0) {
-        this.vipEndDate = String(new Date(vipenddate))
+        this.vipEndDate = getTimeStringFromTimeStamp(vipenddate)
         if (vipenddate >= Date.now()) {
           this.vipStatus = '已开通 '
           this.vipStatusColor = '#FFD700'
@@ -130,29 +131,10 @@ export default struct Vip {
       await promptAction.openToast({
         message: '服务器正在验证，大约需要 5-20 秒，请稍候'
       })
-    } catch (err) {
+    } catch {
       netBoost.setSceneDesc({
         scene: 'transaction',
         sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
-      })
-      const errCode = err.code as number
-      if (errCode === 1001860000) {
-        return
-      }
-      if (errCode === 1001860050) {
-        await promptAction.openToast({
-          message: '系统未登录华为账号，无法购买'
-        })
-        return
-      }
-      if (errCode === 1001860051) {
-        await promptAction.openToast({
-          message: '已购买，无需重复购买'
-        })
-        return
-      }
-      await promptAction.openToast({
-        message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
       })
     }
   }
@@ -160,6 +142,10 @@ export default struct Vip {
   build() {
     HdsNavigation(this.pageInfos) {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             if (!this.vipStatusLoading) {
@@ -518,30 +504,47 @@ export default struct Vip {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
     .hideBackButton(true)
-    .padding({
-      top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-    })
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
+      },
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            }
+          }
+        },
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
       },
       content: {
         title: {
           mainTitle: '会员中心'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
-    .titleMode(HdsNavigationTitleMode.MINI)
+    .titleMode(HdsNavigationTitleMode.MODAL)
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()
       if (this.accessToken) {

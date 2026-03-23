@@ -1,9 +1,9 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { LengthMetrics } from '@kit.ArkUI'
 import { policy } from '@kit.NetworkKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getPermission } from '../common/Permission'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 
 @Builder
 export function PermissionsettingBuilder() {
@@ -16,13 +16,14 @@ struct Permissionsetting {
   @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   dataSync = getPermission('ohos.permission.DISTRIBUTED_DATASYNC')
-  permissionSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'permissionSetting'
-  })
 
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             Column() {
@@ -182,8 +183,7 @@ struct Permissionsetting {
                   isOn: this.writePasteBoard!!
                 })
                   .onChange((isOn) => {
-                    this.permissionSettingDataPreferences.putSync('writePasteBoard', isOn)
-                    this.permissionSettingDataPreferences.flushSync()
+                    setFlushPreference(this.context, 'permissionSetting', 'writePasteBoard', isOn)
                   })
               }
               .borderRadius(12)
@@ -208,9 +208,13 @@ struct Permissionsetting {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -220,15 +224,44 @@ struct Permissionsetting {
       padding: {
         end: LengthMetrics.vp(60)
       },
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      },
       content: {
         title: {
           mainTitle: '权限管理'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onAppear(() => {
-      this.writePasteBoard = this.permissionSettingDataPreferences.getSync('writePasteBoard', false) as boolean
+      this.writePasteBoard = getFlushPreference(this.context, 'permissionSetting', 'writePasteBoard', false) as boolean
     })
   }
 }

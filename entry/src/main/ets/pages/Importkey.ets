@@ -1,8 +1,8 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction, window } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
-import { setCustomKey } from '../common/Crypto'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
+import { importOldCustomKey } from '../common/Crypto'
+import { getFlushPreference } from '../common/Preference'
 
 @Builder
 export function ImportkeyBuilder() {
@@ -18,6 +18,10 @@ struct Importkey {
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         ListItem() {
           Column() {
             TextArea({
@@ -36,7 +40,7 @@ struct Importkey {
               .width('100%')
               .onClick(async () => {
                 try {
-                  await setCustomKey(this.keyValue)
+                  await importOldCustomKey(this.keyValue)
                   this.pageInfos.pop()
                   this.context.eventHub.emit('refreshKey')
                 } catch (err) {
@@ -51,9 +55,13 @@ struct Importkey {
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
+
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -63,21 +71,48 @@ struct Importkey {
       padding: {
         end: LengthMetrics.vp(60)
       },
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      },
       content: {
         title: {
           mainTitle: '导入自定义密钥'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onReady((context) => {
       this.pageInfos = context.pathStack
     })
     .onShown(async () => {
-      const commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-        name: 'commonSetting'
-      })
-      const disallowScreenshot = commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+      const disallowScreenshot =
+        getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
       if (disallowScreenshot) {
         const lastWindow = await window.getLastWindow(this.context)
         await lastWindow.setWindowPrivacyMode(true)
