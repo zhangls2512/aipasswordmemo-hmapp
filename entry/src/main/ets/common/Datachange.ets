@@ -1,8 +1,9 @@
-import { preferences, relationalStore } from '@kit.ArkData'
+import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getAccountAccessToken, getAccountInfo } from './Accesstoken'
 import { encrypt } from './Crypto'
 import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
+import { getFlushPreference } from './Preference'
 import request from './Request'
 import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
 
@@ -32,11 +33,8 @@ interface CloudBackupItem {
 }
 
 function getNewInfo(context: Context, oldInfo: PasswordInfoItem[], newInfo: PasswordInfoItem[], updateTime: number) {
-  const commonSettingDataPreferences = preferences.getPreferencesSync(context, {
-    name: 'commonSetting'
-  })
   const storeValueHistoryPasswordInfoTypeArray =
-    commonSettingDataPreferences.getSync('storeValueHistoryPasswordInfoType', ['密码']) as string[]
+    getFlushPreference(context, 'commonSetting', 'storeValueHistoryPasswordInfoType', ['密码']) as string[]
   return newInfo.map((newItem): PasswordInfoItem => {
     if (!storeValueHistoryPasswordInfoTypeArray.includes(newItem.type)) {
       return {
@@ -245,7 +243,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
   }
 }
 
-export async function newInfo(context: Context, data: InfoInput) {
+export async function newInfo(context: Context, data: InfoInput, hideExistToast?: boolean) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
     securityLevel: relationalStore.SecurityLevel.S4,
@@ -264,9 +262,11 @@ export async function newInfo(context: Context, data: InfoInput) {
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
     resultSet.close()
-    await promptAction.openToast({
-      message: '新增失败，原因：已存在'
-    })
+    if (!hideExistToast) {
+      await promptAction.openToast({
+        message: '新增失败，原因：已存在'
+      })
+    }
     return 'fail'
   }
   resultSet.close()
@@ -400,7 +400,7 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
   return 'success'
 }
 
-export async function newTag(context: Context, data: TagInput) {
+export async function newTag(context: Context, data: TagInput, hideExistToast?: boolean) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: relationalStore.SecurityLevel.S1,
@@ -418,9 +418,11 @@ export async function newTag(context: Context, data: TagInput) {
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
     resultSet.close()
-    await promptAction.openToast({
-      message: '新增失败，原因：已存在'
-    })
+    if (!hideExistToast) {
+      await promptAction.openToast({
+        message: '新增失败，原因：已存在'
+      })
+    }
     return 'fail'
   }
   resultSet.close()

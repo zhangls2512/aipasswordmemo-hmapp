@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LengthMetrics, LoadingDialog } from '@kit.ArkUI'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -18,10 +18,6 @@ export function CloudbackupmanageBuilder() {
 @ComponentV2
 struct Cloudbackupmanage {
   @Local loading: boolean = false
-  @Local total: string = ''
-  @Local password: string = ''
-  @Local info: string = ''
-  @Local tag: string = ''
   @Local allSelected: boolean = false
   @Local passwordSelected: boolean = false
   @Local infoSelected: boolean = false
@@ -30,6 +26,10 @@ struct Cloudbackupmanage {
   @Local accessToken: string = ''
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
+  total = ''
+  password = ''
+  info = ''
+  tag = ''
 
   async getCount() {
     if (this.accessToken) {
@@ -51,6 +51,10 @@ struct Cloudbackupmanage {
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         if (this.loading) {
           ListItem() {
             LoadingProgress()
@@ -208,7 +212,7 @@ struct Cloudbackupmanage {
                   if (data.index === 1) {
                     const dialogControllerProgress = new CustomDialogController({
                       builder: LoadingDialog({
-                        content: '清理中...'
+                        content: '请求中...'
                       })
                     })
                     dialogControllerProgress.open()
@@ -232,9 +236,12 @@ struct Cloudbackupmanage {
           })
           .width('100%')
         }
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -244,13 +251,42 @@ struct Cloudbackupmanage {
       padding: {
         end: LengthMetrics.vp(60)
       },
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      },
       content: {
         title: {
           mainTitle: '管理云备份'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onAppear(async () => {
       this.accessToken = await getAccountAccessToken()
       await this.getCount()

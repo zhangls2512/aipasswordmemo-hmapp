@@ -1,7 +1,10 @@
 {
   "network-security-config": {
     "base-config": {
-      "cleartextTrafficPermitted": true
+      "cleartextTrafficPermitted": false
+    },
+    "component-config": {
+      "Remote Communication Kit": true
     }
   },
   "trust-global-user-ca": false,

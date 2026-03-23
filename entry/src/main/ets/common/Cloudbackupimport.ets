@@ -1,6 +1,6 @@
 import { relationalStore } from '@kit.ArkData'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
-import { decrypt, getKey } from '../common/Crypto'
+import { decrypt, getKeyAlg } from '../common/Crypto'
 import { PasswordInfoItem } from '../common/Dataget'
 import { importInfo, importPassword, importTag, InfoInItem, PasswordInItem, TagInItem } from '../common/Dataimport'
 import request from '../common/Request'
@@ -35,7 +35,7 @@ interface TagCloudBackup {
 
 export async function importCloudBackupPassword(context: Context) {
   const accessToken = await getAccountAccessToken()
-  if (accessToken && getKey()) {
+  if (accessToken && getKeyAlg()) {
     const countResponse = await request(context, '/password/getBackupCount', {
       accessToken: accessToken
     })
@@ -89,7 +89,7 @@ export async function importCloudBackupPassword(context: Context) {
 
 export async function importCloudBackupInfo(context: Context) {
   const accessToken = await getAccountAccessToken()
-  if (accessToken && getKey()) {
+  if (accessToken && getKeyAlg()) {
     const countResponse = await request(context, '/password/getBackupCount', {
       accessToken: accessToken
     })
@@ -141,7 +141,7 @@ export async function importCloudBackupInfo(context: Context) {
 
 export async function importCloudBackupTag(context: Context) {
   const accessToken = await getAccountAccessToken()
-  if (accessToken && getKey()) {
+  if (accessToken && getKeyAlg()) {
     const countResponse = await request(context, '/password/getBackupCount', {
       accessToken: accessToken
     })

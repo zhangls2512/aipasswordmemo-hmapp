@@ -1,10 +1,10 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { updateInfo } from '../common/Datachange'
 import { getInfoInfo, Info } from '../common/Dataget'
+import { getFlushPreference } from '../common/Preference'
 
 @ComponentV2
 export default struct Updateinfo {
@@ -143,6 +143,9 @@ export default struct Updateinfo {
           }
         }
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
 
       ListItem() {
         Column() {
@@ -225,7 +228,7 @@ export default struct Updateinfo {
       this.infoType = infoInfo.type
       this.infoValue = infoInfo.value
       const res = await getCloudServiceStatus(this.context)
-      const key = getKey()
+      const key = getKeyAlg()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'
       }
@@ -236,10 +239,7 @@ export default struct Updateinfo {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-            name: 'cloudbackupSetting'
-          })
-          const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
           if (autoOn.includes('info')) {
             this.cloudBackup = true
           }

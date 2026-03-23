@@ -1,6 +1,6 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { getKey, EncryptData, decrypt } from './Crypto'
+import { getKeyAlg, EncryptData, decrypt } from './Crypto'
 import { PasswordInfoItem } from './Dataget'
 import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
 
@@ -43,11 +43,11 @@ async function getImportString(filestring: string) {
       if (!fileBackupObject.encrypted) {
         return JSON.stringify(fileBackupObject.data)
       } else {
-        if (!getKey()) {
+        if (!getKeyAlg()) {
           await promptAction.openToast({
             message: '未导入密钥，无法解密加密数据'
           })
-          return 'fail'
+          return 'unabledecrypt'
         }
         const decryptedArray: object[] = []
         const promises = fileBackupObject.data.map(async (item: EncryptData) => {
@@ -65,9 +65,9 @@ async function getImportString(filestring: string) {
 
 export async function importPassword(context: Context, data: string, conflict: relationalStore.ConflictResolution) {
   const importstring = await getImportString(data)
-  if (importstring !== 'fail') {
+  if (importstring !== 'fail' && importstring !== 'unabledecrypt') {
     try {
-      const array = JSON.parse(importstring.replace(/[\r\n\s\u0000]/g, '')) as PasswordInItem[]
+      const array = JSON.parse(importstring) as PasswordInItem[]
       const rdbStore = await relationalStore.getRdbStore(context, {
         name: 'password',
         securityLevel: relationalStore.SecurityLevel.S4,
@@ -113,18 +113,20 @@ export async function importPassword(context: Context, data: string, conflict: r
       return 'fail'
     }
   } else {
-    await promptAction.openToast({
-      message: '导入失败'
-    })
+    if (importstring === 'fail') {
+      await promptAction.openToast({
+        message: '导入失败'
+      })
+    }
     return 'fail'
   }
 }
 
 export async function importInfo(context: Context, data: string, conflict: relationalStore.ConflictResolution) {
   const importstring = await getImportString(data)
-  if (importstring !== 'fail') {
+  if (importstring !== 'fail' && importstring !== 'unabledecrypt') {
     try {
-      const array = JSON.parse(importstring.replace(/[\r\n\s\u0000]/g, '')) as InfoInItem[]
+      const array = JSON.parse(importstring) as InfoInItem[]
       const rdbStore = await relationalStore.getRdbStore(context, {
         name: 'info',
         securityLevel: relationalStore.SecurityLevel.S4,
@@ -168,18 +170,20 @@ export async function importInfo(context: Context, data: string, conflict: relat
       return 'fail'
     }
   } else {
-    await promptAction.openToast({
-      message: '导入失败'
-    })
+    if (importstring === 'fail') {
+      await promptAction.openToast({
+        message: '导入失败'
+      })
+    }
     return 'fail'
   }
 }
 
 export async function importTag(context: Context, data: string, conflict: relationalStore.ConflictResolution) {
   const importstring = await getImportString(data)
-  if (importstring !== 'fail') {
+  if (importstring !== 'fail' && importstring !== 'unabledecrypt') {
     try {
-      const array = JSON.parse(importstring.replace(/[\r\n\s\u0000]/g, '')) as TagInItem[]
+      const array = JSON.parse(importstring) as TagInItem[]
       const rdbStore = await relationalStore.getRdbStore(context, {
         name: 'tag',
         securityLevel: relationalStore.SecurityLevel.S1,
@@ -223,9 +227,11 @@ export async function importTag(context: Context, data: string, conflict: relati
       return 'fail'
     }
   } else {
-    await promptAction.openToast({
-      message: '导入失败'
-    })
+    if (importstring === 'fail') {
+      await promptAction.openToast({
+        message: '导入失败'
+      })
+    }
     return 'fail'
   }
 }

@@ -3,7 +3,7 @@ import { display, LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { CloudBackupTimeItem, getTagList, Tag } from '../common/Dataget'
 import { getPreferType } from '../common/Prefertype'
@@ -17,7 +17,6 @@ export default struct TagPage {
   @Local preferType: number = 1
   @Local tagArray: Tag[] = []
   @Local loading: boolean = false
-  @Local isShowMenu: boolean = false
   @Local enableCloudBackup: boolean = false
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Tag[] = []
@@ -27,6 +26,11 @@ export default struct TagPage {
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
   updateId = 0
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '请求中...'
+    })
+  })
 
   async cloudBackup(item: Tag) {
     let cloudBackupTime = JSON.stringify([])
@@ -110,14 +114,9 @@ export default struct TagPage {
             content: '云备份'
           })
             .onClick(async () => {
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '云备份中...'
-                })
-              })
-              dialogControllerProgress.open()
+              this.dialogControllerProgress.open()
               await this.cloudBackup(item)
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.loading = true
             })
         }
@@ -127,17 +126,12 @@ export default struct TagPage {
             content: '取消云备份'
           })
             .onClick(async () => {
-              const dialogControllerProgress = new CustomDialogController({
-                builder: LoadingDialog({
-                  content: '取消云备份中...'
-                })
-              })
-              dialogControllerProgress.open()
+              this.dialogControllerProgress.open()
               await deleteCloudBackup(this.context, {
                 type: 'tag',
                 id: item.id
               })
-              dialogControllerProgress.close()
+              this.dialogControllerProgress.close()
               this.loading = true
             })
         }
@@ -436,7 +430,7 @@ export default struct TagPage {
                           .onChange((isOn) => {
                             if (!isOn) {
                               this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                              item.id), 1)
+                                item.id), 1)
                             }
                             if (isOn) {
                               this.multipleSelectArray.push(item)
@@ -495,6 +489,11 @@ export default struct TagPage {
                 })
               }
             }
+
+            ListItem()
+              .margin({
+                bottom: this.preferType === 0 ? 80 : 0
+              })
           }
         }
         .layoutWeight(1)
@@ -524,13 +523,13 @@ export default struct TagPage {
         this.enableCloudBackup = false
         this.loading = true
         const cloudServiceStatus = await getCloudServiceStatus(this.context)
-        if (cloudServiceStatus && getKey()) {
+        if (cloudServiceStatus && getKeyAlg()) {
           this.enableCloudBackup = true
         }
       })
       this.loading = true
       const cloudServiceStatus = await getCloudServiceStatus(this.context)
-      if (cloudServiceStatus && getKey()) {
+      if (cloudServiceStatus && getKeyAlg()) {
         this.enableCloudBackup = true
       }
     })

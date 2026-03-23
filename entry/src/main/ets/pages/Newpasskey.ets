@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { util } from '@kit.ArkTS'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
-import { HdsNavDestination } from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import request from '../common/Request'
 
@@ -17,12 +17,17 @@ struct Newpasskey {
   @Local credentialId: string = ''
   @Local publicKey: string = ''
   @Local type: string = 'mfa'
-  @Local mfa: string = ''
-  @Local emailcode: string = ''
   @Local buttonText: string = '获取验证码'
   @Local buttonEnabled: boolean = true
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
+  mfa = ''
+  emailcode = ''
+  dialogControllerProgress = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '请求中...'
+    })
+  })
 
   getNumber(data: number, start: number, end: number) {
     const binarystring = data.toString(2).padStart(8, '0')
@@ -184,6 +189,10 @@ struct Newpasskey {
   build() {
     HdsNavDestination() {
       List() {
+        ListItem()
+          .margin({
+            top: 64
+          })
         if (this.email && this.credentialId && this.publicKey) {
           ListItem() {
             Column() {
@@ -279,16 +288,11 @@ struct Newpasskey {
                   })
                   .width('100%')
                   .onClick(async () => {
-                    const dialogControllerProgress = new CustomDialogController({
-                      builder: LoadingDialog({
-                        content: '发送中...'
-                      })
-                    })
-                    dialogControllerProgress.open()
+                    this.dialogControllerProgress.open()
                     const res = await request(this.context, '/account/sendEmailCode', {
                       email: this.email
                     })
-                    dialogControllerProgress.close()
+                    this.dialogControllerProgress.close()
                     if (res !== 'fail') {
                       await promptAction.openToast({
                         message: '验证码已成功发送到邮箱：' + this.email
@@ -333,12 +337,7 @@ struct Newpasskey {
                   if (this.type === 'emailcode') {
                     code = this.emailcode
                   }
-                  const dialogControllerProgress = new CustomDialogController({
-                    builder: LoadingDialog({
-                      content: '新增中...'
-                    })
-                  })
-                  dialogControllerProgress.open()
+                  this.dialogControllerProgress.open()
                   const res = await request(this.context, '/account/bindExternalAccount', {
                     email: this.email,
                     verifyType: this.type,
@@ -347,7 +346,7 @@ struct Newpasskey {
                     credentialId: this.credentialId,
                     publicKey: this.publicKey
                   })
-                  dialogControllerProgress.close()
+                  this.dialogControllerProgress.close()
                   if (res !== 'fail') {
                     await promptAction.openToast({
                       message: '新增成功'
@@ -362,10 +361,12 @@ struct Newpasskey {
           })
           .width('100%')
         }
+        ListItem()
+          .margin({
+            bottom: 28
+          })
       }
-      .backgroundColor($r('app.color.sheet_background'))
       .padding({
-        bottom: $r('sys.float.ohos_id_default_padding_bottom_fixed'),
         left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
@@ -375,13 +376,42 @@ struct Newpasskey {
       padding: {
         end: LengthMetrics.vp(60)
       },
+      style: {
+        scrollEffectOpts: {
+          scrollEffectType: ScrollEffectType.IMMERSIVE_GRADIENT_BLUR
+        },
+        originalStyle: {
+          contentStyle: {
+            titleStyle: {
+              mainTitleColor: $r('sys.color.font_primary')
+            },
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        scrollEffectStyle: {
+          contentStyle: {
+            backIconStyle: {
+              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
+              iconColor: $r('sys.color.icon_primary')
+            }
+          }
+        },
+        thermoCtrl: true,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.ADAPTIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      },
       content: {
         title: {
           mainTitle: '新增通行密钥'
         }
-      },
-      enableComponentSafeArea: true
+      }
     })
+    .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onReady(async (context) => {
       this.pageInfos = context.pathStack
       const accountInfo = await getAccountInfo()

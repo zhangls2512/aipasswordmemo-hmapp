@@ -1,9 +1,9 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { newTag } from '../common/Datachange'
+import { getFlushPreference } from '../common/Preference'
 
 @ComponentV2
 export default struct Newtag {
@@ -13,7 +13,7 @@ export default struct Newtag {
   @Local red: number = 0
   @Local green: number = 0
   @Local blue: number = 0
-  @Local alpha: number = 0
+  @Local alpha: number = 1
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
@@ -135,6 +135,9 @@ export default struct Newtag {
         }
         .alignItems(HorizontalAlign.Start)
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
 
       ListItem() {
         Column() {
@@ -208,7 +211,7 @@ export default struct Newtag {
     })
     .onAppear(async () => {
       const res = await getCloudServiceStatus(this.context)
-      const key = getKey()
+      const key = getKeyAlg()
       if (!res) {
         this.alertText = '未登录账号或账号未开通云服务，云备份不可用'
       }
@@ -219,10 +222,7 @@ export default struct Newtag {
         if (key) {
           this.allowCloudBackup = true
           this.alertText = ''
-          const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-            name: 'cloudbackupSetting'
-          })
-          const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+          const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
           if (autoOn.includes('tag')) {
             this.cloudBackup = true
           }

@@ -39,22 +39,59 @@ export async function setQuickBarPassword(context: Context, passwordId: number, 
   const customCategories = await quickBarManager.getCustomCategories(context)
   const passwordCustomCategory = customCategories.find(item => item.categoryName === '常用密码')
   if (passwordCustomCategory) {
-    const passwordTaskArray = await quickBarManager.getTasksFromCategory(context, passwordCustomCategory.categoryId)
-    const passwordTasks = passwordTaskArray.map((item): QuickBarPasswordItem => {
-      const parameters = item.taskInfo.parameters
-      if (parameters) {
-        return {
-          taskId: item.taskId,
-          passwordId: Number(parameters.find(item => item.key === 'passwordId')?.value)
+    try {
+      const passwordTaskArray = await quickBarManager.getTasksFromCategory(context, passwordCustomCategory.categoryId)
+      const passwordTasks = passwordTaskArray.map((item): QuickBarPasswordItem => {
+        const parameters = item.taskInfo.parameters
+        if (parameters) {
+          return {
+            taskId: item.taskId,
+            passwordId: Number(parameters.find(item => item.key === 'passwordId')?.value)
+          }
         }
+        return {
+          taskId: -1,
+          passwordId: -1
+        }
+      }).filter(item => item.passwordId !== -1)
+      const passwordTask = passwordTasks.find(item => item.passwordId === passwordId)
+      if (!passwordTask) {
+        await quickBarManager.addQuickTask(context, passwordCustomCategory.categoryId, {
+          taskName: passwordName,
+          abilityName: 'EntryAbility',
+          parameters: [
+            {
+              key: 'action',
+              value: 'passwordInfo'
+            },
+            {
+              key: 'passwordId',
+              value: String(passwordId)
+            }
+          ]
+        })
       }
-      return {
-        taskId: -1,
-        passwordId: -1
+      if (passwordTask) {
+        await quickBarManager.updateQuickTask(context, {
+          taskId: passwordTask.taskId,
+          categoryId: passwordCustomCategory.categoryId,
+          taskInfo: {
+            taskName: passwordName,
+            abilityName: 'EntryAbility',
+            parameters: [
+              {
+                key: 'action',
+                value: 'passwordInfo'
+              },
+              {
+                key: 'passwordId',
+                value: String(passwordId)
+              }
+            ]
+          }
+        })
       }
-    }).filter(item => item.passwordId !== -1)
-    const passwordTask = passwordTasks.find(item => item.passwordId === passwordId)
-    if (!passwordTask) {
+    } catch {
       await quickBarManager.addQuickTask(context, passwordCustomCategory.categoryId, {
         taskName: passwordName,
         abilityName: 'EntryAbility',
@@ -68,26 +105,6 @@ export async function setQuickBarPassword(context: Context, passwordId: number, 
             value: String(passwordId)
           }
         ]
-      })
-    }
-    if (passwordTask) {
-      await quickBarManager.updateQuickTask(context, {
-        taskId: passwordTask.taskId,
-        categoryId: passwordCustomCategory.categoryId,
-        taskInfo: {
-          taskName: passwordName,
-          abilityName: 'EntryAbility',
-          parameters: [
-            {
-              key: 'action',
-              value: 'passwordInfo'
-            },
-            {
-              key: 'passwordId',
-              value: String(passwordId)
-            }
-          ]
-        }
       })
     }
   }

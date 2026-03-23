@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { uri } from '@kit.ArkTS'
 import { display, LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { scanBarcode, scanCore } from '@kit.ScanKit'
@@ -7,8 +6,10 @@ import { getAccountAccessToken, getAccountInfo, removeAccount } from '../common/
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
+import { getFlushPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
 import request from '../common/Request'
+import { getTimeStringFromTimeStamp } from '../common/Stringformat'
 import Cloudservice from './Cloudservice'
 import Login from './Login'
 import Passwordcheck from './Passwordcheck'
@@ -35,15 +36,12 @@ export default struct Me {
   @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
-  commonSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-    name: 'commonSetting'
-  })
 
   async get() {
     const accountInfo = await getAccountInfo()
     this.uid = accountInfo.uid
     this.email = accountInfo.email
-    this.endDate = String(new Date(accountInfo.endDate))
+    this.endDate = getTimeStringFromTimeStamp(accountInfo.endDate)
     const accessToken = await getAccountAccessToken()
     if (accessToken) {
       this.cloudServiceLoading = true
@@ -89,6 +87,10 @@ export default struct Me {
 
   build() {
     List() {
+      ListItem()
+        .margin({
+          top: this.preferType === 0 ? 56 : 0
+        })
       ListItem() {
         Column() {
           Row() {
@@ -258,7 +260,7 @@ export default struct Me {
                     if (confirm.index === 1) {
                       const dialogControllerProgress = new CustomDialogController({
                         builder: LoadingDialog({
-                          content: '加载中...'
+                          content: '请求中...'
                         })
                       })
                       dialogControllerProgress.open()
@@ -565,7 +567,7 @@ export default struct Me {
               },
               onAppear: async () => {
                 const disallowScreenshot =
-                  this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                  getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)
@@ -631,7 +633,7 @@ export default struct Me {
               },
               onAppear: async () => {
                 const disallowScreenshot =
-                  this.commonSettingDataPreferences.getSync('disallowScreenshot', true) as boolean
+                  getFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', true) as boolean
                 if (disallowScreenshot) {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(true)
@@ -817,6 +819,10 @@ export default struct Me {
           top: $r('sys.float.ohos_id_elements_margin_vertical_l')
         })
       }
+      ListItem()
+        .margin({
+          bottom: this.preferType === 0 ? 80 : 0
+        })
     }
     .padding({
       left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),

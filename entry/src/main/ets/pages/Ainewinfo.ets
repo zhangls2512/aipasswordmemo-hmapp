@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit'
-import { preferences } from '@kit.ArkData'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { camera, cameraPicker as picker } from '@kit.CameraKit'
@@ -15,8 +14,9 @@ import {
 } from '@kit.ServiceCollaborationKit'
 import { CardRecognition, CardSide, CardType } from '@kit.VisionKit'
 import getCloudServiceStatus from '../common/Cloudservice'
-import { getKey } from '../common/Crypto'
+import { getKeyAlg } from '../common/Crypto'
 import { newInfo } from '../common/Datachange'
+import { getFlushPreference } from '../common/Preference'
 
 interface Item {
   type: string,
@@ -25,7 +25,6 @@ interface Item {
 
 @ComponentV2
 export default struct Ainewinfo {
-  @Consumer() isShowAinewSheet: boolean = false
   @Local list: Item[] = []
   @Local text: string = ''
   @Local showCard: boolean = false
@@ -277,6 +276,9 @@ export default struct Ainewinfo {
         }
         .alignItems(HorizontalAlign.Start)
       }
+      .margin({
+        top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
 
       if (this.list.length === 0) {
         ListItem() {
@@ -390,12 +392,9 @@ export default struct Ainewinfo {
     .onAppear(async () => {
       await textProcessing.init()
       const res = await getCloudServiceStatus(this.context)
-      const key = getKey()
+      const key = getKeyAlg()
       if (res && key) {
-        const cloudbackupSettingDataPreferences = preferences.getPreferencesSync(this.context, {
-          name: 'cloudbackupSetting'
-        })
-        const autoOn = cloudbackupSettingDataPreferences.getSync('autoOn', []) as string[]
+        const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
         if (autoOn.includes('info')) {
           this.cloudBackup = true
         }

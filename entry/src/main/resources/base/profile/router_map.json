@@ -6,6 +6,11 @@
       "buildFunction": "AboutBuilder"
     },
     {
+      "name": "Clearpreferencekey",
+      "pageSourceFile": "src/main/ets/pages/Clearpreferencekey.ets",
+      "buildFunction": "ClearpreferencekeyBuilder"
+    },
+    {
       "name": "License",
       "pageSourceFile": "src/main/ets/pages/License.ets",
       "buildFunction": "LicenseBuilder"
