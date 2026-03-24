@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { uri } from '@kit.ArkTS'
-import { display, LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { scanBarcode, scanCore } from '@kit.ScanKit'
 import { getAccountAccessToken, getAccountInfo, removeAccount } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -831,11 +831,6 @@ export default struct Me {
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', () => {
-        setTimeout(() => {
-          this.preferType = getPreferType(this.UIContext)
-        }, 200)
-      })
       this.context.eventHub.on('refreshMe', async () => {
         await this.get()
       })
@@ -843,7 +838,6 @@ export default struct Me {
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshMe')
-      display.off('change')
     })
   }
 }

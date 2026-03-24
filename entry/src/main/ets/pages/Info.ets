@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { display, LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsEffect } from '@kit.UIDesignKit'
@@ -624,11 +624,6 @@ export default struct InfoPage {
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', () => {
-        setTimeout(() => {
-          this.preferType = getPreferType(this.UIContext)
-        }, 200)
-      })
       this.context.eventHub.on('refreshInfo', async () => {
         this.enableCloudBackup = false
         this.loading = true
@@ -645,7 +640,6 @@ export default struct InfoPage {
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshInfo')
-      display.off('change')
     })
     .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
       height: SheetSize.FIT_CONTENT,

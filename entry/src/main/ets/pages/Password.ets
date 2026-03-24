@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { display, LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
@@ -841,11 +841,6 @@ export default struct PasswordPage {
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', () => {
-        setTimeout(() => {
-          this.preferType = getPreferType(this.UIContext)
-        }, 200)
-      })
       this.showPassword = getFlushPreference(this.context, 'commonSetting', 'showPasswordInIndex', false) as boolean
       this.hideTag = getFlushPreference(this.context, 'commonSetting', 'hideTagInIndex', false) as boolean
       const disallowScreenshot =
@@ -931,7 +926,6 @@ export default struct PasswordPage {
       this.context.eventHub.off('refreshPassword')
       this.context.eventHub.off('searchPassword')
       this.context.eventHub.off('newPassword')
-      display.off('change')
     })
     .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
       height: SheetSize.FIT_CONTENT,
