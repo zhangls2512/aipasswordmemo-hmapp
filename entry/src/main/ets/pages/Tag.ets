@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { display, LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -514,11 +514,6 @@ export default struct TagPage {
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', () => {
-        setTimeout(() => {
-          this.preferType = getPreferType(this.UIContext)
-        }, 200)
-      })
       this.context.eventHub.on('refreshTag', async () => {
         this.enableCloudBackup = false
         this.loading = true
@@ -535,7 +530,6 @@ export default struct TagPage {
     })
     .onDisAppear(() => {
       this.context.eventHub.off('refreshTag')
-      display.off('change')
     })
     .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
       height: SheetSize.FIT_CONTENT,

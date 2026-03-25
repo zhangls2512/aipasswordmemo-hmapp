@@ -110,7 +110,7 @@ struct Feedback {
                 dialogControllerProgress.open()
                 const res = await request(this.context, '/product/sendFeedbackEmail', {
                   product: 'password',
-                  version: '2.0.9.0',
+                  version: '2.0.9.1',
                   content: this.content,
                   contactType: this.contactType,
                   contactValue: this.contactValue
@@ -146,6 +146,7 @@ struct Feedback {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    .recoverable(true)
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
