@@ -624,6 +624,7 @@ export default struct Cleardata {
     }
     .backgroundColor($r('app.color.sheet_background'))
     .hideBackButton(true)
+    .recoverable(true)
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)

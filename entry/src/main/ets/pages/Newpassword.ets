@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { uri } from '@kit.ArkTS'
-import { display, promptAction } from '@kit.ArkUI'
+import { promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
@@ -1166,11 +1166,6 @@ export default struct Newpassword {
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', () => {
-        setTimeout(() => {
-          this.preferType = getPreferType(this.UIContext)
-        }, 200)
-      })
       this.pushItemWhenBlur = getFlushPreference(this.context, 'commonSetting', 'pushItemWhenBlur', true) as boolean
       const oftenUsedInfoType =
         getFlushPreference(this.context, 'commonSetting', 'oftenUsedInfoType', ['密码', 'MFA', '图标']) as string[]
@@ -1198,9 +1193,6 @@ export default struct Newpassword {
           }
         }
       }
-    })
-    .onDisAppear(() => {
-      display.off('change')
     })
   }
 }

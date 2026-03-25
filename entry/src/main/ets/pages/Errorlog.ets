@@ -28,6 +28,10 @@ struct Errorlog {
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   typeArray: Type[] = [
     {
+      name: '全部',
+      value: ''
+    },
+    {
       name: 'js 运行异常',
       value: 'JS_ERROR'
     },
@@ -344,12 +348,15 @@ struct Errorlog {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
             })
+            ListItem()
+              .margin({
+                bottom: 28
+              })
           }
           .layoutWeight(1)
         }
         .alignItems(HorizontalAlign.Start)
         .margin({
-          bottom: 28,
           top: 64
         })
       }
@@ -359,6 +366,7 @@ struct Errorlog {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    .recoverable(true)
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)

@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { display, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
+import { SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
 import {
   getOldPasswordList,
   getPasswordStrengthList,
@@ -432,20 +432,12 @@ export default struct Passwordcheck {
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
-      display.on('change', () => {
-        setTimeout(() => {
-          this.preferType = getPreferType(this.UIContext)
-        }, 200)
-      })
       const passwordStrengthArray = await getPasswordStrengthList(this.context)
       this.lowStrengthPasswordArray = passwordStrengthArray[0]
       this.mediumStrengthPasswordArray = passwordStrengthArray[1]
       this.highStrengthPasswordArray = passwordStrengthArray[2]
       this.repeatArray = await getRepeatPasswordList(this.context)
       this.oldArray = await getOldPasswordList(this.context)
-    })
-    .onDisAppear(() => {
-      display.off('change')
     })
     .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
       preferType: this.preferType,

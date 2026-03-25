@@ -1977,11 +1977,14 @@ struct Tablesync {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
             }
+            ListItem()
+              .margin({
+                bottom: 28
+              })
           }
           .layoutWeight(1)
         }
         .margin({
-          bottom: 28,
           top: 64
         })
       }
@@ -1991,6 +1994,7 @@ struct Tablesync {
       })
     }
     .backgroundColor($r('app.color.sheet_background'))
+    .recoverable(true)
     .titleBar({
       padding: {
         end: LengthMetrics.vp(60)
