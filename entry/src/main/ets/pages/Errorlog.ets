@@ -101,17 +101,11 @@ struct Errorlog {
         const filestring = await read(item)
         try {
           const errorLog = JSON.parse(filestring) as hiAppEvent.AppEventGroup
-          const externalLog: string[] = []
+          let externalLog: string[] = []
           if (errorLog.appEventInfos) {
             errorLog.appEventInfos.forEach(item => {
-              const external_log = item.params['external_log'] as string[] | undefined
-              if (external_log) {
-                external_log.forEach(item => {
-                  if (item) {
-                    externalLog.push(item)
-                  }
-                })
-              }
+              const external_log = item.params['external_log'] as string[]
+              externalLog = externalLog.concat(external_log)
             })
           }
           this.errorLogArray.push({
@@ -137,17 +131,11 @@ struct Errorlog {
         const filestring = await read(item)
         try {
           const errorLog = JSON.parse(filestring) as hiAppEvent.AppEventGroup
-          const externalLog: string[] = []
+          let externalLog: string[] = []
           if (errorLog.appEventInfos) {
             errorLog.appEventInfos.forEach(item => {
-              const external_log = item.params['external_log'] as string[] | undefined
-              if (external_log) {
-                external_log.forEach(item => {
-                  if (item) {
-                    externalLog.push(item)
-                  }
-                })
-              }
+              const external_log = item.params['external_log'] as string[]
+              externalLog = externalLog.concat(external_log)
             })
           }
           if (errorLog.name === type) {
