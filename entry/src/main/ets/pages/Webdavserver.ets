@@ -33,11 +33,13 @@ struct Webdavserver {
               text: this.path!!
             })
               .defaultFocus(this.pathInputFocus)
+              .enableAutoSpacing(true)
             TextInput({
               placeholder: '请输入用户名',
               text: this.username!!
             })
               .contentType(ContentType.USER_NAME)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
@@ -47,6 +49,7 @@ struct Webdavserver {
               text: this.password!!
             })
               .contentType(ContentType.PASSWORD)
+              .enableAutoSpacing(true)
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
