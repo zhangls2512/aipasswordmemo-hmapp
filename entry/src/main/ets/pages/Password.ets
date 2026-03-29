@@ -906,6 +906,9 @@ export default struct PasswordPage {
                 mfa: res.value
               })
             }
+            if (res.value === 'fail') {
+              clearInterval(this.intervalId)
+            }
           }
         })
         await Promise.all(promises)
