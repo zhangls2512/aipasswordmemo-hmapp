@@ -598,7 +598,6 @@ export default struct Newpassword {
               }
               .borderRadius(12)
               .padding(12)
-              .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -610,169 +609,166 @@ export default struct Newpassword {
         }
       })
       ListItem() {
-        Column() {
-          Row() {
-            Button('添加')
+        Row() {
+          Button('添加')
+            .layoutWeight(1)
+            .onClick(async () => {
+              const infoType = this.getCurrentInfoType()
+              if (!infoType) {
+                await promptAction.openToast({
+                  message: '请输入类型'
+                })
+                return
+              }
+              if (this.passwordInfoArray.some(item => item.type === infoType)) {
+                await promptAction.openToast({
+                  message: '已添加此类型信息'
+                })
+                return
+              }
+              let value = this.infoValue
+              if (infoType === '图标' && !value) {
+                await promptAction.openToast({
+                  message: '请选择图片'
+                })
+                return
+              }
+              if (infoType !== '图标' && infoType !== 'MFA' && !value) {
+                await promptAction.openToast({
+                  message: '请输入内容'
+                })
+                return
+              }
+              if (infoType === 'MFA') {
+                if (!this.otpauthUri) {
+                  if (!value) {
+                    await promptAction.openToast({
+                      message: '请输入密钥'
+                    })
+                    return
+                  }
+                  if (!this.mfaStep) {
+                    await promptAction.openToast({
+                      message: '请输入步长'
+                    })
+                    return
+                  }
+                  if (!this.mfaDigits) {
+                    await promptAction.openToast({
+                      message: '请输入位数'
+                    })
+                    return
+                  }
+                  value = this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits
+                }
+                if (this.otpauthUri) {
+                  const uriInstance = new uri.URI(this.otpauthUri)
+                  if (uriInstance.scheme !== 'otpauth') {
+                    await promptAction.openToast({
+                      message: '请输入有效的 otpauthUri'
+                    })
+                    return
+                  }
+                  const uriSecret = uriInstance.getQueryValue('secret')
+                  if (!uriSecret) {
+                    await promptAction.openToast({
+                      message: '请输入有效的 otpauthUri'
+                    })
+                    return
+                  }
+                  let step = '30'
+                  let digits = '6'
+                  const uriStep = uriInstance.getQueryValue('period')
+                  const uriDigits = uriInstance.getQueryValue('digits')
+                  if (uriStep) {
+                    step = uriStep
+                  }
+                  if (uriDigits) {
+                    digits = uriDigits
+                  }
+                  value = uriSecret + '\0' + step + '\0' + digits
+                }
+              }
+              this.passwordInfoArray.push({
+                type: infoType,
+                value: value
+              })
+              this.infoType = ''
+              this.infoTypeIndex = 0
+              this.infoTypeValue = this.oftenUsedInfoTypes[0]
+              this.infoValue = ''
+              this.otpauthUri = ''
+              this.mfaStep = '30'
+              this.mfaDigits = '6'
+              if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
+                this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
+              }
+            })
+          if (this.getCurrentInfoType() === 'MFA') {
+            Blank()
+              .width($r('sys.float.ohos_id_elements_margin_horizontal_m'))
+            Button('扫码添加')
+              .buttonStyle(ButtonStyleMode.NORMAL)
               .layoutWeight(1)
               .onClick(async () => {
-                const infoType = this.getCurrentInfoType()
-                if (!infoType) {
-                  await promptAction.openToast({
-                    message: '请输入类型'
-                  })
-                  return
-                }
-                if (this.passwordInfoArray.some(item => item.type === infoType)) {
+                if (this.passwordInfoArray.some(item => item.type === 'MFA')) {
                   await promptAction.openToast({
                     message: '已添加此类型信息'
                   })
                   return
                 }
-                let value = this.infoValue
-                if (infoType === '图标' && !value) {
-                  await promptAction.openToast({
-                    message: '请选择图片'
+                try {
+                  const res = await scanBarcode.startScanForResult(this.context, {
+                    scanTypes: [scanCore.ScanType.QR_CODE]
                   })
-                  return
-                }
-                if (infoType !== '图标' && infoType !== 'MFA' && !value) {
-                  await promptAction.openToast({
-                    message: '请输入内容'
-                  })
-                  return
-                }
-                if (infoType === 'MFA') {
-                  if (!this.otpauthUri) {
-                    if (!value) {
-                      await promptAction.openToast({
-                        message: '请输入密钥'
-                      })
-                      return
-                    }
-                    if (!this.mfaStep) {
-                      await promptAction.openToast({
-                        message: '请输入步长'
-                      })
-                      return
-                    }
-                    if (!this.mfaDigits) {
-                      await promptAction.openToast({
-                        message: '请输入位数'
-                      })
-                      return
-                    }
-                    value = this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits
-                  }
-                  if (this.otpauthUri) {
-                    const uriInstance = new uri.URI(this.otpauthUri)
-                    if (uriInstance.scheme !== 'otpauth') {
-                      await promptAction.openToast({
-                        message: '请输入有效的 otpauthUri'
-                      })
-                      return
-                    }
-                    const uriSecret = uriInstance.getQueryValue('secret')
-                    if (!uriSecret) {
-                      await promptAction.openToast({
-                        message: '请输入有效的 otpauthUri'
-                      })
-                      return
-                    }
-                    let step = '30'
-                    let digits = '6'
-                    const uriStep = uriInstance.getQueryValue('period')
-                    const uriDigits = uriInstance.getQueryValue('digits')
-                    if (uriStep) {
-                      step = uriStep
-                    }
-                    if (uriDigits) {
-                      digits = uriDigits
-                    }
-                    value = uriSecret + '\0' + step + '\0' + digits
-                  }
-                }
-                this.passwordInfoArray.push({
-                  type: infoType,
-                  value: value
-                })
-                this.infoType = ''
-                this.infoTypeIndex = 0
-                this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                this.infoValue = ''
-                this.otpauthUri = ''
-                this.mfaStep = '30'
-                this.mfaDigits = '6'
-                if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                  this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
-                }
-              })
-            if (this.getCurrentInfoType() === 'MFA') {
-              Blank()
-                .width($r('sys.float.ohos_id_elements_margin_horizontal_m'))
-              Button('扫码添加')
-                .buttonStyle(ButtonStyleMode.NORMAL)
-                .layoutWeight(1)
-                .onClick(async () => {
-                  if (this.passwordInfoArray.some(item => item.type === 'MFA')) {
+                  const uriInstance = new uri.URI(res.originalValue)
+                  if (uriInstance.scheme !== 'otpauth') {
                     await promptAction.openToast({
-                      message: '已添加此类型信息'
+                      message: '请扫描有效的 MFA 添加二维码'
                     })
                     return
                   }
-                  try {
-                    const res = await scanBarcode.startScanForResult(this.context, {
-                      scanTypes: [scanCore.ScanType.QR_CODE]
+                  const uriSecret = uriInstance.getQueryValue('secret')
+                  if (!uriSecret) {
+                    await promptAction.openToast({
+                      message: '请扫描有效的 MFA 添加二维码'
                     })
-                    const uriInstance = new uri.URI(res.originalValue)
-                    if (uriInstance.scheme !== 'otpauth') {
-                      await promptAction.openToast({
-                        message: '请扫描有效的 MFA 添加二维码'
-                      })
-                      return
-                    }
-                    const uriSecret = uriInstance.getQueryValue('secret')
-                    if (!uriSecret) {
-                      await promptAction.openToast({
-                        message: '请扫描有效的 MFA 添加二维码'
-                      })
-                      return
-                    }
-                    let step = '30'
-                    let digits = '6'
-                    const uriStep = uriInstance.getQueryValue('period')
-                    const uriDigits = uriInstance.getQueryValue('digits')
-                    if (uriStep) {
-                      step = uriStep
-                    }
-                    if (uriDigits) {
-                      digits = uriDigits
-                    }
-                    this.passwordInfoArray.push({
-                      type: 'MFA',
-                      value: uriSecret + '\0' + step + '\0' + digits
-                    })
-                    this.infoType = ''
-                    this.infoTypeIndex = 0
-                    this.infoTypeValue = this.oftenUsedInfoTypes[0]
-                    this.infoValue = ''
-                    this.otpauthUri = ''
-                    this.mfaStep = '30'
-                    this.mfaDigits = '6'
-                    if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
-                      this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
-                    }
-                  } catch (err) {
-                    if (err.code !== 1000500002) {
-                      await promptAction.openToast({
-                        message: '发生错误，错误码：' + err.code
-                      })
-                    }
+                    return
                   }
-                })
-            }
+                  let step = '30'
+                  let digits = '6'
+                  const uriStep = uriInstance.getQueryValue('period')
+                  const uriDigits = uriInstance.getQueryValue('digits')
+                  if (uriStep) {
+                    step = uriStep
+                  }
+                  if (uriDigits) {
+                    digits = uriDigits
+                  }
+                  this.passwordInfoArray.push({
+                    type: 'MFA',
+                    value: uriSecret + '\0' + step + '\0' + digits
+                  })
+                  this.infoType = ''
+                  this.infoTypeIndex = 0
+                  this.infoTypeValue = this.oftenUsedInfoTypes[0]
+                  this.infoValue = ''
+                  this.otpauthUri = ''
+                  this.mfaStep = '30'
+                  this.mfaDigits = '6'
+                  if (this.infoTypeValue !== 'MFA' && this.infoTypeValue !== '自定义') {
+                    this.infoArray = await getTypeInfoList(this.context, this.infoTypeValue)
+                  }
+                } catch (err) {
+                  if (err.code !== 1000500002) {
+                    await promptAction.openToast({
+                      message: '发生错误，错误码：' + err.code
+                    })
+                  }
+                }
+              })
           }
         }
-        .width('100%')
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -850,7 +846,6 @@ export default struct Newpassword {
             }
             .borderRadius(12)
             .padding(12)
-            .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -912,7 +907,6 @@ export default struct Newpassword {
               }
               .borderRadius(12)
               .padding(12)
-              .width('100%')
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -989,7 +983,6 @@ export default struct Newpassword {
             }
             .borderRadius(12)
             .padding(12)
-            .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -1025,7 +1018,6 @@ export default struct Newpassword {
             }
             .borderRadius(12)
             .padding(12)
-            .width('100%')
 
             Divider()
               .padding({
@@ -1046,7 +1038,6 @@ export default struct Newpassword {
             }
             .borderRadius(12)
             .padding(12)
-            .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -1076,7 +1067,6 @@ export default struct Newpassword {
             }
             .borderRadius(12)
             .padding(12)
-            .width('100%')
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
           .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))

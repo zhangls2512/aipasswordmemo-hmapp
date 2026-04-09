@@ -100,7 +100,6 @@ export default struct Passwordinfo {
               }
               .borderRadius(12)
               .padding(12)
-              .width('100%')
               .gesture(
                 LongPressGesture()
                   .onAction(async () => {
@@ -168,7 +167,6 @@ export default struct Passwordinfo {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .width('100%')
               .onHover((isHover) => {
                 if (!isHover) {
                   this.hoverId = -1
@@ -251,7 +249,6 @@ export default struct Passwordinfo {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .width('100%')
               .onHover((isHover) => {
                 if (!isHover) {
                   this.hoverId = -1
