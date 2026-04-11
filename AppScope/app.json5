@@ -3,8 +3,8 @@
     "bundleName": "com.zhangxm.aipasswordmemo",
     "icon": "$media:layered_image",
     "label": "$string:app_name",
-    "versionCode": 58,
-    "versionName": "2.0.9.2",
+    "versionCode": 59,
+    "versionName": "2.1.0.0",
     "multiAppMode": {
       "multiAppModeType": "appClone",
       "maxCount": 5
