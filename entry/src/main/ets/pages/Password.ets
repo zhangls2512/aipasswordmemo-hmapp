@@ -469,14 +469,16 @@ export default struct PasswordPage {
             })
 
             Blank()
-            FunctionComponent({
-              agentId: 'agentfac9ae6847d743ca80f8e9528124cedb',
-              onError: () => {
-              }
-            })
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+            if (deviceInfo.deviceType !== '2in1') {
+              FunctionComponent({
+                agentId: 'agentfac9ae6847d743ca80f8e9528124cedb',
+                onError: () => {
+                }
               })
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+            }
             Column() {
               Image($r('app.media.sort'))
             }
