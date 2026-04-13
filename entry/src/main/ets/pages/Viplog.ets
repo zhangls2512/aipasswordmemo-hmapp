@@ -62,7 +62,6 @@ struct Viplog {
               }
               .borderRadius(12)
               .padding(12)
-              .width('100%')
 
               Divider()
                 .padding({
@@ -86,7 +85,6 @@ struct Viplog {
               }
               .borderRadius(12)
               .padding(12)
-              .width('100%')
 
               Divider()
                 .padding({
@@ -107,7 +105,6 @@ struct Viplog {
               }
               .borderRadius(12)
               .padding(12)
-              .width('100%')
 
               Divider()
                 .padding({
@@ -128,7 +125,6 @@ struct Viplog {
               }
               .borderRadius(12)
               .padding(12)
-              .width('100%')
 
               if (item.type === 'pay') {
                 Divider()
@@ -159,7 +155,6 @@ struct Viplog {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .width('100%')
                 .onHover((isHover) => {
                   if (!isHover) {
                     this.hoverId = -1
@@ -203,7 +198,6 @@ struct Viplog {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .width('100%')
                 .onHover((isHover) => {
                   if (!isHover) {
                     this.hoverId = -1

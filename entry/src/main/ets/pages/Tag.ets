@@ -297,7 +297,6 @@ export default struct TagPage {
           .margin({
             bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
-          .width('100%')
         }
         if (!this.multipleSelect) {
           Row() {

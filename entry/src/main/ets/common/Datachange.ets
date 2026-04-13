@@ -7,20 +7,20 @@ import { getFlushPreference } from './Preference'
 import request from './Request'
 import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
 
-interface PasswordInput {
+export interface PasswordInput {
   name: string,
   info: PasswordInfoItem[],
   tag: string[],
   cloudBackup: boolean
 }
 
-interface InfoInput {
+export interface InfoInput {
   type: string,
   value: string,
   cloudBackup: boolean
 }
 
-interface TagInput {
+export interface TagInput {
   value: string,
   color: string,
   cloudBackup: boolean

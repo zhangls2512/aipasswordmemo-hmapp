@@ -306,7 +306,6 @@ export default struct Ainewinfo {
             }
             .borderRadius(12)
             .padding(12)
-            .width('100%')
 
             Divider()
               .padding({
@@ -327,7 +326,6 @@ export default struct Ainewinfo {
             }
             .borderRadius(12)
             .padding(12)
-            .width('100%')
 
             Divider()
               .padding({
@@ -358,7 +356,6 @@ export default struct Ainewinfo {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .width('100%')
             .onHover((isHover) => {
               if (!isHover) {
                 this.hoverId = -1

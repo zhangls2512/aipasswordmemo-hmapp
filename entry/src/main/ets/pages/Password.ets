@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit'
+import { FunctionComponent } from '@kit.AgentFrameworkKit'
 import { LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
@@ -395,7 +396,6 @@ export default struct PasswordPage {
           .margin({
             bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
-          .width('100%')
         }
         if (!this.multipleSelect) {
           Row() {
@@ -469,6 +469,16 @@ export default struct PasswordPage {
             })
 
             Blank()
+            if (deviceInfo.deviceType !== '2in1') {
+              FunctionComponent({
+                agentId: 'agentfac9ae6847d743ca80f8e9528124cedb',
+                onError: () => {
+                }
+              })
+                .margin({
+                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                })
+            }
             Column() {
               Image($r('app.media.sort'))
             }
@@ -761,7 +771,6 @@ export default struct PasswordPage {
                       .backgroundColor($r('sys.color.comp_background_secondary'))
                     }
                   })
-                  .width('100%')
                   .onHover((isHover) => {
                     if (!isHover) {
                       this.hoverId = -1
