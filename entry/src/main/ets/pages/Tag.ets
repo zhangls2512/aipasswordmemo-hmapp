@@ -504,7 +504,6 @@ export default struct TagPage {
           this.loading = false
         })
       }
-      .alignItems(HorizontalAlign.Start)
     }
     .padding({
       left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
