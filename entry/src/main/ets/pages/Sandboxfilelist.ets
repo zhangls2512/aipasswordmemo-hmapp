@@ -311,7 +311,6 @@ struct Sandboxfilelist {
                       .backgroundColor($r('sys.color.comp_background_secondary'))
                     }
                   })
-                  .width('100%')
                   .onHover((isHover) => {
                     if (!isHover) {
                       this.hoverId = -1
@@ -346,7 +345,6 @@ struct Sandboxfilelist {
                   }
                   Row() {
                     Image(getFileTypeIcon(item.name))
-                      .fillColor($r('sys.color.icon_secondary'))
                       .height(24)
                       .margin({
                         right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
@@ -394,7 +392,6 @@ struct Sandboxfilelist {
                       .backgroundColor($r('sys.color.comp_background_secondary'))
                     }
                   })
-                  .width('100%')
                   .onHover((isHover) => {
                     if (!isHover) {
                       this.hoverId = -1

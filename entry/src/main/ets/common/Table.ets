@@ -8,7 +8,7 @@ import { rcp } from '@kit.RemoteCommunicationKit'
 import { encrypt, EncryptData, getKeyAlg } from './Crypto'
 import { getInfoList, getPasswordList, getTagList } from './Dataget'
 import { write } from './File'
-import { getFlushPreference, setFlushPreference } from './Preference'
+import { getFlushPreference } from './Preference'
 import { getWebdavServerInfo } from './Webdavserver'
 import { InfoOutItem, PasswordOutItem, TagOutItem } from '../pages/DataInOut'
 
@@ -124,8 +124,6 @@ export async function backupTable(context: Context, table: string) {
   if (fileIo.accessSync(oldFilePath)) {
     await fileIo.unlink(oldFilePath)
   }
-  const isBackupTables = getFlushPreference(context, 'dataSetting', 'isBackupTables', []) as string[]
-  setFlushPreference(context, 'dataSetting', 'isBackupTables', Array.from(new Set([...isBackupTables, table])))
 }
 
 async function getFileBackupString(context: Context, table: string, encrypted: boolean): Promise<string> {

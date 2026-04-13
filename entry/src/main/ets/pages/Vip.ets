@@ -175,15 +175,13 @@ export default struct Vip {
 
         if (this.iapStatusLoading) {
           ListItem() {
-            Column() {
-              LoadingProgress()
-                .width('20%')
-            }
-            .width('100%')
+            LoadingProgress()
+              .width('20%')
           }
           .margin({
             top: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
+          .width('100%')
         }
         if (this.iapStatus && this.vipEndDate !== '终身') {
           ListItem() {
@@ -237,7 +235,6 @@ export default struct Vip {
                         .backgroundColor($r('sys.color.interactive_pressed'))
                       }
                     })
-                    .width('100%')
                     .onHover((isHover) => {
                       if (!isHover) {
                         this.hoverId = -1
@@ -347,7 +344,6 @@ export default struct Vip {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .width('100%')
                 .onHover((isHover) => {
                   if (!isHover) {
                     this.hoverId = -1
@@ -393,7 +389,6 @@ export default struct Vip {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .width('100%')
               .onHover((isHover) => {
                 if (!isHover) {
                   this.hoverId = -1
@@ -437,7 +432,6 @@ export default struct Vip {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .width('100%')
               .onHover((isHover) => {
                 if (!isHover) {
                   this.hoverId = -1
@@ -480,7 +474,6 @@ export default struct Vip {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .width('100%')
               .onHover((isHover) => {
                 if (!isHover) {
                   this.hoverId = -1
