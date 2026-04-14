@@ -196,6 +196,7 @@
         }
       }
     ],
+    "compressNativeLibs": true,
     "fileContextMenu": "$profile:menu",
     "routerMap": "$profile:router_map"
   }
