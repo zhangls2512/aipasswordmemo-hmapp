@@ -1154,7 +1154,7 @@ struct Infolist {
               Column() {
                 Text('信息内容')
                   .fontWeight(FontWeight.Medium)
-                Text('应用名称、应用版本号、内容、联系方式')
+                Text('应用名称 (密码智能备忘录)、内容、联系方式')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
