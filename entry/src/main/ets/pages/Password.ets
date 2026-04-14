@@ -22,12 +22,12 @@ import {
   PasswordTagItem
 } from '../common/Dataget'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
+import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
 import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
 import PasswordInfo from './Passwordinfo'
 import UpdatePassword from './Updatepassword'
-import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
 
 interface Data {
   nameKeyword: string,
@@ -81,14 +81,13 @@ export default struct PasswordPage {
     const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
     const accountInfo = await getAccountInfo()
     const cloudBackupTimeItem = cloudBackupTimeArray.find(item => item.uid === accountInfo.uid)
-    if (cloudBackupTimeItem) {
-      cloudBackupTimeItem.time = Date.now()
-    }
     if (!cloudBackupTimeItem) {
       cloudBackupTimeArray.push({
         uid: accountInfo.uid,
         time: Date.now()
       })
+    } else {
+      cloudBackupTimeItem.time = Date.now()
     }
     await setCloudBackup(this.context, {
       type: 'password',
@@ -470,14 +469,25 @@ export default struct PasswordPage {
 
             Blank()
             if (deviceInfo.deviceType !== '2in1') {
-              FunctionComponent({
-                agentId: 'agentfac9ae6847d743ca80f8e9528124cedb',
-                onError: () => {
-                }
-              })
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              Column() {
+                FunctionComponent({
+                  agentId: 'agentfac9ae6847d743ca80f8e9528124cedb',
+                  onError: () => {
+                  }
                 })
+              }
+              .borderRadius(20)
+              .height(40)
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
+              .width(40)
             }
             Column() {
               Image($r('app.media.sort'))
