@@ -8,9 +8,9 @@ import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import { checkPermission } from '../common/Permission'
+import { getFlushPreference, setFlushPreference } from '../common/Preference'
 import request from '../common/Request'
 import { Account } from './Huaweiaccount'
-import { getFlushPreference, setFlushPreference } from '../common/Preference'
 
 @ComponentV2
 export default struct Setting {

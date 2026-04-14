@@ -100,7 +100,7 @@ export default struct Uploaderrorlog {
               dialogControllerProgress.open()
               const res = await request(this.context, '/product/newErrorLog', {
                 product: 'password',
-                version: '2.1.0.0',
+                version: '2.1.0.1',
                 errorObject: JSON.parse(this.errorObject),
                 contactType: this.contactType,
                 contactValue: this.contactValue
