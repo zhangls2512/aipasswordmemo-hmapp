@@ -6,13 +6,7 @@ import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
-import {
-  deleteQuickBarPassword,
-  getQuickBarPasswordIdList,
-  setQuickBarPassword,
-  syncQuickBarPassword
-} from '../common/Quickbar'
-import getTotp from '../common/Totp'
+import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import {
   CloudBackupTimeItem,
   getFilterPasswordList,
@@ -21,9 +15,15 @@ import {
   PasswordInfoItem,
   PasswordTagItem
 } from '../common/Dataget'
-import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
+import {
+  deleteQuickBarPassword,
+  getQuickBarPasswordIdList,
+  setQuickBarPassword,
+  syncQuickBarPassword
+} from '../common/Quickbar'
+import getTotp from '../common/Totp'
 import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
 import PasswordInfo from './Passwordinfo'
