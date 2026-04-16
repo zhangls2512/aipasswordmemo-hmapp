@@ -215,7 +215,7 @@ struct Newpasskey {
                       group: 'type'
                     })
                       .checked(this.type === 'mfa' ? true : false)
-                      .onChange((isChecked) => {
+                      .onChange(isChecked => {
                         if (isChecked) {
                           this.type = 'mfa'
                         }
@@ -229,7 +229,7 @@ struct Newpasskey {
                       group: 'type'
                     })
                       .checked(this.type === 'emailcode' ? true : false)
-                      .onChange((isChecked) => {
+                      .onChange(isChecked => {
                         if (isChecked) {
                           this.type = 'emailcode'
                         }

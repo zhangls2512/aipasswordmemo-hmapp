@@ -78,7 +78,7 @@ struct Keypage {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -189,7 +189,7 @@ struct Keypage {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .onHover((isHover) => {
+                .onHover(isHover => {
                   if (!isHover) {
                     this.hoverId = -1
                   }
@@ -244,7 +244,7 @@ struct Keypage {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .onHover((isHover) => {
+                .onHover(isHover => {
                   if (!isHover) {
                     this.hoverId = -1
                   }
@@ -337,7 +337,7 @@ struct Keypage {
       }
     })
     .titleMode(HdsNavDestinationTitleMode.MODAL)
-    .onReady((context) => {
+    .onReady(context => {
       this.pageInfos = context.pathStack
       this.keyAlg = getKeyAlg()
       this.context.eventHub.on('refreshKey', () => {

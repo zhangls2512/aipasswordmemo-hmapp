@@ -37,7 +37,7 @@ struct Servicemode {
                   isOn: this.allService!!
                 })
                   .enabled(!this.allService)
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     this.allService = isOn
                     setFlushPreference(this.context, 'commonSetting', 'allService', isOn)
                   })
@@ -100,7 +100,7 @@ struct Servicemode {
                   isOn: !this.allService
                 })
                   .enabled(this.allService)
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     this.allService = !isOn
                     setFlushPreference(this.context, 'commonSetting', 'allService', !isOn)
                   })
@@ -170,7 +170,7 @@ struct Servicemode {
       }
     })
     .titleMode(HdsNavDestinationTitleMode.MODAL)
-    .onReady((context) => {
+    .onReady(context => {
       this.pageInfos = context.pathStack
       this.allService = getFlushPreference(this.context, 'commonSetting', 'allService', true) as boolean
     })

@@ -81,7 +81,7 @@ export default struct Cleardata {
                 })
                   .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
                   .selectAll(this.allSetting!!)
-                  .onChange((itemName) => {
+                  .onChange(itemName => {
                     this.setting = itemName.name
                   })
               }
@@ -269,7 +269,7 @@ export default struct Cleardata {
                   ]
                 })
                 if (data.index === 1) {
-                  this.setting.forEach((item) => {
+                  this.setting.forEach(item => {
                     const dataPreferences = preferences.getPreferencesSync(this.context, {
                       name: item,
                       storageType: preferences.StorageType.GSKV
@@ -341,7 +341,7 @@ export default struct Cleardata {
                 })
                   .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
                   .selectAll(this.allCache!!)
-                  .onChange((itemName) => {
+                  .onChange(itemName => {
                     this.cache = itemName.name
                   })
               }
@@ -511,7 +511,7 @@ export default struct Cleardata {
                 })
                   .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
                   .selectAll(this.allLog!!)
-                  .onChange((itemName) => {
+                  .onChange(itemName => {
                     this.log = itemName.name
                   })
               }

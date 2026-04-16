@@ -108,7 +108,7 @@ struct Cloudbackupimport {
                     type: ToggleType.Switch,
                     isOn: this.autoImport.includes(item.value)
                   })
-                    .onChange((isOn) => {
+                    .onChange(isOn => {
                       if (!isOn) {
                         this.autoImport = this.autoImport.filter(inItem => inItem !== item.value)
                       }
@@ -167,7 +167,7 @@ struct Cloudbackupimport {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -233,7 +233,7 @@ struct Cloudbackupimport {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -299,7 +299,7 @@ struct Cloudbackupimport {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }

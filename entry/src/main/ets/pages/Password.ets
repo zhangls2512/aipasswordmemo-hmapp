@@ -413,7 +413,7 @@ export default struct PasswordPage {
               }
             })
             .width(40)
-            .onHover((isHover) => {
+            .onHover(isHover => {
               if (!isHover) {
                 this.buttonHoverId = -1
               }
@@ -605,7 +605,7 @@ export default struct PasswordPage {
             value: this.nameKeyword!!
           })
             .searchButton('搜索')
-            .onChange((value) => {
+            .onChange(value => {
               setTempPreference(this.context, 'filterPassword', 'nameKeyword', value)
             })
             .onSubmit(() => {
@@ -682,7 +682,7 @@ export default struct PasswordPage {
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .onChange((isOn) => {
+                        .onChange(isOn => {
                           if (!isOn) {
                             this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
                               item.id), 1)
@@ -781,7 +781,7 @@ export default struct PasswordPage {
                       .backgroundColor($r('sys.color.comp_background_secondary'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }

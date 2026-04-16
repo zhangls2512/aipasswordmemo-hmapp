@@ -87,7 +87,7 @@ struct Cloudbackupmanage {
                   })
                     .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
                     .selectAll(this.allSelected!!)
-                    .onChange((itemName) => {
+                    .onChange(itemName => {
                       this.types = itemName.name
                     })
                 }

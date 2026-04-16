@@ -219,7 +219,7 @@ struct Tablesync {
                           isOn: this.autoSyncTables.includes(item.value)
                         })
                           .enabled(this.onTables.includes(item.value))
-                          .onChange((isOn) => {
+                          .onChange(isOn => {
                             if (!isOn) {
                               this.autoSyncTables = this.autoSyncTables.filter(inItem => inItem !== item.value)
                             }
@@ -362,7 +362,7 @@ struct Tablesync {
                         .backgroundColor($r('sys.color.interactive_pressed'))
                       }
                     })
-                    .onHover((isHover) => {
+                    .onHover(isHover => {
                       if (!isHover) {
                         this.hoverId = -1
                       }
@@ -529,7 +529,7 @@ struct Tablesync {
                           .backgroundColor($r('sys.color.interactive_pressed'))
                         }
                       })
-                      .onHover((isHover) => {
+                      .onHover(isHover => {
                         if (!isHover) {
                           this.hoverId = -1
                         }
@@ -573,7 +573,7 @@ struct Tablesync {
                         .backgroundColor($r('sys.color.interactive_pressed'))
                       }
                     })
-                    .onHover((isHover) => {
+                    .onHover(isHover => {
                       if (!isHover) {
                         this.hoverId = -1
                       }
@@ -664,7 +664,7 @@ struct Tablesync {
                         .backgroundColor($r('sys.color.interactive_pressed'))
                       }
                     })
-                    .onHover((isHover) => {
+                    .onHover(isHover => {
                       if (!isHover) {
                         this.hoverId = -1
                       }
@@ -900,7 +900,7 @@ struct Tablesync {
                           isOn: this.autoHuaweiCloudSyncTables.includes(item.value)
                         })
                           .enabled(this.huaweiCloudSyncOnTables.includes(item.value))
-                          .onChange((isOn) => {
+                          .onChange(isOn => {
                             if (!isOn) {
                               this.autoHuaweiCloudSyncTables =
                                 this.autoHuaweiCloudSyncTables.filter(inItem => inItem !== item.value)
@@ -1446,7 +1446,7 @@ struct Tablesync {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }
@@ -1569,7 +1569,7 @@ struct Tablesync {
                         type: ToggleType.Switch,
                         isOn: this.pauseAutoSyncWhenLowBatteryCapacityLevel!!
                       })
-                        .onChange((isOn) => {
+                        .onChange(isOn => {
                           setFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel',
                             isOn)
                         })
@@ -1593,7 +1593,7 @@ struct Tablesync {
                         type: ToggleType.Switch,
                         isOn: this.pauseAutoSyncWhenPowerSave!!
                       })
-                        .onChange((isOn) => {
+                        .onChange(isOn => {
                           setFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', isOn)
                         })
                     }
@@ -1636,7 +1636,7 @@ struct Tablesync {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }
@@ -1720,7 +1720,7 @@ struct Tablesync {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }
@@ -1804,7 +1804,7 @@ struct Tablesync {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }
@@ -1887,7 +1887,7 @@ struct Tablesync {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }

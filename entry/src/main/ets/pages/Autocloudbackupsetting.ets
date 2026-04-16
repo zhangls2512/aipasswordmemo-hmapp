@@ -60,7 +60,7 @@ struct Autocloudbackupsetting {
                   type: ToggleType.Switch,
                   isOn: this.autoOn.includes(item.value)
                 })
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     if (!isOn) {
                       this.autoOn = this.autoOn.filter(inItem => inItem !== item.value)
                     }

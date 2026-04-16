@@ -190,7 +190,7 @@ export default struct Passwordgenerate {
               }
             })
             .width('100%')
-            .onHover((isHover) => {
+            .onHover(isHover => {
               if (!isHover) {
                 this.hoverId = -1
               }

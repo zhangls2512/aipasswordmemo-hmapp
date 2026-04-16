@@ -355,7 +355,7 @@ export default struct InfoPage {
               }
             })
             .width(40)
-            .onHover((isHover) => {
+            .onHover(isHover => {
               if (!isHover) {
                 this.buttonHoverId = -1
               }
@@ -506,7 +506,7 @@ export default struct InfoPage {
                           .margin({
                             right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                           })
-                          .onChange((isOn) => {
+                          .onChange(isOn => {
                             if (!isOn) {
                               this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
                                 item.id), 1)
@@ -562,7 +562,7 @@ export default struct InfoPage {
                         .backgroundColor($r('sys.color.comp_background_secondary'))
                       }
                     })
-                    .onHover((isHover) => {
+                    .onHover(isHover => {
                       if (!isHover) {
                         this.hoverId = -1
                       }
