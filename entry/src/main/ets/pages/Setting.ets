@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
-import { appAccount } from '@kit.BasicServicesKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
+import { appAccount } from '@kit.BasicServicesKit'
 import { formProvider } from '@kit.FormKit'
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
