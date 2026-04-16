@@ -876,7 +876,7 @@ export default class EntryAbility extends UIAbility {
     if (colorMode === 2) {
       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
     }
-    if (deviceInfo.deviceType !== 'tablet') {
+    if (deviceInfo.deviceType === 'phone') {
       const processCache = getFlushPreference(this.context, 'debugSetting', 'processCache', true) as boolean
       applicationContext.setSupportedProcessCache(processCache)
     }
