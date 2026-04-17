@@ -1465,5 +1465,8 @@ struct DataBackupRecovery {
       })
       await this.getSetting()
     })
+    .onDisAppear(() => {
+      this.context.eventHub.off('refreshDataBackupRecovery')
+    })
   }
 }

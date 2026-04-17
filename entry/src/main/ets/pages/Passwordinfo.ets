@@ -350,15 +350,16 @@ export default struct Passwordinfo {
                 await floatingBallController.stopFloatingBall()
               } catch {
               }
+              this.context.eventHub.off('stopFloatingBall')
             })
           }
           this.intervalId = setInterval(async () => {
             const mfaInfoArray = mfaInfo.value.split('\0')
-            let mfaOthauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
-            mfaOthauthUri = mfaOthauthUri.addQueryValue('secret', mfaInfoArray[0])
-            mfaOthauthUri = mfaOthauthUri.addQueryValue('period', mfaInfoArray[1])
-            mfaOthauthUri = mfaOthauthUri.addQueryValue('digits', mfaInfoArray[2])
-            this.mfaOtpauthUri = mfaOthauthUri.toString()
+            let mfaOtpauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
+            mfaOtpauthUri = mfaOtpauthUri.addQueryValue('secret', mfaInfoArray[0])
+            mfaOtpauthUri = mfaOtpauthUri.addQueryValue('period', mfaInfoArray[1])
+            mfaOtpauthUri = mfaOtpauthUri.addQueryValue('digits', mfaInfoArray[2])
+            this.mfaOtpauthUri = mfaOtpauthUri.toString()
             this.mfaStep = Number(mfaInfoArray[1])
             const res = await getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
             if (res.value !== 'fail') {
