@@ -4,12 +4,12 @@ import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffec
 import openLink from '../common/Openlink'
 
 interface Item {
-  property: string,
+  key: string,
   value: string
 }
 
 interface ItemWithDesc {
-  property: string,
+  key: string,
   value: string,
   desc: string
 }
@@ -24,35 +24,50 @@ struct License {
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   gabaInfoArray: Item[] = [
-    { property: '名称', value: '轩铭密码智能备忘录' },
-    { property: '主体类型', value: '个人' },
-    { property: '开办者名称', value: '张**' },
-    { property: '注册地公安机关', value: '萨尔图区网安大队' },
-    { property: '注册时间', value: '2026-02-13' }
-  ]
-  tscjInfoArray: ItemWithDesc[] = [
     {
-      property: '适老化',
+      key: '名称',
+      value: '轩铭密码智能备忘录'
+    },
+    {
+      key: '主体类型',
+      value: '个人'
+    },
+    {
+      key: '开办者名称',
+      value: '张**'
+    },
+    {
+      key: '注册地公安机关',
+      value: '萨尔图区网安大队'
+    },
+    {
+      key: '注册时间',
+      value: '2026-02-13'
+    }
+  ]
+  tscjbaInfoArray: ItemWithDesc[] = [
+    {
+      key: '适老化',
       value: '轩铭2512适备12号-1L',
       desc: '字体跟随系统关怀模式设置放大'
     },
     {
-      property: '无障碍',
+      key: '无障碍',
       value: '轩铭2512适备12号-2Z',
       desc: '尽可能多地使用系统组件、API，以最大化地利用系统内置的无障碍特性'
     },
     {
-      property: '大小屏',
+      key: '大小屏',
       value: '轩铭2512适备12号-3P',
       desc: '适配平板、PC 大屏'
     },
     {
-      property: '特殊网络环境',
+      key: '特殊网络环境',
       value: '轩铭2512适备12号-4W',
       desc: '无网环境使用在线功能时弹窗提示'
     },
     {
-      property: '深色模式',
+      key: '深色模式',
       value: '轩铭2512适备12号-5S',
       desc: '界面跟随“我的”>“设置”>“通用”>“通用”>“界面”>“深色模式”设置改变颜色主题'
     }
@@ -94,7 +109,7 @@ struct License {
             }) {
               ForEach(this.gabaInfoArray, (item: Item) => {
                 Column() {
-                  Text(item.property)
+                  Text(item.key)
                     .fontWeight(FontWeight.Medium)
                     .textAlign(TextAlign.Center)
                 }
@@ -287,9 +302,9 @@ struct License {
               .padding($r('sys.float.ohos_id_elements_margin_vertical_m'))
               .width('50%')
 
-              ForEach(this.tscjInfoArray, (item: ItemWithDesc) => {
+              ForEach(this.tscjbaInfoArray, (item: ItemWithDesc) => {
                 Column() {
-                  Text(item.property)
+                  Text(item.key)
                     .fontColor($r('sys.color.font_emphasize'))
                     .textAlign(TextAlign.Center)
                     .onClick(async () => {
