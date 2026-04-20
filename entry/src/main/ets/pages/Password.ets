@@ -6,13 +6,7 @@ import { hdsEffect } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
-import {
-  deleteQuickBarPassword,
-  getQuickBarPasswordIdList,
-  setQuickBarPassword,
-  syncQuickBarPassword
-} from '../common/Quickbar'
-import getTotp from '../common/Totp'
+import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import {
   CloudBackupTimeItem,
   getFilterPasswordList,
@@ -21,9 +15,15 @@ import {
   PasswordInfoItem,
   PasswordTagItem
 } from '../common/Dataget'
-import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
+import {
+  deleteQuickBarPassword,
+  getQuickBarPasswordIdList,
+  setQuickBarPassword,
+  syncQuickBarPassword
+} from '../common/Quickbar'
+import getTotp from '../common/Totp'
 import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
 import PasswordInfo from './Passwordinfo'
@@ -413,7 +413,7 @@ export default struct PasswordPage {
               }
             })
             .width(40)
-            .onHover((isHover) => {
+            .onHover(isHover => {
               if (!isHover) {
                 this.buttonHoverId = -1
               }
@@ -605,7 +605,7 @@ export default struct PasswordPage {
             value: this.nameKeyword!!
           })
             .searchButton('搜索')
-            .onChange((value) => {
+            .onChange(value => {
               setTempPreference(this.context, 'filterPassword', 'nameKeyword', value)
             })
             .onSubmit(() => {
@@ -682,7 +682,7 @@ export default struct PasswordPage {
                         .margin({
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                        .onChange((isOn) => {
+                        .onChange(isOn => {
                           if (!isOn) {
                             this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
                               item.id), 1)
@@ -781,7 +781,7 @@ export default struct PasswordPage {
                       .backgroundColor($r('sys.color.comp_background_secondary'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }

@@ -182,7 +182,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.exitAfterContinue!!
                 })
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     setFlushPreference(this.context, 'commonSetting', 'exitAfterContinue', isOn)
                   })
               }
@@ -250,7 +250,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.acceptCollaborate!!
                 })
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     setFlushPreference(this.context, 'commonSetting', 'acceptCollaborate', isOn)
                   })
               }
@@ -273,7 +273,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.destroyWhenBackPressed!!
                 })
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     setFlushPreference(this.context, 'commonSetting', 'destroyWhenBackPressed', isOn)
                   })
               }
@@ -360,7 +360,7 @@ struct Commonsetting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -425,7 +425,7 @@ struct Commonsetting {
                 ])
                   .selected(this.colorModeIndex!!)
                   .value(this.colorModeValue!!)
-                  .onSelect((index) => {
+                  .onSelect(index => {
                     const applicationContext = this.context.getApplicationContext()
                     if (index === 0) {
                       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET)
@@ -563,7 +563,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.disallowScreenshot!!
                 })
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     setFlushPreference(this.context, 'commonSetting', 'disallowScreenshot', isOn)
                   })
               }
@@ -598,7 +598,7 @@ struct Commonsetting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -703,7 +703,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.showPasswordInIndex!!
                 })
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     setFlushPreference(this.context, 'commonSetting', 'showPasswordInIndex', isOn)
                   })
               }
@@ -726,7 +726,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.hideTagInIndex!!
                 })
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     setFlushPreference(this.context, 'commonSetting', 'hideTagInIndex', isOn)
                   })
               }
@@ -752,7 +752,7 @@ struct Commonsetting {
                 ])
                   .selected(this.mfaSecondsRemainingStyleIndex!!)
                   .value(this.mfaSecondsRemainingStyleValue!!)
-                  .onSelect((index) => {
+                  .onSelect(index => {
                     setFlushPreference(this.context, 'commonSetting', 'mfaSecondsRemainingStyle', index)
                   })
               }
@@ -804,7 +804,7 @@ struct Commonsetting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -846,7 +846,7 @@ struct Commonsetting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -888,7 +888,7 @@ struct Commonsetting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -929,7 +929,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.passwordInfoValueDataDetector!!
                 })
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     setFlushPreference(this.context, 'commonSetting', 'passwordInfoValueDataDetector', isOn)
                   })
               }
@@ -954,7 +954,7 @@ struct Commonsetting {
                     type: ToggleType.Switch,
                     isOn: this.showMfaInFloatingBall!!
                   })
-                    .onChange((isOn) => {
+                    .onChange(isOn => {
                       setFlushPreference(this.context, 'commonSetting', 'showMfaInFloatingBall', isOn)
                     })
                 }
@@ -977,7 +977,7 @@ struct Commonsetting {
                   type: ToggleType.Switch,
                   isOn: this.pushItemWhenBlur!!
                 })
-                  .onChange((isOn) => {
+                  .onChange(isOn => {
                     setFlushPreference(this.context, 'commonSetting', 'pushItemWhenBlur', isOn)
                   })
               }
@@ -1020,7 +1020,7 @@ struct Commonsetting {
                 ])
                   .selected(this.checkVersionUpdateIndex!!)
                   .value(this.checkVersionUpdateValue!!)
-                  .onSelect((index) => {
+                  .onSelect(index => {
                     setFlushPreference(this.context, 'commonSetting', 'checkVersionUpdate', index)
                   })
               }
@@ -1045,7 +1045,7 @@ struct Commonsetting {
                 ])
                   .selected(this.openLinkTypeIndex!!)
                   .value(this.openLinkTypeValue!!)
-                  .onSelect((index) => {
+                  .onSelect(index => {
                     setFlushPreference(this.context, 'commonSetting', 'openLinkType', index)
                   })
               }
@@ -1088,15 +1088,6 @@ struct Commonsetting {
               mainTitleColor: $r('sys.color.font_primary')
             },
             backIconStyle: {
-              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
-              iconColor: $r('sys.color.icon_primary')
-            }
-          }
-        },
-        scrollEffectStyle: {
-          contentStyle: {
-            backIconStyle: {
-              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
               iconColor: $r('sys.color.icon_primary')
             }
           }

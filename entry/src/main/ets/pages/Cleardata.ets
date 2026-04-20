@@ -81,7 +81,7 @@ export default struct Cleardata {
                 })
                   .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
                   .selectAll(this.allSetting!!)
-                  .onChange((itemName) => {
+                  .onChange(itemName => {
                     this.setting = itemName.name
                   })
               }
@@ -269,7 +269,7 @@ export default struct Cleardata {
                   ]
                 })
                 if (data.index === 1) {
-                  this.setting.forEach((item) => {
+                  this.setting.forEach(item => {
                     const dataPreferences = preferences.getPreferencesSync(this.context, {
                       name: item,
                       storageType: preferences.StorageType.GSKV
@@ -341,7 +341,7 @@ export default struct Cleardata {
                 })
                   .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
                   .selectAll(this.allCache!!)
-                  .onChange((itemName) => {
+                  .onChange(itemName => {
                     this.cache = itemName.name
                   })
               }
@@ -463,12 +463,10 @@ export default struct Cleardata {
                         webview.WebviewController.removeAllCache(true)
                       }
                       if (item === 'invitationQrcodeCache') {
-                        const invitationcodeQrcodeDir = this.context.cacheDir + '/media/invitationqrcode/'
-                        const fileNames = await fileIo.listFile(invitationcodeQrcodeDir)
-                        const promises = fileNames.map(async (item) => {
-                          await fileIo.unlink(invitationcodeQrcodeDir + item)
-                        })
-                        await Promise.all(promises)
+                        const invitationcodeQrcodeDir = this.context.cacheDir + '/media/invitationqrcode'
+                        if (fileIo.accessSync(invitationcodeQrcodeDir)) {
+                          await fileIo.rmdir(invitationcodeQrcodeDir)
+                        }
                       }
                     } catch {
                     }
@@ -511,7 +509,7 @@ export default struct Cleardata {
                 })
                   .checkboxShape(CheckBoxShape.ROUNDED_SQUARE)
                   .selectAll(this.allLog!!)
-                  .onChange((itemName) => {
+                  .onChange(itemName => {
                     this.log = itemName.name
                   })
               }
@@ -576,13 +574,9 @@ export default struct Cleardata {
                 if (data.index === 1) {
                   const promises = this.log.map(async (item) => {
                     if (item === 'errorLog') {
-                      const errorLogDir = this.context.filesDir + '/log/error/'
+                      const errorLogDir = this.context.filesDir + '/log/error'
                       if (fileIo.accessSync(errorLogDir)) {
-                        const fileNames = await fileIo.listFile(errorLogDir)
-                        const promises = fileNames.map(async (item) => {
-                          await fileIo.unlink(errorLogDir + item)
-                        })
-                        await Promise.all(promises)
+                        await fileIo.rmdir(errorLogDir)
                       }
                     }
                   })

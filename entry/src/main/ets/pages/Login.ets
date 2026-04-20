@@ -90,7 +90,7 @@ export default struct Login {
                   group: 'type'
                 })
                   .checked(this.type === 'password' ? true : false)
-                  .onChange((isChecked) => {
+                  .onChange(isChecked => {
                     if (isChecked) {
                       this.type = 'password'
                     }
@@ -104,7 +104,7 @@ export default struct Login {
                   group: 'type'
                 })
                   .checked(this.type === 'mfa' ? true : false)
-                  .onChange((isChecked) => {
+                  .onChange(isChecked => {
                     if (isChecked) {
                       this.type = 'mfa'
                     }
@@ -118,7 +118,7 @@ export default struct Login {
                   group: 'type'
                 })
                   .checked(this.type === 'emailcode' ? true : false)
-                  .onChange((isChecked) => {
+                  .onChange(isChecked => {
                     if (isChecked) {
                       this.type = 'emailcode'
                     }
@@ -410,7 +410,7 @@ export default struct Login {
               .margin({
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
-              .onChange((isOn) => {
+              .onChange(isOn => {
                 this.controller.setEnabled(isOn)
               })
             Text() {
