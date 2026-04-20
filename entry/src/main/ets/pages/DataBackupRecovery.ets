@@ -250,7 +250,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoBackupTables.includes(item.value)
                         })
-                          .onChange((isOn) => {
+                          .onChange(isOn => {
                             if (!isOn) {
                               this.autoBackupTables = this.autoBackupTables.filter(inItem => inItem !== item.value)
                             }
@@ -317,7 +317,7 @@ struct DataBackupRecovery {
                           .backgroundColor($r('sys.color.interactive_pressed'))
                         }
                       })
-                      .onHover((isHover) => {
+                      .onHover(isHover => {
                         if (!isHover) {
                           this.hoverId = -1
                         }
@@ -390,7 +390,7 @@ struct DataBackupRecovery {
                             .backgroundColor($r('sys.color.interactive_pressed'))
                           }
                         })
-                        .onHover((isHover) => {
+                        .onHover(isHover => {
                           if (!isHover) {
                             this.hoverId = -1
                           }
@@ -441,7 +441,7 @@ struct DataBackupRecovery {
                       type: ToggleType.Switch,
                       isOn: this.encryptFileBackup!!
                     })
-                      .onChange((isOn) => {
+                      .onChange(isOn => {
                         setFlushPreference(this.context, 'dataSetting', 'encryptFileBackup', isOn)
                       })
                   }
@@ -509,7 +509,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoFileBackupTables.includes(item.value)
                         })
-                          .onChange((isOn) => {
+                          .onChange(isOn => {
                             if (!isOn) {
                               this.autoFileBackupTables =
                                 this.autoFileBackupTables.filter(inItem => inItem !== item.value)
@@ -579,7 +579,7 @@ struct DataBackupRecovery {
                           .backgroundColor($r('sys.color.interactive_pressed'))
                         }
                       })
-                      .onHover((isHover) => {
+                      .onHover(isHover => {
                         if (!isHover) {
                           this.hoverId = -1
                         }
@@ -648,7 +648,7 @@ struct DataBackupRecovery {
                           .backgroundColor($r('sys.color.interactive_pressed'))
                         }
                       })
-                      .onHover((isHover) => {
+                      .onHover(isHover => {
                         if (!isHover) {
                           this.hoverId = -1
                         }
@@ -740,7 +740,7 @@ struct DataBackupRecovery {
                           .backgroundColor($r('sys.color.interactive_pressed'))
                         }
                       })
-                      .onHover((isHover) => {
+                      .onHover(isHover => {
                         if (!isHover) {
                           this.hoverId = -1
                         }
@@ -827,7 +827,7 @@ struct DataBackupRecovery {
                           .backgroundColor($r('sys.color.interactive_pressed'))
                         }
                       })
-                      .onHover((isHover) => {
+                      .onHover(isHover => {
                         if (!isHover) {
                           this.hoverId = -1
                         }
@@ -904,7 +904,7 @@ struct DataBackupRecovery {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }
@@ -976,7 +976,7 @@ struct DataBackupRecovery {
                       type: ToggleType.Switch,
                       isOn: this.encryptWebdavBackup!!
                     })
-                      .onChange((isOn) => {
+                      .onChange(isOn => {
                         setFlushPreference(this.context, 'dataSetting', 'encryptWebdavBackup', isOn)
                       })
                   }
@@ -1044,7 +1044,7 @@ struct DataBackupRecovery {
                           type: ToggleType.Switch,
                           isOn: this.autoWebdavBackupTables.includes(item.value)
                         })
-                          .onChange((isOn) => {
+                          .onChange(isOn => {
                             if (!isOn) {
                               this.autoWebdavBackupTables =
                                 this.autoWebdavBackupTables.filter(inItem => inItem !== item.value)
@@ -1114,7 +1114,7 @@ struct DataBackupRecovery {
                           .backgroundColor($r('sys.color.interactive_pressed'))
                         }
                       })
-                      .onHover((isHover) => {
+                      .onHover(isHover => {
                         if (!isHover) {
                           this.hoverId = -1
                         }
@@ -1194,7 +1194,7 @@ struct DataBackupRecovery {
                           .backgroundColor($r('sys.color.interactive_pressed'))
                         }
                       })
-                      .onHover((isHover) => {
+                      .onHover(isHover => {
                         if (!isHover) {
                           this.hoverId = -1
                         }
@@ -1290,7 +1290,7 @@ struct DataBackupRecovery {
                           .backgroundColor($r('sys.color.interactive_pressed'))
                         }
                       })
-                      .onHover((isHover) => {
+                      .onHover(isHover => {
                         if (!isHover) {
                           this.hoverId = -1
                         }
@@ -1368,7 +1368,7 @@ struct DataBackupRecovery {
                         type: ToggleType.Switch,
                         isOn: this.pauseAutoBackupWhenLowBatteryCapacityLevel!!
                       })
-                        .onChange((isOn) => {
+                        .onChange(isOn => {
                           setFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenLowBatteryCapacityLevel',
                             isOn)
                         })
@@ -1392,7 +1392,7 @@ struct DataBackupRecovery {
                         type: ToggleType.Switch,
                         isOn: this.pauseAutoBackupWhenPowerSave!!
                       })
-                        .onChange((isOn) => {
+                        .onChange(isOn => {
                           setFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenPowerSave', isOn)
                         })
                     }
@@ -1441,15 +1441,6 @@ struct DataBackupRecovery {
               mainTitleColor: $r('sys.color.font_primary')
             },
             backIconStyle: {
-              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
-              iconColor: $r('sys.color.icon_primary')
-            }
-          }
-        },
-        scrollEffectStyle: {
-          contentStyle: {
-            backIconStyle: {
-              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
               iconColor: $r('sys.color.icon_primary')
             }
           }
@@ -1473,6 +1464,9 @@ struct DataBackupRecovery {
         await this.getSetting()
       })
       await this.getSetting()
+    })
+    .onDisAppear(() => {
+      this.context.eventHub.off('refreshDataBackupRecovery')
     })
   }
 }

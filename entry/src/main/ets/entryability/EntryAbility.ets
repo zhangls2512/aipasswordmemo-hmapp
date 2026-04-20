@@ -854,13 +854,16 @@ export default class EntryAbility extends UIAbility {
           ]
         ])
         setTimeout(async () => {
-          await this.context.startAbility({
-            bundleName: 'com.zhangxm.aipasswordmemo',
-            abilityName: 'BackGroundAbility'
-          }, {
-            processMode: contextConstant.ProcessMode.NEW_PROCESS_ATTACH_TO_STATUS_BAR_ITEM,
-            startupVisibility: contextConstant.StartupVisibility.STARTUP_HIDE
-          })
+          try {
+            await this.context.startAbility({
+              bundleName: 'com.zhangxm.aipasswordmemo',
+              abilityName: 'BackGroundAbility'
+            }, {
+              processMode: contextConstant.ProcessMode.NEW_PROCESS_ATTACH_TO_STATUS_BAR_ITEM,
+              startupVisibility: contextConstant.StartupVisibility.STARTUP_HIDE
+            })
+          } catch {
+          }
           setTempPreference(this.context, 'statusBar', 'exist', true)
         }, 200)
       }
@@ -876,7 +879,7 @@ export default class EntryAbility extends UIAbility {
     if (colorMode === 2) {
       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
     }
-    if (deviceInfo.deviceType !== 'tablet') {
+    if (deviceInfo.deviceType === 'phone') {
       const processCache = getFlushPreference(this.context, 'debugSetting', 'processCache', true) as boolean
       applicationContext.setSupportedProcessCache(processCache)
     }

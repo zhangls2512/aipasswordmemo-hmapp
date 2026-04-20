@@ -228,7 +228,7 @@ struct Index {
         .barPosition(BarPosition.End)
         .barWidth(320)
         .scrollable(false)
-        .onChange((index) => {
+        .onChange(index => {
           this.index = index
         })
         .onAnimationStart(async (index, targetIndex) => {

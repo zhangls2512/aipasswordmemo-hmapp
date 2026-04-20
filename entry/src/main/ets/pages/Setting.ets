@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
-import { appAccount } from '@kit.BasicServicesKit'
 import { privacyManager } from '@kit.AppGalleryKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
+import { appAccount } from '@kit.BasicServicesKit'
 import { formProvider } from '@kit.FormKit'
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
@@ -115,7 +115,7 @@ export default struct Setting {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }
@@ -170,7 +170,7 @@ export default struct Setting {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .onHover((isHover) => {
+                .onHover(isHover => {
                   if (!isHover) {
                     this.hoverId = -1
                   }
@@ -217,7 +217,7 @@ export default struct Setting {
                     isOn: this.autoLoginByHuaweiAccount!!
                   })
                     .enabled(!this.autoLoginByPasskey)
-                    .onChange((isOn) => {
+                    .onChange(isOn => {
                       setFlushPreference(this.context, 'commonSetting', 'autoLoginByHuaweiAccount', isOn)
                     })
                 }
@@ -253,7 +253,7 @@ export default struct Setting {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .onHover((isHover) => {
+                .onHover(isHover => {
                   if (!isHover) {
                     this.hoverId = -1
                   }
@@ -300,7 +300,7 @@ export default struct Setting {
                     isOn: this.autoLoginByPasskey!!
                   })
                     .enabled(!this.autoLoginByHuaweiAccount)
-                    .onChange((isOn) => {
+                    .onChange(isOn => {
                       setFlushPreference(this.context, 'commonSetting', 'autoLoginByPasskey', isOn)
                     })
                 }
@@ -408,7 +408,7 @@ export default struct Setting {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }
@@ -450,7 +450,7 @@ export default struct Setting {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }
@@ -492,7 +492,7 @@ export default struct Setting {
                       .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
-                  .onHover((isHover) => {
+                  .onHover(isHover => {
                     if (!isHover) {
                       this.hoverId = -1
                     }
@@ -565,7 +565,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -607,7 +607,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -649,7 +649,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -710,7 +710,7 @@ export default struct Setting {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .onHover((isHover) => {
+            .onHover(isHover => {
               if (!isHover) {
                 this.hoverId = -1
               }
@@ -767,7 +767,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -809,7 +809,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -858,7 +858,7 @@ export default struct Setting {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .onHover((isHover) => {
+            .onHover(isHover => {
               if (!isHover) {
                 this.hoverId = -1
               }
@@ -913,7 +913,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -959,7 +959,7 @@ export default struct Setting {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .onHover((isHover) => {
+                .onHover(isHover => {
                   if (!isHover) {
                     this.hoverId = -1
                   }
@@ -997,7 +997,7 @@ export default struct Setting {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .onHover((isHover) => {
+                .onHover(isHover => {
                   if (!isHover) {
                     this.hoverId = -1
                   }
@@ -1056,7 +1056,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -1108,7 +1108,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -1148,7 +1148,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -1190,7 +1190,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -1253,7 +1253,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -1295,7 +1295,7 @@ export default struct Setting {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -1353,7 +1353,7 @@ export default struct Setting {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .onHover((isHover) => {
+            .onHover(isHover => {
               if (!isHover) {
                 this.hoverId = -1
               }
@@ -1395,7 +1395,7 @@ export default struct Setting {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .onHover((isHover) => {
+            .onHover(isHover => {
               if (!isHover) {
                 this.hoverId = -1
               }

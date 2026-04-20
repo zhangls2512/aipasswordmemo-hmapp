@@ -168,7 +168,7 @@ struct Infolist {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -317,7 +317,7 @@ struct Infolist {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -456,7 +456,7 @@ struct Infolist {
                     .backgroundColor($r('sys.color.interactive_pressed'))
                   }
                 })
-                .onHover((isHover) => {
+                .onHover(isHover => {
                   if (!isHover) {
                     this.hoverId = -1
                   }
@@ -596,7 +596,7 @@ struct Infolist {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -871,7 +871,7 @@ struct Infolist {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -1035,7 +1035,7 @@ struct Infolist {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .onHover((isHover) => {
+              .onHover(isHover => {
                 if (!isHover) {
                   this.hoverId = -1
                 }
@@ -1154,7 +1154,7 @@ struct Infolist {
               Column() {
                 Text('信息内容')
                   .fontWeight(FontWeight.Medium)
-                Text('应用名称、应用版本号、内容、联系方式')
+                Text('应用名称 (密码智能备忘录)、内容、联系方式')
                   .fontColor($r('sys.color.font_secondary'))
                   .fontSize($r('sys.float.ohos_id_text_size_body2'))
                   .margin({
@@ -1202,15 +1202,6 @@ struct Infolist {
               mainTitleColor: $r('sys.color.font_primary')
             },
             backIconStyle: {
-              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
-              iconColor: $r('sys.color.icon_primary')
-            }
-          }
-        },
-        scrollEffectStyle: {
-          contentStyle: {
-            backIconStyle: {
-              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
               iconColor: $r('sys.color.icon_primary')
             }
           }

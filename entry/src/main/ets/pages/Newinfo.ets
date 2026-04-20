@@ -165,7 +165,7 @@ export default struct Newinfo {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .onChange((value) => {
+              .onChange(value => {
                 if (this.oftenUsedInfoTypes.includes(value)) {
                   this.infoTypeIndex = this.oftenUsedInfoTypes.indexOf(value)
                   this.infoTypeValue = value

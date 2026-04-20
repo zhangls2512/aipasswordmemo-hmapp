@@ -215,7 +215,7 @@ struct Newpasskey {
                       group: 'type'
                     })
                       .checked(this.type === 'mfa' ? true : false)
-                      .onChange((isChecked) => {
+                      .onChange(isChecked => {
                         if (isChecked) {
                           this.type = 'mfa'
                         }
@@ -229,7 +229,7 @@ struct Newpasskey {
                       group: 'type'
                     })
                       .checked(this.type === 'emailcode' ? true : false)
-                      .onChange((isChecked) => {
+                      .onChange(isChecked => {
                         if (isChecked) {
                           this.type = 'emailcode'
                         }
@@ -387,15 +387,6 @@ struct Newpasskey {
               mainTitleColor: $r('sys.color.font_primary')
             },
             backIconStyle: {
-              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
-              iconColor: $r('sys.color.icon_primary')
-            }
-          }
-        },
-        scrollEffectStyle: {
-          contentStyle: {
-            backIconStyle: {
-              backgroundColor: $r('sys.color.comp_background_color_floating_smooth'),
               iconColor: $r('sys.color.icon_primary')
             }
           }
