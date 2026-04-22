@@ -1,9 +1,9 @@
 import { relationalStore } from '@kit.ArkData'
-import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
-import { decrypt, getKeyAlg } from '../common/Crypto'
-import { PasswordInfoItem } from '../common/Dataget'
-import { importInfo, importPassword, importTag, InfoInItem, PasswordInItem, TagInItem } from '../common/Dataimport'
-import request from '../common/Request'
+import { getAccountAccessToken, getAccountInfo } from './Accesstoken'
+import { decrypt, getKeyAlg } from './Crypto'
+import { PasswordInfoItem } from './Dataget'
+import { importInfo, importPassword, importTag, InfoInItem, PasswordInItem, TagInItem } from './Dataimport'
+import request from './Request'
 
 interface Item {
   id: number,
