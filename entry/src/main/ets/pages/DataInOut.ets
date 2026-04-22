@@ -608,17 +608,12 @@ struct DataInOut {
                         }
                       })
                     })
-                    const collator = new Intl.Collator('zh', {
-                      sensitivity: 'base',
-                      numeric: true
-                    })
-                    allInfoTypesArray.sort(collator.compare)
                     const headers = ['名称'].concat(allInfoTypesArray)
                     const rows = arrayOut.map(item => {
                       const values = [item.name]
-                      for (const infotype of allInfoTypesArray) {
+                      for (let i = 0; i < allInfoTypesArray.length; i++) {
                         let value = ''
-                        const infoValue = item.info.find(item => item.type === infotype)
+                        const infoValue = item.info.find(item => item.type === allInfoTypesArray[i])
                         if (infoValue) {
                           value = infoValue.value
                         }

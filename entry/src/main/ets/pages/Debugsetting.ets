@@ -326,7 +326,7 @@ struct Debugsetting {
               .borderRadius(12)
               .padding(12)
 
-              if (deviceInfo.deviceType !== 'tablet') {
+              if (deviceInfo.deviceType === 'phone') {
                 Divider()
                   .padding({
                     left: 12,
