@@ -453,18 +453,6 @@ struct Index {
           const urires = new uri.URI(wantUri)
           const invitationCode = urires.getQueryValue('invitationcode')
           const vipCode = urires.getQueryValue('vipcode')
-          if (!invitationCode && !vipCode) {
-            await promptAction.showDialog({
-              title: '提示',
-              message: '链接格式错误',
-              buttons: [
-                {
-                  text: '确定',
-                  color: $r('sys.color.font_emphasize')
-                }
-              ]
-            })
-          }
           if (invitationCode) {
             if (!accessToken) {
               await promptAction.showDialog({
