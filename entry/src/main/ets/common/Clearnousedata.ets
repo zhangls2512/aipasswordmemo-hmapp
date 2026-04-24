@@ -19,10 +19,6 @@ export async function clearNouseData(context: Context) {
     await fileIo.unlink(item)
   })
   await Promise.all(promises)
-  const oldInvitationQrcodeDir = context.filesDir + '/media/invitationqrcode'
-  if (fileIo.accessSync(oldInvitationQrcodeDir)) {
-    await fileIo.rmdir(oldInvitationQrcodeDir)
-  }
 }
 
 async function getNousePasswordIconFilePathArray(context: Context) {

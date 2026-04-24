@@ -80,7 +80,7 @@ export async function importPassword(context: Context, data: string, conflict: r
         encrypt: true,
         allowRebuild: true
       })
-      array.map(item => {
+      array.forEach(item => {
         let cloudBackupTime = JSON.stringify([])
         if (typeof (item.cloudBackupTime) === 'string') {
           cloudBackupTime = item.cloudBackupTime
@@ -139,7 +139,7 @@ export async function importInfo(context: Context, data: string, conflict: relat
         encrypt: true,
         allowRebuild: true
       })
-      array.map(item => {
+      array.forEach(item => {
         let cloudBackupTime = JSON.stringify([])
         if (typeof (item.cloudBackupTime) === 'string') {
           cloudBackupTime = item.cloudBackupTime
@@ -196,7 +196,7 @@ export async function importTag(context: Context, data: string, conflict: relati
         encrypt: true,
         allowRebuild: true
       })
-      array.map(item => {
+      array.forEach(item => {
         let cloudBackupTime = JSON.stringify([])
         if (typeof (item.cloudBackupTime) === 'string') {
           cloudBackupTime = item.cloudBackupTime
