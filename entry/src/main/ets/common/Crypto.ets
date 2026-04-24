@@ -143,21 +143,6 @@ export async function importCustomKey(key: string) {
   }
 }
 
-export async function importOldKey() {
-  const query: asset.AssetMap = new Map()
-  query.set(asset.Tag.ALIAS, stringToArray('key'))
-  query.set(asset.Tag.RETURN_TYPE, asset.ReturnType.ALL)
-  try {
-    const keyres = asset.querySync(query)
-    const keyarray = keyres[0].get(asset.Tag.SECRET) as Uint8Array
-    const key = arrayToString(keyarray)
-    if (key !== 'AES256' && key !== 'SM4') {
-      await importOldCustomKey(key)
-    }
-  } catch {
-  }
-}
-
 export async function importOldCustomKey(key: string) {
   await huks.importKeyItem('key', {
     inData: decodeBase64(key),

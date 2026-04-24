@@ -24,7 +24,6 @@ import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { autoLogin } from '../common/Accesstoken'
 import { clearNouseData } from '../common/Clearnousedata'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
-import { importOldKey } from '../common/Crypto'
 import { deleteData } from '../common/Datachange'
 import { write } from '../common/File'
 import openLink from '../common/Openlink'
@@ -884,7 +883,6 @@ export default class EntryAbility extends UIAbility {
       applicationContext.setSupportedProcessCache(processCache)
     }
     await this.appInit(want)
-    await importOldKey()
     await clearNouseData(this.context)
   }
 
