@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { cloudData, relationalStore, uniformTypeDescriptor } from '@kit.ArkData'
 import { LengthMetrics, LoadingDialog, promptAction, SegmentButtonV2Items, TabSegmentButtonV2 } from '@kit.ArkUI'
-import { deviceInfo, zlib } from '@kit.BasicServicesKit'
+import { zlib } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
@@ -96,21 +96,19 @@ struct Tablesync {
     HdsNavDestination() {
       Scroll() {
         Column() {
-          if (deviceInfo.deviceType !== 'tablet') {
-            TabSegmentButtonV2({
-              items: new SegmentButtonV2Items([
-                { text: '可信' },
-                { text: '云空间' },
-                { text: '暂停' },
-                { text: '邻近' }
-              ]),
-              selectedIndex: this.selectedIndex!!
+          TabSegmentButtonV2({
+            items: new SegmentButtonV2Items([
+              { text: '可信' },
+              { text: '云空间' },
+              { text: '暂停' },
+              { text: '邻近' }
+            ]),
+            selectedIndex: this.selectedIndex!!
+          })
+            .margin({
+              bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
-              .margin({
-                bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-              })
-          }
           List() {
             if (this.selectedIndex === 0) {
               ListItem() {

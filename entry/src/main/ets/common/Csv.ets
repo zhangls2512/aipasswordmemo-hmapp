@@ -1,7 +1,7 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { getPasswordMaxId, PasswordInfoItem } from '../common/Dataget'
-import { importPassword } from '../common/Dataimport'
+import { getPasswordMaxId, PasswordInfoItem } from './Dataget'
+import { importPassword } from './Dataimport'
 import { PasswordOutItem } from '../pages/DataInOut'
 
 export function parseCsvLine(line: string) {
