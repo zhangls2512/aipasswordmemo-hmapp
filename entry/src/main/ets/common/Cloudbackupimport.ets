@@ -77,8 +77,7 @@ export async function importCloudBackupPassword(context: Context, conflict: rela
             }
           })
           await Promise.all(promises)
-          await importPassword(context, JSON.stringify(passwordArray),
-            relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+          await importPassword(context, JSON.stringify(passwordArray), conflict)
         }
       }
       return 'success'
@@ -130,7 +129,7 @@ export async function importCloudBackupInfo(context: Context, conflict: relation
             }
           })
           await Promise.all(promises)
-          await importInfo(context, JSON.stringify(infoArray), relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+          await importInfo(context, JSON.stringify(infoArray), conflict)
         }
       }
       return 'success'
@@ -182,7 +181,7 @@ export async function importCloudBackupTag(context: Context, conflict: relationa
             }
           })
           await Promise.all(promises)
-          await importTag(context, JSON.stringify(tagArray), relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+          await importTag(context, JSON.stringify(tagArray), conflict)
         }
       }
       return 'success'
