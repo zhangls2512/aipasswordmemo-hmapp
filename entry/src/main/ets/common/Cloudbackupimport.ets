@@ -33,7 +33,7 @@ interface TagCloudBackup {
   cloudBackupTime: string | number
 }
 
-export async function importCloudBackupPassword(context: Context) {
+export async function importCloudBackupPassword(context: Context, conflict: relationalStore.ConflictResolution) {
   const accessToken = await getAccountAccessToken()
   if (accessToken && getKeyAlg()) {
     const countResponse = await request(context, '/password/getBackupCount', {
@@ -87,7 +87,7 @@ export async function importCloudBackupPassword(context: Context) {
   return 'fail'
 }
 
-export async function importCloudBackupInfo(context: Context) {
+export async function importCloudBackupInfo(context: Context, conflict: relationalStore.ConflictResolution) {
   const accessToken = await getAccountAccessToken()
   if (accessToken && getKeyAlg()) {
     const countResponse = await request(context, '/password/getBackupCount', {
@@ -139,7 +139,7 @@ export async function importCloudBackupInfo(context: Context) {
   return 'fail'
 }
 
-export async function importCloudBackupTag(context: Context) {
+export async function importCloudBackupTag(context: Context, conflict: relationalStore.ConflictResolution) {
   const accessToken = await getAccountAccessToken()
   if (accessToken && getKeyAlg()) {
     const countResponse = await request(context, '/password/getBackupCount', {

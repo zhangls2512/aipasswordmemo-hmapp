@@ -380,7 +380,7 @@ export default class EntryAbility extends UIAbility {
     await autoLogin(context)
     const autoImportTables = getFlushPreference(this.context, 'cloudbackupSetting', 'autoImport', []) as string[]
     if (autoImportTables.includes('password')) {
-      const res = await importCloudBackupPassword(context)
+      const res = await importCloudBackupPassword(context, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
       if (res === 'success') {
         this.context.eventHub.emit('refreshPassword')
         await promptAction.openToast({
@@ -389,7 +389,7 @@ export default class EntryAbility extends UIAbility {
       }
     }
     if (autoImportTables.includes('info')) {
-      const res = await importCloudBackupInfo(context)
+      const res = await importCloudBackupInfo(context, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
       if (res === 'success') {
         this.context.eventHub.emit('refreshInfo')
         await promptAction.openToast({
@@ -398,7 +398,7 @@ export default class EntryAbility extends UIAbility {
       }
     }
     if (autoImportTables.includes('tag')) {
-      const res = await importCloudBackupTag(context)
+      const res = await importCloudBackupTag(context, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
       if (res === 'success') {
         this.context.eventHub.emit('refreshTag')
         await promptAction.openToast({
