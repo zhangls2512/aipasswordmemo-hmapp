@@ -1,9 +1,8 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getPasswordMaxId, PasswordInfoItem } from './Dataget'
-import { importPassword } from './Dataimport'
+import { importPassword, PasswordItem } from './Dataimport'
 import { getFlushPreference } from './Preference'
-import { PasswordOutItem } from '../pages/DataInOut'
 
 export function parseCsvLine(line: string) {
   const result: string[] = []
@@ -37,7 +36,7 @@ export async function importCsvPassword(context: Context, content: string) {
     return
   }
   const lines = content.split('\n').filter(line => line.trim() !== '')
-  const result: PasswordOutItem[] = []
+  const result: PasswordItem[] = []
   const maxId = await getPasswordMaxId(context)
   let idCounter = maxId + 1
   const firstLine = parseCsvLine(lines[0])
