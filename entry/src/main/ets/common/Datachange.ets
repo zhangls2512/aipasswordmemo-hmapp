@@ -5,7 +5,7 @@ import { encrypt } from './Crypto'
 import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
 import { getFlushPreference } from './Preference'
 import request from './Request'
-import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
+import { autoBackupTable, autoSyncTable } from './Table'
 
 export interface PasswordInput {
   name: string,
@@ -166,7 +166,6 @@ export async function newPassword(context: Context, data: PasswordInput) {
   })
   await autoSyncTable(context, 'password')
   await autoBackupTable(context, 'password')
-  await autoHuaweiCloudSyncTable(context, 'password')
   if (data.cloudBackup) {
     await setCloudBackup(context, {
       type: 'password',
@@ -232,7 +231,6 @@ export async function updatePassword(context: Context, id: number, data: Passwor
   })
   await autoSyncTable(context, 'password')
   await autoBackupTable(context, 'password')
-  await autoHuaweiCloudSyncTable(context, 'password')
   if (data.cloudBackup) {
     await setCloudBackup(context, {
       type: 'password',
@@ -294,7 +292,6 @@ export async function newInfo(context: Context, data: InfoInput, hideExistToast?
   })
   await autoSyncTable(context, 'info')
   await autoBackupTable(context, 'info')
-  await autoHuaweiCloudSyncTable(context, 'info')
   if (data.cloudBackup) {
     await setCloudBackup(context, {
       type: 'info',
@@ -373,7 +370,6 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
   })
   await autoSyncTable(context, 'info')
   await autoBackupTable(context, 'info')
-  await autoHuaweiCloudSyncTable(context, 'info')
   if (data.cloudBackup) {
     await setCloudBackup(context, {
       type: 'info',
@@ -434,7 +430,6 @@ export async function newTag(context: Context, data: TagInput, hideExistToast?: 
   })
   await autoSyncTable(context, 'tag')
   await autoBackupTable(context, 'tag')
-  await autoHuaweiCloudSyncTable(context, 'tag')
   if (data.cloudBackup) {
     await setCloudBackup(context, {
       type: 'tag',
@@ -507,7 +502,6 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
   })
   await autoSyncTable(context, 'tag')
   await autoBackupTable(context, 'tag')
-  await autoHuaweiCloudSyncTable(context, 'tag')
   if (data.cloudBackup) {
     await setCloudBackup(context, {
       type: 'tag',
@@ -551,7 +545,6 @@ export async function deleteData(context: Context, type: string, id: number) {
   })
   await autoSyncTable(context, type)
   await autoBackupTable(context, type)
-  await autoHuaweiCloudSyncTable(context, type)
 }
 
 export async function setCloudBackup(context: Context, data: CloudBackupItem) {
@@ -609,7 +602,6 @@ export async function setCloudBackup(context: Context, data: CloudBackupItem) {
       })
       await autoSyncTable(context, data.type)
       await autoBackupTable(context, data.type)
-      await autoHuaweiCloudSyncTable(context, data.type)
     }
   }
 }
@@ -669,7 +661,6 @@ export async function deleteCloudBackup(context: Context, data: CloudBackupItem)
       })
       await autoSyncTable(context, data.type)
       await autoBackupTable(context, data.type)
-      await autoHuaweiCloudSyncTable(context, data.type)
     }
   }
 }

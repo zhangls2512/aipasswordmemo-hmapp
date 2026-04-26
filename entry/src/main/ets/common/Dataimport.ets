@@ -2,7 +2,7 @@ import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { decrypt, EncryptData, getKeyAlg } from './Crypto'
 import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
-import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
+import { autoBackupTable, autoSyncTable } from './Table'
 
 export interface PasswordItem {
   id: number,
@@ -102,7 +102,6 @@ export async function importPassword(context: Context, data: string, conflict: r
       })
       await autoSyncTable(context, 'password')
       await autoBackupTable(context, 'password')
-      await autoHuaweiCloudSyncTable(context, 'password')
       return 'success'
     } catch {
       await promptAction.openToast({
@@ -157,7 +156,6 @@ export async function importInfo(context: Context, data: string, conflict: relat
       })
       await autoSyncTable(context, 'info')
       await autoBackupTable(context, 'info')
-      await autoHuaweiCloudSyncTable(context, 'info')
       return 'success'
     } catch {
       await promptAction.openToast({
@@ -212,7 +210,6 @@ export async function importTag(context: Context, data: string, conflict: relati
       })
       await autoSyncTable(context, 'tag')
       await autoBackupTable(context, 'tag')
-      await autoHuaweiCloudSyncTable(context, 'tag')
       return 'success'
     } catch {
       await promptAction.openToast({

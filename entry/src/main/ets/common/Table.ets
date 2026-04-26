@@ -18,6 +18,35 @@ interface Item {
   networkId: string
 }
 
+export async function autoSyncTable(context: Context, table: string, fromDeviceId?: string) {
+  const pauseAutoSyncWhenLowBatteryCapacityLevel =
+    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
+  const pauseAutoSyncWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
+  const lowBatteryCapacityLevel =
+    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
+  if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
+    return
+  }
+  const currentPowerMode = power.getPowerMode()
+  if (pauseAutoSyncWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
+    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
+    return
+  }
+  const autoSyncTables = getFlushPreference(context, 'dataSetting', 'autoSyncTables', []) as string[]
+  if (autoSyncTables.includes(table)) {
+    const autoSyncDevices: Item[] = getFlushPreference(context, 'dataSetting', 'autoSyncDevices', []) as Item[]
+    const devices =
+      distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo').getAvailableDeviceListSync()
+    const promises = autoSyncDevices.map(async (item) => {
+      if (!devices.find(item => item.deviceId === fromDeviceId)) {
+        await syncTable(context, table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
+      }
+    })
+    await Promise.all(promises)
+  }
+  await huaweiCloudSyncTable(context, table)
+}
+
 export async function syncTable(context: Context, table: string, networkId: string,
   syncMode: relationalStore.SyncMode) {
   let securityLevel = relationalStore.SecurityLevel.S4
@@ -51,48 +80,7 @@ export async function syncTable(context: Context, table: string, networkId: stri
   }
 }
 
-export async function autoSyncTable(context: Context, table: string, fromDeviceId?: string) {
-  const pauseAutoSyncWhenLowBatteryCapacityLevel =
-    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-  const pauseAutoSyncWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
-  const lowBatteryCapacityLevel =
-    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
-  if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    return
-  }
-  const currentPowerMode = power.getPowerMode()
-  if (pauseAutoSyncWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
-    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
-    return
-  }
-  const autoSyncTables = getFlushPreference(context, 'dataSetting', 'autoSyncTables', []) as string[]
-  if (autoSyncTables.includes(table)) {
-    const autoSyncDevices: Item[] = getFlushPreference(context, 'dataSetting', 'autoSyncDevices', []) as Item[]
-    const devices =
-      distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo').getAvailableDeviceListSync()
-    const promises = autoSyncDevices.map(async (item) => {
-      if (!devices.find(item => item.deviceId === fromDeviceId)) {
-        await syncTable(context, table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
-      }
-    })
-    await Promise.all(promises)
-  }
-}
-
-export async function autoHuaweiCloudSyncTable(context: Context, table: string) {
-  const pauseAutoSyncWhenLowBatteryCapacityLevel =
-    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-  const pauseAutoSyncWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
-  const lowBatteryCapacityLevel =
-    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
-  if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    return
-  }
-  const currentPowerMode = power.getPowerMode()
-  if (pauseAutoSyncWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
-    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
-    return
-  }
+async function huaweiCloudSyncTable(context: Context, table: string) {
   const autoHuaweiCloudSyncTables =
     getFlushPreference(context, 'dataSetting', 'autoHuaweiCloudSyncTables', []) as string[]
   if (autoHuaweiCloudSyncTables.includes(table)) {
@@ -104,6 +92,37 @@ export async function autoHuaweiCloudSyncTable(context: Context, table: string) 
     })
     await huaweiCloudSyncRdbStore.cloudSync(relationalStore.SyncMode.SYNC_MODE_TIME_FIRST, [table], () => {
     })
+  }
+}
+
+export async function autoBackupTable(context: Context, table: string) {
+  const pauseAutoBackupWhenLowBatteryCapacityLevel =
+    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
+  const pauseAutoBackupWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
+  const lowBatteryCapacityLevel =
+    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
+  if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
+    return
+  }
+  const currentPowerMode = power.getPowerMode()
+  if (pauseAutoBackupWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
+    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
+    return
+  }
+  const autoBackupTables =
+    getFlushPreference(context, 'dataSetting', 'autoBackupTables', ['password', 'info', 'tag']) as string[]
+  if (autoBackupTables.includes(table)) {
+    await backupTable(context, table)
+  }
+  const autoFileBackupTables =
+    getFlushPreference(context, 'dataSetting', 'autoFileBackupTables', ['password', 'info', 'tag']) as string[]
+  if (autoFileBackupTables.includes(table)) {
+    await fileBackupTable(context, table)
+  }
+  const autoWebdavBackupTables =
+    getFlushPreference(context, 'dataSetting', 'autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
+  if (autoWebdavBackupTables.includes(table)) {
+    await webdavBackupTable(context, table)
   }
 }
 
@@ -276,37 +295,6 @@ export async function webdavBackupTable(context: Context, table: string) {
     }
   }
   return 'success'
-}
-
-export async function autoBackupTable(context: Context, table: string) {
-  const pauseAutoBackupWhenLowBatteryCapacityLevel =
-    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-  const pauseAutoBackupWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
-  const lowBatteryCapacityLevel =
-    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
-  if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    return
-  }
-  const currentPowerMode = power.getPowerMode()
-  if (pauseAutoBackupWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
-    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
-    return
-  }
-  const autoBackupTables =
-    getFlushPreference(context, 'dataSetting', 'autoBackupTables', ['password', 'info', 'tag']) as string[]
-  if (autoBackupTables.includes(table)) {
-    await backupTable(context, table)
-  }
-  const autoFileBackupTables =
-    getFlushPreference(context, 'dataSetting', 'autoFileBackupTables', ['password', 'info', 'tag']) as string[]
-  if (autoFileBackupTables.includes(table)) {
-    await fileBackupTable(context, table)
-  }
-  const autoWebdavBackupTables =
-    getFlushPreference(context, 'dataSetting', 'autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
-  if (autoWebdavBackupTables.includes(table)) {
-    await webdavBackupTable(context, table)
-  }
 }
 
 export async function recoveryTable(context: Context, table: string) {

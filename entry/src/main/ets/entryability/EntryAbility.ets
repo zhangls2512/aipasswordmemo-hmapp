@@ -28,7 +28,7 @@ import { deleteData } from '../common/Datachange'
 import { write } from '../common/File'
 import openLink from '../common/Openlink'
 import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
-import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from '../common/Table'
+import { autoBackupTable, autoSyncTable } from '../common/Table'
 
 interface JsErrorObject {
   name: string,
@@ -491,7 +491,6 @@ export default class EntryAbility extends UIAbility {
       await Promise.all(promises)
       this.context.eventHub.emit('refreshPassword')
       await autoBackupTable(this.context, 'password')
-      await autoHuaweiCloudSyncTable(this.context, 'password')
     })
     infoRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       const promises = deviceIds.map(async (item) => {
@@ -539,7 +538,6 @@ export default class EntryAbility extends UIAbility {
       await Promise.all(promises)
       this.context.eventHub.emit('refreshInfo')
       await autoBackupTable(this.context, 'info')
-      await autoHuaweiCloudSyncTable(this.context, 'info')
     })
     tagRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       const promises = deviceIds.map(async (item) => {
@@ -587,7 +585,6 @@ export default class EntryAbility extends UIAbility {
       await Promise.all(promises)
       this.context.eventHub.emit('refreshTag')
       await autoBackupTable(this.context, 'tag')
-      await autoHuaweiCloudSyncTable(this.context, 'tag')
     })
     huaweiCloudSyncRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_CLOUD_DETAILS,
       (changeInfo: relationalStore.ChangeInfo[]) => {
