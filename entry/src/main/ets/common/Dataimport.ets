@@ -1,10 +1,10 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { getKeyAlg, EncryptData, decrypt } from './Crypto'
+import { decrypt, EncryptData, getKeyAlg } from './Crypto'
 import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
 import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
 
-export interface PasswordInItem {
+export interface PasswordItem {
   id: number,
   name: string,
   info: PasswordInfoItem[],
@@ -13,7 +13,7 @@ export interface PasswordInItem {
   cloudBackupTime: CloudBackupTimeItem[]
 }
 
-export interface InfoInItem {
+export interface InfoItem {
   id: number,
   type: string,
   value: string,
@@ -21,7 +21,7 @@ export interface InfoInItem {
   cloudBackupTime: CloudBackupTimeItem[]
 }
 
-export interface TagInItem {
+export interface TagItem {
   id: number,
   value: string,
   color: string,
@@ -50,7 +50,7 @@ async function getImportString(filestring: string) {
           return 'unabledecrypt'
         }
         const decryptedArray: object[] = []
-        const promises = fileBackupObject.data.map(async (item: EncryptData) => {
+        const promises = fileBackupObject.data.map(async (item) => {
           const res = await decrypt(item)
           decryptedArray.push(JSON.parse(res))
         })
@@ -67,7 +67,7 @@ export async function importPassword(context: Context, data: string, conflict: r
   const importstring = await getImportString(data)
   if (importstring !== 'fail' && importstring !== 'unabledecrypt') {
     try {
-      const array = JSON.parse(importstring) as PasswordInItem[]
+      const array = JSON.parse(importstring) as PasswordItem[]
       const rdbStore = await relationalStore.getRdbStore(context, {
         name: 'password',
         securityLevel: relationalStore.SecurityLevel.S4,
@@ -124,7 +124,7 @@ export async function importInfo(context: Context, data: string, conflict: relat
   const importstring = await getImportString(data)
   if (importstring !== 'fail' && importstring !== 'unabledecrypt') {
     try {
-      const array = JSON.parse(importstring) as InfoInItem[]
+      const array = JSON.parse(importstring) as InfoItem[]
       const rdbStore = await relationalStore.getRdbStore(context, {
         name: 'info',
         securityLevel: relationalStore.SecurityLevel.S4,
@@ -179,7 +179,7 @@ export async function importTag(context: Context, data: string, conflict: relati
   const importstring = await getImportString(data)
   if (importstring !== 'fail' && importstring !== 'unabledecrypt') {
     try {
-      const array = JSON.parse(importstring) as TagInItem[]
+      const array = JSON.parse(importstring) as TagItem[]
       const rdbStore = await relationalStore.getRdbStore(context, {
         name: 'tag',
         securityLevel: relationalStore.SecurityLevel.S1,

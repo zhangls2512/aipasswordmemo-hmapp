@@ -2,7 +2,7 @@ import { relationalStore } from '@kit.ArkData'
 import { getAccountAccessToken } from './Account'
 import { decrypt, getKeyAlg } from './Crypto'
 import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
-import { importInfo, importPassword, importTag, InfoInItem, PasswordInItem, TagInItem } from './Dataimport'
+import { importInfo, importPassword, importTag, InfoItem, PasswordItem, TagItem } from './Dataimport'
 import request from './Request'
 
 interface Item {
@@ -50,7 +50,7 @@ export async function importCloudBackupPassword(context: Context, conflict: rela
         })
         if (listResponse !== 'fail') {
           const array = JSON.parse(listResponse).data as Item[]
-          const passwordArray: PasswordInItem[] = []
+          const passwordArray: PasswordItem[] = []
           const promises = array.map(async (item) => {
             const itemstring = await decrypt({
               content: item.content,
@@ -95,7 +95,7 @@ export async function importCloudBackupInfo(context: Context, conflict: relation
         })
         if (listResponse !== 'fail') {
           const array = JSON.parse(listResponse).data as Item[]
-          const infoArray: InfoInItem[] = []
+          const infoArray: InfoItem[] = []
           const promises = array.map(async (item) => {
             const itemstring = await decrypt({
               content: item.content,
@@ -139,7 +139,7 @@ export async function importCloudBackupTag(context: Context, conflict: relationa
         })
         if (listResponse !== 'fail') {
           const array = JSON.parse(listResponse).data as Item[]
-          const tagArray: TagInItem[] = []
+          const tagArray: TagItem[] = []
           const promises = array.map(async (item) => {
             const itemstring = await decrypt({
               content: item.content,

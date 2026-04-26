@@ -49,7 +49,7 @@ export default async function getTotp(key: string, step: number, digits: number)
       ((hmac[offset + 2] & 0xff) << 8) | (hmac[offset + 3] & 0xff)
     const otp = binary % Math.pow(10, digits)
     return {
-      value: otp.toString().padStart(digits, '0'),
+      value: String(otp).padStart(digits, '0'),
       secondsRemaining: Math.ceil(step - (Date.now() / 1000 % step))
     }
   } catch (err) {

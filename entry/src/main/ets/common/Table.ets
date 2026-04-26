@@ -10,7 +10,6 @@ import { getInfoList, getPasswordList, getTagList } from './Dataget'
 import { write } from './File'
 import { getFlushPreference } from './Preference'
 import { getWebdavServerInfo } from './Webdavserver'
-import { InfoOutItem, PasswordOutItem, TagOutItem } from '../pages/DataInOut'
 
 interface Item {
   deviceId: string,
@@ -138,7 +137,7 @@ async function getFileBackupString(context: Context, table: string, encrypted: b
       }
       if (encrypted) {
         const encryptedArray: EncryptData[] = []
-        const promises = array.map(async (item: PasswordOutItem) => {
+        const promises = array.map(async (item) => {
           const res = await encrypt(JSON.stringify(item))
           encryptedArray.push({
             content: res.content,
@@ -164,7 +163,7 @@ async function getFileBackupString(context: Context, table: string, encrypted: b
       }
       if (encrypted) {
         const encryptedArray: EncryptData[] = []
-        const promises = array.map(async (item: InfoOutItem) => {
+        const promises = array.map(async (item) => {
           const res = await encrypt(JSON.stringify(item))
           encryptedArray.push({
             content: res.content,
@@ -190,7 +189,7 @@ async function getFileBackupString(context: Context, table: string, encrypted: b
       }
       if (encrypted) {
         const encryptedArray: EncryptData[] = []
-        const promises = array.map(async (item: TagOutItem) => {
+        const promises = array.map(async (item) => {
           const res = await encrypt(JSON.stringify(item))
           encryptedArray.push({
             content: res.content,

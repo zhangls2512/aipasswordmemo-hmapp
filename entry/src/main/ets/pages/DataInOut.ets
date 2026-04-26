@@ -5,43 +5,11 @@ import { zlib } from '@kit.BasicServicesKit'
 import { fileIo, picker } from '@kit.CoreFileKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { importCsvPassword, parseCsvLine } from '../common/Csv'
-import {
-  CloudBackupTimeItem,
-  getInfoList,
-  getPasswordList,
-  getPasswordMaxId,
-  getTagList,
-  PasswordInfoItem
-} from '../common/Dataget'
-import { importInfo, importPassword, importTag } from '../common/Dataimport'
+import { getInfoList, getPasswordList, getPasswordMaxId, getTagList, PasswordInfoItem } from '../common/Dataget'
+import { importInfo, importPassword, importTag, PasswordItem } from '../common/Dataimport'
 import { readUri, writeUri } from '../common/File'
 import openLink from '../common/Openlink'
 import { getFlushPreference } from '../common/Preference'
-
-export interface PasswordOutItem {
-  id: number,
-  name: string,
-  info: PasswordInfoItem[],
-  tag: string[],
-  updateTime: number,
-  cloudBackupTime: CloudBackupTimeItem[]
-}
-
-export interface InfoOutItem {
-  id: number,
-  type: string,
-  value: string,
-  updateTime: number,
-  cloudBackupTime: CloudBackupTimeItem[]
-}
-
-export interface TagOutItem {
-  id: number,
-  value: string,
-  color: string,
-  updateTime: number,
-  cloudBackupTime: CloudBackupTimeItem[]
-}
 
 @Builder
 export function DataInOutBuilder() {
@@ -452,7 +420,7 @@ struct DataInOut {
                     conflictResolution = 5
                   }
                   const lines = filestring.split('\n').filter(line => line.trim() !== '')
-                  const result: PasswordOutItem[] = []
+                  const result: PasswordItem[] = []
                   const maxId = await getPasswordMaxId(this.context)
                   let idCounter = maxId + 1
                   const storeValueHistoryPasswordInfoTypeArray =

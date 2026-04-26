@@ -1,7 +1,7 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getAccountInfo } from './Account'
-import { PasswordOutItem } from '../pages/DataInOut'
+import { PasswordItem } from './Dataimport'
 
 export interface CloudBackupTimeItem {
   uid: string,
@@ -118,14 +118,14 @@ export async function getPasswordList(context: Context) {
     const tagIndex = resultSet.getColumnIndex('tag')
     const updateTimeIndex = resultSet.getColumnIndex('updateTime')
     const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
-    const array: PasswordOutItem[] = []
+    const array: PasswordItem[] = []
     while (resultSet.goToNextRow()) {
       let cloudBackupTime: CloudBackupTimeItem[] = []
       try {
         cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
       } catch {
       }
-      const info: PasswordOutItem = {
+      const info: PasswordItem = {
         id: resultSet.getValue(idIndex) as number,
         name: resultSet.getValue(nameIndex) as string,
         info: JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[],

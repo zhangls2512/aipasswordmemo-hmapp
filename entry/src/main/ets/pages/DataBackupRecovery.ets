@@ -116,10 +116,7 @@ struct DataBackupRecovery {
       const response = await session.get(webdavServerInfo.path + '/' + table + '.txt')
       session.close()
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        let body = ''
-        if (response.toString()) {
-          body = response.toString() as string
-        }
+        const body = String(response)
         if (!body) {
           await promptAction.openToast({
             message: '备份文件内容为空，无法恢复'

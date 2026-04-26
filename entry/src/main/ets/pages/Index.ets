@@ -406,6 +406,9 @@ struct Index {
           if (wantUri.endsWith('.csv')) {
             await importCsvPassword(this.context, filestring)
             this.context.eventHub.emit('refreshPassword')
+            await promptAction.openToast({
+              message: '导入成功'
+            })
           }
           if (wantUri.endsWith('.zip')) {
             const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
