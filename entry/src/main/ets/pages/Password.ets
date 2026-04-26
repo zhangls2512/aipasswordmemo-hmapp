@@ -3,18 +3,10 @@ import { FunctionComponent } from '@kit.AgentFrameworkKit'
 import { LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
-import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
-import {
-  CloudBackupTimeItem,
-  getFilterPasswordList,
-  getTagList,
-  Password,
-  PasswordInfoItem,
-  PasswordTagItem
-} from '../common/Dataget'
+import { getFilterPasswordList, getTagList, Password, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
 import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
 import {
@@ -72,36 +64,6 @@ export default struct PasswordPage {
       content: '请求中...'
     })
   })
-
-  async cloudBackup(item: Password) {
-    let cloudBackupTime = JSON.stringify([])
-    if (typeof (item.cloudBackupTime) === 'string') {
-      cloudBackupTime = item.cloudBackupTime
-    }
-    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-    const accountInfo = await getAccountInfo()
-    const cloudBackupTimeItem = cloudBackupTimeArray.find(item => item.uid === accountInfo.uid)
-    if (!cloudBackupTimeItem) {
-      cloudBackupTimeArray.push({
-        uid: accountInfo.uid,
-        time: Date.now()
-      })
-    } else {
-      cloudBackupTimeItem.time = Date.now()
-    }
-    await setCloudBackup(this.context, {
-      type: 'password',
-      id: item.id,
-      content: JSON.stringify({
-        id: item.id,
-        name: item.name,
-        info: item.info,
-        tag: item.tag.map(item => item.value),
-        updateTime: item.updateTime,
-        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-      })
-    })
-  }
 
   @Builder
   MenuBuilder(item: Password) {
@@ -201,7 +163,17 @@ export default struct PasswordPage {
           })
             .onClick(async () => {
               this.dialogControllerProgress.open()
-              await this.cloudBackup(item)
+              await setCloudBackup(this.context, {
+                type: 'password',
+                id: item.id,
+                content: JSON.stringify({
+                  name: item.name,
+                  info: item.info,
+                  tag: item.tag.map(item => item.value),
+                  updateTime: item.updateTime,
+                  cloudBackupTime: item.cloudBackupTime
+                })
+              })
               this.dialogControllerProgress.close()
               this.loading = true
             })
@@ -383,7 +355,17 @@ export default struct PasswordPage {
                     })
                   })
                   dialogControllerProgress.open()
-                  await this.cloudBackup(this.multipleSelectArray[i])
+                  await setCloudBackup(this.context, {
+                    type: 'password',
+                    id: this.multipleSelectArray[i].id,
+                    content: JSON.stringify({
+                      name: this.multipleSelectArray[i].name,
+                      info: this.multipleSelectArray[i].info,
+                      tag: this.multipleSelectArray[i].tag.map(item => item.value),
+                      updateTime: this.multipleSelectArray[i].updateTime,
+                      cloudBackupTime: this.multipleSelectArray[i].cloudBackupTime
+                    })
+                  })
                   dialogControllerProgress.close()
                 }
                 this.multipleSelect = false

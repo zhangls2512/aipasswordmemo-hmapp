@@ -64,7 +64,8 @@ export default struct Updatepassword {
       this.infoValue) {
       this.passwordInfoArray.push({
         type: infoType,
-        value: this.infoValue
+        value: this.infoValue,
+        history: []
       })
       this.infoType = ''
       this.infoTypeIndex = 0
@@ -377,7 +378,8 @@ export default struct Updatepassword {
                   }
                   this.passwordInfoArray.push({
                     type: infoType,
-                    value: uriSecret + '\0' + step + '\0' + digits
+                    value: uriSecret + '\0' + step + '\0' + digits,
+                    history: []
                   })
                   this.infoType = ''
                   this.infoTypeIndex = 0
@@ -409,7 +411,8 @@ export default struct Updatepassword {
                     this.infoValue && this.mfaStep && this.mfaDigits) {
                     this.passwordInfoArray.push({
                       type: infoType,
-                      value: this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits
+                      value: this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits,
+                      history: []
                     })
                     this.infoType = ''
                     this.infoTypeIndex = 0
@@ -589,7 +592,8 @@ export default struct Updatepassword {
                     }
                     this.passwordInfoArray.push({
                       type: this.getCurrentInfoType(),
-                      value: item
+                      value: item,
+                      history: []
                     })
                   })
               }
@@ -688,7 +692,8 @@ export default struct Updatepassword {
               }
               this.passwordInfoArray.push({
                 type: infoType,
-                value: value
+                value: value,
+                history: []
               })
               this.infoType = ''
               this.infoTypeIndex = 0
@@ -744,7 +749,8 @@ export default struct Updatepassword {
                   }
                   this.passwordInfoArray.push({
                     type: 'MFA',
-                    value: uriSecret + '\0' + step + '\0' + digits
+                    value: uriSecret + '\0' + step + '\0' + digits,
+                    history: []
                   })
                   this.infoType = ''
                   this.infoTypeIndex = 0

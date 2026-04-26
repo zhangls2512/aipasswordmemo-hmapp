@@ -3,7 +3,7 @@ import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { netBoost } from '@kit.NetworkBoostKit'
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
-import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
+import { getAccountAccessToken, getAccountInfo } from '../common/Account'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 import { getTimeStringFromTimeStamp } from '../common/Stringformat'
@@ -131,11 +131,26 @@ export default struct Vip {
       await promptAction.openToast({
         message: '服务器正在验证，大约需要 5-20 秒，请稍候'
       })
-    } catch {
+    } catch (err) {
       netBoost.setSceneDesc({
         scene: 'transaction',
         sceneEvent: netBoost.SceneEvent.SCENE_EVENT_LEAVE
       })
+      if (err.code === 1001860004) {
+        await promptAction.openToast({
+          message: '操作过于频繁，请稍后再试'
+        })
+      }
+      if (err.code === 1001860051) {
+        await promptAction.openToast({
+          message: '您已购买，不能重复购买'
+        })
+      }
+      if (err.code !== 1001860000 && err.code !== 1001860005 && err.code !== 1001860004 && err.code !== 1001860051) {
+        await promptAction.openToast({
+          message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+        })
+      }
     }
   }
 

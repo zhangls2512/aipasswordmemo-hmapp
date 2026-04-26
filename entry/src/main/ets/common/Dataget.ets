@@ -1,6 +1,7 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { getAccountInfo } from './Accesstoken'
+import { getAccountInfo } from './Account'
+import { PasswordOutItem } from '../pages/DataInOut'
 
 export interface CloudBackupTimeItem {
   uid: string,
@@ -10,7 +11,7 @@ export interface CloudBackupTimeItem {
 export interface PasswordInfoItem {
   type: string,
   value: string,
-  history?: PasswordInfoTypeValueHistoryItem[]
+  history: PasswordInfoTypeValueHistoryItem[]
 }
 
 interface PasswordInfoTypeValueHistoryItem {
@@ -29,7 +30,7 @@ export interface Password {
   info: PasswordInfoItem[],
   tag: PasswordTagItem[],
   updateTime: number,
-  cloudBackupTime: string | number,
+  cloudBackupTime: CloudBackupTimeItem[],
   isCloudBackup: boolean
 }
 
@@ -38,7 +39,7 @@ export interface Info {
   type: string,
   value: string,
   updateTime: number,
-  cloudBackupTime: string | number,
+  cloudBackupTime: CloudBackupTimeItem[],
   isCloudBackup: boolean
 }
 
@@ -47,7 +48,7 @@ export interface Tag {
   value: string,
   color: string,
   updateTime: number,
-  cloudBackupTime: string | number,
+  cloudBackupTime: CloudBackupTimeItem[],
   isCloudBackup: boolean
 }
 
@@ -75,28 +76,25 @@ export async function getPasswordInfo(context: Context, id: number) {
         color: await getTagColor(context, item)
       }
     })
+    let cloudBackupTime: CloudBackupTimeItem[] = []
+    try {
+      cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+    } catch {
+    }
     const info: Password = {
       id: resultSet.getValue(idIndex) as number,
       name: resultSet.getValue(nameIndex) as string,
       info: JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[],
       tag: await Promise.all(promises),
       updateTime: resultSet.getValue(updateTimeIndex) as number,
-      cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex) as string | number,
+      cloudBackupTime: cloudBackupTime,
       isCloudBackup: false
     }
     resultSet.close()
-    if (typeof (info.cloudBackupTime) === 'number' && info.cloudBackupTime >= info.updateTime) {
+    const accountInfo = await getAccountInfo()
+    const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+    if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
       info.isCloudBackup = true
-    }
-    if (typeof (info.cloudBackupTime) === 'string') {
-      const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
-      const accountInfo = await getAccountInfo()
-      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeItem) {
-        if (cloudBackupTimeItem.time >= info.updateTime) {
-          info.isCloudBackup = true
-        }
-      }
     }
     return info
   }
@@ -120,36 +118,20 @@ export async function getPasswordList(context: Context) {
     const tagIndex = resultSet.getColumnIndex('tag')
     const updateTimeIndex = resultSet.getColumnIndex('updateTime')
     const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
-    const array: Password[] = []
+    const array: PasswordOutItem[] = []
     while (resultSet.goToNextRow()) {
-      const tag = JSON.parse(resultSet.getValue(tagIndex) as string) as string[]
-      const promises = tag.map(async (item): Promise<PasswordTagItem> => {
-        return {
-          value: item,
-          color: await getTagColor(context, item)
-        }
-      })
-      const info: Password = {
+      let cloudBackupTime: CloudBackupTimeItem[] = []
+      try {
+        cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+      } catch {
+      }
+      const info: PasswordOutItem = {
         id: resultSet.getValue(idIndex) as number,
         name: resultSet.getValue(nameIndex) as string,
         info: JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[],
-        tag: await Promise.all(promises),
+        tag: JSON.parse(resultSet.getValue(tagIndex) as string) as string[],
         updateTime: resultSet.getValue(updateTimeIndex) as number,
-        cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex) as string | number,
-        isCloudBackup: false
-      }
-      if (typeof (info.cloudBackupTime) === 'number' && info.cloudBackupTime >= info.updateTime) {
-        info.isCloudBackup = true
-      }
-      if (typeof (info.cloudBackupTime) === 'string') {
-        const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
-        const accountInfo = await getAccountInfo()
-        const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-        if (cloudBackupTimeItem) {
-          if (cloudBackupTimeItem.time >= info.updateTime) {
-            info.isCloudBackup = true
-          }
-        }
+        cloudBackupTime: cloudBackupTime
       }
       array.push(info)
     }
@@ -210,27 +192,24 @@ export async function getFilterPasswordList(context: Context, nameKeyword: strin
             color: await getTagColor(context, item)
           }
         })
+        let cloudBackupTime: CloudBackupTimeItem[] = []
+        try {
+          cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+        } catch {
+        }
         const info: Password = {
           id: resultSet.getValue(idIndex) as number,
           name: resultSet.getValue(nameIndex) as string,
           info: JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[],
           tag: await Promise.all(promises),
           updateTime: resultSet.getValue(updateTimeIndex) as number,
-          cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex) as string | number,
+          cloudBackupTime: cloudBackupTime,
           isCloudBackup: false
         }
-        if (typeof (info.cloudBackupTime) === 'number' && info.cloudBackupTime >= info.updateTime) {
+        const accountInfo = await getAccountInfo()
+        const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+        if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
           info.isCloudBackup = true
-        }
-        if (typeof (info.cloudBackupTime) === 'string') {
-          const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
-          const accountInfo = await getAccountInfo()
-          const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-          if (cloudBackupTimeItem) {
-            if (cloudBackupTimeItem.time >= info.updateTime) {
-              info.isCloudBackup = true
-            }
-          }
         }
         array.push(info)
       }
@@ -280,27 +259,24 @@ export async function getInfoInfo(context: Context, id: number) {
   const updateTimeIndex = resultSet.getColumnIndex('updateTime')
   const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
   if (resultSet.goToNextRow()) {
+    let cloudBackupTime: CloudBackupTimeItem[] = []
+    try {
+      cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+    } catch {
+    }
     const info: Info = {
       id: resultSet.getValue(idIndex) as number,
       type: resultSet.getValue(typeIndex) as string,
       value: resultSet.getValue(valueIndex) as string,
       updateTime: resultSet.getValue(updateTimeIndex) as number,
-      cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex) as string | number,
+      cloudBackupTime: cloudBackupTime,
       isCloudBackup: false
     }
     resultSet.close()
-    if (typeof (info.cloudBackupTime) === 'number' && info.cloudBackupTime >= info.updateTime) {
+    const accountInfo = await getAccountInfo()
+    const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+    if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
       info.isCloudBackup = true
-    }
-    if (typeof (info.cloudBackupTime) === 'string') {
-      const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
-      const accountInfo = await getAccountInfo()
-      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeItem) {
-        if (cloudBackupTimeItem.time >= info.updateTime) {
-          info.isCloudBackup = true
-        }
-      }
     }
     return info
   }
@@ -326,26 +302,23 @@ export async function getInfoList(context: Context) {
     const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
     const array: Info[] = []
     while (resultSet.goToNextRow()) {
+      let cloudBackupTime: CloudBackupTimeItem[] = []
+      try {
+        cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+      } catch {
+      }
       const info: Info = {
         id: resultSet.getValue(idIndex) as number,
         type: resultSet.getValue(typeIndex) as string,
         value: resultSet.getValue(valueIndex) as string,
         updateTime: resultSet.getValue(updateTimeIndex) as number,
-        cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex) as string | number,
+        cloudBackupTime: cloudBackupTime,
         isCloudBackup: false
       }
-      if (typeof (info.cloudBackupTime) === 'number' && info.cloudBackupTime >= info.updateTime) {
+      const accountInfo = await getAccountInfo()
+      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+      if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
         info.isCloudBackup = true
-      }
-      if (typeof (info.cloudBackupTime) === 'string') {
-        const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
-        const accountInfo = await getAccountInfo()
-        const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-        if (cloudBackupTimeItem) {
-          if (cloudBackupTimeItem.time >= info.updateTime) {
-            info.isCloudBackup = true
-          }
-        }
       }
       array.push(info)
     }
@@ -451,27 +424,24 @@ export async function getTagInfo(context: Context, id: number) {
   const updateTimeIndex = resultSet.getColumnIndex('updateTime')
   const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
   if (resultSet.goToNextRow()) {
+    let cloudBackupTime: CloudBackupTimeItem[] = []
+    try {
+      cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+    } catch {
+    }
     const info: Tag = {
       id: resultSet.getValue(idIndex) as number,
       value: resultSet.getValue(valueIndex) as string,
       color: resultSet.getValue(colorIndex) as string,
       updateTime: resultSet.getValue(updateTimeIndex) as number,
-      cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex) as string | number,
+      cloudBackupTime: cloudBackupTime,
       isCloudBackup: false
     }
     resultSet.close()
-    if (typeof (info.cloudBackupTime) === 'number' && info.cloudBackupTime >= info.updateTime) {
+    const accountInfo = await getAccountInfo()
+    const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+    if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
       info.isCloudBackup = true
-    }
-    if (typeof (info.cloudBackupTime) === 'string') {
-      const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
-      const accountInfo = await getAccountInfo()
-      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeItem) {
-        if (cloudBackupTimeItem.time >= info.updateTime) {
-          info.isCloudBackup = true
-        }
-      }
     }
     return info
   }
@@ -502,26 +472,23 @@ export async function getTagList(context: Context, orderColumn: string = 'update
     const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
     const array: Tag[] = []
     while (resultSet.goToNextRow()) {
+      let cloudBackupTime: CloudBackupTimeItem[] = []
+      try {
+        cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+      } catch {
+      }
       const info: Tag = {
         id: resultSet.getValue(idIndex) as number,
         value: resultSet.getValue(valueIndex) as string,
         color: resultSet.getValue(colorIndex) as string,
         updateTime: resultSet.getValue(updateTimeIndex) as number,
-        cloudBackupTime: resultSet.getValue(cloudBackupTimeIndex) as string | number,
+        cloudBackupTime: cloudBackupTime,
         isCloudBackup: false
       }
-      if (typeof (info.cloudBackupTime) === 'number' && info.cloudBackupTime >= info.updateTime) {
+      const accountInfo = await getAccountInfo()
+      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+      if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
         info.isCloudBackup = true
-      }
-      if (typeof (info.cloudBackupTime) === 'string') {
-        const cloudBackupTime = JSON.parse(info.cloudBackupTime) as CloudBackupTimeItem[]
-        const accountInfo = await getAccountInfo()
-        const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-        if (cloudBackupTimeItem) {
-          if (cloudBackupTimeItem.time >= info.updateTime) {
-            info.isCloudBackup = true
-          }
-        }
       }
       array.push(info)
     }

@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { LengthMetrics } from '@kit.ArkUI'
 import { iap } from '@kit.IAPKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
-import { getAccountAccessToken } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Account'
 import request from '../common/Request'
 import { getTimeStringFromTimeStamp } from '../common/Stringformat'
 

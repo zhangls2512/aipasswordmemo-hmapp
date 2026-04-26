@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
-import { getAccountAccessToken, getAccountInfo } from '../common/Accesstoken'
+import { getAccountAccessToken, getAccountInfo } from '../common/Account'
 import request from '../common/Request'
 
 export interface Account {

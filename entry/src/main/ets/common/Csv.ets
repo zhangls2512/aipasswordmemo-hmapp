@@ -2,6 +2,7 @@ import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getPasswordMaxId, PasswordInfoItem } from './Dataget'
 import { importPassword } from './Dataimport'
+import { getFlushPreference } from './Preference'
 import { PasswordOutItem } from '../pages/DataInOut'
 
 export function parseCsvLine(line: string) {
@@ -48,17 +49,37 @@ export async function importCsvPassword(context: Context, content: string) {
         infoColumnsIndex.push(index)
       }
     })
+    const storeValueHistoryPasswordInfoTypeArray =
+      getFlushPreference(context, 'commonSetting', 'storeValueHistoryPasswordInfoType', ['密码']) as string[]
     lines.forEach((item, index) => {
       if (index !== 0) {
         const parsedLine = parseCsvLine(item)
         const name = parsedLine[nameIndex]
         const info: PasswordInfoItem[] = []
+        const updateTime = Date.now()
         infoColumnsIndex.forEach(item => {
           if (firstLine[item] && parsedLine[item] && firstLine[item] !== 'MFA') {
-            info.push({
-              type: firstLine[item],
-              value: parsedLine[item]
-            })
+            const type = firstLine[item]
+            const value = parsedLine[item]
+            if (!storeValueHistoryPasswordInfoTypeArray.includes(type)) {
+              info.push({
+                type: type,
+                value: value,
+                history: []
+              })
+            }
+            if (storeValueHistoryPasswordInfoTypeArray.includes(type)) {
+              info.push({
+                type: type,
+                value: value,
+                history: [
+                  {
+                    value: value,
+                    updateTime: updateTime
+                  }
+                ]
+              })
+            }
           }
         })
         if (name && info.length > 0) {
@@ -67,8 +88,8 @@ export async function importCsvPassword(context: Context, content: string) {
             name: name,
             info: info,
             tag: [],
-            updateTime: Date.now(),
-            cloudBackupTime: JSON.stringify([])
+            updateTime: updateTime,
+            cloudBackupTime: []
           })
         }
       }

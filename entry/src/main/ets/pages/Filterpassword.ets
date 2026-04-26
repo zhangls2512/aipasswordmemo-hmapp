@@ -36,7 +36,8 @@ export default struct Filterpassword {
       this.infoValue) {
       this.passwordInfoArray.push({
         type: infoType,
-        value: this.infoValue
+        value: this.infoValue,
+        history: []
       })
       this.infoType = ''
       this.infoTypeIndex = 0
@@ -293,7 +294,8 @@ export default struct Filterpassword {
                     }
                     this.passwordInfoArray.push({
                       type: this.getCurrentInfoType(),
-                      value: item
+                      value: item,
+                      history: []
                     })
                   })
               }
@@ -335,7 +337,8 @@ export default struct Filterpassword {
               }
               this.passwordInfoArray.push({
                 type: infoType,
-                value: this.infoValue
+                value: this.infoValue,
+                history: []
               })
               this.infoType = ''
               this.infoTypeIndex = 0

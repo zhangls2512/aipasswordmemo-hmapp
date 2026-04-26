@@ -13,7 +13,7 @@ import {
   HdsNavDestinationTitleMode,
   ScrollEffectType
 } from '@kit.UIDesignKit'
-import { getAccountAccessToken } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Account'
 import getDeviceToken from '../common/Devicetoken'
 import copy from '../common/Pasteboard'
 import request from '../common/Request'

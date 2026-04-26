@@ -130,29 +130,15 @@ async function getFileBackupString(context: Context, table: string, encrypted: b
   if (table === 'password') {
     const array = await getPasswordList(context)
     if (array.length > 0) {
-      const arrayOut = array.map((item): PasswordOutItem => {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
-        return {
-          id: item.id,
-          name: item.name,
-          info: item.info,
-          tag: item.tag.map(item => item.value),
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }
-      })
       if (!encrypted) {
         return JSON.stringify({
           encrypted: false,
-          data: arrayOut
+          data: array
         })
       }
       if (encrypted) {
         const encryptedArray: EncryptData[] = []
-        const promises = arrayOut.map(async (item: PasswordOutItem) => {
+        const promises = array.map(async (item: PasswordOutItem) => {
           const res = await encrypt(JSON.stringify(item))
           encryptedArray.push({
             content: res.content,
@@ -170,28 +156,15 @@ async function getFileBackupString(context: Context, table: string, encrypted: b
   if (table === 'info') {
     const array = await getInfoList(context)
     if (array.length > 0) {
-      const arrayOut = array.map((item): InfoOutItem => {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
-        return {
-          id: item.id,
-          type: item.type,
-          value: item.value,
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }
-      })
       if (!encrypted) {
         return JSON.stringify({
           encrypted: false,
-          data: arrayOut
+          data: array
         })
       }
       if (encrypted) {
         const encryptedArray: EncryptData[] = []
-        const promises = arrayOut.map(async (item: InfoOutItem) => {
+        const promises = array.map(async (item: InfoOutItem) => {
           const res = await encrypt(JSON.stringify(item))
           encryptedArray.push({
             content: res.content,
@@ -209,28 +182,15 @@ async function getFileBackupString(context: Context, table: string, encrypted: b
   if (table === 'tag') {
     const array = await getTagList(context)
     if (array.length > 0) {
-      const arrayOut = array.map((item): TagOutItem => {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
-        return {
-          id: item.id,
-          value: item.value,
-          color: item.color,
-          updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
-        }
-      })
       if (!encrypted) {
         return JSON.stringify({
           encrypted: false,
-          data: arrayOut
+          data: array
         })
       }
       if (encrypted) {
         const encryptedArray: EncryptData[] = []
-        const promises = arrayOut.map(async (item: TagOutItem) => {
+        const promises = array.map(async (item: TagOutItem) => {
           const res = await encrypt(JSON.stringify(item))
           encryptedArray.push({
             content: res.content,

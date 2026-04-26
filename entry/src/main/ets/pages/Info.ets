@@ -3,11 +3,10 @@ import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsEffect } from '@kit.UIDesignKit'
-import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
-import { CloudBackupTimeItem, getInfoList, getInfoTypeList, Info } from '../common/Dataget'
+import { getInfoList, getInfoTypeList, Info } from '../common/Dataget'
 import copy from '../common/Pasteboard'
 import { getPreferType } from '../common/Prefertype'
 import AinewInfo from './Ainewinfo'
@@ -37,34 +36,6 @@ export default struct InfoPage {
       content: '请求中...'
     })
   })
-
-  async cloudBackup(item: Info) {
-    let cloudBackupTime = JSON.stringify([])
-    if (typeof (item.cloudBackupTime) === 'string') {
-      cloudBackupTime = item.cloudBackupTime
-    }
-    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-    const accountInfo = await getAccountInfo()
-    const cloudBackupTimeItem = cloudBackupTimeArray.find(item => item.uid === accountInfo.uid)
-    if (!cloudBackupTimeItem) {
-      cloudBackupTimeArray.push({
-        uid: accountInfo.uid,
-        time: Date.now()
-      })
-    } else {
-      cloudBackupTimeItem.time = Date.now()
-    }
-    await setCloudBackup(this.context, {
-      type: 'info',
-      id: item.id,
-      content: JSON.stringify({
-        type: item.type,
-        value: item.value,
-        updateTime: item.updateTime,
-        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-      })
-    })
-  }
 
   @Builder
   MenuBuilder(item: Info) {
@@ -147,7 +118,16 @@ export default struct InfoPage {
           })
             .onClick(async () => {
               this.dialogControllerProgress.open()
-              await this.cloudBackup(item)
+              await setCloudBackup(this.context, {
+                type: 'info',
+                id: item.id,
+                content: JSON.stringify({
+                  type: item.type,
+                  value: item.value,
+                  updateTime: item.updateTime,
+                  cloudBackupTime: item.cloudBackupTime
+                })
+              })
               this.dialogControllerProgress.close()
               this.loading = true
             })
@@ -322,7 +302,16 @@ export default struct InfoPage {
                     })
                   })
                   dialogControllerProgress.open()
-                  await this.cloudBackup(this.multipleSelectArray[i])
+                  await setCloudBackup(this.context, {
+                    type: 'info',
+                    id: this.multipleSelectArray[i].id,
+                    content: JSON.stringify({
+                      type: this.multipleSelectArray[i].type,
+                      value: this.multipleSelectArray[i].value,
+                      updateTime: this.multipleSelectArray[i].updateTime,
+                      cloudBackupTime: this.multipleSelectArray[i].cloudBackupTime
+                    })
+                  })
                   dialogControllerProgress.close()
                 }
                 this.multipleSelect = false

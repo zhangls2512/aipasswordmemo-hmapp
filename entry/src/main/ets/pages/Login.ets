@@ -5,7 +5,7 @@ import { util } from '@kit.ArkTS'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { netBoost } from '@kit.NetworkBoostKit'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
-import { setAccount } from '../common/Accesstoken'
+import { setAccount } from '../common/Account'
 import openLink from '../common/Openlink'
 import request from '../common/Request'
 

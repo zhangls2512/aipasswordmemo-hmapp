@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { pushService } from '@kit.PushKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
-import { getAccountAccessToken } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Account'
 import getDeviceToken from '../common/Devicetoken'
 import openLink from '../common/Openlink'
 

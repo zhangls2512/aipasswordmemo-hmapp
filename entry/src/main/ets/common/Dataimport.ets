@@ -1,7 +1,7 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getKeyAlg, EncryptData, decrypt } from './Crypto'
-import { PasswordInfoItem } from './Dataget'
+import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
 import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from './Table'
 
 export interface PasswordInItem {
@@ -10,7 +10,7 @@ export interface PasswordInItem {
   info: PasswordInfoItem[],
   tag: string[],
   updateTime: number,
-  cloudBackupTime: string | number
+  cloudBackupTime: CloudBackupTimeItem[]
 }
 
 export interface InfoInItem {
@@ -18,7 +18,7 @@ export interface InfoInItem {
   type: string,
   value: string,
   updateTime: number,
-  cloudBackupTime: string | number
+  cloudBackupTime: CloudBackupTimeItem[]
 }
 
 export interface TagInItem {
@@ -26,7 +26,7 @@ export interface TagInItem {
   value: string,
   color: string,
   updateTime: number,
-  cloudBackupTime: string | number
+  cloudBackupTime: CloudBackupTimeItem[]
 }
 
 interface FileBackupObject {
@@ -81,17 +81,14 @@ export async function importPassword(context: Context, data: string, conflict: r
         allowRebuild: true
       })
       array.forEach(item => {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
         rdbStore.insertSync('password', {
           id: item.id,
           name: item.name,
           info: JSON.stringify(item.info),
           tag: JSON.stringify(item.tag),
           updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
+          cloudBackupTime: Array.isArray(item.cloudBackupTime) ? JSON.stringify(item.cloudBackupTime) :
+            JSON.stringify([])
         }, conflict)
         huaweiCloudSyncRdbStore.insertSync('password', {
           id: String(item.id),
@@ -99,7 +96,8 @@ export async function importPassword(context: Context, data: string, conflict: r
           info: JSON.stringify(item.info),
           tag: JSON.stringify(item.tag),
           updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
+          cloudBackupTime: Array.isArray(item.cloudBackupTime) ? JSON.stringify(item.cloudBackupTime) :
+            JSON.stringify([])
         }, conflict)
       })
       await autoSyncTable(context, 'password')
@@ -140,23 +138,21 @@ export async function importInfo(context: Context, data: string, conflict: relat
         allowRebuild: true
       })
       array.forEach(item => {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
         rdbStore.insertSync('info', {
           id: item.id,
           type: item.type,
           value: item.value,
           updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
+          cloudBackupTime: Array.isArray(item.cloudBackupTime) ? JSON.stringify(item.cloudBackupTime) :
+            JSON.stringify([])
         }, conflict)
         huaweiCloudSyncRdbStore.insertSync('info', {
           id: String(item.id),
           type: item.type,
           value: item.value,
           updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
+          cloudBackupTime: Array.isArray(item.cloudBackupTime) ? JSON.stringify(item.cloudBackupTime) :
+            JSON.stringify([])
         }, conflict)
       })
       await autoSyncTable(context, 'info')
@@ -197,23 +193,21 @@ export async function importTag(context: Context, data: string, conflict: relati
         allowRebuild: true
       })
       array.forEach(item => {
-        let cloudBackupTime = JSON.stringify([])
-        if (typeof (item.cloudBackupTime) === 'string') {
-          cloudBackupTime = item.cloudBackupTime
-        }
         rdbStore.insertSync('tag', {
           id: item.id,
           value: item.value,
           color: item.color,
           updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
+          cloudBackupTime: Array.isArray(item.cloudBackupTime) ? JSON.stringify(item.cloudBackupTime) :
+            JSON.stringify([])
         }, conflict)
         huaweiCloudSyncRdbStore.insertSync('tag', {
           id: String(item.id),
           value: item.value,
           color: item.color,
           updateTime: item.updateTime,
-          cloudBackupTime: cloudBackupTime
+          cloudBackupTime: Array.isArray(item.cloudBackupTime) ? JSON.stringify(item.cloudBackupTime) :
+            JSON.stringify([])
         }, conflict)
       })
       await autoSyncTable(context, 'tag')

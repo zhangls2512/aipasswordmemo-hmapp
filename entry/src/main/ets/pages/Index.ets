@@ -15,7 +15,7 @@ import {
   HdsTabsController,
   ScrollEffectType
 } from '@kit.UIDesignKit'
-import { getAccountAccessToken } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Account'
 import { getKeyAlg } from '../common/Crypto'
 import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
