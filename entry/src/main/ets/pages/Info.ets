@@ -298,7 +298,7 @@ export default struct InfoPage {
                 for (let i = 0; i < this.multipleSelectArray.length; i++) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
-                      content: '批量云备份中，进度：' + i + '/' + this.multipleSelectArray.length
+                      content: '批量云备份中，进度：' + (i + 1) + '/' + this.multipleSelectArray.length
                     })
                   })
                   dialogControllerProgress.open()
