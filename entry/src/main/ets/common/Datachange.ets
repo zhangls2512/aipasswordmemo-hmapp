@@ -246,7 +246,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
   }
 }
 
-export async function newInfo(context: Context, data: InfoInput, hideExistToast?: boolean) {
+export async function newInfo(context: Context, data: InfoInput, hideExistToast = false) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
     securityLevel: relationalStore.SecurityLevel.S4,
@@ -385,7 +385,7 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
   return 'success'
 }
 
-export async function newTag(context: Context, data: TagInput, hideExistToast?: boolean) {
+export async function newTag(context: Context, data: TagInput, hideExistToast = false) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: relationalStore.SecurityLevel.S1,
@@ -639,7 +639,8 @@ export async function deleteCloudBackup(context: Context, data: CloudBackupItem)
       if (resultSet.goToNextRow()) {
         try {
           cloudBackupTime =
-            JSON.parse(resultSet.getValue(resultSet.getColumnIndex('cloudBackupTime')) as string) as CloudBackupTimeItem[]
+            JSON.parse(resultSet.getValue(resultSet.getColumnIndex('cloudBackupTime')) as string) as
+              CloudBackupTimeItem[]
         } catch {
         }
         resultSet.close()
