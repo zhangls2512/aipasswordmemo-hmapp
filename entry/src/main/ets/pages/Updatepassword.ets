@@ -871,8 +871,7 @@ export default struct Updatepassword {
               top: $r('sys.float.ohos_id_elements_margin_vertical_l')
             })
             .onBlur(() => {
-              if (this.pushItemWhenBlur && this.passwordTag &&
-                !this.passwordTagArray.some(item => item === this.passwordTag)) {
+              if (this.pushItemWhenBlur && this.passwordTag && !this.passwordTagArray.includes(this.passwordTag)) {
                 this.passwordTagArray.push(this.passwordTag)
                 this.passwordTag = ''
               }
@@ -899,7 +898,7 @@ export default struct Updatepassword {
                 Image($r('app.media.add'))
                   .height(24)
                   .onClick(async () => {
-                    if (this.passwordTagArray.some(tagItem => tagItem === item.value)) {
+                    if (this.passwordTagArray.includes(item.value)) {
                       await promptAction.openToast({
                         message: '已添加此标签'
                       })
@@ -930,7 +929,7 @@ export default struct Updatepassword {
               })
               return
             }
-            if (this.passwordTagArray.some(item => item === this.passwordTag)) {
+            if (this.passwordTagArray.includes(this.passwordTag)) {
               await promptAction.openToast({
                 message: '已添加此标签'
               })

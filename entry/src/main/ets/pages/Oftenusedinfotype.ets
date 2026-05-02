@@ -48,7 +48,7 @@ struct Oftenusedinfotype {
                   })
                   return
                 }
-                if (this.oftenUsedInfoTypeArray.some(item => item === this.type)) {
+                if (this.oftenUsedInfoTypeArray.includes(this.type)) {
                   await promptAction.openToast({
                     message: '已添加此类型'
                   })
@@ -136,7 +136,7 @@ struct Oftenusedinfotype {
                   Image($r('app.media.add'))
                     .height(24)
                     .onClick(async () => {
-                      if (this.oftenUsedInfoTypeArray.some(typeItem => typeItem === item)) {
+                      if (this.oftenUsedInfoTypeArray.includes(item)) {
                         await promptAction.openToast({
                           message: '已添加此类型'
                         })

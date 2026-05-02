@@ -47,7 +47,7 @@ struct Defaulthidepasswordinfotype {
                   })
                   return
                 }
-                if (this.defaultHidePasswordInfoTypeArray.some(item => item === this.type)) {
+                if (this.defaultHidePasswordInfoTypeArray.includes(this.type)) {
                   await promptAction.openToast({
                     message: '已添加此类型'
                   })
