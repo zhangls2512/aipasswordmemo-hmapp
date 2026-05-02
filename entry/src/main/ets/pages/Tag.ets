@@ -488,6 +488,8 @@ export default struct TagPage {
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
         .onRefreshing(async () => {
+          this.multipleSelect = false
+          this.multipleSelectArray = []
           this.tagArray = await getTagList(this.context, this.orderColumn)
           this.loading = false
         })

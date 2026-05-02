@@ -596,6 +596,9 @@ export default struct InfoPage {
         }
         .layoutWeight(1)
         .onRefreshing(async () => {
+          this.multipleSelect = false
+          this.multipleSelectArray = []
+          this.selectType = ''
           this.infoArray = await getInfoList(this.context)
           this.types = await getInfoTypeList(this.context)
           this.loading = false
