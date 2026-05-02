@@ -220,7 +220,6 @@ export default struct Newtag {
         }
         if (key) {
           this.allowCloudBackup = true
-          this.alertText = ''
           const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
           if (autoOn.includes('tag')) {
             this.cloudBackup = true
