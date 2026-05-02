@@ -22,8 +22,8 @@ export default struct InfoPage {
   @Local infoArray: Info[] = []
   @Local loading: boolean = false
   @Local enableCloudBackup: boolean = false
-  @Local types: string[] = []
   @Local selectType: string = ''
+  @Local types: string[] = []
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Info[] = []
   @Local hoverId: number = -1
@@ -596,9 +596,9 @@ export default struct InfoPage {
         }
         .layoutWeight(1)
         .onRefreshing(async () => {
+          this.selectType = ''
           this.multipleSelect = false
           this.multipleSelectArray = []
-          this.selectType = ''
           this.infoArray = await getInfoList(this.context)
           this.types = await getInfoTypeList(this.context)
           this.loading = false
