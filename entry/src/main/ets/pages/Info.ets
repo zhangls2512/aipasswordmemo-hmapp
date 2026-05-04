@@ -599,6 +599,7 @@ export default struct InfoPage {
           this.selectType = ''
           this.multipleSelect = false
           this.multipleSelectArray = []
+          this.infoArray = []
           this.infoArray = await getInfoList(this.context)
           this.types = await getInfoTypeList(this.context)
           this.loading = false

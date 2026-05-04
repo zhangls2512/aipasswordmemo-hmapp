@@ -490,6 +490,7 @@ export default struct TagPage {
         .onRefreshing(async () => {
           this.multipleSelect = false
           this.multipleSelectArray = []
+          this.tagArray = []
           this.tagArray = await getTagList(this.context, this.orderColumn)
           this.loading = false
         })

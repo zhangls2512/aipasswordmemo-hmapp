@@ -804,6 +804,7 @@ export default struct PasswordPage {
           this.tag = []
           this.multipleSelect = false
           this.multipleSelectArray = []
+          this.passwordArray = []
           this.passwordArray =
             await getFilterPasswordList(this.context, this.nameKeyword, this.info, this.tag, this.orderColumn)
           if (deviceInfo.deviceType === '2in1') {
