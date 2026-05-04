@@ -40,7 +40,7 @@ export async function importCsvPassword(context: Context, content: string) {
   const maxId = await getPasswordMaxId(context)
   let idCounter = maxId + 1
   const firstLine = parseCsvLine(lines[0])
-  const nameIndex = firstLine.findIndex(item => item === '名称')
+  const nameIndex = firstLine.indexOf('名称')
   if (nameIndex !== -1) {
     const infoColumnsIndex: number[] = []
     firstLine.forEach((item, index) => {

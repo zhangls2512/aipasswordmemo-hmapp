@@ -832,7 +832,6 @@ export default struct PasswordPage {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(false)
             }
-            this.loading = true
           }
         })
       }
