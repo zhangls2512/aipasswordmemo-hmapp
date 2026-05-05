@@ -78,13 +78,19 @@ export default class EntryAbility extends UIAbility {
       await openLink(this.context, want.parameters.noticeUrl as string)
     }
     if (want.parameters?.shortcutId === 'newPassword') {
-      this.context.eventHub.emit('newPassword')
+      setTimeout(() => {
+        this.context.eventHub.emit('newPassword')
+      }, 100)
     }
     if (want.parameters?.shortcutId === 'searchPassword') {
-      this.context.eventHub.emit('searchPassword')
+      setTimeout(() => {
+        this.context.eventHub.emit('searchPassword')
+      }, 100)
     }
     if (want.parameters?.action === 'passwordInfo') {
-      this.context.eventHub.emit('passwordInfo', Number(want.parameters.passwordId))
+      setTimeout(() => {
+        this.context.eventHub.emit('passwordInfo', Number(want.parameters?.passwordId))
+      }, 100)
     }
     if (want.parameters?.menuHandler === 'clickMenu1' || want.parameters?.menuHandler === 'clickMenu2' ||
       want.parameters?.menuHandler === 'clickMenu3') {
