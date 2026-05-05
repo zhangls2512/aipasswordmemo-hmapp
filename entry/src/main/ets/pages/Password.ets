@@ -709,6 +709,7 @@ export default struct PasswordPage {
                               })
                             Text(item.info.find(infoItem => infoItem.type === '密码')?.value)
                               .copyOption(CopyOptions.LocalDevice)
+                              .layoutWeight(1)
                           }
                           .margin({
                             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -723,6 +724,7 @@ export default struct PasswordPage {
                               })
                             Text(this.mfaArray.find(mfaItem => mfaItem.id === item.id)?.mfa)
                               .copyOption(CopyOptions.LocalDevice)
+                              .layoutWeight(1)
                           }
                           .margin({
                             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
