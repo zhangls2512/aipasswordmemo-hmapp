@@ -3,6 +3,7 @@ import { appInfoManager } from '@kit.AppGalleryKit'
 import { LengthMetrics, uiAppearance, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
+import { dlpAntiPeep } from '@kit.DeviceSecurityKit'
 import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
@@ -23,6 +24,7 @@ struct Commonsetting {
   @Local acceptCollaborate: boolean = false
   @Local destroyWhenBackPressed: boolean = false
   @Local statusBar: boolean = false
+  @Local isDlpAntiPeepSwitchOn: boolean = false
   @Local colorModeIndex: number = 0
   @Local colorModeValue: string = '跟随系统'
   @Local windowRectAutoSave: boolean = false
@@ -326,58 +328,34 @@ struct Commonsetting {
                 .borderRadius(12)
                 .padding(12)
               }
-              Divider()
-                .padding({
-                  left: 12,
-                  right: 12
-                })
-              Row() {
-                Text('防窥保护')
-                  .fontWeight(FontWeight.Medium)
-                  .layoutWeight(1)
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              if (deviceInfo.deviceType === 'phone') {
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
                   })
-                Text('去设置')
-                  .fontColor($r('sys.color.font_secondary'))
-                  .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                  .margin({
-                    right: $r('sys.float.ohos_id_elements_margin_horizontal_s')
+                Row() {
+                  Text('防窥保护')
+                    .fontWeight(FontWeight.Medium)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+                  Toggle({
+                    type: ToggleType.Switch,
+                    isOn: this.isDlpAntiPeepSwitchOn!!
                   })
-                Image($r('app.media.right'))
-                  .fillColor($r('sys.color.icon_fourth'))
-                  .height(12)
-                  .width(12)
+                    .enabled(!this.isDlpAntiPeepSwitchOn)
+                    .onChange(async (isOn) => {
+                      if (isOn) {
+                        await dlpAntiPeep.requestAntiPeepOptions(this.context)
+                        this.isDlpAntiPeepSwitchOn = await dlpAntiPeep.isDlpAntiPeepSwitchOn()
+                      }
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
               }
-              .borderRadius(12)
-              .padding(12)
-              .stateStyles({
-                normal: {
-                  .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
-                },
-                pressed: {
-                  .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .onHover(isHover => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 0
-                }
-              })
-              .onClick(async () => {
-                await this.context.startAbility({
-                  bundleName: 'com.huawei.hmos.settings',
-                  abilityName: 'com.huawei.hmos.settings.MainAbility',
-                  uri: 'privacy_settings',
-                  parameters: {
-                    pushParams: 'com.zhangxm.aipasswordmemo'
-                  }
-                })
-              })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
             .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
@@ -591,7 +569,7 @@ struct Commonsetting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
+                  .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
                     $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
@@ -603,7 +581,7 @@ struct Commonsetting {
                   this.hoverId = -1
                 }
                 if (isHover) {
-                  this.hoverId = 1
+                  this.hoverId = 0
                 }
               })
               .onClick(async () => {
@@ -797,7 +775,7 @@ struct Commonsetting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
+                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
                     $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
@@ -809,7 +787,7 @@ struct Commonsetting {
                   this.hoverId = -1
                 }
                 if (isHover) {
-                  this.hoverId = 2
+                  this.hoverId = 1
                 }
               })
               .onClick(() => {
@@ -839,7 +817,7 @@ struct Commonsetting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
+                  .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
                     $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
@@ -851,7 +829,7 @@ struct Commonsetting {
                   this.hoverId = -1
                 }
                 if (isHover) {
-                  this.hoverId = 3
+                  this.hoverId = 2
                 }
               })
               .onClick(() => {
@@ -881,7 +859,7 @@ struct Commonsetting {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
+                  .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
                     $r('sys.color.ohos_id_color_card_bg'))
                 },
                 pressed: {
@@ -893,7 +871,7 @@ struct Commonsetting {
                   this.hoverId = -1
                 }
                 if (isHover) {
-                  this.hoverId = 4
+                  this.hoverId = 3
                 }
               })
               .onClick(() => {
@@ -1125,6 +1103,9 @@ struct Commonsetting {
       this.destroyWhenBackPressed =
         getFlushPreference(this.context, 'commonSetting', 'destroyWhenBackPressed', false) as boolean
       this.statusBar = getFlushPreference(this.context, 'commonSetting', 'statusBar', false) as boolean
+      if (deviceInfo.deviceType === 'phone') {
+        this.isDlpAntiPeepSwitchOn = await dlpAntiPeep.isDlpAntiPeepSwitchOn()
+      }
       const colorMode = getFlushPreference(this.context, 'commonSetting', 'colorMode', 0)
       this.colorModeIndex = colorMode as number
       if (colorMode === 0) {
