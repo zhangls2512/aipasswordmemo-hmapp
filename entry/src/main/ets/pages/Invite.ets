@@ -111,6 +111,7 @@ struct Invite {
                         quality: 100
                       })
                       await imagePacker.release()
+                      await qrcodePixelMap.release()
                       fileIo.closeSync(qrcodeFile)
                     }
                     const qrcodeUri = fileUri.getUriFromPath(qrcodePath)
@@ -154,6 +155,7 @@ struct Invite {
                         quality: 100
                       })
                       await imagePacker.release()
+                      await qrcodePixelMap.release()
                       fileIo.closeSync(qrcodeFile)
                     }
                     const qrcodeUri = fileUri.getUriFromPath(qrcodePath)

@@ -30,7 +30,7 @@ export default struct InfoPage {
   @Local buttonHoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
-  updateId = 0
+  infoId = 0
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'
@@ -157,9 +157,9 @@ export default struct InfoPage {
   }
 
   @Builder
-  UpdateSheetBuilder(id: number) {
+  UpdateSheetBuilder() {
     UpdateInfo({
-      infoId: id
+      infoId: this.infoId
     })
   }
 
@@ -569,7 +569,7 @@ export default struct InfoPage {
                         })
                         return
                       }
-                      this.updateId = item.id
+                      this.infoId = item.id
                       this.isShowUpdateSheet = true
                     })
                     .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
@@ -631,7 +631,7 @@ export default struct InfoPage {
     .onDisAppear(() => {
       this.context.eventHub.off('refreshInfo')
     })
-    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(), {
       height: SheetSize.FIT_CONTENT,
       preferType: this.preferType,
       title: {

@@ -203,16 +203,16 @@ export default struct PasswordPage {
   }
 
   @Builder
-  InfoSheetBuilder(id: number) {
+  InfoSheetBuilder() {
     PasswordInfo({
-      passwordId: id
+      passwordId: this.passwordId
     })
   }
 
   @Builder
-  UpdateSheetBuilder(id: number) {
+  UpdateSheetBuilder() {
     UpdatePassword({
-      passwordId: id
+      passwordId: this.passwordId
     })
   }
 
@@ -816,7 +816,7 @@ export default struct PasswordPage {
           this.tags = await getTagList(this.context, 'value')
           this.loading = false
         })
-        .bindSheet(this.isShowInfoSheet!!, this.InfoSheetBuilder(this.passwordId), {
+        .bindSheet(this.isShowInfoSheet!!, this.InfoSheetBuilder(), {
           height: SheetSize.FIT_CONTENT,
           preferType: this.preferType,
           title: {
@@ -936,7 +936,7 @@ export default struct PasswordPage {
       this.context.eventHub.off('searchPassword')
       this.context.eventHub.off('newPassword')
     })
-    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(), {
       height: SheetSize.FIT_CONTENT,
       preferType: this.preferType,
       title: {

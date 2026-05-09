@@ -282,7 +282,7 @@ export async function webdavBackupTable(context: Context, table: string) {
           return 'fail'
         }
         await promptAction.openToast({
-          message: '请求失败，错误码：' + response.statusCode
+          message: 'HTTP 请求失败，状态码：' + response.statusCode
         })
         return 'fail'
       }

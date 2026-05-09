@@ -24,7 +24,7 @@ export default struct TagPage {
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
-  updateId = 0
+  tagId = 0
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'
@@ -124,9 +124,9 @@ export default struct TagPage {
   }
 
   @Builder
-  UpdateSheetBuilder(id: number) {
+  UpdateSheetBuilder() {
     UpdateTag({
-      tagId: id
+      tagId: this.tagId
     })
   }
 
@@ -460,7 +460,7 @@ export default struct TagPage {
                       if (this.multipleSelect) {
                         return
                       }
-                      this.updateId = item.id
+                      this.tagId = item.id
                       this.isShowUpdateSheet = true
                     })
                     .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
@@ -520,7 +520,7 @@ export default struct TagPage {
     .onDisAppear(() => {
       this.context.eventHub.off('refreshTag')
     })
-    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(), {
       height: SheetSize.FIT_CONTENT,
       preferType: this.preferType,
       title: {
