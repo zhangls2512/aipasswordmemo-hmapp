@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
-import { camera, cameraPicker as picker } from '@kit.CameraKit'
+import { camera, cameraPicker } from '@kit.CameraKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { textRecognition } from '@kit.CoreVisionKit'
 import { image } from '@kit.ImageKit'
@@ -90,7 +90,7 @@ export default struct Ainewinfo {
       MenuItem({ content: '拍照' })
         .onClick(async () => {
           try {
-            const pickerres = await picker.pick(this.context, [picker.PickerMediaType.PHOTO], {
+            const pickerres = await cameraPicker.pick(this.context, [cameraPicker.PickerMediaType.PHOTO], {
               cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK
             })
             const fileSource = fileIo.openSync(pickerres.resultUri)
@@ -189,7 +189,7 @@ export default struct Ainewinfo {
                 await imagePixelMap.release()
                 this.dialogControllerProgress.close()
                 this.text = textrecognitionres.value
-                this.getList(this.text)
+                await this.getList(this.text)
               }
             }
           })
@@ -263,6 +263,8 @@ export default struct Ainewinfo {
             .margin({
               top: $r('sys.float.ohos_id_elements_margin_vertical_m')
             })
+            .maxLength(1000)
+            .showCounter(true)
             .onChange(async (value) => {
               await this.getList(value)
             })
@@ -396,6 +398,9 @@ export default struct Ainewinfo {
           this.cloudBackup = true
         }
       }
+    })
+    .onDisAppear(async () => {
+      await textProcessing.release()
     })
   }
 }
