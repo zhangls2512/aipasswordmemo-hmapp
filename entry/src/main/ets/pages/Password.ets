@@ -897,7 +897,9 @@ export default struct PasswordPage {
           this.isShowInfoSheet = false
         }
         this.passwordId = passwordId
-        this.isShowInfoSheet = true
+        setTimeout(() => {
+          this.isShowInfoSheet = true
+        }, 100)
       })
       this.intervalId = setInterval(async () => {
         const mfaArray: MfaItem[] = []
