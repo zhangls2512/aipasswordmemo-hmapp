@@ -6,7 +6,8 @@ import { fileIo } from '@kit.CoreFileKit'
 import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
 import { encrypt, EncryptData, getKeyAlg } from './Crypto'
-import { getInfoList, getPasswordList, getTagList } from './Dataget'
+import { getInfoList, getPasswordList, getTagList, Info, Tag } from './Dataget'
+import { PasswordItem } from './Dataimport'
 import { write } from './File'
 import { getFlushPreference } from './Preference'
 import { getWebdavServerInfo } from './Webdavserver'
@@ -116,13 +117,27 @@ export async function autoBackupTable(context: Context, table: string) {
   }
   const autoFileBackupTables =
     getFlushPreference(context, 'dataSetting', 'autoFileBackupTables', ['password', 'info', 'tag']) as string[]
-  if (autoFileBackupTables.includes(table)) {
-    await fileBackupTable(context, table)
-  }
   const autoWebdavBackupTables =
     getFlushPreference(context, 'dataSetting', 'autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
-  if (autoWebdavBackupTables.includes(table)) {
-    await webdavBackupTable(context, table)
+  const fileBackup = autoFileBackupTables.includes(table)
+  const webdavBackup = autoWebdavBackupTables.includes(table)
+  let array: PasswordItem[] | Info[] | Tag[] = []
+  if (fileBackup || webdavBackup) {
+    if (table === 'password') {
+      array = await getPasswordList(context)
+    }
+    if (table === 'info') {
+      array = await getInfoList(context)
+    }
+    if (table === 'tag') {
+      array = await getTagList(context)
+    }
+  }
+  if (fileBackup) {
+    await fileBackupTable(context, table, array)
+  }
+  if (webdavBackup) {
+    await webdavBackupTable(context, table, array)
   }
 }
 
@@ -144,101 +159,61 @@ export async function backupTable(context: Context, table: string) {
   }
 }
 
-async function getFileBackupString(context: Context, table: string, encrypted: boolean): Promise<string> {
-  if (table === 'password') {
-    const array = await getPasswordList(context)
-    if (array.length > 0) {
-      if (!encrypted) {
-        return JSON.stringify({
-          encrypted: false,
-          data: array
-        })
-      }
-      if (encrypted) {
-        const encryptedArray: EncryptData[] = []
-        const promises = array.map(async (item) => {
-          const res = await encrypt(JSON.stringify(item))
-          encryptedArray.push({
-            content: res.content,
-            iv: res.iv
-          })
-        })
-        await Promise.all(promises)
-        return JSON.stringify({
-          encrypted: true,
-          data: encryptedArray
-        })
-      }
+async function getFileBackupString(array: PasswordItem[] | Info[] | Tag[], encrypted: boolean): Promise<string> {
+  if (array.length > 0) {
+    if (!encrypted) {
+      return JSON.stringify({
+        encrypted: false,
+        data: array
+      })
     }
-  }
-  if (table === 'info') {
-    const array = await getInfoList(context)
-    if (array.length > 0) {
-      if (!encrypted) {
-        return JSON.stringify({
-          encrypted: false,
-          data: array
+    if (encrypted) {
+      const encryptedArray: EncryptData[] = []
+      const promises = array.map(async (item: PasswordItem | Info | Tag) => {
+        const res = await encrypt(JSON.stringify(item))
+        encryptedArray.push({
+          content: res.content,
+          iv: res.iv
         })
-      }
-      if (encrypted) {
-        const encryptedArray: EncryptData[] = []
-        const promises = array.map(async (item) => {
-          const res = await encrypt(JSON.stringify(item))
-          encryptedArray.push({
-            content: res.content,
-            iv: res.iv
-          })
-        })
-        await Promise.all(promises)
-        return JSON.stringify({
-          encrypted: true,
-          data: encryptedArray
-        })
-      }
-    }
-  }
-  if (table === 'tag') {
-    const array = await getTagList(context)
-    if (array.length > 0) {
-      if (!encrypted) {
-        return JSON.stringify({
-          encrypted: false,
-          data: array
-        })
-      }
-      if (encrypted) {
-        const encryptedArray: EncryptData[] = []
-        const promises = array.map(async (item) => {
-          const res = await encrypt(JSON.stringify(item))
-          encryptedArray.push({
-            content: res.content,
-            iv: res.iv
-          })
-        })
-        await Promise.all(promises)
-        return JSON.stringify({
-          encrypted: true,
-          data: encryptedArray
-        })
-      }
+      })
+      await Promise.all(promises)
+      return JSON.stringify({
+        encrypted: true,
+        data: encryptedArray
+      })
     }
   }
   return 'fail'
 }
 
-export async function fileBackupTable(context: Context, table: string) {
+export async function fileBackupTable(context: Context, table: string, dataArray?: PasswordItem[] | Info[] | Tag[]) {
   const encryptFileBackup = getFlushPreference(context, 'dataSetting', 'encryptFileBackup', true)
   let encrypted = false
   if (encryptFileBackup && getKeyAlg()) {
     encrypted = true
   }
-  const datastring = await getFileBackupString(context, table, encrypted)
+  let array: PasswordItem[] | Info[] | Tag[] = []
+  if (!dataArray) {
+    if (table === 'password') {
+      array = await getPasswordList(context)
+    }
+    if (table === 'info') {
+      array = await getInfoList(context)
+    }
+    if (table === 'tag') {
+      array = await getTagList(context)
+    }
+  }
+  if (dataArray) {
+    array = dataArray
+  }
+  const datastring = await getFileBackupString(array, encrypted)
   if (datastring !== 'fail') {
     await write(context.filesDir + '/backup/' + table + '.txt', datastring)
   }
 }
 
-export async function webdavBackupTable(context: Context, table: string) {
+export async function webdavBackupTable(context: Context, table: string, dataArray?: PasswordItem[] | Info[] | Tag[]) {
   const webdavServerInfo = await getWebdavServerInfo()
   if (!webdavServerInfo.path) {
     return 'fail'
@@ -248,7 +223,22 @@ export async function webdavBackupTable(context: Context, table: string) {
   if (encryptWebdavBackup && getKeyAlg()) {
     encrypted = true
   }
-  const datastring = await getFileBackupString(context, table, encrypted)
+  let array: PasswordItem[] | Info[] | Tag[] = []
+  if (!dataArray) {
+    if (table === 'password') {
+      array = await getPasswordList(context)
+    }
+    if (table === 'info') {
+      array = await getInfoList(context)
+    }
+    if (table === 'tag') {
+      array = await getTagList(context)
+    }
+  }
+  if (dataArray) {
+    array = dataArray
+  }
+  const datastring = await getFileBackupString(array, encrypted)
   if (datastring !== 'fail') {
     const session = rcp.createSession({
       requestConfiguration: {
