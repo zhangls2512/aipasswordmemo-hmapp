@@ -1,6 +1,5 @@
 import { common, ConfigurationConstant } from '@kit.AbilityKit'
-import { appInfoManager } from '@kit.AppGalleryKit'
-import { LengthMetrics, uiAppearance, window } from '@kit.ArkUI'
+import { LengthMetrics, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { dlpAntiPeep } from '@kit.DeviceSecurityKit'
@@ -10,6 +9,7 @@ import { sensor } from '@kit.SensorServiceKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getFlushPreference, setFlushPreference } from '../common/Preference'
 import { restartApp } from '../common/Restartapp'
+import { selectDynamicIcon } from '../common/Selectdynamicicon'
 
 @Builder
 export function CommonsettingBuilder() {
@@ -104,33 +104,8 @@ struct Commonsetting {
                   .selected(this.iconModeIndex!!)
                   .value(this.iconModeValue!!)
                   .onSelect(async (index) => {
-                    try {
-                      if (index === 0) {
-                        if (this.colorModeIndex === 0) {
-                          const systemColorMode = uiAppearance.getDarkMode()
-                          if (systemColorMode === 0) {
-                            await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-                          }
-                          if (systemColorMode === 1) {
-                            await appInfoManager.disableDynamicIcon()
-                          }
-                        }
-                        if (this.colorModeIndex === 1) {
-                          await appInfoManager.disableDynamicIcon()
-                        }
-                        if (this.colorModeIndex === 2) {
-                          await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-                        }
-                      }
-                      if (index === 1) {
-                        await appInfoManager.disableDynamicIcon()
-                      }
-                      if (index === 2) {
-                        await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-                      }
-                    } catch {
-                    }
                     setFlushPreference(this.context, 'commonSetting', 'iconMode', index)
+                    await selectDynamicIcon(this.context)
                   })
               }
               .borderRadius(12)
@@ -412,6 +387,7 @@ struct Commonsetting {
                     if (index === 2) {
                       applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
                     }
+                    await selectDynamicIcon(this.context)
                     if (index === 3) {
                       const promptAction = this.UIContext.getPromptAction()
                       const data = await promptAction.showDialog({
