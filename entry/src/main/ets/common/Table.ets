@@ -160,28 +160,26 @@ export async function backupTable(context: Context, table: string) {
 }
 
 async function getFileBackupString(array: PasswordItem[] | Info[] | Tag[], encrypted: boolean): Promise<string> {
-  if (array.length > 0) {
-    if (!encrypted) {
-      return JSON.stringify({
-        encrypted: false,
-        data: array
+  if (!encrypted) {
+    return JSON.stringify({
+      encrypted: false,
+      data: array
+    })
+  }
+  if (encrypted) {
+    const encryptedArray: EncryptData[] = []
+    const promises = array.map(async (item: PasswordItem | Info | Tag) => {
+      const res = await encrypt(JSON.stringify(item))
+      encryptedArray.push({
+        content: res.content,
+        iv: res.iv
       })
-    }
-    if (encrypted) {
-      const encryptedArray: EncryptData[] = []
-      const promises = array.map(async (item: PasswordItem | Info | Tag) => {
-        const res = await encrypt(JSON.stringify(item))
-        encryptedArray.push({
-          content: res.content,
-          iv: res.iv
-        })
-      })
-      await Promise.all(promises)
-      return JSON.stringify({
-        encrypted: true,
-        data: encryptedArray
-      })
-    }
+    })
+    await Promise.all(promises)
+    return JSON.stringify({
+      encrypted: true,
+      data: encryptedArray
+    })
   }
   return 'fail'
 }
@@ -284,7 +282,7 @@ export async function webdavBackupTable(context: Context, table: string, dataArr
       return 'fail'
     }
   }
-  return 'success'
+  return 'fail'
 }
 
 export async function recoveryTable(context: Context, table: string) {

@@ -6,6 +6,11 @@
       "buildFunction": "AboutBuilder"
     },
     {
+      "name": "Dumpjsrawheapdata",
+      "pageSourceFile": "src/main/ets/pages/Dumpjsrawheapdata.ets",
+      "buildFunction": "DumpjsrawheapdataBuilder"
+    },
+    {
       "name": "Clearpreferencekey",
       "pageSourceFile": "src/main/ets/pages/Clearpreferencekey.ets",
       "buildFunction": "ClearpreferencekeyBuilder"

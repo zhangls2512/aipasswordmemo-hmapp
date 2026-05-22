@@ -24,6 +24,7 @@ import { readUri } from '../common/File'
 import { getFlushPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
 import request from '../common/Request'
+import { restartApp } from '../common/Restartapp'
 import Cleardata from './Cleardata'
 import Info from './Info'
 import Me from './Me'
@@ -438,11 +439,7 @@ struct Index {
               ]
             })
             if (data.index === 1) {
-              const applicationContext = this.context.getApplicationContext()
-              applicationContext.restartApp({
-                bundleName: 'com.zhangxm.aipasswordmemo',
-                abilityName: 'EntryAbility'
-              })
+              await restartApp(this.context, this.UIContext)
             }
           }
         }

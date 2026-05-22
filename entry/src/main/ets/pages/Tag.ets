@@ -219,8 +219,6 @@ export default struct TagPage {
                   await deleteData(this.context, 'tag', item.id)
                 })
                 await Promise.all(promises)
-                this.multipleSelect = false
-                this.multipleSelectArray = []
                 this.loading = true
               }
             })
@@ -276,8 +274,6 @@ export default struct TagPage {
                   })
                   dialogControllerProgress.close()
                 }
-                this.multipleSelect = false
-                this.multipleSelectArray = []
                 this.loading = true
               })
             }
@@ -416,8 +412,9 @@ export default struct TagPage {
                           })
                           .onChange(isOn => {
                             if (!isOn) {
-                              this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                                item.id), 1)
+                              this.multipleSelectArray.splice(
+                                this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                                  item.id), 1)
                             }
                             if (isOn) {
                               this.multipleSelectArray.push(item)

@@ -10,6 +10,7 @@ import { importInfo, importPassword, importTag, PasswordItem } from '../common/D
 import { readUri, writeUri } from '../common/File'
 import openLink from '../common/Openlink'
 import { getFlushPreference } from '../common/Preference'
+import { restartApp } from '../common/Restartapp'
 
 @Builder
 export function DataInOutBuilder() {
@@ -208,11 +209,7 @@ struct DataInOut {
                     ]
                   })
                   if (data.index === 1) {
-                    const applicationContext = this.context.getApplicationContext()
-                    applicationContext.restartApp({
-                      bundleName: 'com.zhangxm.aipasswordmemo',
-                      abilityName: 'EntryAbility'
-                    })
+                    await restartApp(this.context, this.UIContext)
                   }
                 }
               })
@@ -519,7 +516,8 @@ struct DataInOut {
 
         ListItem() {
           Column() {
-            Text('导出 (未加密，请务必安全存储，保障数据安全。如需加密，请前往“我的”>“设置”>“数据”>“备份与恢复”>“文件”，开启“加密”，手动备份成功后导出)')
+            Text(
+              '导出 (未加密，请务必安全存储，保障数据安全。如需加密，请前往“我的”>“设置”>“数据”>“备份与恢复”>“文件”，开启“加密”，手动备份成功后导出)')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)

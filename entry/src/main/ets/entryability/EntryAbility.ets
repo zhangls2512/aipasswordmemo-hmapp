@@ -165,7 +165,7 @@ export default class EntryAbility extends UIAbility {
     const errorLogDir = this.context.filesDir + '/log/error/'
     errorManager.on('error', {
       async onUnhandledException(errMsg) {
-        if (getFlushPreference(this.context, 'debugSetting', 'globalErrorShowType', 0) === 0) {
+        if (getFlushPreference(context, 'debugSetting', 'globalErrorShowType', 0) === 0) {
           await promptAction.openToast({
             message: 'js 运行异常：' + errMsg
           })
@@ -180,16 +180,16 @@ export default class EntryAbility extends UIAbility {
             stack: err.stack
           }
         }
-        if (getFlushPreference(this.context, 'debugSetting', 'saveErrorLog', true)) {
+        if (getFlushPreference(context, 'debugSetting', 'saveErrorLog', true)) {
           await write(errorLogDir + Date.now() + '.txt', JSON.stringify(object))
         }
-        if (getFlushPreference(this.context, 'debugSetting', 'globalErrorShowType', 0) === 1) {
+        if (getFlushPreference(context, 'debugSetting', 'globalErrorShowType', 0) === 1) {
           context.eventHub.emit('dialog', 'js 运行异常', '名称：' + err.name + '\n信息：' + err.message)
         }
-        if (getFlushPreference(this.context, 'debugSetting', 'autoUploadErrorLog', true) &&
-          getFlushPreference(this.context, 'commonSetting', 'allService', true)) {
-          if ((getFlushPreference(this.context, 'debugSetting', 'autoUploadErrorLogType',
-            ['JS_ERROR', 'APP_CRASH']) as string[]).includes('JS_ERROR')) {
+        if (getFlushPreference(context, 'debugSetting', 'autoUploadErrorLog', true) &&
+          getFlushPreference(context, 'commonSetting', 'allService', true)) {
+          if ((getFlushPreference(context, 'debugSetting', 'autoUploadErrorLogType', ['JS_ERROR', 'APP_CRASH']) as
+            string[]).includes('JS_ERROR')) {
             context.eventHub.emit('uploadErrorLog', object.name, JSON.stringify(object))
           }
         }
@@ -421,7 +421,8 @@ export default class EntryAbility extends UIAbility {
       encrypt: true,
       allowRebuild: true
     })
-    await passwordRdbStore.executeSql('CREATE TABLE IF NOT EXISTS password(id INTEGER PRIMARY KEY AUTOINCREMENT,name,info,tag,updateTime,cloudBackupTime)')
+    await passwordRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS password(id INTEGER PRIMARY KEY AUTOINCREMENT,name,info,tag,updateTime,cloudBackupTime)')
     await passwordRdbStore.executeSql('CREATE INDEX IF NOT EXISTS name ON password(name)')
     const infoRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'info',
@@ -429,7 +430,8 @@ export default class EntryAbility extends UIAbility {
       encrypt: true,
       allowRebuild: true
     })
-    await infoRdbStore.executeSql('CREATE TABLE IF NOT EXISTS info(id INTEGER PRIMARY KEY AUTOINCREMENT,type,value,updateTime,cloudBackupTime,UNIQUE(type,value))')
+    await infoRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS info(id INTEGER PRIMARY KEY AUTOINCREMENT,type,value,updateTime,cloudBackupTime,UNIQUE(type,value))')
     await infoRdbStore.executeSql('CREATE INDEX IF NOT EXISTS type ON info(type)')
     const tagRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'tag',
@@ -437,7 +439,8 @@ export default class EntryAbility extends UIAbility {
       encrypt: true,
       allowRebuild: true
     })
-    await tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag(id INTEGER PRIMARY KEY AUTOINCREMENT,value,color,updateTime,cloudBackupTime,UNIQUE(value,color))')
+    await tagRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS tag(id INTEGER PRIMARY KEY AUTOINCREMENT,value,color,updateTime,cloudBackupTime,UNIQUE(value,color))')
     await tagRdbStore.executeSql('CREATE INDEX IF NOT EXISTS value ON tag(value)')
     const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'huaweicloudsync',
@@ -445,9 +448,12 @@ export default class EntryAbility extends UIAbility {
       encrypt: true,
       allowRebuild: true
     })
-    await huaweiCloudSyncRdbStore.executeSql('CREATE TABLE IF NOT EXISTS password(id TEXT PRIMARY KEY,name TEXT,info TEXT,tag TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
-    await huaweiCloudSyncRdbStore.executeSql('CREATE TABLE IF NOT EXISTS info(id TEXT PRIMARY KEY,type TEXT,value TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
-    await huaweiCloudSyncRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag(id TEXT PRIMARY KEY,value TEXT,color TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
+    await huaweiCloudSyncRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS password(id TEXT PRIMARY KEY,name TEXT,info TEXT,tag TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
+    await huaweiCloudSyncRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS info(id TEXT PRIMARY KEY,type TEXT,value TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
+    await huaweiCloudSyncRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS tag(id TEXT PRIMARY KEY,value TEXT,color TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
     passwordRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       const promises = deviceIds.map(async (item) => {
         const tableName = await passwordRdbStore.obtainDistributedTableName(item, 'password')

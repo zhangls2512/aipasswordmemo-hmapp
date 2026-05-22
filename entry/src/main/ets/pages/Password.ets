@@ -310,8 +310,6 @@ export default struct PasswordPage {
                   await deleteData(this.context, 'password', item.id)
                 })
                 await Promise.all(promises)
-                this.multipleSelect = false
-                this.multipleSelectArray = []
                 this.loading = true
               }
             })
@@ -368,8 +366,6 @@ export default struct PasswordPage {
                   })
                   dialogControllerProgress.close()
                 }
-                this.multipleSelect = false
-                this.multipleSelectArray = []
                 this.loading = true
               })
             }
@@ -666,8 +662,9 @@ export default struct PasswordPage {
                         })
                         .onChange(isOn => {
                           if (!isOn) {
-                            this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                              item.id), 1)
+                            this.multipleSelectArray.splice(
+                              this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                                item.id), 1)
                           }
                           if (isOn) {
                             this.multipleSelectArray.push(item)
@@ -791,8 +788,21 @@ export default struct PasswordPage {
                 .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
                 .padding($r('sys.float.ohos_id_corner_radius_mark'))
               }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .selected(this.multipleSelectArray.some(selectItem => selectItem.id === item.id))
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .onSelect(isSelected => {
+                if (!isSelected) {
+                  this.multipleSelectArray = this.multipleSelectArray.filter(selectItem => selectItem.id !== item.id)
+                }
+                if (isSelected) {
+                  this.multipleSelect = true
+                  if (!this.multipleSelectArray.find(selectItem => selectItem.id === item.id)) {
+                    this.multipleSelectArray.push(item)
+                  }
+                }
               })
             })
             ListItem()
@@ -800,6 +810,8 @@ export default struct PasswordPage {
                 bottom: this.preferType === 0 ? 80 : 0
               })
           }
+          .height('100%')
+          .multiSelectable(true)
         }
         .layoutWeight(1)
         .onRefreshing(async () => {
