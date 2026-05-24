@@ -44,7 +44,7 @@ struct Networktest {
                 dialogControllerProgress.open()
                 try {
                   const startTime = Date.now()
-                  const response = await globalSession.fetch(new rcp.Request('https://api.zhangls2512.cn/test'))
+                  const response = await globalSession.get('https://api.zhangls2512.cn/test')
                   dialogControllerProgress.close()
                   if (response.statusCode >= 200 && response.statusCode < 300) {
                     const res = response.toJSON() as Response
