@@ -1,8 +1,8 @@
 import { relationalStore } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { getPasswordMaxId, PasswordInfoItem } from './Dataget'
-import { importPassword } from './Dataimport'
-import { PasswordOutItem } from '../pages/DataInOut'
+import { importPassword, PasswordItem } from './Dataimport'
+import { getFlushPreference } from './Preference'
 
 export function parseCsvLine(line: string) {
   const result: string[] = []
@@ -36,11 +36,11 @@ export async function importCsvPassword(context: Context, content: string) {
     return
   }
   const lines = content.split('\n').filter(line => line.trim() !== '')
-  const result: PasswordOutItem[] = []
+  const result: PasswordItem[] = []
   const maxId = await getPasswordMaxId(context)
   let idCounter = maxId + 1
   const firstLine = parseCsvLine(lines[0])
-  const nameIndex = firstLine.findIndex(item => item === '名称')
+  const nameIndex = firstLine.indexOf('名称')
   if (nameIndex !== -1) {
     const infoColumnsIndex: number[] = []
     firstLine.forEach((item, index) => {
@@ -48,17 +48,37 @@ export async function importCsvPassword(context: Context, content: string) {
         infoColumnsIndex.push(index)
       }
     })
+    const storeValueHistoryPasswordInfoTypeArray =
+      getFlushPreference(context, 'commonSetting', 'storeValueHistoryPasswordInfoType', ['密码']) as string[]
     lines.forEach((item, index) => {
       if (index !== 0) {
         const parsedLine = parseCsvLine(item)
         const name = parsedLine[nameIndex]
         const info: PasswordInfoItem[] = []
+        const updateTime = Date.now()
         infoColumnsIndex.forEach(item => {
           if (firstLine[item] && parsedLine[item] && firstLine[item] !== 'MFA') {
-            info.push({
-              type: firstLine[item],
-              value: parsedLine[item]
-            })
+            const type = firstLine[item]
+            const value = parsedLine[item]
+            if (!storeValueHistoryPasswordInfoTypeArray.includes(type)) {
+              info.push({
+                type: type,
+                value: value,
+                history: []
+              })
+            }
+            if (storeValueHistoryPasswordInfoTypeArray.includes(type)) {
+              info.push({
+                type: type,
+                value: value,
+                history: [
+                  {
+                    value: value,
+                    updateTime: updateTime
+                  }
+                ]
+              })
+            }
           }
         })
         if (name && info.length > 0) {
@@ -67,8 +87,8 @@ export async function importCsvPassword(context: Context, content: string) {
             name: name,
             info: info,
             tag: [],
-            updateTime: Date.now(),
-            cloudBackupTime: JSON.stringify([])
+            updateTime: updateTime,
+            cloudBackupTime: []
           })
         }
       }

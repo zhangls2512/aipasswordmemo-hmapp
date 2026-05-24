@@ -1,12 +1,12 @@
 import { common } from '@kit.AbilityKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsEffect } from '@kit.UIDesignKit'
-import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
-import { CloudBackupTimeItem, getTagList, Tag } from '../common/Dataget'
+import { getTagList, Tag } from '../common/Dataget'
 import { getPreferType } from '../common/Prefertype'
+import { autoSyncTable, autoBackupTable } from '../common/Table'
 import NewTag from './Newtag'
 import UpdateTag from './Updatetag'
 
@@ -25,40 +25,12 @@ export default struct TagPage {
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
-  updateId = 0
+  tagId = 0
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'
     })
   })
-
-  async cloudBackup(item: Tag) {
-    let cloudBackupTime = JSON.stringify([])
-    if (typeof (item.cloudBackupTime) === 'string') {
-      cloudBackupTime = item.cloudBackupTime
-    }
-    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-    const accountInfo = await getAccountInfo()
-    const cloudBackupTimeItem = cloudBackupTimeArray.find(item => item.uid === accountInfo.uid)
-    if (!cloudBackupTimeItem) {
-      cloudBackupTimeArray.push({
-        uid: accountInfo.uid,
-        time: Date.now()
-      })
-    } else {
-      cloudBackupTimeItem.time = Date.now()
-    }
-    await setCloudBackup(this.context, {
-      type: 'tag',
-      id: item.id,
-      content: JSON.stringify({
-        value: item.value,
-        color: item.color,
-        updateTime: item.updateTime,
-        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-      })
-    })
-  }
 
   @Builder
   MenuBuilder(item: Tag) {
@@ -103,7 +75,17 @@ export default struct TagPage {
               ]
             })
             if (data.index === 1) {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '删除中...'
+                })
+              })
+              dialogControllerProgress.open()
               await deleteData(this.context, 'tag', item.id)
+              dialogControllerProgress.close()
+              await promptAction.openToast({
+                message: '删除成功'
+              })
               this.loading = true
             }
           })
@@ -114,7 +96,16 @@ export default struct TagPage {
           })
             .onClick(async () => {
               this.dialogControllerProgress.open()
-              await this.cloudBackup(item)
+              await setCloudBackup(this.context, {
+                type: 'tag',
+                id: item.id,
+                content: JSON.stringify({
+                  value: item.value,
+                  color: item.color,
+                  updateTime: item.updateTime,
+                  cloudBackupTime: item.cloudBackupTime
+                })
+              })
               this.dialogControllerProgress.close()
               this.loading = true
             })
@@ -144,9 +135,9 @@ export default struct TagPage {
   }
 
   @Builder
-  UpdateSheetBuilder(id: number) {
+  UpdateSheetBuilder() {
     UpdateTag({
-      tagId: id
+      tagId: this.tagId
     })
   }
 
@@ -160,6 +151,7 @@ export default struct TagPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut(FunctionKey.ESC, [])
             .margin({
               right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
             })
@@ -196,6 +188,7 @@ export default struct TagPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('D', [ModifierKey.CTRL])
             .padding(11)
             .stateStyles({
               normal: {
@@ -235,12 +228,22 @@ export default struct TagPage {
                 ]
               })
               if (data.index === 1) {
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '删除中...'
+                  })
+                })
+                dialogControllerProgress.open()
                 const promises = this.multipleSelectArray.map(async (item) => {
-                  await deleteData(this.context, 'tag', item.id)
+                  await deleteData(this.context, 'tag', item.id, false)
                 })
                 await Promise.all(promises)
-                this.multipleSelect = false
-                this.multipleSelectArray = []
+                await autoSyncTable(this.context, 'tag')
+                await autoBackupTable(this.context, 'tag')
+                dialogControllerProgress.close()
+                await promptAction.openToast({
+                  message: '删除成功'
+                })
                 this.loading = true
               }
             })
@@ -280,16 +283,25 @@ export default struct TagPage {
                 for (let i = 0; i < this.multipleSelectArray.length; i++) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
-                      content: '批量云备份中，进度：' + i + '/' + this.multipleSelectArray.length
+                      content: '批量云备份中，进度：' + (i + 1) + '/' + this.multipleSelectArray.length
                     })
                   })
                   dialogControllerProgress.open()
-                  await this.cloudBackup(this.multipleSelectArray[i])
+                  await setCloudBackup(this.context, {
+                    type: 'tag',
+                    id: this.multipleSelectArray[i].id,
+                    content: JSON.stringify({
+                      value: this.multipleSelectArray[i].value,
+                      color: this.multipleSelectArray[i].color,
+                      updateTime: this.multipleSelectArray[i].updateTime,
+                      cloudBackupTime: this.multipleSelectArray[i].cloudBackupTime
+                    })
+                  }, false)
                   dialogControllerProgress.close()
                 }
-                this.multipleSelect = false
-                this.multipleSelectArray = []
                 this.loading = true
+                await autoSyncTable(this.context, 'tag')
+                await autoBackupTable(this.context, 'tag')
               })
             }
           }
@@ -304,6 +316,7 @@ export default struct TagPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('N', [ModifierKey.CTRL, ModifierKey.SHIFT])
             .padding(11)
             .stateStyles({
               normal: {
@@ -427,8 +440,9 @@ export default struct TagPage {
                           })
                           .onChange(isOn => {
                             if (!isOn) {
-                              this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                                item.id), 1)
+                              this.multipleSelectArray.splice(
+                                this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                                  item.id), 1)
                             }
                             if (isOn) {
                               this.multipleSelectArray.push(item)
@@ -471,7 +485,7 @@ export default struct TagPage {
                       if (this.multipleSelect) {
                         return
                       }
-                      this.updateId = item.id
+                      this.tagId = item.id
                       this.isShowUpdateSheet = true
                     })
                     .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
@@ -494,11 +508,17 @@ export default struct TagPage {
               })
           }
         }
+        .keyboardShortcut('R', [ModifierKey.CTRL], () => {
+          this.loading = true
+        })
         .layoutWeight(1)
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')
         })
         .onRefreshing(async () => {
+          this.multipleSelect = false
+          this.multipleSelectArray = []
+          this.tagArray = []
           this.tagArray = await getTagList(this.context, this.orderColumn)
           this.loading = false
         })
@@ -528,7 +548,7 @@ export default struct TagPage {
     .onDisAppear(() => {
       this.context.eventHub.off('refreshTag')
     })
-    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(), {
       height: SheetSize.FIT_CONTENT,
       preferType: this.preferType,
       title: {

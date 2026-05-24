@@ -3,13 +3,13 @@ import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsEffect } from '@kit.UIDesignKit'
-import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
-import { CloudBackupTimeItem, getInfoList, getInfoTypeList, Info } from '../common/Dataget'
+import { getInfoList, getInfoTypeList, Info } from '../common/Dataget'
 import copy from '../common/Pasteboard'
 import { getPreferType } from '../common/Prefertype'
+import { autoSyncTable, autoBackupTable } from '../common/Table'
 import AinewInfo from './Ainewinfo'
 import NewInfo from './Newinfo'
 import UpdateInfo from './Updateinfo'
@@ -23,48 +23,20 @@ export default struct InfoPage {
   @Local infoArray: Info[] = []
   @Local loading: boolean = false
   @Local enableCloudBackup: boolean = false
-  @Local types: string[] = []
   @Local selectType: string = ''
+  @Local types: string[] = []
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Info[] = []
   @Local hoverId: number = -1
   @Local buttonHoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
-  updateId = 0
+  infoId = 0
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'
     })
   })
-
-  async cloudBackup(item: Info) {
-    let cloudBackupTime = JSON.stringify([])
-    if (typeof (item.cloudBackupTime) === 'string') {
-      cloudBackupTime = item.cloudBackupTime
-    }
-    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-    const accountInfo = await getAccountInfo()
-    const cloudBackupTimeItem = cloudBackupTimeArray.find(item => item.uid === accountInfo.uid)
-    if (!cloudBackupTimeItem) {
-      cloudBackupTimeArray.push({
-        uid: accountInfo.uid,
-        time: Date.now()
-      })
-    } else {
-      cloudBackupTimeItem.time = Date.now()
-    }
-    await setCloudBackup(this.context, {
-      type: 'info',
-      id: item.id,
-      content: JSON.stringify({
-        type: item.type,
-        value: item.value,
-        updateTime: item.updateTime,
-        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-      })
-    })
-  }
 
   @Builder
   MenuBuilder(item: Info) {
@@ -136,7 +108,17 @@ export default struct InfoPage {
               ]
             })
             if (data.index === 1) {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '删除中...'
+                })
+              })
+              dialogControllerProgress.open()
               await deleteData(this.context, 'info', item.id)
+              dialogControllerProgress.close()
+              await promptAction.openToast({
+                message: '删除成功'
+              })
               this.loading = true
             }
           })
@@ -147,7 +129,16 @@ export default struct InfoPage {
           })
             .onClick(async () => {
               this.dialogControllerProgress.open()
-              await this.cloudBackup(item)
+              await setCloudBackup(this.context, {
+                type: 'info',
+                id: item.id,
+                content: JSON.stringify({
+                  type: item.type,
+                  value: item.value,
+                  updateTime: item.updateTime,
+                  cloudBackupTime: item.cloudBackupTime
+                })
+              })
               this.dialogControllerProgress.close()
               this.loading = true
             })
@@ -177,9 +168,9 @@ export default struct InfoPage {
   }
 
   @Builder
-  UpdateSheetBuilder(id: number) {
+  UpdateSheetBuilder() {
     UpdateInfo({
-      infoId: id
+      infoId: this.infoId
     })
   }
 
@@ -198,6 +189,7 @@ export default struct InfoPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut(FunctionKey.ESC, [])
             .margin({
               right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
             })
@@ -234,6 +226,7 @@ export default struct InfoPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('D', [ModifierKey.CTRL])
             .padding(11)
             .stateStyles({
               normal: {
@@ -273,12 +266,22 @@ export default struct InfoPage {
                 ]
               })
               if (data.index === 1) {
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '删除中...'
+                  })
+                })
+                dialogControllerProgress.open()
                 const promises = this.multipleSelectArray.map(async (item) => {
-                  await deleteData(this.context, 'info', item.id)
+                  await deleteData(this.context, 'info', item.id, false)
                 })
                 await Promise.all(promises)
-                this.multipleSelect = false
-                this.multipleSelectArray = []
+                await autoSyncTable(this.context, 'info')
+                await autoBackupTable(this.context, 'info')
+                dialogControllerProgress.close()
+                await promptAction.openToast({
+                  message: '删除成功'
+                })
                 this.loading = true
               }
             })
@@ -318,16 +321,25 @@ export default struct InfoPage {
                 for (let i = 0; i < this.multipleSelectArray.length; i++) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
-                      content: '批量云备份中，进度：' + i + '/' + this.multipleSelectArray.length
+                      content: '批量云备份中，进度：' + (i + 1) + '/' + this.multipleSelectArray.length
                     })
                   })
                   dialogControllerProgress.open()
-                  await this.cloudBackup(this.multipleSelectArray[i])
+                  await setCloudBackup(this.context, {
+                    type: 'info',
+                    id: this.multipleSelectArray[i].id,
+                    content: JSON.stringify({
+                      type: this.multipleSelectArray[i].type,
+                      value: this.multipleSelectArray[i].value,
+                      updateTime: this.multipleSelectArray[i].updateTime,
+                      cloudBackupTime: this.multipleSelectArray[i].cloudBackupTime
+                    })
+                  }, false)
                   dialogControllerProgress.close()
                 }
-                this.multipleSelect = false
-                this.multipleSelectArray = []
                 this.loading = true
+                await autoSyncTable(this.context, 'info')
+                await autoBackupTable(this.context, 'info')
               })
             }
           }
@@ -342,6 +354,7 @@ export default struct InfoPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('N', [ModifierKey.CTRL, ModifierKey.SHIFT])
             .margin({
               right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
             })
@@ -508,8 +521,9 @@ export default struct InfoPage {
                           })
                           .onChange(isOn => {
                             if (!isOn) {
-                              this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                                item.id), 1)
+                              this.multipleSelectArray.splice(
+                                this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                                  item.id), 1)
                             }
                             if (isOn) {
                               this.multipleSelectArray.push(item)
@@ -580,7 +594,7 @@ export default struct InfoPage {
                         })
                         return
                       }
-                      this.updateId = item.id
+                      this.infoId = item.id
                       this.isShowUpdateSheet = true
                     })
                     .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
@@ -594,19 +608,41 @@ export default struct InfoPage {
                   .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
                   .padding($r('sys.float.ohos_id_corner_radius_mark'))
                 }
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                .selected(this.multipleSelectArray.some(selectItem => selectItem.id === item.id))
                 .margin({
                   top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                })
+                .onSelect(isSelected => {
+                  if (!isSelected) {
+                    this.multipleSelectArray = this.multipleSelectArray.filter(selectItem => selectItem.id !== item.id)
+                  }
+                  if (isSelected) {
+                    this.multipleSelect = true
+                    if (!this.multipleSelectArray.find(selectItem => selectItem.id === item.id)) {
+                      this.multipleSelectArray.push(item)
+                    }
+                  }
                 })
               }
             })
             ListItem()
               .margin({
-                bottom: this.preferType === 0 ? 80 : 0
+                bottom: 80
               })
           }
+          .height('100%')
+          .multiSelectable(true)
         }
+        .keyboardShortcut('R', [ModifierKey.CTRL], () => {
+          this.loading = true
+        })
         .layoutWeight(1)
         .onRefreshing(async () => {
+          this.selectType = ''
+          this.multipleSelect = false
+          this.multipleSelectArray = []
+          this.infoArray = []
           this.infoArray = await getInfoList(this.context)
           this.types = await getInfoTypeList(this.context)
           this.loading = false
@@ -638,7 +674,7 @@ export default struct InfoPage {
     .onDisAppear(() => {
       this.context.eventHub.off('refreshInfo')
     })
-    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.updateId), {
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(), {
       height: SheetSize.FIT_CONTENT,
       preferType: this.preferType,
       title: {

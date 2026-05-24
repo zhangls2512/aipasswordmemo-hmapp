@@ -3,18 +3,10 @@ import { FunctionComponent } from '@kit.AgentFrameworkKit'
 import { LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { hdsEffect } from '@kit.UIDesignKit'
-import { getAccountInfo } from '../common/Accesstoken'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
-import {
-  CloudBackupTimeItem,
-  getFilterPasswordList,
-  getTagList,
-  Password,
-  PasswordInfoItem,
-  PasswordTagItem
-} from '../common/Dataget'
+import { getFilterPasswordList, getTagList, Password, PasswordInfoItem, PasswordTagItem } from '../common/Dataget'
 import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
 import {
@@ -23,6 +15,7 @@ import {
   setQuickBarPassword,
   syncQuickBarPassword
 } from '../common/Quickbar'
+import { autoSyncTable, autoBackupTable } from '../common/Table'
 import getTotp from '../common/Totp'
 import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
@@ -72,36 +65,6 @@ export default struct PasswordPage {
       content: '请求中...'
     })
   })
-
-  async cloudBackup(item: Password) {
-    let cloudBackupTime = JSON.stringify([])
-    if (typeof (item.cloudBackupTime) === 'string') {
-      cloudBackupTime = item.cloudBackupTime
-    }
-    const cloudBackupTimeArray = JSON.parse(cloudBackupTime) as CloudBackupTimeItem[]
-    const accountInfo = await getAccountInfo()
-    const cloudBackupTimeItem = cloudBackupTimeArray.find(item => item.uid === accountInfo.uid)
-    if (!cloudBackupTimeItem) {
-      cloudBackupTimeArray.push({
-        uid: accountInfo.uid,
-        time: Date.now()
-      })
-    } else {
-      cloudBackupTimeItem.time = Date.now()
-    }
-    await setCloudBackup(this.context, {
-      type: 'password',
-      id: item.id,
-      content: JSON.stringify({
-        id: item.id,
-        name: item.name,
-        info: item.info,
-        tag: item.tag.map(item => item.value),
-        updateTime: item.updateTime,
-        cloudBackupTime: JSON.stringify(cloudBackupTimeArray)
-      })
-    })
-  }
 
   @Builder
   MenuBuilder(item: Password) {
@@ -190,7 +153,17 @@ export default struct PasswordPage {
               ]
             })
             if (data.index === 1) {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '删除中...'
+                })
+              })
+              dialogControllerProgress.open()
               await deleteData(this.context, 'password', item.id)
+              dialogControllerProgress.close()
+              await promptAction.openToast({
+                message: '删除成功'
+              })
               this.loading = true
             }
           })
@@ -201,7 +174,17 @@ export default struct PasswordPage {
           })
             .onClick(async () => {
               this.dialogControllerProgress.open()
-              await this.cloudBackup(item)
+              await setCloudBackup(this.context, {
+                type: 'password',
+                id: item.id,
+                content: JSON.stringify({
+                  name: item.name,
+                  info: item.info,
+                  tag: item.tag.map(item => item.value),
+                  updateTime: item.updateTime,
+                  cloudBackupTime: item.cloudBackupTime
+                })
+              })
               this.dialogControllerProgress.close()
               this.loading = true
             })
@@ -231,16 +214,16 @@ export default struct PasswordPage {
   }
 
   @Builder
-  InfoSheetBuilder(id: number) {
+  InfoSheetBuilder() {
     PasswordInfo({
-      passwordId: id
+      passwordId: this.passwordId
     })
   }
 
   @Builder
-  UpdateSheetBuilder(id: number) {
+  UpdateSheetBuilder() {
     UpdatePassword({
-      passwordId: id
+      passwordId: this.passwordId
     })
   }
 
@@ -259,6 +242,7 @@ export default struct PasswordPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut(FunctionKey.ESC, [])
             .margin({
               right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
             })
@@ -295,6 +279,7 @@ export default struct PasswordPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('D', [ModifierKey.CTRL])
             .padding(11)
             .stateStyles({
               normal: {
@@ -334,12 +319,22 @@ export default struct PasswordPage {
                 ]
               })
               if (data.index === 1) {
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '删除中...'
+                  })
+                })
+                dialogControllerProgress.open()
                 const promises = this.multipleSelectArray.map(async (item) => {
-                  await deleteData(this.context, 'password', item.id)
+                  await deleteData(this.context, 'password', item.id, false)
                 })
                 await Promise.all(promises)
-                this.multipleSelect = false
-                this.multipleSelectArray = []
+                await autoSyncTable(this.context, 'password')
+                await autoBackupTable(this.context, 'password')
+                dialogControllerProgress.close()
+                await promptAction.openToast({
+                  message: '删除成功'
+                })
                 this.loading = true
               }
             })
@@ -379,16 +374,26 @@ export default struct PasswordPage {
                 for (let i = 0; i < this.multipleSelectArray.length; i++) {
                   const dialogControllerProgress = new CustomDialogController({
                     builder: LoadingDialog({
-                      content: '批量云备份中，进度：' + i + '/' + this.multipleSelectArray.length
+                      content: '批量云备份中，进度：' + (i + 1) + '/' + this.multipleSelectArray.length
                     })
                   })
                   dialogControllerProgress.open()
-                  await this.cloudBackup(this.multipleSelectArray[i])
+                  await setCloudBackup(this.context, {
+                    type: 'password',
+                    id: this.multipleSelectArray[i].id,
+                    content: JSON.stringify({
+                      name: this.multipleSelectArray[i].name,
+                      info: this.multipleSelectArray[i].info,
+                      tag: this.multipleSelectArray[i].tag.map(item => item.value),
+                      updateTime: this.multipleSelectArray[i].updateTime,
+                      cloudBackupTime: this.multipleSelectArray[i].cloudBackupTime
+                    })
+                  }, false)
                   dialogControllerProgress.close()
                 }
-                this.multipleSelect = false
-                this.multipleSelectArray = []
                 this.loading = true
+                await autoSyncTable(this.context, 'password')
+                await autoBackupTable(this.context, 'password')
               })
             }
           }
@@ -403,6 +408,7 @@ export default struct PasswordPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('N', [ModifierKey.CTRL, ModifierKey.SHIFT])
             .padding(11)
             .stateStyles({
               normal: {
@@ -537,6 +543,7 @@ export default struct PasswordPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('F', [ModifierKey.CTRL])
             .padding(11)
             .stateStyles({
               normal: {
@@ -684,8 +691,9 @@ export default struct PasswordPage {
                         })
                         .onChange(isOn => {
                           if (!isOn) {
-                            this.multipleSelectArray.splice(this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                              item.id), 1)
+                            this.multipleSelectArray.splice(
+                              this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                                item.id), 1)
                           }
                           if (isOn) {
                             this.multipleSelectArray.push(item)
@@ -727,6 +735,7 @@ export default struct PasswordPage {
                               })
                             Text(item.info.find(infoItem => infoItem.type === '密码')?.value)
                               .copyOption(CopyOptions.LocalDevice)
+                              .layoutWeight(1)
                           }
                           .margin({
                             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -741,6 +750,7 @@ export default struct PasswordPage {
                               })
                             Text(this.mfaArray.find(mfaItem => mfaItem.id === item.id)?.mfa)
                               .copyOption(CopyOptions.LocalDevice)
+                              .layoutWeight(1)
                           }
                           .margin({
                             top: $r('sys.float.ohos_id_elements_margin_vertical_m')
@@ -807,18 +817,40 @@ export default struct PasswordPage {
                 .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
                 .padding($r('sys.float.ohos_id_corner_radius_mark'))
               }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .selected(this.multipleSelectArray.some(selectItem => selectItem.id === item.id))
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .onSelect(isSelected => {
+                if (!isSelected) {
+                  this.multipleSelectArray = this.multipleSelectArray.filter(selectItem => selectItem.id !== item.id)
+                }
+                if (isSelected) {
+                  this.multipleSelect = true
+                  if (!this.multipleSelectArray.find(selectItem => selectItem.id === item.id)) {
+                    this.multipleSelectArray.push(item)
+                  }
+                }
               })
             })
             ListItem()
               .margin({
-                bottom: this.preferType === 0 ? 80 : 0
+                bottom: 80
               })
           }
+          .height('100%')
+          .multiSelectable(true)
         }
+        .keyboardShortcut('R', [ModifierKey.CTRL], () => {
+          this.loading = true
+        })
         .layoutWeight(1)
         .onRefreshing(async () => {
+          this.tag = []
+          this.multipleSelect = false
+          this.multipleSelectArray = []
+          this.passwordArray = []
           this.passwordArray =
             await getFilterPasswordList(this.context, this.nameKeyword, this.info, this.tag, this.orderColumn)
           if (deviceInfo.deviceType === '2in1') {
@@ -828,7 +860,7 @@ export default struct PasswordPage {
           this.tags = await getTagList(this.context, 'value')
           this.loading = false
         })
-        .bindSheet(this.isShowInfoSheet!!, this.InfoSheetBuilder(this.passwordId), {
+        .bindSheet(this.isShowInfoSheet!!, this.InfoSheetBuilder(), {
           height: SheetSize.FIT_CONTENT,
           preferType: this.preferType,
           title: {
@@ -847,7 +879,6 @@ export default struct PasswordPage {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(false)
             }
-            this.loading = true
           }
         })
       }
@@ -910,7 +941,9 @@ export default struct PasswordPage {
           this.isShowInfoSheet = false
         }
         this.passwordId = passwordId
-        this.isShowInfoSheet = true
+        setTimeout(() => {
+          this.isShowInfoSheet = true
+        }, 100)
       })
       this.intervalId = setInterval(async () => {
         const mfaArray: MfaItem[] = []
@@ -949,7 +982,7 @@ export default struct PasswordPage {
       this.context.eventHub.off('searchPassword')
       this.context.eventHub.off('newPassword')
     })
-    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(), {
       height: SheetSize.FIT_CONTENT,
       preferType: this.preferType,
       title: {

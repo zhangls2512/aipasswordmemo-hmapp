@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { notificationManager } from '@kit.NotificationKit'
 import { pushService } from '@kit.PushKit'
-import request from '../common/Request'
+import { request } from '../common/Request'
 
 interface NoticeItem {
   _id: string,

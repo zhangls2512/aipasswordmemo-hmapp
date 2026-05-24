@@ -15,7 +15,7 @@ import {
   HdsTabsController,
   ScrollEffectType
 } from '@kit.UIDesignKit'
-import { getAccountAccessToken } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Account'
 import { getKeyAlg } from '../common/Crypto'
 import { importCsvPassword } from '../common/Csv'
 import { importInfo, importPassword, importTag } from '../common/Dataimport'
@@ -23,7 +23,8 @@ import getDeviceToken from '../common/Devicetoken'
 import { readUri } from '../common/File'
 import { getFlushPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
-import request from '../common/Request'
+import { request } from '../common/Request'
+import { restartApp } from '../common/Restartapp'
 import Cleardata from './Cleardata'
 import Info from './Info'
 import Me from './Me'
@@ -406,6 +407,9 @@ struct Index {
           if (wantUri.endsWith('.csv')) {
             await importCsvPassword(this.context, filestring)
             this.context.eventHub.emit('refreshPassword')
+            await promptAction.openToast({
+              message: '导入成功'
+            })
           }
           if (wantUri.endsWith('.zip')) {
             const passwordIconDir = this.context.filesDir + '/media/passwordicon/'
@@ -435,11 +439,7 @@ struct Index {
               ]
             })
             if (data.index === 1) {
-              const applicationContext = this.context.getApplicationContext()
-              applicationContext.restartApp({
-                bundleName: 'com.zhangxm.aipasswordmemo',
-                abilityName: 'EntryAbility'
-              })
+              await restartApp(this.context, this.UIContext)
             }
           }
         }

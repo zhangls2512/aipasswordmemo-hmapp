@@ -27,6 +27,7 @@ export default struct Passwordinfo {
   mfaOtpauthUri = ''
   mfaSecondsRemainingColor = Color.Transparent
   intervalId = -1
+  floatingBall = false
 
   build() {
     List() {
@@ -331,70 +332,97 @@ export default struct Passwordinfo {
         this.passwordTag = passwordInfo.tag
         const mfaInfo = this.passwordInfo.find(item => item.type === 'MFA')
         if (mfaInfo) {
-          const floatingBallController = await floatingBall.create({
-            context: this.context
-          })
           const showMfaInFloatingBall =
             getFlushPreference(this.context, 'commonSetting', 'showMfaInFloatingBall', false)
+          if (!showMfaInFloatingBall) {
+            this.intervalId = setInterval(async () => {
+              const mfaInfoArray = mfaInfo.value.split('\0')
+              let mfaOtpauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
+              mfaOtpauthUri = mfaOtpauthUri.addQueryValue('secret', mfaInfoArray[0])
+              mfaOtpauthUri = mfaOtpauthUri.addQueryValue('period', mfaInfoArray[1])
+              mfaOtpauthUri = mfaOtpauthUri.addQueryValue('digits', mfaInfoArray[2])
+              this.mfaOtpauthUri = mfaOtpauthUri.toString()
+              this.mfaStep = Number(mfaInfoArray[1])
+              const res = await getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
+              if (res.value !== 'fail') {
+                this.mfaValue = res.value
+                this.mfaSecondsRemaining = res.secondsRemaining
+                const mfaSecondsRemainingPercent = Number((this.mfaSecondsRemaining / this.mfaStep).toFixed(2))
+                if (mfaSecondsRemainingPercent >= 0.5) {
+                  this.mfaSecondsRemainingColor = Color.Green
+                }
+                if (mfaSecondsRemainingPercent < 0.5 && mfaSecondsRemainingPercent >= 0.3) {
+                  this.mfaSecondsRemainingColor = Color.Yellow
+                }
+                if (mfaSecondsRemainingPercent < 0.3 && mfaSecondsRemainingPercent >= 0.1) {
+                  this.mfaSecondsRemainingColor = Color.Orange
+                }
+                if (mfaSecondsRemainingPercent <= 0.1) {
+                  this.mfaSecondsRemainingColor = Color.Red
+                }
+              }
+              if (res.value === 'fail') {
+                clearInterval(this.intervalId)
+              }
+            }, 500)
+          }
           if (showMfaInFloatingBall) {
+            const floatingBallController = await floatingBall.create({
+              context: this.context
+            })
             await floatingBallController.startFloatingBall({
               template: floatingBall.FloatingBallTemplate.NORMAL,
               title: '000000'
             })
+            this.floatingBall = true
             floatingBallController.on('click', async () => {
               await copy(this.context, this.UIContext, this.mfaValue)
             })
             this.context.eventHub.on('stopFloatingBall', async () => {
-              try {
-                floatingBallController.off('click')
-                await floatingBallController.stopFloatingBall()
-              } catch {
-              }
+              floatingBallController.off('click')
+              await floatingBallController.stopFloatingBall()
               this.context.eventHub.off('stopFloatingBall')
             })
-          }
-          this.intervalId = setInterval(async () => {
-            const mfaInfoArray = mfaInfo.value.split('\0')
-            let mfaOtpauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
-            mfaOtpauthUri = mfaOtpauthUri.addQueryValue('secret', mfaInfoArray[0])
-            mfaOtpauthUri = mfaOtpauthUri.addQueryValue('period', mfaInfoArray[1])
-            mfaOtpauthUri = mfaOtpauthUri.addQueryValue('digits', mfaInfoArray[2])
-            this.mfaOtpauthUri = mfaOtpauthUri.toString()
-            this.mfaStep = Number(mfaInfoArray[1])
-            const res = await getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
-            if (res.value !== 'fail') {
-              this.mfaValue = res.value
-              this.mfaSecondsRemaining = res.secondsRemaining
-              if (showMfaInFloatingBall) {
-                await floatingBallController.updateFloatingBall({
-                  template: floatingBall.FloatingBallTemplate.NORMAL,
-                  title: res.value,
-                  content: String(res.secondsRemaining)
-                })
+            this.intervalId = setInterval(async () => {
+              const mfaInfoArray = mfaInfo.value.split('\0')
+              let mfaOtpauthUri = new uri.URI('otpauth://totp/' + passwordInfo.name)
+              mfaOtpauthUri = mfaOtpauthUri.addQueryValue('secret', mfaInfoArray[0])
+              mfaOtpauthUri = mfaOtpauthUri.addQueryValue('period', mfaInfoArray[1])
+              mfaOtpauthUri = mfaOtpauthUri.addQueryValue('digits', mfaInfoArray[2])
+              this.mfaOtpauthUri = mfaOtpauthUri.toString()
+              this.mfaStep = Number(mfaInfoArray[1])
+              const res = await getTotp(mfaInfoArray[0], Number(mfaInfoArray[1]), Number(mfaInfoArray[2]))
+              if (res.value !== 'fail') {
+                this.mfaValue = res.value
+                this.mfaSecondsRemaining = res.secondsRemaining
+                if (showMfaInFloatingBall) {
+                  await floatingBallController.updateFloatingBall({
+                    template: floatingBall.FloatingBallTemplate.NORMAL,
+                    title: res.value,
+                    content: String(res.secondsRemaining)
+                  })
+                }
+                const mfaSecondsRemainingPercent = Number((this.mfaSecondsRemaining / this.mfaStep).toFixed(2))
+                if (mfaSecondsRemainingPercent >= 0.5) {
+                  this.mfaSecondsRemainingColor = Color.Green
+                }
+                if (mfaSecondsRemainingPercent < 0.5 && mfaSecondsRemainingPercent >= 0.3) {
+                  this.mfaSecondsRemainingColor = Color.Yellow
+                }
+                if (mfaSecondsRemainingPercent < 0.3 && mfaSecondsRemainingPercent >= 0.1) {
+                  this.mfaSecondsRemainingColor = Color.Orange
+                }
+                if (mfaSecondsRemainingPercent <= 0.1) {
+                  this.mfaSecondsRemainingColor = Color.Red
+                }
               }
-              const mfaSecondsRemainingPercent = Number((this.mfaSecondsRemaining / this.mfaStep).toFixed(2))
-              if (mfaSecondsRemainingPercent >= 0.5) {
-                this.mfaSecondsRemainingColor = Color.Green
-              }
-              if (mfaSecondsRemainingPercent < 0.5 && mfaSecondsRemainingPercent >= 0.3) {
-                this.mfaSecondsRemainingColor = Color.Yellow
-              }
-              if (mfaSecondsRemainingPercent < 0.3 && mfaSecondsRemainingPercent >= 0.1) {
-                this.mfaSecondsRemainingColor = Color.Orange
-              }
-              if (mfaSecondsRemainingPercent <= 0.1) {
-                this.mfaSecondsRemainingColor = Color.Red
-              }
-            }
-            if (res.value === 'fail') {
-              clearInterval(this.intervalId)
-              this.intervalId = -1
-              try {
+              if (res.value === 'fail') {
+                clearInterval(this.intervalId)
                 await floatingBallController.stopFloatingBall()
-              } catch {
+                this.floatingBall = false
               }
-            }
-          }, 500)
+            }, 500)
+          }
         }
       }
       if (passwordInfo === 'fail') {
@@ -406,7 +434,9 @@ export default struct Passwordinfo {
     .onDisAppear(() => {
       if (this.intervalId !== -1) {
         clearInterval(this.intervalId)
-        this.context.eventHub.emit('stopFloatingBall')
+        if (this.floatingBall) {
+          this.context.eventHub.emit('stopFloatingBall')
+        }
       }
     })
   }

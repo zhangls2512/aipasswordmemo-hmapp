@@ -20,16 +20,17 @@ import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
+import { sensor } from '@kit.SensorServiceKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
-import { autoLogin } from '../common/Accesstoken'
+import { autoLogin } from '../common/Account'
 import { clearNouseData } from '../common/Clearnousedata'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
-import { importOldKey } from '../common/Crypto'
 import { deleteData } from '../common/Datachange'
 import { write } from '../common/File'
 import openLink from '../common/Openlink'
 import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
-import { autoBackupTable, autoHuaweiCloudSyncTable, autoSyncTable } from '../common/Table'
+import { selectDynamicIcon } from '../common/Selectdynamicicon'
+import { autoBackupTable, autoSyncTable } from '../common/Table'
 
 interface JsErrorObject {
   name: string,
@@ -79,13 +80,19 @@ export default class EntryAbility extends UIAbility {
       await openLink(this.context, want.parameters.noticeUrl as string)
     }
     if (want.parameters?.shortcutId === 'newPassword') {
-      this.context.eventHub.emit('newPassword')
+      setTimeout(() => {
+        this.context.eventHub.emit('newPassword')
+      }, 100)
     }
     if (want.parameters?.shortcutId === 'searchPassword') {
-      this.context.eventHub.emit('searchPassword')
+      setTimeout(() => {
+        this.context.eventHub.emit('searchPassword')
+      }, 100)
     }
     if (want.parameters?.action === 'passwordInfo') {
-      this.context.eventHub.emit('passwordInfo', Number(want.parameters.passwordId))
+      setTimeout(() => {
+        this.context.eventHub.emit('passwordInfo', Number(want.parameters?.passwordId))
+      }, 100)
     }
     if (want.parameters?.menuHandler === 'clickMenu1' || want.parameters?.menuHandler === 'clickMenu2' ||
       want.parameters?.menuHandler === 'clickMenu3') {
@@ -108,7 +115,7 @@ export default class EntryAbility extends UIAbility {
     try {
       const sharedData = await systemShare.getSharedData(want)
       const sharedRecords = sharedData.getRecords()
-      if (sharedRecords.length !== 0) {
+      if (sharedRecords.length > 0) {
         this.context.eventHub.emit('wantUri', sharedRecords[0].uri)
       }
     } catch {
@@ -160,7 +167,7 @@ export default class EntryAbility extends UIAbility {
     const errorLogDir = this.context.filesDir + '/log/error/'
     errorManager.on('error', {
       async onUnhandledException(errMsg) {
-        if (getFlushPreference(this.context, 'debugSetting', 'globalErrorShowType', 0) === 0) {
+        if (getFlushPreference(context, 'debugSetting', 'globalErrorShowType', 0) === 0) {
           await promptAction.openToast({
             message: 'js 运行异常：' + errMsg
           })
@@ -175,16 +182,16 @@ export default class EntryAbility extends UIAbility {
             stack: err.stack
           }
         }
-        if (getFlushPreference(this.context, 'debugSetting', 'saveErrorLog', true)) {
+        if (getFlushPreference(context, 'debugSetting', 'saveErrorLog', true)) {
           await write(errorLogDir + Date.now() + '.txt', JSON.stringify(object))
         }
-        if (getFlushPreference(this.context, 'debugSetting', 'globalErrorShowType', 0) === 1) {
+        if (getFlushPreference(context, 'debugSetting', 'globalErrorShowType', 0) === 1) {
           context.eventHub.emit('dialog', 'js 运行异常', '名称：' + err.name + '\n信息：' + err.message)
         }
-        if (getFlushPreference(this.context, 'debugSetting', 'autoUploadErrorLog', true) &&
-          getFlushPreference(this.context, 'commonSetting', 'allService', true)) {
-          if ((getFlushPreference(this.context, 'debugSetting', 'autoUploadErrorLogType',
-            ['JS_ERROR', 'APP_CRASH']) as string[]).includes('JS_ERROR')) {
+        if (getFlushPreference(context, 'debugSetting', 'autoUploadErrorLog', true) &&
+          getFlushPreference(context, 'commonSetting', 'allService', true)) {
+          if ((getFlushPreference(context, 'debugSetting', 'autoUploadErrorLogType', ['JS_ERROR', 'APP_CRASH']) as
+            string[]).includes('JS_ERROR')) {
             context.eventHub.emit('uploadErrorLog', object.name, JSON.stringify(object))
           }
         }
@@ -381,7 +388,7 @@ export default class EntryAbility extends UIAbility {
     await autoLogin(context)
     const autoImportTables = getFlushPreference(this.context, 'cloudbackupSetting', 'autoImport', []) as string[]
     if (autoImportTables.includes('password')) {
-      const res = await importCloudBackupPassword(context)
+      const res = await importCloudBackupPassword(context, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
       if (res === 'success') {
         this.context.eventHub.emit('refreshPassword')
         await promptAction.openToast({
@@ -390,7 +397,7 @@ export default class EntryAbility extends UIAbility {
       }
     }
     if (autoImportTables.includes('info')) {
-      const res = await importCloudBackupInfo(context)
+      const res = await importCloudBackupInfo(context, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
       if (res === 'success') {
         this.context.eventHub.emit('refreshInfo')
         await promptAction.openToast({
@@ -399,7 +406,7 @@ export default class EntryAbility extends UIAbility {
       }
     }
     if (autoImportTables.includes('tag')) {
-      const res = await importCloudBackupTag(context)
+      const res = await importCloudBackupTag(context, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
       if (res === 'success') {
         this.context.eventHub.emit('refreshTag')
         await promptAction.openToast({
@@ -416,7 +423,8 @@ export default class EntryAbility extends UIAbility {
       encrypt: true,
       allowRebuild: true
     })
-    await passwordRdbStore.executeSql('CREATE TABLE IF NOT EXISTS password(id INTEGER PRIMARY KEY AUTOINCREMENT,name,info,tag,updateTime,cloudBackupTime)')
+    await passwordRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS password(id INTEGER PRIMARY KEY AUTOINCREMENT,name,info,tag,updateTime,cloudBackupTime)')
     await passwordRdbStore.executeSql('CREATE INDEX IF NOT EXISTS name ON password(name)')
     const infoRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'info',
@@ -424,7 +432,8 @@ export default class EntryAbility extends UIAbility {
       encrypt: true,
       allowRebuild: true
     })
-    await infoRdbStore.executeSql('CREATE TABLE IF NOT EXISTS info(id INTEGER PRIMARY KEY AUTOINCREMENT,type,value,updateTime,cloudBackupTime,UNIQUE(type,value))')
+    await infoRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS info(id INTEGER PRIMARY KEY AUTOINCREMENT,type,value,updateTime,cloudBackupTime,UNIQUE(type,value))')
     await infoRdbStore.executeSql('CREATE INDEX IF NOT EXISTS type ON info(type)')
     const tagRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'tag',
@@ -432,7 +441,8 @@ export default class EntryAbility extends UIAbility {
       encrypt: true,
       allowRebuild: true
     })
-    await tagRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag(id INTEGER PRIMARY KEY AUTOINCREMENT,value,color,updateTime,cloudBackupTime,UNIQUE(value,color))')
+    await tagRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS tag(id INTEGER PRIMARY KEY AUTOINCREMENT,value,color,updateTime,cloudBackupTime,UNIQUE(value,color))')
     await tagRdbStore.executeSql('CREATE INDEX IF NOT EXISTS value ON tag(value)')
     const huaweiCloudSyncRdbStore = await relationalStore.getRdbStore(this.context, {
       name: 'huaweicloudsync',
@@ -440,9 +450,12 @@ export default class EntryAbility extends UIAbility {
       encrypt: true,
       allowRebuild: true
     })
-    await huaweiCloudSyncRdbStore.executeSql('CREATE TABLE IF NOT EXISTS password(id TEXT PRIMARY KEY,name TEXT,info TEXT,tag TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
-    await huaweiCloudSyncRdbStore.executeSql('CREATE TABLE IF NOT EXISTS info(id TEXT PRIMARY KEY,type TEXT,value TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
-    await huaweiCloudSyncRdbStore.executeSql('CREATE TABLE IF NOT EXISTS tag(id TEXT PRIMARY KEY,value TEXT,color TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
+    await huaweiCloudSyncRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS password(id TEXT PRIMARY KEY,name TEXT,info TEXT,tag TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
+    await huaweiCloudSyncRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS info(id TEXT PRIMARY KEY,type TEXT,value TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
+    await huaweiCloudSyncRdbStore.executeSql(
+      'CREATE TABLE IF NOT EXISTS tag(id TEXT PRIMARY KEY,value TEXT,color TEXT,updateTime INTEGER,cloudBackupTime TEXT)')
     passwordRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       const promises = deviceIds.map(async (item) => {
         const tableName = await passwordRdbStore.obtainDistributedTableName(item, 'password')
@@ -484,7 +497,7 @@ export default class EntryAbility extends UIAbility {
         resultSetb.close()
         const deleteIds = idsb.filter(item => !idsa.includes(item))
         const deletepromises = deleteIds.map(async (item) => {
-          await deleteData(this.context, 'password', item)
+          await deleteData(this.context, 'password', item, false)
         })
         await Promise.all(deletepromises)
         await autoSyncTable(this.context, 'password', item)
@@ -492,7 +505,6 @@ export default class EntryAbility extends UIAbility {
       await Promise.all(promises)
       this.context.eventHub.emit('refreshPassword')
       await autoBackupTable(this.context, 'password')
-      await autoHuaweiCloudSyncTable(this.context, 'password')
     })
     infoRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       const promises = deviceIds.map(async (item) => {
@@ -532,7 +544,7 @@ export default class EntryAbility extends UIAbility {
         resultSetb.close()
         const deleteIds = idsb.filter(item => !idsa.includes(item))
         const deletepromises = deleteIds.map(async (item) => {
-          await deleteData(this.context, 'info', item)
+          await deleteData(this.context, 'info', item, false)
         })
         await Promise.all(deletepromises)
         await autoSyncTable(this.context, 'info', item)
@@ -540,7 +552,6 @@ export default class EntryAbility extends UIAbility {
       await Promise.all(promises)
       this.context.eventHub.emit('refreshInfo')
       await autoBackupTable(this.context, 'info')
-      await autoHuaweiCloudSyncTable(this.context, 'info')
     })
     tagRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_REMOTE, async (deviceIds) => {
       const promises = deviceIds.map(async (item) => {
@@ -580,7 +591,7 @@ export default class EntryAbility extends UIAbility {
         resultSetb.close()
         const deleteIds = idsb.filter(item => !idsa.includes(item))
         const deletepromises = deleteIds.map(async (item) => {
-          await deleteData(this.context, 'tag', item)
+          await deleteData(this.context, 'tag', item, false)
         })
         await Promise.all(deletepromises)
         await autoSyncTable(this.context, 'tag', item)
@@ -588,7 +599,6 @@ export default class EntryAbility extends UIAbility {
       await Promise.all(promises)
       this.context.eventHub.emit('refreshTag')
       await autoBackupTable(this.context, 'tag')
-      await autoHuaweiCloudSyncTable(this.context, 'tag')
     })
     huaweiCloudSyncRdbStore.on('dataChange', relationalStore.SubscribeType.SUBSCRIBE_TYPE_CLOUD_DETAILS,
       (changeInfo: relationalStore.ChangeInfo[]) => {
@@ -648,7 +658,7 @@ export default class EntryAbility extends UIAbility {
                     })
                     const deletedIdArray = item.deleted as string[]
                     const deletepromises = deletedIdArray.map(async (id) => {
-                      await deleteData(this.context, 'password', Number(id))
+                      await deleteData(this.context, 'password', Number(id), false)
                       await huaweiCloudSyncRdbStore.cleanDirtyData(table)
                     })
                     await Promise.all(insertpromises)
@@ -702,7 +712,7 @@ export default class EntryAbility extends UIAbility {
                     })
                     const deletedIdArray = item.deleted as string[]
                     const deletepromises = deletedIdArray.map(async (id) => {
-                      await deleteData(this.context, 'info', Number(id))
+                      await deleteData(this.context, 'info', Number(id), false)
                       await huaweiCloudSyncRdbStore.cleanDirtyData(table)
                     })
                     await Promise.all(insertpromises)
@@ -756,7 +766,7 @@ export default class EntryAbility extends UIAbility {
                     })
                     const deletedIdArray = item.deleted as string[]
                     const deletepromises = deletedIdArray.map(async (id) => {
-                      await deleteData(this.context, 'tag', Number(id))
+                      await deleteData(this.context, 'tag', Number(id), false)
                       await huaweiCloudSyncRdbStore.cleanDirtyData(table)
                     })
                     await Promise.all(insertpromises)
@@ -857,7 +867,7 @@ export default class EntryAbility extends UIAbility {
           try {
             await this.context.startAbility({
               bundleName: 'com.zhangxm.aipasswordmemo',
-              abilityName: 'BackGroundAbility'
+              abilityName: 'BackgroundAbility'
             }, {
               processMode: contextConstant.ProcessMode.NEW_PROCESS_ATTACH_TO_STATUS_BAR_ITEM,
               startupVisibility: contextConstant.StartupVisibility.STARTUP_HIDE
@@ -884,7 +894,6 @@ export default class EntryAbility extends UIAbility {
       applicationContext.setSupportedProcessCache(processCache)
     }
     await this.appInit(want)
-    await importOldKey()
     await clearNouseData(this.context)
   }
 
@@ -900,6 +909,50 @@ export default class EntryAbility extends UIAbility {
     await this.windowInit(windowStage)
   }
 
+  async onForeground() {
+    const colorMode = getFlushPreference(this.context, 'commonSetting', 'colorMode', 0)
+    if (colorMode === 3) {
+      try {
+        await sensor.getSingleSensor(sensor.SensorId.AMBIENT_LIGHT)
+        let lastUpdateTime = 0
+        sensor.on(sensor.SensorId.AMBIENT_LIGHT, async (event) => {
+          const currentTime = Date.now()
+          if (currentTime - lastUpdateTime >= 3000) {
+            const currentColorMode = getFlushPreference(this.context, 'commonSetting', 'colorMode', 0)
+            if (currentColorMode === 3) {
+              lastUpdateTime = currentTime
+              const applicationContext = this.context.getApplicationContext()
+              if (event.intensity >= 30 &&
+                this.context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
+                applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
+                await selectDynamicIcon(this.context)
+              }
+              if (event.intensity <= 20 &&
+                this.context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
+                applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
+                await selectDynamicIcon(this.context)
+              }
+            } else {
+              sensor.off(sensor.SensorId.AMBIENT_LIGHT)
+            }
+          }
+        })
+      } catch {
+      }
+    }
+  }
+
+  async onBackground() {
+    const colorMode = getFlushPreference(this.context, 'commonSetting', 'colorMode', 0)
+    if (colorMode === 3) {
+      try {
+        await sensor.getSingleSensor(sensor.SensorId.AMBIENT_LIGHT)
+        sensor.off(sensor.SensorId.AMBIENT_LIGHT)
+      } catch {
+      }
+    }
+  }
+
   async onPrepareToTerminateAsync(): Promise<boolean> {
     const statusBarExist = getTempPreference(this.context, 'statusBar', 'exist', false) as boolean
     if (statusBarExist) {
@@ -909,34 +962,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onConfigurationUpdate() {
-    const iconMode = getFlushPreference(this.context, 'commonSetting', 'iconMode', 1)
-    const colorMode = getFlushPreference(this.context, 'commonSetting', 'colorMode', 0)
-    try {
-      if (iconMode === 0) {
-        if (colorMode === 0) {
-          const systemColorMode = uiAppearance.getDarkMode()
-          if (systemColorMode === 0) {
-            await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-          }
-          if (systemColorMode === 1) {
-            await appInfoManager.disableDynamicIcon()
-          }
-        }
-        if (colorMode === 1) {
-          await appInfoManager.disableDynamicIcon()
-        }
-        if (colorMode === 2) {
-          await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-        }
-      }
-      if (iconMode === 1) {
-        await appInfoManager.disableDynamicIcon()
-      }
-      if (iconMode === 2) {
-        await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-      }
-    } catch {
-    }
+    await selectDynamicIcon(this.context)
   }
 
   onBackPressed() {
@@ -949,7 +975,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 61) {
+    if (wantParam.version !== 62) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

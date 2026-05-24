@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { uri } from '@kit.ArkTS'
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
@@ -17,6 +17,7 @@ import { newInfo, newTag, updatePassword } from '../common/Datachange'
 import { getPasswordInfo, getTagList, getTypeInfoList, Password, PasswordInfoItem, Tag } from '../common/Dataget'
 import { getFlushPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
+import { autoSyncTable, autoBackupTable } from '../common/Table'
 import { SelectItem } from './Newpassword'
 import Passwordgenerate from './Passwordgenerate'
 
@@ -64,7 +65,8 @@ export default struct Updatepassword {
       this.infoValue) {
       this.passwordInfoArray.push({
         type: infoType,
-        value: this.infoValue
+        value: this.infoValue,
+        history: []
       })
       this.infoType = ''
       this.infoTypeIndex = 0
@@ -377,7 +379,8 @@ export default struct Updatepassword {
                   }
                   this.passwordInfoArray.push({
                     type: infoType,
-                    value: uriSecret + '\0' + step + '\0' + digits
+                    value: uriSecret + '\0' + step + '\0' + digits,
+                    history: []
                   })
                   this.infoType = ''
                   this.infoTypeIndex = 0
@@ -409,7 +412,8 @@ export default struct Updatepassword {
                     this.infoValue && this.mfaStep && this.mfaDigits) {
                     this.passwordInfoArray.push({
                       type: infoType,
-                      value: this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits
+                      value: this.infoValue + '\0' + this.mfaStep + '\0' + this.mfaDigits,
+                      history: []
                     })
                     this.infoType = ''
                     this.infoTypeIndex = 0
@@ -589,7 +593,8 @@ export default struct Updatepassword {
                     }
                     this.passwordInfoArray.push({
                       type: this.getCurrentInfoType(),
-                      value: item
+                      value: item,
+                      history: []
                     })
                   })
               }
@@ -688,7 +693,8 @@ export default struct Updatepassword {
               }
               this.passwordInfoArray.push({
                 type: infoType,
-                value: value
+                value: value,
+                history: []
               })
               this.infoType = ''
               this.infoTypeIndex = 0
@@ -744,7 +750,8 @@ export default struct Updatepassword {
                   }
                   this.passwordInfoArray.push({
                     type: 'MFA',
-                    value: uriSecret + '\0' + step + '\0' + digits
+                    value: uriSecret + '\0' + step + '\0' + digits,
+                    history: []
                   })
                   this.infoType = ''
                   this.infoTypeIndex = 0
@@ -865,8 +872,7 @@ export default struct Updatepassword {
               top: $r('sys.float.ohos_id_elements_margin_vertical_l')
             })
             .onBlur(() => {
-              if (this.pushItemWhenBlur && this.passwordTag &&
-                !this.passwordTagArray.some(item => item === this.passwordTag)) {
+              if (this.pushItemWhenBlur && this.passwordTag && !this.passwordTagArray.includes(this.passwordTag)) {
                 this.passwordTagArray.push(this.passwordTag)
                 this.passwordTag = ''
               }
@@ -893,7 +899,7 @@ export default struct Updatepassword {
                 Image($r('app.media.add'))
                   .height(24)
                   .onClick(async () => {
-                    if (this.passwordTagArray.some(tagItem => tagItem === item.value)) {
+                    if (this.passwordTagArray.includes(item.value)) {
                       await promptAction.openToast({
                         message: '已添加此标签'
                       })
@@ -924,7 +930,7 @@ export default struct Updatepassword {
               })
               return
             }
-            if (this.passwordTagArray.some(item => item === this.passwordTag)) {
+            if (this.passwordTagArray.includes(this.passwordTag)) {
               await promptAction.openToast({
                 message: '已添加此标签'
               })
@@ -1088,6 +1094,7 @@ export default struct Updatepassword {
 
       ListItem() {
         Button('修改')
+          .keyboardShortcut('S', [ModifierKey.CTRL])
           .width('100%')
           .onClick(async () => {
             if (!this.passwordName) {
@@ -1102,11 +1109,21 @@ export default struct Updatepassword {
               })
               return
             }
+            const dialogControllerProgress = new CustomDialogController({
+              builder: LoadingDialog({
+                content: '修改中...'
+              })
+            })
+            dialogControllerProgress.open()
             await updatePassword(this.context, this.passwordId, {
               name: this.passwordName,
               info: this.passwordInfoArray,
               tag: this.passwordTagArray,
               cloudBackup: this.cloudBackup
+            })
+            dialogControllerProgress.close()
+            await promptAction.openToast({
+              message: '修改成功'
             })
             let infoCloudBackup = false
             let tagCloudBackup = false
@@ -1117,27 +1134,45 @@ export default struct Updatepassword {
             if (this.allowCloudBackup && autoOn.includes('tag')) {
               tagCloudBackup = true
             }
-            if (this.autoNewInfo) {
+            if (this.autoNewInfo && this.passwordInfoArray.length > 0) {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '自动新增常用信息中...'
+                })
+              })
+              dialogControllerProgress.open()
               const promises = this.passwordInfoArray.map(async (item) => {
                 if (item.type !== 'MFA') {
                   await newInfo(this.context, {
                     type: item.type,
                     value: item.value,
                     cloudBackup: infoCloudBackup
-                  }, true)
+                  }, false)
                 }
               })
               await Promise.all(promises)
+              await autoSyncTable(this.context, 'info')
+              await autoBackupTable(this.context, 'info')
+              dialogControllerProgress.close()
             }
-            if (this.autoNewTag) {
+            if (this.autoNewTag && this.passwordTagArray.length > 0) {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '自动新增标签中...'
+                })
+              })
+              dialogControllerProgress.open()
               const promises = this.passwordTagArray.map(async (item) => {
                 await newTag(this.context, {
                   value: item,
                   color: '',
                   cloudBackup: tagCloudBackup
-                }, true)
+                }, false)
               })
               await Promise.all(promises)
+              await autoSyncTable(this.context, 'tag')
+              await autoBackupTable(this.context, 'tag')
+              dialogControllerProgress.close()
             }
             this.isShowUpdateSheet = false
           })
@@ -1177,7 +1212,6 @@ export default struct Updatepassword {
         }
         if (key) {
           this.allowCloudBackup = true
-          this.alertText = ''
           const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
           if (autoOn.includes('password')) {
             this.cloudBackup = true

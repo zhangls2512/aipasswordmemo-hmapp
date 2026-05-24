@@ -47,7 +47,7 @@ struct Storevaluehistorypasswordinfotype {
                   })
                   return
                 }
-                if (this.storeValueHistoryPasswordInfoTypeArray.some(item => item === this.type)) {
+                if (this.storeValueHistoryPasswordInfoTypeArray.includes(this.type)) {
                   await promptAction.openToast({
                     message: '已添加此类型'
                   })

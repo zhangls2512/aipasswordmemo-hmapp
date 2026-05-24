@@ -12,7 +12,6 @@ import { checkPermission } from '../common/Permission'
 import { getFlushPreference, setFlushPreference } from '../common/Preference'
 import { getSizeString } from '../common/Stringformat'
 import { syncTable } from '../common/Table'
-import { InfoOutItem, PasswordOutItem, TagOutItem } from './DataInOut'
 
 interface Type {
   name: string,
@@ -301,8 +300,7 @@ struct Tablesync {
                         })
                       Text(item.deviceType === 'PHONE' ? '手机' :
                         item.deviceType === 'TABLET' ? '平板' :
-                          item.deviceType === '2IN1' ? '电脑' :
-                            'undefined')
+                          item.deviceType === '2IN1' ? '电脑' : 'undefined')
                         .fontColor($r('sys.color.font_secondary'))
                         .fontSize($r('sys.float.ohos_id_text_size_body2'))
                         .layoutWeight(1)
@@ -1644,22 +1642,8 @@ struct Tablesync {
                   })
                   .onClick(async () => {
                     const array = await getPasswordList(this.context)
-                    const arrayOut = array.map((item): PasswordOutItem => {
-                      let cloudBackupTime = JSON.stringify([])
-                      if (typeof (item.cloudBackupTime) === 'string') {
-                        cloudBackupTime = item.cloudBackupTime
-                      }
-                      return {
-                        id: item.id,
-                        name: item.name,
-                        info: item.info,
-                        tag: item.tag.map(item => item.value),
-                        updateTime: item.updateTime,
-                        cloudBackupTime: cloudBackupTime
-                      }
-                    })
                     const filePath = this.context.tempDir + '/password.txt'
-                    await write(filePath, JSON.stringify(arrayOut))
+                    await write(filePath, JSON.stringify(array))
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
                       title: 'password.txt',
@@ -1812,21 +1796,8 @@ struct Tablesync {
                   })
                   .onClick(async () => {
                     const array = await getInfoList(this.context)
-                    const arrayOut = array.map((item): InfoOutItem => {
-                      let cloudBackupTime = JSON.stringify([])
-                      if (typeof (item.cloudBackupTime) === 'string') {
-                        cloudBackupTime = item.cloudBackupTime
-                      }
-                      return {
-                        id: item.id,
-                        type: item.type,
-                        value: item.value,
-                        updateTime: item.updateTime,
-                        cloudBackupTime: cloudBackupTime
-                      }
-                    })
                     const filePath = this.context.tempDir + '/info.txt'
-                    await write(filePath, JSON.stringify(arrayOut))
+                    await write(filePath, JSON.stringify(array))
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
                       title: 'info.txt',
@@ -1895,21 +1866,8 @@ struct Tablesync {
                   })
                   .onClick(async () => {
                     const array = await getTagList(this.context)
-                    const arrayOut = array.map((item): TagOutItem => {
-                      let cloudBackupTime = JSON.stringify([])
-                      if (typeof (item.cloudBackupTime) === 'string') {
-                        cloudBackupTime = item.cloudBackupTime
-                      }
-                      return {
-                        id: item.id,
-                        value: item.value,
-                        color: item.color,
-                        updateTime: item.updateTime,
-                        cloudBackupTime: cloudBackupTime
-                      }
-                    })
                     const filePath = this.context.tempDir + '/tag.txt'
-                    await write(filePath, JSON.stringify(arrayOut))
+                    await write(filePath, JSON.stringify(array))
                     const shareData = new systemShare.SharedData({
                       utd: uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
                       title: 'tag.txt',
