@@ -405,7 +405,7 @@ struct Tablesync {
                       const res =
                         await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
                       if (res) {
-                        this.availableDeviceArray = this.deviceManager.getAvailableDeviceListSync() as Item[]
+                        this.availableDeviceArray = await this.deviceManager.getAvailableDeviceList() as Item[]
                         await promptAction.openToast({
                           message: '刷新成功'
                         })
@@ -1969,7 +1969,7 @@ struct Tablesync {
       this.getSetting()
       const res = await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
       if (res) {
-        this.availableDeviceArray = this.deviceManager.getAvailableDeviceListSync() as Item[]
+        this.availableDeviceArray = await this.deviceManager.getAvailableDeviceList() as Item[]
       }
     })
     .onDisAppear(() => {
