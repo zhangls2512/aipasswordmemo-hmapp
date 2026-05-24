@@ -9,7 +9,7 @@ interface WebdavServerInfo {
 
 let globalWebdavServerInfo: WebdavServerInfo | undefined = undefined
 
-export async function getWebdavServerInfo(): Promise<WebdavServerInfo> {
+export async function getWebdavServerInfo() {
   if (!globalWebdavServerInfo) {
     const appAccountManager = appAccount.createAppAccountManager()
     try {

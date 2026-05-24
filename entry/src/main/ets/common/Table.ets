@@ -166,7 +166,7 @@ export async function backupTable(context: Context, table: string) {
   }
 }
 
-async function getFileBackupString(array: PasswordItem[] | Info[] | Tag[], encrypted: boolean): Promise<string> {
+async function getFileBackupString(array: PasswordItem[] | Info[] | Tag[], encrypted: boolean) {
   if (!encrypted) {
     return JSON.stringify({
       encrypted: false,
