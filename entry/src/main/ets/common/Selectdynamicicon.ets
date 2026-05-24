@@ -24,20 +24,20 @@ export async function selectDynamicIcon(context: common.UIAbilityContext) {
       if (colorMode === 2) {
         await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
       }
+      if (colorMode === 3) {
+        if (context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
+          await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
+        }
+        if (context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
+          await appInfoManager.disableDynamicIcon()
+        }
+      }
     }
     if (iconMode === 1) {
       await appInfoManager.disableDynamicIcon()
     }
     if (iconMode === 2) {
       await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-    }
-    if (iconMode === 3) {
-      if (context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
-        await appInfoManager.selectDynamicIcon('dark_' + deviceInfo.deviceType)
-      }
-      if (context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
-        await appInfoManager.disableDynamicIcon()
-      }
     }
   } catch {
   }
