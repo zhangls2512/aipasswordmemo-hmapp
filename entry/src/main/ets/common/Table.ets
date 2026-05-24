@@ -8,6 +8,7 @@ import { encrypt, EncryptData, getKeyAlg } from './Crypto'
 import { getInfoList, getPasswordList, getTagList, Info, Tag } from './Dataget'
 import { PasswordItem } from './Dataimport'
 import { write } from './File'
+import { getPermission } from './Permission'
 import { getFlushPreference } from './Preference'
 import { globalSession } from './Request'
 import { getWebdavServerInfo } from './Webdavserver'
@@ -48,34 +49,42 @@ export async function autoSyncTable(context: Context, table: string, fromDeviceI
 
 export async function syncTable(context: Context, table: string, networkId: string,
   syncMode: relationalStore.SyncMode) {
-  let securityLevel = relationalStore.SecurityLevel.S4
-  if (table === 'tag') {
-    securityLevel = relationalStore.SecurityLevel.S1
-  }
-  const rdbStore = await relationalStore.getRdbStore(context, {
-    name: table,
-    securityLevel: securityLevel,
-    encrypt: true,
-    allowRebuild: true
-  })
-  const predicates = new relationalStore.RdbPredicates(table)
-  predicates.inDevices([networkId])
-  try {
-    const res = await rdbStore.sync(syncMode, predicates)
-    if (res[0][1] !== 0) {
-      await promptAction.openToast({
-        message: '同步失败，设备 ID：' + res[0][0] + '，错误码：' + res[0][1]
-      })
-    }
-    if (res[0][1] === 0) {
-      await promptAction.openToast({
-        message: '同步成功，设备 ID：' + res[0][0]
-      })
-    }
-  } catch (err) {
+  const permission = getPermission('ohos.permission.DISTRIBUTED_DATASYNC')
+  if (!permission) {
     await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code
+      message: '同步失败，原因：无权限'
     })
+  }
+  if (permission) {
+    let securityLevel = relationalStore.SecurityLevel.S4
+    if (table === 'tag') {
+      securityLevel = relationalStore.SecurityLevel.S1
+    }
+    const rdbStore = await relationalStore.getRdbStore(context, {
+      name: table,
+      securityLevel: securityLevel,
+      encrypt: true,
+      allowRebuild: true
+    })
+    const predicates = new relationalStore.RdbPredicates(table)
+    predicates.inDevices([networkId])
+    try {
+      const res = await rdbStore.sync(syncMode, predicates)
+      if (res[0][1] !== 0) {
+        await promptAction.openToast({
+          message: '同步失败，设备 ID：' + res[0][0] + '，错误码：' + res[0][1]
+        })
+      }
+      if (res[0][1] === 0) {
+        await promptAction.openToast({
+          message: '同步成功，设备 ID：' + res[0][0]
+        })
+      }
+    } catch (err) {
+      await promptAction.openToast({
+        message: '发生错误，错误码：' + err.code
+      })
+    }
   }
 }
 
