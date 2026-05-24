@@ -51,7 +51,6 @@ struct MfaCard {
         top: $r('sys.float.ohos_id_elements_margin_vertical_l')
       })
     }
-    .backgroundColor($r('sys.color.comp_background_primary'))
     .padding({
       left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
       right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
