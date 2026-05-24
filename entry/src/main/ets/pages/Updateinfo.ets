@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { updateInfo } from '../common/Datachange'
@@ -189,6 +189,7 @@ export default struct Updateinfo {
 
       ListItem() {
         Button('修改')
+          .keyboardShortcut('S', [ModifierKey.CTRL])
           .width('100%')
           .onClick(async () => {
             if (!this.infoType) {
@@ -203,10 +204,20 @@ export default struct Updateinfo {
               })
               return
             }
+            const dialogControllerProgress = new CustomDialogController({
+              builder: LoadingDialog({
+                content: '修改中...'
+              })
+            })
+            dialogControllerProgress.open()
             const res = await updateInfo(this.context, this.infoId, {
               type: this.infoType,
               value: this.infoValue,
               cloudBackup: this.cloudBackup
+            })
+            dialogControllerProgress.close()
+            await promptAction.openToast({
+              message: '修改' + (res === 'success' ? '成功' : '失败，原因：已存在')
             })
             if (res === 'success') {
               this.isShowUpdateSheet = false
@@ -237,7 +248,6 @@ export default struct Updateinfo {
         }
         if (key) {
           this.allowCloudBackup = true
-          this.alertText = ''
           const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
           if (autoOn.includes('info')) {
             this.cloudBackup = true

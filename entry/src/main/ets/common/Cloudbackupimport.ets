@@ -1,9 +1,9 @@
 import { relationalStore } from '@kit.ArkData'
-import { getAccountAccessToken, getAccountInfo } from './Accesstoken'
+import { getAccountAccessToken } from './Account'
 import { decrypt, getKeyAlg } from './Crypto'
-import { PasswordInfoItem } from './Dataget'
-import { importInfo, importPassword, importTag, InfoInItem, PasswordInItem, TagInItem } from './Dataimport'
-import request from './Request'
+import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
+import { importInfo, importPassword, importTag, InfoItem, PasswordItem, TagItem } from './Dataimport'
+import { request } from './Request'
 
 interface Item {
   id: number,
@@ -16,24 +16,24 @@ interface PasswordCloudBackup {
   info: PasswordInfoItem[],
   tag: string[],
   updateTime: number,
-  cloudBackupTime: string | number
+  cloudBackupTime: CloudBackupTimeItem[]
 }
 
 interface InfoCloudBackup {
   type: string,
   value: string,
   updateTime: number,
-  cloudBackupTime: string | number
+  cloudBackupTime: CloudBackupTimeItem[]
 }
 
 interface TagCloudBackup {
   value: string,
   color: string,
   updateTime: number,
-  cloudBackupTime: string | number
+  cloudBackupTime: CloudBackupTimeItem[]
 }
 
-export async function importCloudBackupPassword(context: Context) {
+export async function importCloudBackupPassword(context: Context, conflict: relationalStore.ConflictResolution) {
   const accessToken = await getAccountAccessToken()
   if (accessToken && getKeyAlg()) {
     const countResponse = await request(context, '/password/getBackupCount', {
@@ -50,8 +50,7 @@ export async function importCloudBackupPassword(context: Context) {
         })
         if (listResponse !== 'fail') {
           const array = JSON.parse(listResponse).data as Item[]
-          const passwordArray: PasswordInItem[] = []
-          const accountInfo = await getAccountInfo()
+          const passwordArray: PasswordItem[] = []
           const promises = array.map(async (item) => {
             const itemstring = await decrypt({
               content: item.content,
@@ -59,26 +58,18 @@ export async function importCloudBackupPassword(context: Context) {
             })
             if (itemstring !== 'fail') {
               const itemobject = JSON.parse(itemstring) as PasswordCloudBackup
-              let cloudBackupTime = itemobject.cloudBackupTime
-              if (typeof (cloudBackupTime) === 'number') {
-                cloudBackupTime = JSON.stringify([{
-                  uid: accountInfo.uid,
-                  time: itemobject.cloudBackupTime
-                }])
-              }
               passwordArray.push({
                 id: item.id,
                 name: itemobject.name,
-                info: itemobject.info,
-                tag: itemobject.tag,
+                info: Array.isArray(itemobject.info) ? itemobject.info : [],
+                tag: Array.isArray(itemobject.tag) ? itemobject.tag : [],
                 updateTime: itemobject.updateTime,
-                cloudBackupTime: cloudBackupTime
+                cloudBackupTime: Array.isArray(itemobject.cloudBackupTime) ? itemobject.cloudBackupTime : []
               })
             }
           })
           await Promise.all(promises)
-          await importPassword(context, JSON.stringify(passwordArray),
-            relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+          await importPassword(context, JSON.stringify(passwordArray), conflict)
         }
       }
       return 'success'
@@ -87,7 +78,7 @@ export async function importCloudBackupPassword(context: Context) {
   return 'fail'
 }
 
-export async function importCloudBackupInfo(context: Context) {
+export async function importCloudBackupInfo(context: Context, conflict: relationalStore.ConflictResolution) {
   const accessToken = await getAccountAccessToken()
   if (accessToken && getKeyAlg()) {
     const countResponse = await request(context, '/password/getBackupCount', {
@@ -104,8 +95,7 @@ export async function importCloudBackupInfo(context: Context) {
         })
         if (listResponse !== 'fail') {
           const array = JSON.parse(listResponse).data as Item[]
-          const infoArray: InfoInItem[] = []
-          const accountInfo = await getAccountInfo()
+          const infoArray: InfoItem[] = []
           const promises = array.map(async (item) => {
             const itemstring = await decrypt({
               content: item.content,
@@ -113,24 +103,17 @@ export async function importCloudBackupInfo(context: Context) {
             })
             if (itemstring !== 'fail') {
               const itemobject = JSON.parse(itemstring) as InfoCloudBackup
-              let cloudBackupTime = itemobject.cloudBackupTime
-              if (typeof (cloudBackupTime) === 'number') {
-                cloudBackupTime = JSON.stringify([{
-                  uid: accountInfo.uid,
-                  time: itemobject.cloudBackupTime
-                }])
-              }
               infoArray.push({
                 id: item.id,
                 type: itemobject.type,
                 value: itemobject.value,
                 updateTime: itemobject.updateTime,
-                cloudBackupTime: cloudBackupTime
+                cloudBackupTime: Array.isArray(itemobject.cloudBackupTime) ? itemobject.cloudBackupTime : []
               })
             }
           })
           await Promise.all(promises)
-          await importInfo(context, JSON.stringify(infoArray), relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+          await importInfo(context, JSON.stringify(infoArray), conflict)
         }
       }
       return 'success'
@@ -139,7 +122,7 @@ export async function importCloudBackupInfo(context: Context) {
   return 'fail'
 }
 
-export async function importCloudBackupTag(context: Context) {
+export async function importCloudBackupTag(context: Context, conflict: relationalStore.ConflictResolution) {
   const accessToken = await getAccountAccessToken()
   if (accessToken && getKeyAlg()) {
     const countResponse = await request(context, '/password/getBackupCount', {
@@ -156,8 +139,7 @@ export async function importCloudBackupTag(context: Context) {
         })
         if (listResponse !== 'fail') {
           const array = JSON.parse(listResponse).data as Item[]
-          const tagArray: TagInItem[] = []
-          const accountInfo = await getAccountInfo()
+          const tagArray: TagItem[] = []
           const promises = array.map(async (item) => {
             const itemstring = await decrypt({
               content: item.content,
@@ -165,24 +147,17 @@ export async function importCloudBackupTag(context: Context) {
             })
             if (itemstring !== 'fail') {
               const itemobject = JSON.parse(itemstring) as TagCloudBackup
-              let cloudBackupTime = itemobject.cloudBackupTime
-              if (typeof (cloudBackupTime) === 'number') {
-                cloudBackupTime = JSON.stringify([{
-                  uid: accountInfo.uid,
-                  time: itemobject.cloudBackupTime
-                }])
-              }
               tagArray.push({
                 id: item.id,
                 value: itemobject.value,
                 color: itemobject.color,
                 updateTime: itemobject.updateTime,
-                cloudBackupTime: cloudBackupTime
+                cloudBackupTime: Array.isArray(itemobject.cloudBackupTime) ? itemobject.cloudBackupTime : []
               })
             }
           })
           await Promise.all(promises)
-          await importTag(context, JSON.stringify(tagArray), relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+          await importTag(context, JSON.stringify(tagArray), conflict)
         }
       }
       return 'success'

@@ -1,8 +1,8 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
-import { getAccountAccessToken } from '../common/Accesstoken'
+import { getAccountAccessToken } from '../common/Account'
 import getCloudServiceStatus from '../common/Cloudservice'
-import request from '../common/Request'
+import { request } from '../common/Request'
 
 @ComponentV2
 export default struct Cloudservice {

@@ -6,34 +6,11 @@ import { fileIo, picker } from '@kit.CoreFileKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { importCsvPassword, parseCsvLine } from '../common/Csv'
 import { getInfoList, getPasswordList, getPasswordMaxId, getTagList, PasswordInfoItem } from '../common/Dataget'
-import { importInfo, importPassword, importTag } from '../common/Dataimport'
+import { importInfo, importPassword, importTag, PasswordItem } from '../common/Dataimport'
 import { readUri, writeUri } from '../common/File'
 import openLink from '../common/Openlink'
-
-export interface PasswordOutItem {
-  id: number,
-  name: string,
-  info: PasswordInfoItem[],
-  tag: string[],
-  updateTime: number,
-  cloudBackupTime: string
-}
-
-export interface InfoOutItem {
-  id: number,
-  type: string,
-  value: string,
-  updateTime: number,
-  cloudBackupTime: string
-}
-
-export interface TagOutItem {
-  id: number,
-  value: string,
-  color: string,
-  updateTime: number,
-  cloudBackupTime: string
-}
+import { getFlushPreference } from '../common/Preference'
+import { restartApp } from '../common/Restartapp'
 
 @Builder
 export function DataInOutBuilder() {
@@ -232,11 +209,7 @@ struct DataInOut {
                     ]
                   })
                   if (data.index === 1) {
-                    const applicationContext = this.context.getApplicationContext()
-                    applicationContext.restartApp({
-                      bundleName: 'com.zhangxm.aipasswordmemo',
-                      abilityName: 'EntryAbility'
-                    })
+                    await restartApp(this.context, this.UIContext)
                   }
                 }
               })
@@ -444,9 +417,12 @@ struct DataInOut {
                     conflictResolution = 5
                   }
                   const lines = filestring.split('\n').filter(line => line.trim() !== '')
-                  const result: PasswordOutItem[] = []
+                  const result: PasswordItem[] = []
                   const maxId = await getPasswordMaxId(this.context)
                   let idCounter = maxId + 1
+                  const storeValueHistoryPasswordInfoTypeArray =
+                    getFlushPreference(this.context, 'commonSetting', 'storeValueHistoryPasswordInfoType',
+                      ['密码']) as string[]
                   lines.forEach(item => {
                     const parsedFields = parseCsvLine(item)
                     const name = parsedFields[0]
@@ -454,22 +430,50 @@ struct DataInOut {
                     const username = parsedFields[2]
                     const password = parsedFields[3]
                     const info: PasswordInfoItem[] = []
+                    const updateTime = Date.now()
                     if (username) {
-                      info.push({ type: '用户名', value: username })
+                      info.push({
+                        type: '用户名',
+                        value: username,
+                        history: storeValueHistoryPasswordInfoTypeArray.includes('用户名') ? [
+                          {
+                            value: username,
+                            updateTime: updateTime
+                          }
+                        ] : []
+                      })
                     }
                     if (password) {
-                      info.push({ type: '密码', value: password })
+                      info.push({
+                        type: '密码',
+                        value: password,
+                        history: storeValueHistoryPasswordInfoTypeArray.includes('密码') ? [
+                          {
+                            value: password,
+                            updateTime: updateTime
+                          }
+                        ] : []
+                      })
                     }
                     if (url) {
-                      info.push({ type: 'URL', value: url })
+                      info.push({
+                        type: 'URL',
+                        value: url,
+                        history: storeValueHistoryPasswordInfoTypeArray.includes('URL') ? [
+                          {
+                            value: url,
+                            updateTime: updateTime
+                          }
+                        ] : []
+                      })
                     }
                     result.push({
                       id: idCounter++,
                       name,
                       info,
                       tag: [],
-                      updateTime: Date.now(),
-                      cloudBackupTime: JSON.stringify([])
+                      updateTime: updateTime,
+                      cloudBackupTime: []
                     })
                   })
                   await importPassword(this.context, JSON.stringify(result), conflictResolution)
@@ -512,7 +516,8 @@ struct DataInOut {
 
         ListItem() {
           Column() {
-            Text('导出 (未加密，请务必安全存储，保障数据安全。如需加密，请前往“我的”>“设置”>“数据”>“备份与恢复”>“文件”，开启“加密”，手动备份成功后导出)')
+            Text(
+              '导出 (未加密，请务必安全存储，保障数据安全。如需加密，请前往“我的”>“设置”>“数据”>“备份与恢复”>“文件”，开启“加密”，手动备份成功后导出)')
               .fontColor($r('sys.color.font_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight(FontWeight.Medium)
@@ -555,20 +560,6 @@ struct DataInOut {
               })
               .onClick(async () => {
                 const array = await getPasswordList(this.context)
-                const arrayOut = array.map((item): PasswordOutItem => {
-                  let cloudBackupTime = JSON.stringify([])
-                  if (typeof (item.cloudBackupTime) === 'string') {
-                    cloudBackupTime = item.cloudBackupTime
-                  }
-                  return {
-                    id: item.id,
-                    name: item.name,
-                    info: item.info,
-                    tag: item.tag.map(item => item.value),
-                    updateTime: item.updateTime,
-                    cloudBackupTime: cloudBackupTime
-                  }
-                })
                 const documentSaveOptions = new picker.DocumentSaveOptions()
                 documentSaveOptions.newFileNames = ['password']
                 const promptAction = this.UIContext.getPromptAction()
@@ -591,7 +582,7 @@ struct DataInOut {
                   const uris = await documentViewPicker.save(documentSaveOptions)
                   if (uris.length === 1) {
                     const filePath = uris[0]
-                    await writeUri(filePath, JSON.stringify(arrayOut))
+                    await writeUri(filePath, JSON.stringify(array))
                     await promptAction.openToast({
                       message: '导出成功'
                     })
@@ -599,9 +590,9 @@ struct DataInOut {
                 }
                 if (data.index === 1) {
                   let filestring = ''
-                  if (arrayOut.length > 0) {
+                  if (array.length > 0) {
                     const allInfoTypesArray: string[] = []
-                    arrayOut.forEach(item => {
+                    array.forEach(item => {
                       item.info.forEach(infoItem => {
                         if (!allInfoTypesArray.includes(infoItem.type)) {
                           allInfoTypesArray.push(infoItem.type)
@@ -609,7 +600,7 @@ struct DataInOut {
                       })
                     })
                     const headers = ['名称'].concat(allInfoTypesArray)
-                    const rows = arrayOut.map(item => {
+                    const rows = array.map(item => {
                       const values = [item.name]
                       for (let i = 0; i < allInfoTypesArray.length; i++) {
                         let value = ''
@@ -753,20 +744,7 @@ struct DataInOut {
                 if (uris.length === 1) {
                   const filePath = uris[0]
                   const array = await getInfoList(this.context)
-                  const arrayOut = array.map((item): InfoOutItem => {
-                    let cloudBackupTime = JSON.stringify([])
-                    if (typeof (item.cloudBackupTime) === 'string') {
-                      cloudBackupTime = item.cloudBackupTime
-                    }
-                    return {
-                      id: item.id,
-                      type: item.type,
-                      value: item.value,
-                      updateTime: item.updateTime,
-                      cloudBackupTime: cloudBackupTime
-                    }
-                  })
-                  await writeUri(filePath, JSON.stringify(arrayOut))
+                  await writeUri(filePath, JSON.stringify(array))
                   await promptAction.openToast({
                     message: '导出成功'
                   })
@@ -818,20 +796,7 @@ struct DataInOut {
                 if (uris.length === 1) {
                   const filePath = uris[0]
                   const array = await getTagList(this.context)
-                  const arrayOut = array.map((item): TagOutItem => {
-                    let cloudBackupTime = JSON.stringify([])
-                    if (typeof (item.cloudBackupTime) === 'string') {
-                      cloudBackupTime = item.cloudBackupTime
-                    }
-                    return {
-                      id: item.id,
-                      value: item.value,
-                      color: item.color,
-                      updateTime: item.updateTime,
-                      cloudBackupTime: cloudBackupTime
-                    }
-                  })
-                  await writeUri(filePath, JSON.stringify(arrayOut))
+                  await writeUri(filePath, JSON.stringify(array))
                   await promptAction.openToast({
                     message: '导出成功'
                   })

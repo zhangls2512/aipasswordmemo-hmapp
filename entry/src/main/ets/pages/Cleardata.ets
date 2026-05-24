@@ -5,6 +5,7 @@ import { webview } from '@kit.ArkWeb'
 import { fileIo } from '@kit.CoreFileKit'
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getDirectorySize, getFileSize } from '../common/File'
+import { restartApp } from '../common/Restartapp'
 import { getSizeString } from '../common/Stringformat'
 
 @ComponentV2
@@ -301,11 +302,7 @@ export default struct Cleardata {
                     ]
                   })
                   if (res.index === 1) {
-                    const applicationContext = this.context.getApplicationContext()
-                    applicationContext.restartApp({
-                      bundleName: 'com.zhangxm.aipasswordmemo',
-                      abilityName: 'EntryAbility'
-                    })
+                    await restartApp(this.context, this.UIContext)
                   }
                 }
                 await this.getSize()
@@ -455,20 +452,17 @@ export default struct Cleardata {
                 })
                 if (data.index === 1) {
                   const promises = this.cache.map(async (item) => {
-                    try {
-                      if (item === 'appCache') {
-                        await bundleManager.cleanBundleCacheFilesForSelf()
+                    if (item === 'appCache') {
+                      await bundleManager.cleanBundleCacheFilesForSelf()
+                    }
+                    if (item === 'webviewCache') {
+                      webview.WebviewController.removeAllCache(true)
+                    }
+                    if (item === 'invitationQrcodeCache') {
+                      const invitationcodeQrcodeDir = this.context.cacheDir + '/media/invitationqrcode'
+                      if (fileIo.accessSync(invitationcodeQrcodeDir)) {
+                        await fileIo.rmdir(invitationcodeQrcodeDir)
                       }
-                      if (item === 'webviewCache') {
-                        webview.WebviewController.removeAllCache(true)
-                      }
-                      if (item === 'invitationQrcodeCache') {
-                        const invitationcodeQrcodeDir = this.context.cacheDir + '/media/invitationqrcode'
-                        if (fileIo.accessSync(invitationcodeQrcodeDir)) {
-                          await fileIo.rmdir(invitationcodeQrcodeDir)
-                        }
-                      }
-                    } catch {
                     }
                   })
                   await Promise.all(promises)

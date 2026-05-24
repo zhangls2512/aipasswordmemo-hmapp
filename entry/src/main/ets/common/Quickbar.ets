@@ -1,5 +1,5 @@
 import { quickBarManager } from '@kit.DeskTopExtensionKit'
-import { getPasswordList } from './Dataget'
+import { getPasswordInfo } from './Dataget'
 
 interface QuickBarPasswordItem {
   taskId: number,
@@ -136,14 +136,13 @@ export async function deleteQuickBarPassword(context: Context, passwordId: numbe
 
 export async function syncQuickBarPassword(context: Context) {
   const passwordIds = await getQuickBarPasswordIdList(context)
-  const passwords = await getPasswordList(context)
   const promises = passwordIds.map(async (item) => {
-    const password = passwords.find(passwordItem => passwordItem.id === item)
-    if (!password) {
-      await deleteQuickBarPassword(context, item)
+    const res = await getPasswordInfo(context, item)
+    if (res !== 'fail') {
+      await setQuickBarPassword(context, item, res.name)
     }
-    if (password) {
-      await setQuickBarPassword(context, item, password.name)
+    if (res === 'fail') {
+      await deleteQuickBarPassword(context, item)
     }
   })
   await Promise.all(promises)

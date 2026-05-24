@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit'
+import { relationalStore } from '@kit.ArkData'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { importCloudBackupInfo, importCloudBackupPassword, importCloudBackupTag } from '../common/Cloudbackupimport'
@@ -191,7 +192,15 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const res = await importCloudBackupPassword(this.context)
+                let res = ''
+                if (this.index === 0) {
+                  res =
+                    await importCloudBackupPassword(this.context, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+                }
+                if (this.index === 1) {
+                  res = await importCloudBackupPassword(this.context,
+                    relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+                }
                 this.dialogControllerProgress.close()
                 if (res === 'success') {
                   await promptAction.openToast({
@@ -257,7 +266,14 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const res = await importCloudBackupInfo(this.context)
+                let res = ''
+                if (this.index === 0) {
+                  res = await importCloudBackupInfo(this.context, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+                }
+                if (this.index === 1) {
+                  res =
+                    await importCloudBackupInfo(this.context, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+                }
                 this.dialogControllerProgress.close()
                 if (res === 'success') {
                   await promptAction.openToast({
@@ -323,7 +339,13 @@ struct Cloudbackupimport {
                   return
                 }
                 this.dialogControllerProgress.open()
-                const res = await importCloudBackupTag(this.context)
+                let res = ''
+                if (this.index === 0) {
+                  res = await importCloudBackupTag(this.context, relationalStore.ConflictResolution.ON_CONFLICT_IGNORE)
+                }
+                if (this.index === 1) {
+                  res = await importCloudBackupTag(this.context, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+                }
                 this.dialogControllerProgress.close()
                 if (res === 'success') {
                   await promptAction.openToast({

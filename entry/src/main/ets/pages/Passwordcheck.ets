@@ -26,9 +26,9 @@ export default struct Passwordcheck {
   passwordId = 0
 
   @Builder
-  UpdateSheetBuilder(id: number) {
+  UpdateSheetBuilder() {
     UpdatePassword({
-      passwordId: id
+      passwordId: this.passwordId
     })
   }
 
@@ -434,7 +434,7 @@ export default struct Passwordcheck {
       this.repeatArray = await getRepeatPasswordList(this.context)
       this.oldArray = await getOldPasswordList(this.context)
     })
-    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(this.passwordId), {
+    .bindSheet(this.isShowUpdateSheet!!, this.UpdateSheetBuilder(), {
       preferType: this.preferType,
       title: {
         title: '修改密码'

@@ -5,9 +5,9 @@ import { util } from '@kit.ArkTS'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { netBoost } from '@kit.NetworkBoostKit'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
-import { setAccount } from '../common/Accesstoken'
+import { setAccount } from '../common/Account'
 import openLink from '../common/Openlink'
-import request from '../common/Request'
+import { request } from '../common/Request'
 
 @ComponentV2
 export default struct Login {
@@ -358,9 +358,11 @@ export default struct Login {
                   verifyType: 'passkey',
                   credentialId: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.rawId,
                     util.Type.BASIC_URL_SAFE),
-                  authenticatorData: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.authenticatorData,
+                  authenticatorData: new util.Base64Helper().encodeToStringSync(
+                    publicKeyAssertionCredential.response.authenticatorData,
                     util.Type.BASIC_URL_SAFE),
-                  clientDataJSON: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.clientDataJson,
+                  clientDataJSON: new util.Base64Helper().encodeToStringSync(
+                    publicKeyAssertionCredential.response.clientDataJson,
                     util.Type.BASIC_URL_SAFE),
                   signature: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.signature,
                     util.Type.BASIC_URL_SAFE)

@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { updateTag } from '../common/Datachange'
@@ -182,6 +182,7 @@ export default struct Updatetag {
 
       ListItem() {
         Button('修改')
+          .keyboardShortcut('S', [ModifierKey.CTRL])
           .width('100%')
           .onClick(async () => {
             if (!this.tagValue) {
@@ -190,10 +191,20 @@ export default struct Updatetag {
               })
               return
             }
+            const dialogControllerProgress = new CustomDialogController({
+              builder: LoadingDialog({
+                content: '修改中...'
+              })
+            })
+            dialogControllerProgress.open()
             const res = await updateTag(this.context, this.tagId, {
               value: this.tagValue,
               color: this.tagColor,
               cloudBackup: this.cloudBackup
+            })
+            dialogControllerProgress.close()
+            await promptAction.openToast({
+              message: '修改' + (res === 'success' ? '成功' : '失败，原因：已存在')
             })
             if (res === 'success') {
               this.isShowUpdateSheet = false
@@ -224,7 +235,6 @@ export default struct Updatetag {
         }
         if (key) {
           this.allowCloudBackup = true
-          this.alertText = ''
           const autoOn = getFlushPreference(this.context, 'cloudbackupSetting', 'autoOn', []) as string[]
           if (autoOn.includes('tag')) {
             this.cloudBackup = true
