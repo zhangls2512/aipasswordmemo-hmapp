@@ -897,6 +897,7 @@ struct Infolist {
                     ]
                   })
                 } catch (err) {
+                  this.dialogControllerProgress.close()
                   await promptAction.openToast({
                     message: '发生错误，错误码：' + err.code
                   })
