@@ -4,7 +4,7 @@ import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountInfo } from '../common/Account'
-import request from '../common/Request'
+import { request } from '../common/Request'
 
 @Builder
 export function NewpasskeyBuilder() {

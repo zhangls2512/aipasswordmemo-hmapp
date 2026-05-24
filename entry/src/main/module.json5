@@ -154,6 +154,11 @@
             "resource": "$profile:form_config"
           }
         ]
+      },
+      {
+        "name": "EntryFormEditAbility",
+        "srcEntry": "./ets/entryformeditability/EntryFormEditAbility.ets",
+        "type": "formEdit"
       }
     ],
     "requestPermissions": [

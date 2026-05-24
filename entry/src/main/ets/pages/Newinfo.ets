@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
@@ -372,6 +372,7 @@ export default struct Newinfo {
 
       ListItem() {
         Button('新增')
+          .keyboardShortcut('S', [ModifierKey.CTRL])
           .width('100%')
           .onClick(async () => {
             const infoType = this.getCurrentInfoType()
@@ -387,10 +388,20 @@ export default struct Newinfo {
               })
               return
             }
+            const dialogControllerProgress = new CustomDialogController({
+              builder: LoadingDialog({
+                content: '新增中...'
+              })
+            })
+            dialogControllerProgress.open()
             const res = await newInfo(this.context, {
               type: infoType,
               value: this.infoValue,
               cloudBackup: this.cloudBackup
+            })
+            dialogControllerProgress.close()
+            await promptAction.openToast({
+              message: '新增' + (res === 'success' ? '成功' : '失败，原因：已存在')
             })
             if (res === 'success') {
               this.isShowNewSheet = false

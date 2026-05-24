@@ -4,7 +4,7 @@ import { getAccountAccessToken, getAccountInfo } from './Account'
 import { encrypt } from './Crypto'
 import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
 import { getFlushPreference } from './Preference'
-import request from './Request'
+import { request } from './Request'
 import { autoBackupTable, autoSyncTable } from './Table'
 
 export interface PasswordInput {
@@ -161,9 +161,6 @@ export async function newPassword(context: Context, data: PasswordInput) {
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
-  await promptAction.openToast({
-    message: '新增成功'
-  })
   await autoSyncTable(context, 'password')
   await autoBackupTable(context, 'password')
   if (data.cloudBackup) {
@@ -226,9 +223,6 @@ export async function updatePassword(context: Context, id: number, data: Passwor
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify(cloudBackupTime)
   }, predicatesb)
-  await promptAction.openToast({
-    message: '修改成功'
-  })
   await autoSyncTable(context, 'password')
   await autoBackupTable(context, 'password')
   if (data.cloudBackup) {
@@ -246,7 +240,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
   }
 }
 
-export async function newInfo(context: Context, data: InfoInput, hideExistToast = false) {
+export async function newInfo(context: Context, data: InfoInput, autoSyncBackup = true) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'info',
     securityLevel: relationalStore.SecurityLevel.S4,
@@ -265,11 +259,6 @@ export async function newInfo(context: Context, data: InfoInput, hideExistToast 
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
     resultSet.close()
-    if (!hideExistToast) {
-      await promptAction.openToast({
-        message: '新增失败，原因：已存在'
-      })
-    }
     return 'fail'
   }
   resultSet.close()
@@ -287,11 +276,10 @@ export async function newInfo(context: Context, data: InfoInput, hideExistToast 
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
-  await promptAction.openToast({
-    message: '新增成功'
-  })
-  await autoSyncTable(context, 'info')
-  await autoBackupTable(context, 'info')
+  if (autoSyncBackup) {
+    await autoSyncTable(context, 'info')
+    await autoBackupTable(context, 'info')
+  }
   if (data.cloudBackup) {
     await setCloudBackup(context, {
       type: 'info',
@@ -332,9 +320,6 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
   const resultSeta = await rdbStore.query(predicatesa)
   if (resultSeta.goToNextRow()) {
     resultSeta.close()
-    await promptAction.openToast({
-      message: '修改失败，原因：已存在'
-    })
     return 'fail'
   }
   resultSeta.close()
@@ -365,9 +350,6 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify(cloudBackupTime)
   }, predicatesc)
-  await promptAction.openToast({
-    message: '修改成功'
-  })
   await autoSyncTable(context, 'info')
   await autoBackupTable(context, 'info')
   if (data.cloudBackup) {
@@ -385,7 +367,7 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
   return 'success'
 }
 
-export async function newTag(context: Context, data: TagInput, hideExistToast = false) {
+export async function newTag(context: Context, data: TagInput, autoSyncBackup = true) {
   const rdbStore = await relationalStore.getRdbStore(context, {
     name: 'tag',
     securityLevel: relationalStore.SecurityLevel.S1,
@@ -403,11 +385,6 @@ export async function newTag(context: Context, data: TagInput, hideExistToast = 
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
     resultSet.close()
-    if (!hideExistToast) {
-      await promptAction.openToast({
-        message: '新增失败，原因：已存在'
-      })
-    }
     return 'fail'
   }
   resultSet.close()
@@ -425,11 +402,10 @@ export async function newTag(context: Context, data: TagInput, hideExistToast = 
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
-  await promptAction.openToast({
-    message: '新增成功'
-  })
-  await autoSyncTable(context, 'tag')
-  await autoBackupTable(context, 'tag')
+  if (autoSyncBackup) {
+    await autoSyncTable(context, 'tag')
+    await autoBackupTable(context, 'tag')
+  }
   if (data.cloudBackup) {
     await setCloudBackup(context, {
       type: 'tag',
@@ -464,9 +440,6 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
   const resultSeta = await rdbStore.query(predicatesa)
   if (resultSeta.goToNextRow()) {
     resultSeta.close()
-    await promptAction.openToast({
-      message: '修改失败，原因：已存在'
-    })
     return 'fail'
   }
   resultSeta.close()
@@ -497,9 +470,6 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify(cloudBackupTime)
   }, predicatesc)
-  await promptAction.openToast({
-    message: '修改成功'
-  })
   await autoSyncTable(context, 'tag')
   await autoBackupTable(context, 'tag')
   if (data.cloudBackup) {
@@ -517,7 +487,7 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
   return 'success'
 }
 
-export async function deleteData(context: Context, type: string, id: number) {
+export async function deleteData(context: Context, type: string, id: number, autoSyncBackup = true) {
   let securityLevel = relationalStore.SecurityLevel.S4
   if (type === 'tag') {
     securityLevel = relationalStore.SecurityLevel.S1
@@ -540,14 +510,13 @@ export async function deleteData(context: Context, type: string, id: number) {
   const predicatesb = new relationalStore.RdbPredicates(type)
   predicatesb.equalTo('id', String(id))
   huaweiCloudSyncRdbStore.deleteSync(predicatesb)
-  await promptAction.openToast({
-    message: '删除成功'
-  })
-  await autoSyncTable(context, type)
-  await autoBackupTable(context, type)
+  if (autoSyncBackup) {
+    await autoSyncTable(context, type)
+    await autoBackupTable(context, type)
+  }
 }
 
-export async function setCloudBackup(context: Context, data: CloudBackupItem) {
+export async function setCloudBackup(context: Context, data: CloudBackupItem, autoSyncBackup = true) {
   const content = JSON.parse(data.content as string) as Content
   const accountInfo = await getAccountInfo()
   const cloudBackupTimeItem = content.cloudBackupTime.find(item => item.uid === accountInfo.uid)
@@ -597,16 +566,15 @@ export async function setCloudBackup(context: Context, data: CloudBackupItem) {
       huaweiCloudSyncRdbStore.updateSync({
         cloudBackupTime: JSON.stringify(content.cloudBackupTime)
       }, predicatesb)
-      await promptAction.openToast({
-        message: '云备份成功'
-      })
-      await autoSyncTable(context, data.type)
-      await autoBackupTable(context, data.type)
+      if (autoSyncBackup) {
+        await autoSyncTable(context, data.type)
+        await autoBackupTable(context, data.type)
+      }
     }
   }
 }
 
-export async function deleteCloudBackup(context: Context, data: CloudBackupItem) {
+export async function deleteCloudBackup(context: Context, data: CloudBackupItem, autoSyncBackup = true) {
   const accessToken = await getAccountAccessToken()
   const accountInfo = await getAccountInfo()
   if (accessToken) {
@@ -657,11 +625,10 @@ export async function deleteCloudBackup(context: Context, data: CloudBackupItem)
       huaweiCloudSyncRdbStore.updateSync({
         cloudBackupTime: JSON.stringify(cloudBackupTime)
       }, predicatesb)
-      await promptAction.openToast({
-        message: '取消云备份成功'
-      })
-      await autoSyncTable(context, data.type)
-      await autoBackupTable(context, data.type)
+      if (autoSyncBackup) {
+        await autoSyncTable(context, data.type)
+        await autoBackupTable(context, data.type)
+      }
     }
   }
 }

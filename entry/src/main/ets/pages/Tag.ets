@@ -6,6 +6,7 @@ import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
 import { getTagList, Tag } from '../common/Dataget'
 import { getPreferType } from '../common/Prefertype'
+import { autoSyncTable, autoBackupTable } from '../common/Table'
 import NewTag from './Newtag'
 import UpdateTag from './Updatetag'
 
@@ -74,7 +75,17 @@ export default struct TagPage {
               ]
             })
             if (data.index === 1) {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '删除中...'
+                })
+              })
+              dialogControllerProgress.open()
               await deleteData(this.context, 'tag', item.id)
+              dialogControllerProgress.close()
+              await promptAction.openToast({
+                message: '删除成功'
+              })
               this.loading = true
             }
           })
@@ -140,6 +151,7 @@ export default struct TagPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut(FunctionKey.ESC, [])
             .margin({
               right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
             })
@@ -176,6 +188,7 @@ export default struct TagPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('D', [ModifierKey.CTRL])
             .padding(11)
             .stateStyles({
               normal: {
@@ -215,10 +228,22 @@ export default struct TagPage {
                 ]
               })
               if (data.index === 1) {
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '删除中...'
+                  })
+                })
+                dialogControllerProgress.open()
                 const promises = this.multipleSelectArray.map(async (item) => {
-                  await deleteData(this.context, 'tag', item.id)
+                  await deleteData(this.context, 'tag', item.id, false)
                 })
                 await Promise.all(promises)
+                await autoSyncTable(this.context, 'tag')
+                await autoBackupTable(this.context, 'tag')
+                dialogControllerProgress.close()
+                await promptAction.openToast({
+                  message: '删除成功'
+                })
                 this.loading = true
               }
             })
@@ -271,10 +296,12 @@ export default struct TagPage {
                       updateTime: this.multipleSelectArray[i].updateTime,
                       cloudBackupTime: this.multipleSelectArray[i].cloudBackupTime
                     })
-                  })
+                  }, false)
                   dialogControllerProgress.close()
                 }
                 this.loading = true
+                await autoSyncTable(this.context, 'tag')
+                await autoBackupTable(this.context, 'tag')
               })
             }
           }
@@ -289,6 +316,7 @@ export default struct TagPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('N', [ModifierKey.CTRL, ModifierKey.SHIFT])
             .padding(11)
             .stateStyles({
               normal: {
@@ -480,6 +508,9 @@ export default struct TagPage {
               })
           }
         }
+        .keyboardShortcut('R', [ModifierKey.CTRL], () => {
+          this.loading = true
+        })
         .layoutWeight(1)
         .margin({
           top: $r('sys.float.ohos_id_elements_margin_vertical_m')

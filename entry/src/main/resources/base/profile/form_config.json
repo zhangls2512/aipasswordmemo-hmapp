@@ -14,6 +14,23 @@
       "updateEnabled": false,
       "enableBlurBackground": true,
       "renderingMode": "autoColor"
+    },
+    {
+      "name": "mfa",
+      "displayName": "$string:mfa",
+      "description": "$string:mfa",
+      "src": "./ets/form/pages/MfaCard.ets",
+      "uiSyntax": "arkts",
+      "isDefault": false,
+      "supportDimensions": [
+        "4*4"
+      ],
+      "defaultDimension": "4*4",
+      "updateEnabled": true,
+      "updateDuration": 0,
+      "formConfigAbility": "ability://EntryFormEditAbility",
+      "enableBlurBackground": true,
+      "renderingMode": "autoColor"
     }
   ]
 }

@@ -3,7 +3,7 @@ import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo, removeAccount, setAccount } from '../common/Account'
-import request from '../common/Request'
+import { request } from '../common/Request'
 
 @Builder
 export function EmailBuilder() {

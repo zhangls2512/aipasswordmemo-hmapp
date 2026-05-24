@@ -10,6 +10,7 @@ import { getInfoList, getPasswordList, getTagList, Info, Tag } from './Dataget'
 import { PasswordItem } from './Dataimport'
 import { write } from './File'
 import { getFlushPreference } from './Preference'
+import { globalSession } from './Request'
 import { getWebdavServerInfo } from './Webdavserver'
 
 interface Item {
@@ -238,23 +239,11 @@ export async function webdavBackupTable(context: Context, table: string, dataArr
   }
   const datastring = await getFileBackupString(array, encrypted)
   if (datastring !== 'fail') {
-    const session = rcp.createSession({
-      requestConfiguration: {
-        security: {
-          tlsRange: {
-            min: 'TlsV1.2'
-          }
-        }
-      },
-      headers: {
-        Authorization: 'Basic ' +
-          new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
-            webdavServerInfo.password))
-      }
-    })
     try {
-      const response = await session.put(webdavServerInfo.path + '/' + table + '.txt', datastring)
-      session.close()
+      const response = await globalSession.fetch(new rcp.Request(webdavServerInfo.path + '/' + table + '.txt', 'PUT', {
+        Authorization: 'Basic ' + new util.Base64Helper().encodeToStringSync(
+          new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' + webdavServerInfo.password))
+      }, datastring))
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return 'success'
       } else {
@@ -275,7 +264,6 @@ export async function webdavBackupTable(context: Context, table: string, dataArr
         return 'fail'
       }
     } catch (err) {
-      session.close()
       await promptAction.openToast({
         message: '发生错误，错误码：' + err.code
       })

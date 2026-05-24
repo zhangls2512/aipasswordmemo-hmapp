@@ -5,7 +5,7 @@ import { netBoost } from '@kit.NetworkBoostKit'
 import { hdsMaterial, HdsNavigation, HdsNavigationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Account'
 import openLink from '../common/Openlink'
-import request from '../common/Request'
+import { request } from '../common/Request'
 import { getTimeStringFromTimeStamp } from '../common/Stringformat'
 
 interface VipItem {

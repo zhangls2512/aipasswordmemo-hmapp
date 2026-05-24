@@ -1,5 +1,5 @@
 import { common, ConfigurationConstant } from '@kit.AbilityKit'
-import { LengthMetrics, window } from '@kit.ArkUI'
+import { LengthMetrics, promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { dlpAntiPeep } from '@kit.DeviceSecurityKit'
@@ -311,12 +311,24 @@ struct Commonsetting {
                     right: 12
                   })
                 Row() {
-                  Text('防窥保护')
-                    .fontWeight(FontWeight.Medium)
-                    .layoutWeight(1)
-                    .margin({
-                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                    })
+                  Column() {
+                    Text('防窥保护')
+                      .fontWeight(FontWeight.Medium)
+                    if (this.isDlpAntiPeepSwitchOn) {
+                      Text('如需关闭，请前往系统设置“隐私和安全”>“防窥保护”')
+                        .fontColor($r('sys.color.font_secondary'))
+                        .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                        .margin({
+                          top: $r('sys.float.ohos_id_text_margin_vertical')
+                        })
+                    }
+                  }
+                  .alignItems(HorizontalAlign.Start)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+
                   Toggle({
                     type: ToggleType.Switch,
                     isOn: this.isDlpAntiPeepSwitchOn!!
@@ -324,8 +336,15 @@ struct Commonsetting {
                     .enabled(!this.isDlpAntiPeepSwitchOn)
                     .onChange(async (isOn) => {
                       if (isOn) {
-                        await dlpAntiPeep.requestAntiPeepOptions(this.context)
-                        this.isDlpAntiPeepSwitchOn = await dlpAntiPeep.isDlpAntiPeepSwitchOn()
+                        try {
+                          await dlpAntiPeep.requestAntiPeepOptions(this.context)
+                          this.isDlpAntiPeepSwitchOn = await dlpAntiPeep.isDlpAntiPeepSwitchOn()
+                        } catch (err) {
+                          this.isDlpAntiPeepSwitchOn = false
+                          await promptAction.openToast({
+                            message: '发生错误，错误码：' + err.code
+                          })
+                        }
                       }
                     })
                 }

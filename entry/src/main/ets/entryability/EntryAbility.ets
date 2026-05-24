@@ -20,6 +20,7 @@ import { netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
+import { sensor } from '@kit.SensorServiceKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { autoLogin } from '../common/Account'
 import { clearNouseData } from '../common/Clearnousedata'
@@ -30,7 +31,6 @@ import openLink from '../common/Openlink'
 import { getFlushPreference, getTempPreference, setTempPreference } from '../common/Preference'
 import { selectDynamicIcon } from '../common/Selectdynamicicon'
 import { autoBackupTable, autoSyncTable } from '../common/Table'
-import { sensor } from '@kit.SensorServiceKit'
 
 interface JsErrorObject {
   name: string,
@@ -497,7 +497,7 @@ export default class EntryAbility extends UIAbility {
         resultSetb.close()
         const deleteIds = idsb.filter(item => !idsa.includes(item))
         const deletepromises = deleteIds.map(async (item) => {
-          await deleteData(this.context, 'password', item)
+          await deleteData(this.context, 'password', item, false)
         })
         await Promise.all(deletepromises)
         await autoSyncTable(this.context, 'password', item)
@@ -544,7 +544,7 @@ export default class EntryAbility extends UIAbility {
         resultSetb.close()
         const deleteIds = idsb.filter(item => !idsa.includes(item))
         const deletepromises = deleteIds.map(async (item) => {
-          await deleteData(this.context, 'info', item)
+          await deleteData(this.context, 'info', item, false)
         })
         await Promise.all(deletepromises)
         await autoSyncTable(this.context, 'info', item)
@@ -591,7 +591,7 @@ export default class EntryAbility extends UIAbility {
         resultSetb.close()
         const deleteIds = idsb.filter(item => !idsa.includes(item))
         const deletepromises = deleteIds.map(async (item) => {
-          await deleteData(this.context, 'tag', item)
+          await deleteData(this.context, 'tag', item, false)
         })
         await Promise.all(deletepromises)
         await autoSyncTable(this.context, 'tag', item)
@@ -658,7 +658,7 @@ export default class EntryAbility extends UIAbility {
                     })
                     const deletedIdArray = item.deleted as string[]
                     const deletepromises = deletedIdArray.map(async (id) => {
-                      await deleteData(this.context, 'password', Number(id))
+                      await deleteData(this.context, 'password', Number(id), false)
                       await huaweiCloudSyncRdbStore.cleanDirtyData(table)
                     })
                     await Promise.all(insertpromises)
@@ -712,7 +712,7 @@ export default class EntryAbility extends UIAbility {
                     })
                     const deletedIdArray = item.deleted as string[]
                     const deletepromises = deletedIdArray.map(async (id) => {
-                      await deleteData(this.context, 'info', Number(id))
+                      await deleteData(this.context, 'info', Number(id), false)
                       await huaweiCloudSyncRdbStore.cleanDirtyData(table)
                     })
                     await Promise.all(insertpromises)
@@ -766,7 +766,7 @@ export default class EntryAbility extends UIAbility {
                     })
                     const deletedIdArray = item.deleted as string[]
                     const deletepromises = deletedIdArray.map(async (id) => {
-                      await deleteData(this.context, 'tag', Number(id))
+                      await deleteData(this.context, 'tag', Number(id), false)
                       await huaweiCloudSyncRdbStore.cleanDirtyData(table)
                     })
                     await Promise.all(insertpromises)
@@ -975,7 +975,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onContinue(wantParam: Record<string, Object>) {
-    if (wantParam.version !== 61) {
+    if (wantParam.version !== 62) {
       await promptAction.openToast({
         message: '接续失败，原因：目标端应用版本号与发起端不匹配'
       })

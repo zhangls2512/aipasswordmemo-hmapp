@@ -367,10 +367,20 @@ export default struct Ainewinfo {
               }
             })
             .onClick(async () => {
-              await newInfo(this.context, {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '新增中...'
+                })
+              })
+              dialogControllerProgress.open()
+              const res = await newInfo(this.context, {
                 type: item.type,
                 value: item.value,
                 cloudBackup: this.cloudBackup
+              })
+              dialogControllerProgress.close()
+              await promptAction.openToast({
+                message: '新增' + (res === 'success' ? '成功' : '失败，原因：已存在')
               })
             })
           }

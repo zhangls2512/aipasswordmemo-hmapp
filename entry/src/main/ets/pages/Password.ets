@@ -15,6 +15,7 @@ import {
   setQuickBarPassword,
   syncQuickBarPassword
 } from '../common/Quickbar'
+import { autoSyncTable, autoBackupTable } from '../common/Table'
 import getTotp from '../common/Totp'
 import FilterPassword from './Filterpassword'
 import NewPassword from './Newpassword'
@@ -152,7 +153,17 @@ export default struct PasswordPage {
               ]
             })
             if (data.index === 1) {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '删除中...'
+                })
+              })
+              dialogControllerProgress.open()
               await deleteData(this.context, 'password', item.id)
+              dialogControllerProgress.close()
+              await promptAction.openToast({
+                message: '删除成功'
+              })
               this.loading = true
             }
           })
@@ -231,6 +242,7 @@ export default struct PasswordPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut(FunctionKey.ESC, [])
             .margin({
               right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
             })
@@ -267,6 +279,7 @@ export default struct PasswordPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('D', [ModifierKey.CTRL])
             .padding(11)
             .stateStyles({
               normal: {
@@ -306,10 +319,22 @@ export default struct PasswordPage {
                 ]
               })
               if (data.index === 1) {
+                const dialogControllerProgress = new CustomDialogController({
+                  builder: LoadingDialog({
+                    content: '删除中...'
+                  })
+                })
+                dialogControllerProgress.open()
                 const promises = this.multipleSelectArray.map(async (item) => {
-                  await deleteData(this.context, 'password', item.id)
+                  await deleteData(this.context, 'password', item.id, false)
                 })
                 await Promise.all(promises)
+                await autoSyncTable(this.context, 'password')
+                await autoBackupTable(this.context, 'password')
+                dialogControllerProgress.close()
+                await promptAction.openToast({
+                  message: '删除成功'
+                })
                 this.loading = true
               }
             })
@@ -363,10 +388,12 @@ export default struct PasswordPage {
                       updateTime: this.multipleSelectArray[i].updateTime,
                       cloudBackupTime: this.multipleSelectArray[i].cloudBackupTime
                     })
-                  })
+                  }, false)
                   dialogControllerProgress.close()
                 }
                 this.loading = true
+                await autoSyncTable(this.context, 'password')
+                await autoBackupTable(this.context, 'password')
               })
             }
           }
@@ -381,6 +408,7 @@ export default struct PasswordPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('N', [ModifierKey.CTRL, ModifierKey.SHIFT])
             .padding(11)
             .stateStyles({
               normal: {
@@ -515,6 +543,7 @@ export default struct PasswordPage {
             }
             .borderRadius(20)
             .height(40)
+            .keyboardShortcut('F', [ModifierKey.CTRL])
             .padding(11)
             .stateStyles({
               normal: {
@@ -807,12 +836,15 @@ export default struct PasswordPage {
             })
             ListItem()
               .margin({
-                bottom: this.preferType === 0 ? 80 : 0
+                bottom: 80
               })
           }
           .height('100%')
           .multiSelectable(true)
         }
+        .keyboardShortcut('R', [ModifierKey.CTRL], () => {
+          this.loading = true
+        })
         .layoutWeight(1)
         .onRefreshing(async () => {
           this.tag = []

@@ -16,7 +16,7 @@ import {
 import { getAccountAccessToken } from '../common/Account'
 import getDeviceToken from '../common/Devicetoken'
 import copy from '../common/Pasteboard'
-import request from '../common/Request'
+import { request } from '../common/Request'
 
 @Builder
 export function InviteBuilder() {
@@ -93,13 +93,12 @@ struct Invite {
                     const qrcodeDir = this.context.cacheDir + '/media/invitationqrcode/'
                     const qrcodePath = qrcodeDir + this.invitationcode + '.png'
                     if (!fileIo.accessSync(qrcodePath)) {
-                      const qrcodePixelMap =
-                        await generateBarcode.createBarcode('https://www.zhangls2512.cn/product/password?invitationcode=' +
-                          this.invitationcode, {
-                          scanType: scanCore.ScanType.QR_CODE,
-                          width: 200,
-                          height: 200
-                        })
+                      const qrcodePixelMap = await generateBarcode.createBarcode(
+                        'https://www.zhangls2512.cn/product/password?invitationcode=' + this.invitationcode, {
+                        scanType: scanCore.ScanType.QR_CODE,
+                        width: 200,
+                        height: 200
+                      })
                       if (!fileIo.accessSync(qrcodeDir)) {
                         await fileIo.mkdir(qrcodeDir, true)
                       }
@@ -138,8 +137,9 @@ struct Invite {
                     const qrcodePath = qrcodeDir + this.invitationcode + '.png'
                     if (!fileIo.accessSync(qrcodePath)) {
                       const qrcodePixelMap =
-                        await generateBarcode.createBarcode('https://www.zhangls2512.cn/product/password?invitationcode=' +
-                          this.invitationcode, {
+                        await generateBarcode.createBarcode(
+                          'https://www.zhangls2512.cn/product/password?invitationcode=' +
+                            this.invitationcode, {
                           scanType: scanCore.ScanType.QR_CODE,
                           width: 200,
                           height: 200

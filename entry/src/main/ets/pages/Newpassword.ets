@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { uri } from '@kit.ArkTS'
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { image } from '@kit.ImageKit'
@@ -17,6 +17,7 @@ import { newInfo, newPassword, newTag } from '../common/Datachange'
 import { getTagList, getTypeInfoList, PasswordInfoItem, Tag } from '../common/Dataget'
 import { getFlushPreference } from '../common/Preference'
 import { getPreferType } from '../common/Prefertype'
+import { autoSyncTable, autoBackupTable } from '../common/Table'
 import Passwordgenerate from './Passwordgenerate'
 
 export interface SelectItem {
@@ -1096,6 +1097,7 @@ export default struct Newpassword {
 
       ListItem() {
         Button('新增')
+          .keyboardShortcut('S', [ModifierKey.CTRL])
           .width('100%')
           .onClick(async () => {
             if (!this.passwordName) {
@@ -1110,11 +1112,21 @@ export default struct Newpassword {
               })
               return
             }
+            const dialogControllerProgress = new CustomDialogController({
+              builder: LoadingDialog({
+                content: '新增中...'
+              })
+            })
+            dialogControllerProgress.open()
             await newPassword(this.context, {
               name: this.passwordName,
               info: this.passwordInfoArray,
               tag: this.passwordTagArray,
               cloudBackup: this.cloudBackup
+            })
+            dialogControllerProgress.close()
+            await promptAction.openToast({
+              message: '新增成功'
             })
             let infoCloudBackup = false
             let tagCloudBackup = false
@@ -1125,27 +1137,45 @@ export default struct Newpassword {
             if (this.allowCloudBackup && autoOn.includes('tag')) {
               tagCloudBackup = true
             }
-            if (this.autoNewInfo) {
+            if (this.autoNewInfo && this.passwordInfoArray.length > 0) {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '自动新增常用信息中...'
+                })
+              })
+              dialogControllerProgress.open()
               const promises = this.passwordInfoArray.map(async (item) => {
                 if (item.type !== 'MFA') {
                   await newInfo(this.context, {
                     type: item.type,
                     value: item.value,
                     cloudBackup: infoCloudBackup
-                  }, true)
+                  }, false)
                 }
               })
               await Promise.all(promises)
+              await autoSyncTable(this.context, 'info')
+              await autoBackupTable(this.context, 'info')
+              dialogControllerProgress.close()
             }
-            if (this.autoNewTag) {
+            if (this.autoNewTag && this.passwordTagArray.length > 0) {
+              const dialogControllerProgress = new CustomDialogController({
+                builder: LoadingDialog({
+                  content: '自动新增标签中...'
+                })
+              })
+              dialogControllerProgress.open()
               const promises = this.passwordTagArray.map(async (item) => {
                 await newTag(this.context, {
                   value: item,
                   color: '',
                   cloudBackup: tagCloudBackup
-                }, true)
+                }, false)
               })
               await Promise.all(promises)
+              await autoSyncTable(this.context, 'tag')
+              await autoBackupTable(this.context, 'tag')
+              dialogControllerProgress.close()
             }
             this.isShowNewSheet = false
           })

@@ -9,7 +9,7 @@ import getCloudServiceStatus from '../common/Cloudservice'
 import openLink from '../common/Openlink'
 import { checkPermission } from '../common/Permission'
 import { getFlushPreference, setFlushPreference } from '../common/Preference'
-import request from '../common/Request'
+import { request } from '../common/Request'
 import { Account } from './Huaweiaccount'
 
 @ComponentV2

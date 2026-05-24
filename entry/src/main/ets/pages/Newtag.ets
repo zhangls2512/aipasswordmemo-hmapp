@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { newTag } from '../common/Datachange'
@@ -181,6 +181,7 @@ export default struct Newtag {
 
       ListItem() {
         Button('新增')
+          .keyboardShortcut('S', [ModifierKey.CTRL])
           .width('100%')
           .onClick(async () => {
             if (!this.tagValue) {
@@ -189,10 +190,20 @@ export default struct Newtag {
               })
               return
             }
+            const dialogControllerProgress = new CustomDialogController({
+              builder: LoadingDialog({
+                content: '新增中...'
+              })
+            })
+            dialogControllerProgress.open()
             const res = await newTag(this.context, {
               value: this.tagValue,
               color: this.tagColor,
               cloudBackup: this.cloudBackup
+            })
+            dialogControllerProgress.close()
+            await promptAction.openToast({
+              message: '新增' + (res === 'success' ? '成功' : '失败，原因：已存在')
             })
             if (res === 'success') {
               this.isShowNewSheet = false

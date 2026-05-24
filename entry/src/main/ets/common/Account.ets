@@ -5,13 +5,16 @@ import { appAccount } from '@kit.BasicServicesKit'
 import { netBoost } from '@kit.NetworkBoostKit'
 import { fido2 } from '@kit.OnlineAuthenticationKit'
 import { getFlushPreference } from './Preference'
-import request from './Request'
+import { request } from './Request'
 
 interface AccountInfo {
   uid: string,
   email: string,
   endDate: number
 }
+
+let globalAccessToken: string | undefined = undefined
+let globalAccountInfo: AccountInfo | undefined = undefined
 
 export async function setAccount(accessToken: string, accountInfo: AccountInfo) {
   const appAccountManager = appAccount.createAppAccountManager()
@@ -24,6 +27,8 @@ export async function setAccount(accessToken: string, accountInfo: AccountInfo) 
       }
     })
     await appAccountManager.setCredential('default', 'accessToken', accessToken)
+    globalAccessToken = accessToken
+    globalAccountInfo = accountInfo
   } catch (err) {
     await promptAction.openToast({
       message: '发生错误，错误码：' + err.code
@@ -32,57 +37,59 @@ export async function setAccount(accessToken: string, accountInfo: AccountInfo) 
 }
 
 export async function getAccountAccessToken() {
-  const appAccountManager = appAccount.createAppAccountManager()
-  try {
-    const endDate = Number(appAccountManager.getCustomDataSync('default', 'endDate'))
-    if (endDate < Date.now() && endDate !== 0) {
-      await removeAccount()
-      await promptAction.openToast({
-        message: '登录态过期，请重新登录'
-      })
-      return ''
-    }
-    const accessToken = await appAccountManager.getCredential('default', 'accessToken')
-    return accessToken
-  } catch {
-    return ''
+  if (globalAccessToken === undefined) {
+    await getAccountInfo()
   }
+  if (globalAccessToken && globalAccountInfo) {
+    await removeAccountWhenExpire()
+  }
+  return globalAccessToken ?? ''
 }
 
 export async function getAccountInfo(): Promise<AccountInfo> {
-  const appAccountManager = appAccount.createAppAccountManager()
-  try {
-    const endDate = Number(appAccountManager.getCustomDataSync('default', 'endDate'))
-    if (endDate < Date.now()) {
-      await removeAccount()
-      await promptAction.openToast({
-        message: '登录态过期，请重新登录'
-      })
-      return {
+  if (!globalAccountInfo) {
+    const appAccountManager = appAccount.createAppAccountManager()
+    try {
+      const endDate = Number(appAccountManager.getCustomDataSync('default', 'endDate'))
+      globalAccessToken = await appAccountManager.getCredential('default', 'accessToken')
+      globalAccountInfo = {
+        uid: appAccountManager.getCustomDataSync('default', 'uid'),
+        email: appAccountManager.getCustomDataSync('default', 'email'),
+        endDate: endDate
+      }
+      await removeAccountWhenExpire()
+    } catch {
+      globalAccessToken = ''
+      globalAccountInfo = {
         uid: '',
         email: '',
         endDate: 0
       }
     }
-    return {
-      uid: appAccountManager.getCustomDataSync('default', 'uid'),
-      email: appAccountManager.getCustomDataSync('default', 'email'),
-      endDate: endDate
-    }
-  } catch {
-    return {
-      uid: '',
-      email: '',
-      endDate: 0
+  }
+  return globalAccountInfo
+}
+
+async function removeAccountWhenExpire() {
+  if (globalAccountInfo) {
+    const currentTime = Date.now()
+    if (globalAccountInfo.endDate <= currentTime) {
+      await removeAccount()
+      await promptAction.openToast({
+        message: '登录态过期，请重新登录'
+      })
     }
   }
 }
 
 export async function removeAccount() {
-  const accessToken = await getAccountAccessToken()
-  if (accessToken) {
-    const appAccountManager = appAccount.createAppAccountManager()
-    await appAccountManager.removeAccount('default')
+  const appAccountManager = appAccount.createAppAccountManager()
+  await appAccountManager.removeAccount('default')
+  globalAccessToken = ''
+  globalAccountInfo = {
+    uid: '',
+    email: '',
+    endDate: 0
   }
 }
 
@@ -142,9 +149,11 @@ export async function autoLogin(context: Context) {
           verifyType: 'passkey',
           credentialId: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.rawId,
             util.Type.BASIC_URL_SAFE),
-          authenticatorData: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.authenticatorData,
+          authenticatorData: new util.Base64Helper().encodeToStringSync(
+            publicKeyAssertionCredential.response.authenticatorData,
             util.Type.BASIC_URL_SAFE),
-          clientDataJSON: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.clientDataJson,
+          clientDataJSON: new util.Base64Helper().encodeToStringSync(
+            publicKeyAssertionCredential.response.clientDataJson,
             util.Type.BASIC_URL_SAFE),
           signature: new util.Base64Helper().encodeToStringSync(publicKeyAssertionCredential.response.signature,
             util.Type.BASIC_URL_SAFE)

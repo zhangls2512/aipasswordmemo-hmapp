@@ -3,7 +3,7 @@ import { getAccountAccessToken } from './Account'
 import { decrypt, getKeyAlg } from './Crypto'
 import { CloudBackupTimeItem, PasswordInfoItem } from './Dataget'
 import { importInfo, importPassword, importTag, InfoItem, PasswordItem, TagItem } from './Dataimport'
-import request from './Request'
+import { request } from './Request'
 
 interface Item {
   id: number,

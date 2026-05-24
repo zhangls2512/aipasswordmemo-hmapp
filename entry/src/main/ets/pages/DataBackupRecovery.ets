@@ -10,6 +10,7 @@ import { importInfo, importPassword, importTag } from '../common/Dataimport'
 import { read } from '../common/File'
 import { checkPermission } from '../common/Permission'
 import { getFlushPreference, setFlushPreference } from '../common/Preference'
+import { globalSession } from '../common/Request'
 import { backupTable, fileBackupTable, recoveryTable, webdavBackupTable } from '../common/Table'
 import { getWebdavServerInfo } from '../common/Webdavserver'
 
@@ -98,23 +99,11 @@ struct DataBackupRecovery {
 
   async getWebdavBackup(table: string) {
     const webdavServerInfo = await getWebdavServerInfo()
-    const session = rcp.createSession({
-      requestConfiguration: {
-        security: {
-          tlsRange: {
-            min: 'TlsV1.2'
-          }
-        }
-      },
-      headers: {
-        Authorization: 'Basic ' +
-          new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
-            webdavServerInfo.password))
-      }
-    })
     try {
-      const response = await session.get(webdavServerInfo.path + '/' + table + '.txt')
-      session.close()
+      const response = await globalSession.fetch(new rcp.Request(webdavServerInfo.path + '/' + table + '.txt', 'GET', {
+        Authorization: 'Basic ' + new util.Base64Helper().encodeToStringSync(
+          new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' + webdavServerInfo.password))
+      }))
       if (response.statusCode >= 200 && response.statusCode < 300) {
         const body = String(response)
         if (!body) {
@@ -142,7 +131,6 @@ struct DataBackupRecovery {
       })
       return 'fail'
     } catch (err) {
-      session.close()
       await promptAction.openToast({
         message: '发生错误，错误码：' + err.code
       })
@@ -152,23 +140,12 @@ struct DataBackupRecovery {
 
   async deleteWebdavBackup(table: string) {
     const webdavServerInfo = await getWebdavServerInfo()
-    const session = rcp.createSession({
-      requestConfiguration: {
-        security: {
-          tlsRange: {
-            min: 'TlsV1.2'
-          }
-        }
-      },
-      headers: {
-        Authorization: 'Basic ' +
-          new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' +
-            webdavServerInfo.password))
-      }
-    })
     try {
-      const response = await session.delete(webdavServerInfo.path + '/' + table + '.txt')
-      session.close()
+      const response =
+        await globalSession.fetch(new rcp.Request(webdavServerInfo.path + '/' + table + '.txt', 'DELETE', {
+          Authorization: 'Basic ' + new util.Base64Helper().encodeToStringSync(
+            new util.TextEncoder().encodeInto(webdavServerInfo.username + ':' + webdavServerInfo.password))
+        }))
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return 'success'
       }
@@ -189,7 +166,6 @@ struct DataBackupRecovery {
       })
       return 'fail'
     } catch (err) {
-      session.close()
       await promptAction.openToast({
         message: '发生错误，错误码：' + err.code
       })

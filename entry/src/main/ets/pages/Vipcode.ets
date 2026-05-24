@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit'
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Account'
-import request from '../common/Request'
+import { request } from '../common/Request'
 
 @Builder
 export function VipcodeBuilder() {
@@ -73,7 +73,8 @@ struct Vipcode {
                 top: $r('sys.float.ohos_id_text_paragraph_margin_m')
               })
               .onClick(async () => {
-                await this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+                await this.context.openLink(
+                  'https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
               })
             Text('· 提供有效反馈')
               .fontColor($r('sys.color.font_emphasize'))
