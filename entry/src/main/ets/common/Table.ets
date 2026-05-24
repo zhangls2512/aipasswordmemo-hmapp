@@ -3,7 +3,6 @@ import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
 import { batteryInfo, power } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
-import { distributedDeviceManager } from '@kit.DistributedServiceKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
 import { encrypt, EncryptData, getKeyAlg } from './Crypto'
 import { getInfoList, getPasswordList, getTagList, Info, Tag } from './Dataget'
@@ -37,10 +36,8 @@ export async function autoSyncTable(context: Context, table: string, fromDeviceI
   const autoSyncTables = getFlushPreference(context, 'dataSetting', 'autoSyncTables', []) as string[]
   if (autoSyncTables.includes(table)) {
     const autoSyncDevices: Item[] = getFlushPreference(context, 'dataSetting', 'autoSyncDevices', []) as Item[]
-    const devices =
-      distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo').getAvailableDeviceListSync()
     const promises = autoSyncDevices.map(async (item) => {
-      if (!devices.find(item => item.deviceId === fromDeviceId)) {
+      if (item.deviceId !== fromDeviceId) {
         await syncTable(context, table, item.networkId, relationalStore.SyncMode.SYNC_MODE_PUSH)
       }
     })

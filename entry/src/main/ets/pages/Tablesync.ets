@@ -49,6 +49,7 @@ struct Tablesync {
   autoHuaweiCloudSyncTables: string[] = []
   pauseAutoSyncWhenLowBatteryCapacityLevel = false
   pauseAutoSyncWhenPowerSave = false
+  deviceManager = distributedDeviceManager.createDeviceManager('com.zhangxm.aitodo')
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '进行中...'
@@ -401,12 +402,14 @@ struct Tablesync {
                     })
                   Button('刷新')
                     .onClick(async () => {
-                      this.availableDeviceArray =
-                        distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo')
-                          .getAvailableDeviceListSync() as Item[]
-                      await promptAction.openToast({
-                        message: '刷新成功'
-                      })
+                      const res =
+                        await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
+                      if (res) {
+                        this.availableDeviceArray = this.deviceManager.getAvailableDeviceListSync() as Item[]
+                        await promptAction.openToast({
+                          message: '刷新成功'
+                        })
+                      }
                     })
                 }
               }
@@ -978,29 +981,36 @@ struct Tablesync {
                               Span(String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].upload.total))
                               Span('/')
                                 .fontColor($r('sys.color.font_secondary'))
-                              Span(String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].upload.remained))
+                              Span(
+                                String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].upload.remained))
                                 .fontColor(Color.Orange)
                               Span('/')
                                 .fontColor($r('sys.color.font_secondary'))
-                              Span(String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].upload.successful))
+                              Span(String(
+                                this.passwordHuaweiCloudSyncProgressDetails.details['password'].upload.successful))
                                 .fontColor(Color.Green)
                               Span('/')
                                 .fontColor($r('sys.color.font_secondary'))
-                              Span(String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].upload.failed))
+                              Span(
+                                String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].upload.failed))
                                 .fontColor(Color.Red)
                               Span('\n下载：')
-                              Span(String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].download.total))
+                              Span(
+                                String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].download.total))
                               Span('/')
                                 .fontColor($r('sys.color.font_secondary'))
-                              Span(String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].download.remained))
+                              Span(String(
+                                this.passwordHuaweiCloudSyncProgressDetails.details['password'].download.remained))
                                 .fontColor(Color.Orange)
                               Span('/')
                                 .fontColor($r('sys.color.font_secondary'))
-                              Span(String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].download.successful))
+                              Span(String(
+                                this.passwordHuaweiCloudSyncProgressDetails.details['password'].download.successful))
                                 .fontColor(Color.Green)
                               Span('/')
                                 .fontColor($r('sys.color.font_secondary'))
-                              Span(String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].download.failed))
+                              Span(
+                                String(this.passwordHuaweiCloudSyncProgressDetails.details['password'].download.failed))
                                 .fontColor(Color.Red)
                             }
                           }
@@ -1959,9 +1969,11 @@ struct Tablesync {
       this.getSetting()
       const res = await checkPermission(this.context, this.UIContext, 'ohos.permission.DISTRIBUTED_DATASYNC')
       if (res) {
-        this.availableDeviceArray = distributedDeviceManager.createDeviceManager('com.zhangxm.aipasswordmemo')
-          .getAvailableDeviceListSync() as Item[]
+        this.availableDeviceArray = this.deviceManager.getAvailableDeviceListSync() as Item[]
       }
+    })
+    .onDisAppear(() => {
+      distributedDeviceManager.releaseDeviceManager(this.deviceManager)
     })
   }
 }
