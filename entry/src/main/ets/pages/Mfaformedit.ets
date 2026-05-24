@@ -42,8 +42,10 @@ struct Mfaformedit {
       ListItem() {
         Text('编辑内容实时保存\n点击卡片顶部“刷新”按钮即可获取最新MFA')
           .enableAutoSpacing(true)
+          .fontWeight(FontWeight.Medium)
           .textAlign(TextAlign.Center)
       }
+      .width('100%')
 
       ForEach(this.formMfaArray, (item: FormMfaItem, index) => {
         ListItem() {

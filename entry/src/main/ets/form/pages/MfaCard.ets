@@ -36,6 +36,7 @@ struct MfaCard {
           GridCol() {
             Row() {
               Text(item.name)
+                .fontWeight(FontWeight.Medium)
                 .layoutWeight(1)
                 .margin({
                   right: $r('sys.float.ohos_id_elements_margin_horizontal_s')

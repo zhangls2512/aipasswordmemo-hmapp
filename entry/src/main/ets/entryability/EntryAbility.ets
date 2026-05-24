@@ -867,7 +867,7 @@ export default class EntryAbility extends UIAbility {
           try {
             await this.context.startAbility({
               bundleName: 'com.zhangxm.aipasswordmemo',
-              abilityName: 'BackGroundAbility'
+              abilityName: 'BackgroundAbility'
             }, {
               processMode: contextConstant.ProcessMode.NEW_PROCESS_ATTACH_TO_STATUS_BAR_ITEM,
               startupVisibility: contextConstant.StartupVisibility.STARTUP_HIDE
