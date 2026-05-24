@@ -45,8 +45,20 @@ struct Mfaformedit {
           .fontWeight(FontWeight.Medium)
           .textAlign(TextAlign.Center)
       }
+      .margin({
+        bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+      })
       .width('100%')
 
+      if (this.formMfaArray.length === 0 && this.hasMfaPasswordArray.length === 0) {
+        ListItem() {
+          Text('无数据')
+        }
+        .margin({
+          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+        })
+        .width('100%')
+      }
       ForEach(this.formMfaArray, (item: FormMfaItem, index) => {
         ListItem() {
           Row() {
