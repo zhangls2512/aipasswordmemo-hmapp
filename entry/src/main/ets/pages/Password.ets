@@ -847,7 +847,6 @@ export default struct PasswordPage {
         })
         .layoutWeight(1)
         .onRefreshing(async () => {
-          this.tag = []
           this.multipleSelect = false
           this.multipleSelectArray = []
           this.passwordArray = []
