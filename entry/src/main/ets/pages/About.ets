@@ -69,7 +69,6 @@ struct About {
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
-              .textAlign(TextAlign.Center)
           }
           .width('100%')
         }
@@ -454,7 +453,8 @@ struct About {
               }
             })
             .onClick(async () => {
-              await this.context.openLink('https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
+              await this.context.openLink(
+                'https://appgallery.huawei.com/app/detail?id=com.zhangxm.aipasswordmemo&action=write-review')
             })
 
             Divider()
@@ -768,7 +768,8 @@ struct About {
                 }
               })
               .onClick(async () => {
-                await this.context.openLink('https://www.chuckfang.com/MeoW/appLinking?channelId=e734229e5e9141ba83682e72ecd9df41')
+                await this.context.openLink(
+                  'https://www.chuckfang.com/MeoW/appLinking?channelId=e734229e5e9141ba83682e72ecd9df41')
               })
             }
             .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -978,7 +979,6 @@ struct About {
               .margin({
                 top: $r('sys.float.ohos_id_text_margin_vertical')
               })
-              .textAlign(TextAlign.Center)
           }
           .width('100%')
         }

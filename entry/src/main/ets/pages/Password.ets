@@ -840,6 +840,9 @@ export default struct PasswordPage {
               })
           }
           .height('100%')
+          .lanes({
+            fillType: PresetFillType.BREAKPOINT_DEFAULT
+          }, $r('sys.float.ohos_id_elements_margin_horizontal_m'))
           .multiSelectable(true)
         }
         .keyboardShortcut('R', [ModifierKey.CTRL], () => {
@@ -847,7 +850,6 @@ export default struct PasswordPage {
         })
         .layoutWeight(1)
         .onRefreshing(async () => {
-          this.tag = []
           this.multipleSelect = false
           this.multipleSelectArray = []
           this.passwordArray = []

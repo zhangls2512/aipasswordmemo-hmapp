@@ -43,7 +43,6 @@ struct PasswordentranceCard {
         })
       })
     }
-    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
     .height('100%')
   }
 }

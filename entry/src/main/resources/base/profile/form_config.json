@@ -26,8 +26,7 @@
         "4*4"
       ],
       "defaultDimension": "4*4",
-      "updateEnabled": true,
-      "updateDuration": 0,
+      "updateEnabled": false,
       "formConfigAbility": "ability://EntryFormEditAbility",
       "enableBlurBackground": true,
       "renderingMode": "autoColor"
