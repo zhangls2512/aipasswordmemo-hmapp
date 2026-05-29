@@ -24,7 +24,6 @@ export default class InsightIntentExecutorImpl extends InsightIntentExecutor {
       return {
         code: 0,
         result: {
-          message: message,
           data: res
         }
       } as insightIntent.ExecuteResult
