@@ -46,7 +46,7 @@ export async function getAccountAccessToken() {
   return globalAccessToken ?? ''
 }
 
-export async function getAccountInfo(): Promise<AccountInfo> {
+export async function getAccountInfo() {
   if (!globalAccountInfo) {
     const appAccountManager = appAccount.createAppAccountManager()
     try {

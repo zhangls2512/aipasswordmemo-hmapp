@@ -1,5 +1,4 @@
 import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
-import { rcp } from '@kit.RemoteCommunicationKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { globalSession } from '../common/Request'
 

@@ -3,8 +3,7 @@ import { InfoInput, newInfo, newPassword, newTag, PasswordInput, TagInput } from
 import { getFilterPasswordList } from '../common/Dataget'
 
 export default class InsightIntentExecutorImpl extends InsightIntentExecutor {
-  async onExecuteInUIAbilityForegroundMode(name: string,
-    param: Record<string, Object>): Promise<insightIntent.ExecuteResult> {
+  async onExecuteInUIAbilityForegroundMode(name: string, param: Record<string, Object>) {
     const context = getContext() as common.UIAbilityContext
     const paramString = JSON.stringify(param)
     let message = 'success'
@@ -21,13 +20,13 @@ export default class InsightIntentExecutorImpl extends InsightIntentExecutor {
     if (name === 'SearchPassword') {
       const paramJson = JSON.parse(paramString) as PasswordInput
       const res = await getFilterPasswordList(context, paramJson.name, paramJson.info, paramJson.tag)
-      return Promise.resolve({
+      return {
         code: -1,
         result: {
           message: message,
           data: res
         }
-      } as insightIntent.ExecuteResult)
+      } as insightIntent.ExecuteResult
     }
     if (name === 'NewInfo') {
       const paramJson = JSON.parse(paramString) as InfoInput
@@ -47,11 +46,11 @@ export default class InsightIntentExecutorImpl extends InsightIntentExecutor {
       })
       context.eventHub.emit('refreshTag')
     }
-    return Promise.resolve({
+    return {
       code: -1,
       result: {
         message: message
       }
-    } as insightIntent.ExecuteResult)
+    } as insightIntent.ExecuteResult
   }
 }
