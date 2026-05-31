@@ -502,6 +502,14 @@ export default struct InfoPage {
           .scrollable(ScrollDirection.Horizontal)
           .scrollBar(BarState.Off)
         }
+        if (this.infoArray.length === 0 && !this.loading) {
+          Text('无数据')
+            .margin({
+              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            })
+            .textAlign(TextAlign.Center)
+            .width('100%')
+        }
         Refresh({
           refreshing: $$this.loading
         }) {
