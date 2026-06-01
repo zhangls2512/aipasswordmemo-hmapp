@@ -380,7 +380,7 @@ export default class EntryAbility extends UIAbility {
           }
         } catch (err) {
           await promptAction.openToast({
-            message: '发生错误，错误码：' + err.code + '，错误信息：' + err.message
+            message: '发生错误，错误码：' + err.code + (err.message ? '，错误信息：' + err.message : '')
           })
         }
       }
@@ -792,19 +792,22 @@ export default class EntryAbility extends UIAbility {
     const allowRestore = getFlushPreference(this.context, 'commonSetting', 'allowRestore', true) as boolean
     this.context.setRestoreEnabled(allowRestore)
     if (deviceInfo.deviceType === '2in1') {
-      statusBarManager.on('statusBarIconClick', async () => {
-        await this.context.showAbility()
-      })
+      const statusBarContent = getFlushPreference(this.context, 'commonSetting', 'statusBarContent', 0)
+      if (statusBarContent === 1) {
+        statusBarManager.on('statusBarIconClick', async () => {
+          await this.context.showAbility()
+        })
+      }
       statusBarManager.on('rightMenuClick', (data) => {
         const datastring = JSON.stringify(data)
         const eventData = JSON.parse(datastring) as MenuCodeEventData
         this.context.eventHub.emit(eventData.data.menuCode)
       })
       const subscriber = commonEventManager.createSubscriberSync({
-        events: ['BACKGROUNDABILITY_EVENT_PREPARETOTERMINATE']
+        events: ['BACKGROUNDABILITY_EVENT_DESTROY']
       })
       await commonEventManager.subscribeToEvent(subscriber, async (data) => {
-        if (data.event === 'BACKGROUNDABILITY_EVENT_PREPARETOTERMINATE') {
+        if (data.event === 'BACKGROUNDABILITY_EVENT_DESTROY') {
           statusBarManager.removeFromStatusBar(this.context)
           setTempPreference(this.context, 'statusBar', 'exist', false)
           await this.context.terminateSelf()
@@ -820,19 +823,36 @@ export default class EntryAbility extends UIAbility {
         const whiteImageSource = image.createImageSource(whiteFileData.buffer)
         const whitePixelMap = await whiteImageSource.createPixelMap()
         await whiteImageSource.release()
-        statusBarManager.addToStatusBar(this.context, {
-          icons: {
-            black: blackPixelMap,
-            white: whitePixelMap
-          },
-          quickOperation: {
-            title: '',
-            height: 1,
-            abilityName: '',
-            moduleName: 'entry',
-            loadingStatus: true
-          }
-        })
+        if (statusBarContent === 0) {
+          statusBarManager.addToStatusBar(this.context, {
+            icons: {
+              black: blackPixelMap,
+              white: whitePixelMap
+            },
+            quickOperation: {
+              title: 'MFA',
+              height: 1000,
+              abilityName: 'StatusBarViewAbility',
+              moduleName: 'entry',
+              loadingStatus: true
+            }
+          })
+        }
+        if (statusBarContent === 1) {
+          statusBarManager.addToStatusBar(this.context, {
+            icons: {
+              black: blackPixelMap,
+              white: whitePixelMap
+            },
+            quickOperation: {
+              title: '',
+              height: 1,
+              abilityName: 'EntryAbility',
+              moduleName: 'entry',
+              loadingStatus: true
+            }
+          })
+        }
         await blackPixelMap.release()
         await whitePixelMap.release()
         statusBarManager.updateStatusBarMenu(this.context, [

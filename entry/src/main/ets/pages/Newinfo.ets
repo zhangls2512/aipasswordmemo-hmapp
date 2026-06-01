@@ -101,7 +101,7 @@ export default struct Newinfo {
         Column() {
           CollaborationServiceStateDialog({
             async onState(stateCode: number, bufferType: string, buffer: ArrayBuffer) {
-              if (stateCode !== 0) {
+              if (stateCode !== 0 && stateCode !== 1001202003) {
                 await promptAction.openToast({
                   message: '发生错误，错误码：' + stateCode
                 })
