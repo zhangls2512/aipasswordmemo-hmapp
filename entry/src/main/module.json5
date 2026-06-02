@@ -159,6 +159,11 @@
         "name": "EntryFormEditAbility",
         "srcEntry": "./ets/entryformeditability/EntryFormEditAbility.ets",
         "type": "formEdit"
+      },
+      {
+        "name": "StatusBarViewAbility",
+        "srcEntry": "./ets/statusbarviewability/StatusBarViewAbility.ets",
+        "type": "statusBarView"
       }
     ],
     "requestPermissions": [

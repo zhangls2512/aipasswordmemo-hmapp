@@ -45,7 +45,8 @@ struct Importkey {
                   this.context.eventHub.emit('refreshKey')
                 } catch (err) {
                   await promptAction.openToast({
-                    message: '导入失败，原因：密钥格式不正确（错误码：' + err.code + '，错误信息：' + err.message + '）'
+                    message: '导入失败，原因：密钥格式不正确（错误码：' + err.code +
+                      (err.message ? '，错误信息：' + err.message : '') + '）'
                   })
                 }
               })
