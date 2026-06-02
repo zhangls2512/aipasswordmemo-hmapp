@@ -26,6 +26,8 @@ struct Commonsetting {
   @Local acceptCollaborate: boolean = false
   @Local destroyWhenBackPressed: boolean = false
   @Local statusBar: boolean = false
+  @Local statusBarContentIndex: number = 0
+  @Local statusBarContentValue: string = 'MFA'
   @Local isDlpAntiPeepSwitchOn: boolean = false
   @Local colorModeList: SelectOption[] = [
     {
@@ -304,6 +306,50 @@ struct Commonsetting {
                 .borderRadius(12)
                 .padding(12)
               }
+              if (this.statusBar) {
+                Divider()
+                  .padding({
+                    left: 12,
+                    right: 12
+                  })
+                Row() {
+                  Text('状态栏内容')
+                    .fontWeight(FontWeight.Medium)
+                    .layoutWeight(1)
+                    .margin({
+                      right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                    })
+                  Select([
+                    { value: 'MFA' },
+                    { value: '主窗口' }
+                  ])
+                    .selected(this.statusBarContentIndex!!)
+                    .value(this.statusBarContentValue!!)
+                    .onSelect(async (index) => {
+                      setFlushPreference(this.context, 'commonSetting', 'statusBarContent', index)
+                      const promptAction = this.UIContext.getPromptAction()
+                      const data = await promptAction.showDialog({
+                        title: '提示',
+                        message: '设置成功，需重启应用生效，是否重启？',
+                        buttons: [
+                          {
+                            text: '取消',
+                            color: $r('sys.color.font_primary')
+                          },
+                          {
+                            text: '重启',
+                            color: $r('sys.color.font_emphasize')
+                          }
+                        ]
+                      })
+                      if (data.index === 1) {
+                        await restartApp(this.context, this.UIContext)
+                      }
+                    })
+                }
+                .borderRadius(12)
+                .padding(12)
+              }
               if (deviceInfo.deviceType === 'phone') {
                 Divider()
                   .padding({
@@ -342,7 +388,7 @@ struct Commonsetting {
                         } catch (err) {
                           this.isDlpAntiPeepSwitchOn = false
                           await promptAction.openToast({
-                            message: '发生错误，错误码：' + err.code
+                            message: '发生错误，错误码：' + err.code + (err.message ? '，错误信息：' + err.message : '')
                           })
                         }
                       }
@@ -1111,6 +1157,14 @@ struct Commonsetting {
       this.destroyWhenBackPressed =
         getFlushPreference(this.context, 'commonSetting', 'destroyWhenBackPressed', false) as boolean
       this.statusBar = getFlushPreference(this.context, 'commonSetting', 'statusBar', false) as boolean
+      const statusBarContent = getFlushPreference(this.context, 'commonSetting', 'statusBarContent', 0)
+      this.statusBarContentIndex = statusBarContent as number
+      if (statusBarContent === 0) {
+        this.statusBarContentValue = 'MFA'
+      }
+      if (statusBarContent === 1) {
+        this.statusBarContentValue = '主窗口'
+      }
       if (deviceInfo.deviceType === 'phone') {
         this.isDlpAntiPeepSwitchOn = await dlpAntiPeep.isDlpAntiPeepSwitchOn()
       }

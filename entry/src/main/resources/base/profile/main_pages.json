@@ -1,6 +1,7 @@
 {
   "src": [
     "pages/Index",
-    "pages/Mfaformedit"
+    "pages/Mfaformedit",
+    "pages/Mfastatusbar"
   ]
 }
