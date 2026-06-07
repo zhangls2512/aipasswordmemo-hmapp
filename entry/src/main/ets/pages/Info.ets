@@ -385,9 +385,6 @@ export default struct InfoPage {
               title: {
                 title: '新增常用信息'
               },
-              onDisappear: () => {
-                this.loading = true
-              },
               onWillDismiss: async (DismissSheetAction) => {
                 const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showDialog({
@@ -444,9 +441,6 @@ export default struct InfoPage {
                 preferType: this.preferType,
                 title: {
                   title: 'AI 识别新增常用信息'
-                },
-                onDisappear: () => {
-                  this.loading = true
                 }
               })
           }
@@ -497,7 +491,7 @@ export default struct InfoPage {
           .edgeEffect(EdgeEffect.Spring)
           .margin({
             bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            top: this.types.length === 0 ? 0 : $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .scrollable(ScrollDirection.Horizontal)
           .scrollBar(BarState.Off)
@@ -690,9 +684,6 @@ export default struct InfoPage {
       preferType: this.preferType,
       title: {
         title: '修改常用信息'
-      },
-      onDisappear: () => {
-        this.loading = true
       },
       onWillDismiss: async (DismissSheetAction) => {
         const promptAction = this.UIContext.getPromptAction()

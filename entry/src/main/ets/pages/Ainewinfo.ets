@@ -382,6 +382,9 @@ export default struct Ainewinfo {
               await promptAction.openToast({
                 message: '新增' + (res === 'success' ? '成功' : '失败，原因：已存在')
               })
+              if (res === 'success') {
+                this.context.eventHub.emit('refreshInfo')
+              }
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

@@ -221,6 +221,7 @@ export default struct Updateinfo {
             })
             if (res === 'success') {
               this.isShowUpdateSheet = false
+              this.context.eventHub.emit('refreshInfo')
             }
           })
       }

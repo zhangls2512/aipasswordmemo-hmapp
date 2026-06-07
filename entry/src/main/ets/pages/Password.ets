@@ -449,7 +449,6 @@ export default struct PasswordPage {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(false)
                 }
-                this.loading = true
               },
               onWillDismiss: async (DismissSheetAction) => {
                 const promptAction = this.UIContext.getPromptAction()
@@ -668,7 +667,7 @@ export default struct PasswordPage {
           }
           .edgeEffect(EdgeEffect.Spring)
           .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            bottom: this.tags.length === 0 ? 0 : $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .scrollable(ScrollDirection.Horizontal)
           .scrollBar(BarState.Off)
@@ -1011,7 +1010,6 @@ export default struct PasswordPage {
           const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(false)
         }
-        this.loading = true
       },
       onWillDismiss: async (DismissSheetAction) => {
         const promptAction = this.UIContext.getPromptAction()

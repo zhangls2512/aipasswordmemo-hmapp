@@ -405,6 +405,7 @@ export default struct Newinfo {
             })
             if (res === 'success') {
               this.isShowNewSheet = false
+              this.context.eventHub.emit('refreshInfo')
             }
           })
       }

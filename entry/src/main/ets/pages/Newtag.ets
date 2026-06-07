@@ -207,6 +207,7 @@ export default struct Newtag {
             })
             if (res === 'success') {
               this.isShowNewSheet = false
+              this.context.eventHub.emit('refreshTag')
             }
           })
       }

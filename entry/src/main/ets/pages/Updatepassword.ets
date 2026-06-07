@@ -1175,6 +1175,7 @@ export default struct Updatepassword {
               dialogControllerProgress.close()
             }
             this.isShowUpdateSheet = false
+            this.context.eventHub.emit('refreshPassword')
           })
       }
       .margin({

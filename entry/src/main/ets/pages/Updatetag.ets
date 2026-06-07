@@ -208,6 +208,7 @@ export default struct Updatetag {
             })
             if (res === 'success') {
               this.isShowUpdateSheet = false
+              this.context.eventHub.emit('refreshTag')
             }
           })
       }

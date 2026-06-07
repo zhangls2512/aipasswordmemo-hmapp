@@ -344,9 +344,6 @@ export default struct TagPage {
               title: {
                 title: '新增标签'
               },
-              onDisappear: () => {
-                this.loading = true
-              },
               onWillDismiss: async (DismissSheetAction) => {
                 const promptAction = this.UIContext.getPromptAction()
                 const data = await promptAction.showDialog({
@@ -561,9 +558,6 @@ export default struct TagPage {
       preferType: this.preferType,
       title: {
         title: '修改标签'
-      },
-      onDisappear: () => {
-        this.loading = true
       },
       onWillDismiss: async (DismissSheetAction) => {
         const promptAction = this.UIContext.getPromptAction()
