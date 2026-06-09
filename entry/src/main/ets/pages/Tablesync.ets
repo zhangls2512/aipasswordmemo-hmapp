@@ -165,6 +165,7 @@ struct Tablesync {
                                   relationalStore.DistributedType.DISTRIBUTED_DEVICE, {
                                     autoSync: false
                                   })
+                                await rdbStore.close()
                                 this.onTables = Array.from(new Set([...this.onTables, item.value]))
                                 setFlushPreference(this.context, 'dataSetting', 'onTables', this.onTables)
                               }
@@ -827,6 +828,7 @@ struct Tablesync {
                                 relationalStore.DistributedType.DISTRIBUTED_CLOUD, {
                                   autoSync: false
                                 })
+                              await rdbStore.close()
                               this.huaweiCloudSyncOnTables =
                                 Array.from(new Set([...this.huaweiCloudSyncOnTables, item.value]))
                               setFlushPreference(this.context, 'dataSetting', 'huaweiCloudSyncOnTables',
@@ -1048,6 +1050,7 @@ struct Tablesync {
                             ['password'], (progressDetails) => {
                               this.passwordHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.down'))
                         .height(24)
@@ -1071,6 +1074,7 @@ struct Tablesync {
                             ['password'], (progressDetails) => {
                               this.passwordHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.time'))
                         .height(24)
@@ -1094,6 +1098,7 @@ struct Tablesync {
                             ['password'], (progressDetails) => {
                               this.passwordHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                     }
                     .borderRadius(12)
@@ -1207,6 +1212,7 @@ struct Tablesync {
                             ['info'], (progressDetails) => {
                               this.infoHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.down'))
                         .height(24)
@@ -1230,6 +1236,7 @@ struct Tablesync {
                             ['info'], (progressDetails) => {
                               this.infoHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.time'))
                         .height(24)
@@ -1253,6 +1260,7 @@ struct Tablesync {
                             ['info'], (progressDetails) => {
                               this.infoHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                     }
                     .borderRadius(12)
@@ -1366,6 +1374,7 @@ struct Tablesync {
                             ['tag'], (progressDetails) => {
                               this.tagHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.down'))
                         .height(24)
@@ -1389,6 +1398,7 @@ struct Tablesync {
                             ['tag'], (progressDetails) => {
                               this.tagHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.time'))
                         .height(24)
@@ -1412,6 +1422,7 @@ struct Tablesync {
                             ['tag'], (progressDetails) => {
                               this.tagHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                     }
                     .borderRadius(12)
@@ -1492,6 +1503,7 @@ struct Tablesync {
                       }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
                     }
                     resultSetPassword.close()
+                    await passwordRdbStore.close()
                     const infoRdbStore = await relationalStore.getRdbStore(this.context, {
                       name: 'info',
                       securityLevel: relationalStore.SecurityLevel.S4,
@@ -1515,6 +1527,7 @@ struct Tablesync {
                       }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
                     }
                     resultSetInfo.close()
+                    await infoRdbStore.close()
                     const tagRdbStore = await relationalStore.getRdbStore(this.context, {
                       name: 'tag',
                       securityLevel: relationalStore.SecurityLevel.S1,
@@ -1538,6 +1551,8 @@ struct Tablesync {
                       }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
                     }
                     resultSetTag.close()
+                    await tagRdbStore.close()
+                    await rdbStore.close()
                     await promptAction.openToast({
                       message: '迁移成功'
                     })

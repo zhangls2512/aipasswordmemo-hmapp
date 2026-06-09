@@ -153,6 +153,7 @@ export async function newPassword(context: Context, data: PasswordInput) {
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
+  await rdbStore.close()
   huaweiCloudSyncRdbStore.insertSync('password', {
     id: String(id),
     name: data.name,
@@ -161,6 +162,7 @@ export async function newPassword(context: Context, data: PasswordInput) {
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
+  await huaweiCloudSyncRdbStore.close()
   await autoSyncTable(context, 'password')
   await autoBackupTable(context, 'password')
   if (data.cloudBackup) {
@@ -214,6 +216,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify(cloudBackupTime)
   }, predicates)
+  await rdbStore.close()
   const predicatesb = new relationalStore.RdbPredicates('password')
   predicatesb.equalTo('id', String(id))
   huaweiCloudSyncRdbStore.updateSync({
@@ -223,6 +226,7 @@ export async function updatePassword(context: Context, id: number, data: Passwor
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify(cloudBackupTime)
   }, predicatesb)
+  await huaweiCloudSyncRdbStore.close()
   await autoSyncTable(context, 'password')
   await autoBackupTable(context, 'password')
   if (data.cloudBackup) {
@@ -259,6 +263,8 @@ export async function newInfo(context: Context, data: InfoInput, autoSyncBackup 
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
     resultSet.close()
+    await rdbStore.close()
+    await huaweiCloudSyncRdbStore.close()
     return 'fail'
   }
   resultSet.close()
@@ -269,6 +275,7 @@ export async function newInfo(context: Context, data: InfoInput, autoSyncBackup 
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
+  await rdbStore.close()
   huaweiCloudSyncRdbStore.insertSync('info', {
     id: String(id),
     type: data.type,
@@ -276,6 +283,7 @@ export async function newInfo(context: Context, data: InfoInput, autoSyncBackup 
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
+  await huaweiCloudSyncRdbStore.close()
   if (autoSyncBackup) {
     await autoSyncTable(context, 'info')
     await autoBackupTable(context, 'info')
@@ -320,6 +328,8 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
   const resultSeta = await rdbStore.query(predicatesa)
   if (resultSeta.goToNextRow()) {
     resultSeta.close()
+    await rdbStore.close()
+    await huaweiCloudSyncRdbStore.close()
     return 'fail'
   }
   resultSeta.close()
@@ -342,6 +352,7 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify(cloudBackupTime)
   }, predicatesb)
+  await rdbStore.close()
   const predicatesc = new relationalStore.RdbPredicates('info')
   predicatesc.equalTo('id', String(id))
   huaweiCloudSyncRdbStore.updateSync({
@@ -350,6 +361,7 @@ export async function updateInfo(context: Context, id: number, data: InfoInput) 
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify(cloudBackupTime)
   }, predicatesc)
+  await huaweiCloudSyncRdbStore.close()
   await autoSyncTable(context, 'info')
   await autoBackupTable(context, 'info')
   if (data.cloudBackup) {
@@ -385,6 +397,8 @@ export async function newTag(context: Context, data: TagInput, autoSyncBackup = 
   const resultSet = await rdbStore.query(predicates)
   if (resultSet.goToNextRow()) {
     resultSet.close()
+    await rdbStore.close()
+    await huaweiCloudSyncRdbStore.close()
     return 'fail'
   }
   resultSet.close()
@@ -395,6 +409,7 @@ export async function newTag(context: Context, data: TagInput, autoSyncBackup = 
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
+  await rdbStore.close()
   huaweiCloudSyncRdbStore.insertSync('tag', {
     id: String(id),
     value: data.value,
@@ -402,6 +417,7 @@ export async function newTag(context: Context, data: TagInput, autoSyncBackup = 
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify([])
   })
+  await huaweiCloudSyncRdbStore.close()
   if (autoSyncBackup) {
     await autoSyncTable(context, 'tag')
     await autoBackupTable(context, 'tag')
@@ -440,6 +456,8 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
   const resultSeta = await rdbStore.query(predicatesa)
   if (resultSeta.goToNextRow()) {
     resultSeta.close()
+    await rdbStore.close()
+    await huaweiCloudSyncRdbStore.close()
     return 'fail'
   }
   resultSeta.close()
@@ -462,6 +480,7 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify(cloudBackupTime)
   }, predicatesb)
+  await rdbStore.close()
   const predicatesc = new relationalStore.RdbPredicates('tag')
   predicatesc.equalTo('id', String(id))
   huaweiCloudSyncRdbStore.updateSync({
@@ -470,6 +489,7 @@ export async function updateTag(context: Context, id: number, data: TagInput) {
     updateTime: updateTime,
     cloudBackupTime: JSON.stringify(cloudBackupTime)
   }, predicatesc)
+  await huaweiCloudSyncRdbStore.close()
   await autoSyncTable(context, 'tag')
   await autoBackupTable(context, 'tag')
   if (data.cloudBackup) {
@@ -507,9 +527,11 @@ export async function deleteData(context: Context, type: string, id: number, aut
   const predicates = new relationalStore.RdbPredicates(type)
   predicates.equalTo('id', id)
   rdbStore.deleteSync(predicates)
+  await rdbStore.close()
   const predicatesb = new relationalStore.RdbPredicates(type)
   predicatesb.equalTo('id', String(id))
   huaweiCloudSyncRdbStore.deleteSync(predicatesb)
+  await huaweiCloudSyncRdbStore.close()
   if (autoSyncBackup) {
     await autoSyncTable(context, type)
     await autoBackupTable(context, type)
@@ -561,11 +583,13 @@ export async function setCloudBackup(context: Context, data: CloudBackupItem, au
       rdbStore.updateSync({
         cloudBackupTime: JSON.stringify(content.cloudBackupTime)
       }, predicates)
+      await rdbStore.close()
       const predicatesb = new relationalStore.RdbPredicates(data.type)
       predicatesb.equalTo('id', String(data.id))
       huaweiCloudSyncRdbStore.updateSync({
         cloudBackupTime: JSON.stringify(content.cloudBackupTime)
       }, predicatesb)
+      await huaweiCloudSyncRdbStore.close()
       if (autoSyncBackup) {
         await autoSyncTable(context, data.type)
         await autoBackupTable(context, data.type)
@@ -620,11 +644,13 @@ export async function deleteCloudBackup(context: Context, data: CloudBackupItem,
       rdbStore.updateSync({
         cloudBackupTime: JSON.stringify(cloudBackupTime)
       }, predicates)
+      await rdbStore.close()
       const predicatesb = new relationalStore.RdbPredicates(data.type)
       predicatesb.equalTo('id', String(data.id))
       huaweiCloudSyncRdbStore.updateSync({
         cloudBackupTime: JSON.stringify(cloudBackupTime)
       }, predicatesb)
+      await huaweiCloudSyncRdbStore.close()
       if (autoSyncBackup) {
         await autoSyncTable(context, data.type)
         await autoBackupTable(context, data.type)

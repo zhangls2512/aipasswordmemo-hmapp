@@ -57,6 +57,7 @@ export async function getPasswordStrengthList(context: Context) {
     }
   }
   resultSet.close()
+  await rdbStore.close()
   return array
 }
 
@@ -100,6 +101,7 @@ export async function getRepeatPasswordList(context: Context) {
     }
   }
   resultSet.close()
+  await rdbStore.close()
   return Array.from(arrayMap.values()).filter(item => item.count !== 1).sort((a, b) => b.count - a.count)
 }
 
@@ -129,5 +131,6 @@ export async function getOldPasswordList(context: Context) {
     }
   }
   resultSet.close()
+  await rdbStore.close()
   return array
 }

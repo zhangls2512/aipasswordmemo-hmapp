@@ -1,5 +1,4 @@
 import { relationalStore } from '@kit.ArkData'
-import { promptAction } from '@kit.ArkUI'
 import { getAccountInfo } from './Account'
 import { PasswordItem } from './Dataimport'
 
@@ -91,6 +90,7 @@ export async function getPasswordInfo(context: Context, id: number) {
       isCloudBackup: false
     }
     resultSet.close()
+    await rdbStore.close()
     const accountInfo = await getAccountInfo()
     const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
     if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
@@ -99,129 +99,117 @@ export async function getPasswordInfo(context: Context, id: number) {
     return info
   }
   resultSet.close()
+  await rdbStore.close()
   return 'fail'
 }
 
 export async function getPasswordList(context: Context) {
-  try {
-    const rdbStore = await relationalStore.getRdbStore(context, {
-      name: 'password',
-      securityLevel: relationalStore.SecurityLevel.S4,
-      encrypt: true,
-      allowRebuild: true
-    })
-    const predicates = new relationalStore.RdbPredicates('password')
-    const resultSet = await rdbStore.query(predicates)
-    const idIndex = resultSet.getColumnIndex('id')
-    const nameIndex = resultSet.getColumnIndex('name')
-    const infoIndex = resultSet.getColumnIndex('info')
-    const tagIndex = resultSet.getColumnIndex('tag')
-    const updateTimeIndex = resultSet.getColumnIndex('updateTime')
-    const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
-    const array: PasswordItem[] = []
-    while (resultSet.goToNextRow()) {
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: 'password',
+    securityLevel: relationalStore.SecurityLevel.S4,
+    encrypt: true,
+    allowRebuild: true
+  })
+  const predicates = new relationalStore.RdbPredicates('password')
+  const resultSet = await rdbStore.query(predicates)
+  const idIndex = resultSet.getColumnIndex('id')
+  const nameIndex = resultSet.getColumnIndex('name')
+  const infoIndex = resultSet.getColumnIndex('info')
+  const tagIndex = resultSet.getColumnIndex('tag')
+  const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+  const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+  const array: PasswordItem[] = []
+  while (resultSet.goToNextRow()) {
+    let cloudBackupTime: CloudBackupTimeItem[] = []
+    try {
+      cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+    } catch {
+    }
+    const info: PasswordItem = {
+      id: resultSet.getValue(idIndex) as number,
+      name: resultSet.getValue(nameIndex) as string,
+      info: JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[],
+      tag: JSON.parse(resultSet.getValue(tagIndex) as string) as string[],
+      updateTime: resultSet.getValue(updateTimeIndex) as number,
+      cloudBackupTime: cloudBackupTime
+    }
+    array.push(info)
+  }
+  resultSet.close()
+  await rdbStore.close()
+  return array
+}
+
+export async function getFilterPasswordList(context: Context, nameKeyword: string, info: PasswordInfoItem[],
+  tag: string[], orderColumn: string = 'updateTime') {
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: 'password',
+    securityLevel: relationalStore.SecurityLevel.S4,
+    encrypt: true,
+    allowRebuild: true
+  })
+  const predicates = new relationalStore.RdbPredicates('password')
+  if (nameKeyword) {
+    predicates.contains('name', nameKeyword)
+  }
+  if (orderColumn === 'updateTime') {
+    predicates.orderByDesc('updateTime')
+  }
+  if (orderColumn === 'name') {
+    predicates.orderByAsc('name')
+  }
+  const resultSet = await rdbStore.query(predicates)
+  const idIndex = resultSet.getColumnIndex('id')
+  const nameIndex = resultSet.getColumnIndex('name')
+  const infoIndex = resultSet.getColumnIndex('info')
+  const tagIndex = resultSet.getColumnIndex('tag')
+  const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+  const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+  const array: Password[] = []
+  while (resultSet.goToNextRow()) {
+    let fit = true
+    if (info.length > 0) {
+      const passwordInfo = JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[]
+      fit = info.every(infoItem => passwordInfo.some(passwordInfoItem => passwordInfoItem.type === infoItem.type &&
+        passwordInfoItem.value === infoItem.value))
+    }
+    if (tag.length > 0) {
+      const passwordTag = JSON.parse(resultSet.getValue(tagIndex) as string) as string[]
+      fit = tag.every(item => passwordTag.includes(item))
+    }
+    if (fit) {
+      const tag = JSON.parse(resultSet.getValue(tagIndex) as string) as string[]
+      const promises = tag.map(async (item): Promise<PasswordTagItem> => {
+        return {
+          value: item,
+          color: await getTagColor(context, item)
+        }
+      })
       let cloudBackupTime: CloudBackupTimeItem[] = []
       try {
         cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
       } catch {
       }
-      const info: PasswordItem = {
+      const info: Password = {
         id: resultSet.getValue(idIndex) as number,
         name: resultSet.getValue(nameIndex) as string,
         info: JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[],
-        tag: JSON.parse(resultSet.getValue(tagIndex) as string) as string[],
+        tag: await Promise.all(promises),
         updateTime: resultSet.getValue(updateTimeIndex) as number,
-        cloudBackupTime: cloudBackupTime
+        cloudBackupTime: cloudBackupTime,
+        isCloudBackup: false
+      }
+      const accountInfo = await getAccountInfo()
+      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+      if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
+        info.isCloudBackup = true
       }
       array.push(info)
     }
-    resultSet.close()
-    return array
-  } catch (err) {
-    await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code + (err.message ? '，错误信息：' + err.message : '')
-    })
-    return []
   }
-}
-
-export async function getFilterPasswordList(context: Context, nameKeyword: string, info: PasswordInfoItem[],
-  tag: string[],
-  orderColumn: string = 'updateTime') {
-  try {
-    const rdbStore = await relationalStore.getRdbStore(context, {
-      name: 'password',
-      securityLevel: relationalStore.SecurityLevel.S4,
-      encrypt: true,
-      allowRebuild: true
-    })
-    const predicates = new relationalStore.RdbPredicates('password')
-    if (nameKeyword) {
-      predicates.contains('name', nameKeyword)
-    }
-    if (orderColumn === 'updateTime') {
-      predicates.orderByDesc('updateTime')
-    }
-    if (orderColumn === 'name') {
-      predicates.orderByAsc('name')
-    }
-    const resultSet = await rdbStore.query(predicates)
-    const idIndex = resultSet.getColumnIndex('id')
-    const nameIndex = resultSet.getColumnIndex('name')
-    const infoIndex = resultSet.getColumnIndex('info')
-    const tagIndex = resultSet.getColumnIndex('tag')
-    const updateTimeIndex = resultSet.getColumnIndex('updateTime')
-    const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
-    const array: Password[] = []
-    while (resultSet.goToNextRow()) {
-      let fit = true
-      if (info.length > 0) {
-        const passwordInfo = JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[]
-        fit = info.every(infoItem => passwordInfo.some(passwordInfoItem => passwordInfoItem.type === infoItem.type &&
-          passwordInfoItem.value === infoItem.value))
-      }
-      if (tag.length > 0) {
-        const passwordTag = JSON.parse(resultSet.getValue(tagIndex) as string) as string[]
-        fit = tag.every(item => passwordTag.includes(item))
-      }
-      if (fit) {
-        const tag = JSON.parse(resultSet.getValue(tagIndex) as string) as string[]
-        const promises = tag.map(async (item): Promise<PasswordTagItem> => {
-          return {
-            value: item,
-            color: await getTagColor(context, item)
-          }
-        })
-        let cloudBackupTime: CloudBackupTimeItem[] = []
-        try {
-          cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
-        } catch {
-        }
-        const info: Password = {
-          id: resultSet.getValue(idIndex) as number,
-          name: resultSet.getValue(nameIndex) as string,
-          info: JSON.parse(resultSet.getValue(infoIndex) as string) as PasswordInfoItem[],
-          tag: await Promise.all(promises),
-          updateTime: resultSet.getValue(updateTimeIndex) as number,
-          cloudBackupTime: cloudBackupTime,
-          isCloudBackup: false
-        }
-        const accountInfo = await getAccountInfo()
-        const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-        if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
-          info.isCloudBackup = true
-        }
-        array.push(info)
-      }
-    }
-    resultSet.close()
-    return array
-  } catch (err) {
-    await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code + (err.message ? '，错误信息：' + err.message : '')
-    })
-    return []
-  }
+  resultSet.close()
+  await rdbStore.close()
+  return array
 }
 
 export async function getPasswordMaxId(context: Context) {
@@ -240,6 +228,7 @@ export async function getPasswordMaxId(context: Context) {
     maxId = resultSet.getValue(idIndex) as number
   }
   resultSet.close()
+  await rdbStore.close()
   return maxId
 }
 
@@ -273,6 +262,7 @@ export async function getInfoInfo(context: Context, id: number) {
       isCloudBackup: false
     }
     resultSet.close()
+    await rdbStore.close()
     const accountInfo = await getAccountInfo()
     const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
     if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
@@ -281,111 +271,94 @@ export async function getInfoInfo(context: Context, id: number) {
     return info
   }
   resultSet.close()
+  await rdbStore.close()
   return 'fail'
 }
 
 export async function getInfoList(context: Context) {
-  try {
-    const rdbStore = await relationalStore.getRdbStore(context, {
-      name: 'info',
-      securityLevel: relationalStore.SecurityLevel.S4,
-      encrypt: true,
-      allowRebuild: true
-    })
-    const predicates = new relationalStore.RdbPredicates('info')
-    predicates.orderByDesc('updateTime')
-    const resultSet = await rdbStore.query(predicates)
-    const idIndex = resultSet.getColumnIndex('id')
-    const typeIndex = resultSet.getColumnIndex('type')
-    const valueIndex = resultSet.getColumnIndex('value')
-    const updateTimeIndex = resultSet.getColumnIndex('updateTime')
-    const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
-    const array: Info[] = []
-    while (resultSet.goToNextRow()) {
-      let cloudBackupTime: CloudBackupTimeItem[] = []
-      try {
-        cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
-      } catch {
-      }
-      const info: Info = {
-        id: resultSet.getValue(idIndex) as number,
-        type: resultSet.getValue(typeIndex) as string,
-        value: resultSet.getValue(valueIndex) as string,
-        updateTime: resultSet.getValue(updateTimeIndex) as number,
-        cloudBackupTime: cloudBackupTime,
-        isCloudBackup: false
-      }
-      const accountInfo = await getAccountInfo()
-      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
-        info.isCloudBackup = true
-      }
-      array.push(info)
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: 'info',
+    securityLevel: relationalStore.SecurityLevel.S4,
+    encrypt: true,
+    allowRebuild: true
+  })
+  const predicates = new relationalStore.RdbPredicates('info')
+  predicates.orderByDesc('updateTime')
+  const resultSet = await rdbStore.query(predicates)
+  const idIndex = resultSet.getColumnIndex('id')
+  const typeIndex = resultSet.getColumnIndex('type')
+  const valueIndex = resultSet.getColumnIndex('value')
+  const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+  const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+  const array: Info[] = []
+  while (resultSet.goToNextRow()) {
+    let cloudBackupTime: CloudBackupTimeItem[] = []
+    try {
+      cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+    } catch {
     }
-    resultSet.close()
-    return array
-  } catch (err) {
-    await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code + (err.message ? '，错误信息：' + err.message : '')
-    })
-    return []
+    const info: Info = {
+      id: resultSet.getValue(idIndex) as number,
+      type: resultSet.getValue(typeIndex) as string,
+      value: resultSet.getValue(valueIndex) as string,
+      updateTime: resultSet.getValue(updateTimeIndex) as number,
+      cloudBackupTime: cloudBackupTime,
+      isCloudBackup: false
+    }
+    const accountInfo = await getAccountInfo()
+    const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+    if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
+      info.isCloudBackup = true
+    }
+    array.push(info)
   }
+  resultSet.close()
+  await rdbStore.close()
+  return array
 }
 
 export async function getInfoTypeList(context: Context) {
-  try {
-    const rdbStore = await relationalStore.getRdbStore(context, {
-      name: 'info',
-      securityLevel: relationalStore.SecurityLevel.S4,
-      encrypt: true,
-      allowRebuild: true
-    })
-    const predicates = new relationalStore.RdbPredicates('info')
-    predicates.orderByAsc('type')
-    const resultSet = await rdbStore.query(predicates)
-    const typeIndex = resultSet.getColumnIndex('type')
-    const array: string[] = []
-    while (resultSet.goToNextRow()) {
-      const type = resultSet.getValue(typeIndex) as string
-      if (!array.includes(type)) {
-        array.push(type)
-      }
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: 'info',
+    securityLevel: relationalStore.SecurityLevel.S4,
+    encrypt: true,
+    allowRebuild: true
+  })
+  const predicates = new relationalStore.RdbPredicates('info')
+  predicates.orderByAsc('type')
+  const resultSet = await rdbStore.query(predicates)
+  const typeIndex = resultSet.getColumnIndex('type')
+  const array: string[] = []
+  while (resultSet.goToNextRow()) {
+    const type = resultSet.getValue(typeIndex) as string
+    if (!array.includes(type)) {
+      array.push(type)
     }
-    resultSet.close()
-    return array
-  } catch (err) {
-    await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code + (err.message ? '，错误信息：' + err.message : '')
-    })
-    return []
   }
+  resultSet.close()
+  await rdbStore.close()
+  return array
 }
 
 export async function getTypeInfoList(context: Context, type: string) {
-  try {
-    const rdbStore = await relationalStore.getRdbStore(context, {
-      name: 'info',
-      securityLevel: relationalStore.SecurityLevel.S4,
-      encrypt: true,
-      allowRebuild: true
-    })
-    const predicates = new relationalStore.RdbPredicates('info')
-    predicates.equalTo('type', type)
-    predicates.orderByAsc('value')
-    const resultSet = await rdbStore.query(predicates)
-    const valueIndex = resultSet.getColumnIndex('value')
-    const array: string[] = []
-    while (resultSet.goToNextRow()) {
-      array.push(resultSet.getValue(valueIndex) as string)
-    }
-    resultSet.close()
-    return array
-  } catch (err) {
-    await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code + (err.message ? '，错误信息：' + err.message : '')
-    })
-    return []
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: 'info',
+    securityLevel: relationalStore.SecurityLevel.S4,
+    encrypt: true,
+    allowRebuild: true
+  })
+  const predicates = new relationalStore.RdbPredicates('info')
+  predicates.equalTo('type', type)
+  predicates.orderByAsc('value')
+  const resultSet = await rdbStore.query(predicates)
+  const valueIndex = resultSet.getColumnIndex('value')
+  const array: string[] = []
+  while (resultSet.goToNextRow()) {
+    array.push(resultSet.getValue(valueIndex) as string)
   }
+  resultSet.close()
+  await rdbStore.close()
+  return array
 }
 
 async function getTagColor(context: Context, value: string) {
@@ -402,9 +375,11 @@ async function getTagColor(context: Context, value: string) {
   if (resultSet.goToNextRow()) {
     const color = resultSet.getValue(colorIndex) as string
     resultSet.close()
+    await rdbStore.close()
     return color
   }
   resultSet.close()
+  await rdbStore.close()
   return ''
 }
 
@@ -438,6 +413,7 @@ export async function getTagInfo(context: Context, id: number) {
       isCloudBackup: false
     }
     resultSet.close()
+    await rdbStore.close()
     const accountInfo = await getAccountInfo()
     const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
     if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
@@ -446,58 +422,53 @@ export async function getTagInfo(context: Context, id: number) {
     return info
   }
   resultSet.close()
+  await rdbStore.close()
   return 'fail'
 }
 
 export async function getTagList(context: Context, orderColumn: string = 'updateTime') {
-  try {
-    const rdbStore = await relationalStore.getRdbStore(context, {
-      name: 'tag',
-      securityLevel: relationalStore.SecurityLevel.S1,
-      encrypt: true,
-      allowRebuild: true
-    })
-    const predicates = new relationalStore.RdbPredicates('tag')
-    if (orderColumn === 'updateTime') {
-      predicates.orderByDesc('updateTime')
-    }
-    if (orderColumn === 'value') {
-      predicates.orderByAsc('value')
-    }
-    const resultSet = await rdbStore.query(predicates)
-    const idIndex = resultSet.getColumnIndex('id')
-    const valueIndex = resultSet.getColumnIndex('value')
-    const colorIndex = resultSet.getColumnIndex('color')
-    const updateTimeIndex = resultSet.getColumnIndex('updateTime')
-    const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
-    const array: Tag[] = []
-    while (resultSet.goToNextRow()) {
-      let cloudBackupTime: CloudBackupTimeItem[] = []
-      try {
-        cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
-      } catch {
-      }
-      const info: Tag = {
-        id: resultSet.getValue(idIndex) as number,
-        value: resultSet.getValue(valueIndex) as string,
-        color: resultSet.getValue(colorIndex) as string,
-        updateTime: resultSet.getValue(updateTimeIndex) as number,
-        cloudBackupTime: cloudBackupTime,
-        isCloudBackup: false
-      }
-      const accountInfo = await getAccountInfo()
-      const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
-      if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
-        info.isCloudBackup = true
-      }
-      array.push(info)
-    }
-    resultSet.close()
-    return array
-  } catch (err) {
-    await promptAction.openToast({
-      message: '发生错误，错误码：' + err.code + (err.message ? '，错误信息：' + err.message : '')
-    })
-    return []
+  const rdbStore = await relationalStore.getRdbStore(context, {
+    name: 'tag',
+    securityLevel: relationalStore.SecurityLevel.S1,
+    encrypt: true,
+    allowRebuild: true
+  })
+  const predicates = new relationalStore.RdbPredicates('tag')
+  if (orderColumn === 'updateTime') {
+    predicates.orderByDesc('updateTime')
   }
+  if (orderColumn === 'value') {
+    predicates.orderByAsc('value')
+  }
+  const resultSet = await rdbStore.query(predicates)
+  const idIndex = resultSet.getColumnIndex('id')
+  const valueIndex = resultSet.getColumnIndex('value')
+  const colorIndex = resultSet.getColumnIndex('color')
+  const updateTimeIndex = resultSet.getColumnIndex('updateTime')
+  const cloudBackupTimeIndex = resultSet.getColumnIndex('cloudBackupTime')
+  const array: Tag[] = []
+  while (resultSet.goToNextRow()) {
+    let cloudBackupTime: CloudBackupTimeItem[] = []
+    try {
+      cloudBackupTime = JSON.parse(resultSet.getValue(cloudBackupTimeIndex) as string) as CloudBackupTimeItem[]
+    } catch {
+    }
+    const info: Tag = {
+      id: resultSet.getValue(idIndex) as number,
+      value: resultSet.getValue(valueIndex) as string,
+      color: resultSet.getValue(colorIndex) as string,
+      updateTime: resultSet.getValue(updateTimeIndex) as number,
+      cloudBackupTime: cloudBackupTime,
+      isCloudBackup: false
+    }
+    const accountInfo = await getAccountInfo()
+    const cloudBackupTimeItem = cloudBackupTime.find(item => item.uid === accountInfo.uid)
+    if (cloudBackupTimeItem && cloudBackupTimeItem.time >= info.updateTime) {
+      info.isCloudBackup = true
+    }
+    array.push(info)
+  }
+  resultSet.close()
+  await rdbStore.close()
+  return array
 }
