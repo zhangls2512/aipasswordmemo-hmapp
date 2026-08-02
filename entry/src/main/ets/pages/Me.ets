@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { uri } from '@kit.ArkTS'
 import { LoadingDialog, promptAction, window } from '@kit.ArkUI'
-import { deviceInfo } from '@kit.BasicServicesKit'
 import { scanBarcode, scanCore } from '@kit.ScanKit'
 import { getAccountAccessToken, getAccountInfo, removeAccount } from '../common/Account'
 import getCloudServiceStatus from '../common/Cloudservice'
@@ -155,7 +154,7 @@ export default struct Me {
           })
 
           if (this.uid) {
-            if (deviceInfo.deviceType !== '2in1') {
+            if (scanCore.isDefaultScanSupported()) {
               Divider()
                 .padding({
                   left: 12,

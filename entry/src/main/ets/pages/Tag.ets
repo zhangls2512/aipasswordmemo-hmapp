@@ -1,6 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
-import { hdsEffect } from '@kit.UIDesignKit'
+import { LengthMetrics, LoadingDialog, promptAction, uiMaterial } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
@@ -164,12 +163,13 @@ export default struct TagPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(() => {
               this.multipleSelect = false
@@ -198,12 +198,13 @@ export default struct TagPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
@@ -266,12 +267,13 @@ export default struct TagPage {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .width(40)
               .onClick(async () => {
                 if (this.multipleSelectArray.length === 0) {
@@ -381,12 +383,13 @@ export default struct TagPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .bindMenu([
               {
@@ -444,12 +447,13 @@ export default struct TagPage {
                             right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                           })
                           .onChange(isOn => {
-                            if (!isOn) {
+                            const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
+                            if (!isOn && exist) {
                               this.multipleSelectArray.splice(
                                 this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
                                   item.id), 1)
                             }
-                            if (isOn) {
+                            if (isOn && !exist) {
                               this.multipleSelectArray.push(item)
                             }
                           })
@@ -488,6 +492,15 @@ export default struct TagPage {
                     })
                     .onClick(() => {
                       if (this.multipleSelect) {
+                        const exist = this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+                        if (exist) {
+                          this.multipleSelectArray.splice(
+                            this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                              item.id), 1)
+                        }
+                        if (!exist) {
+                          this.multipleSelectArray.push(item)
+                        }
                         return
                       }
                       this.tagId = item.id

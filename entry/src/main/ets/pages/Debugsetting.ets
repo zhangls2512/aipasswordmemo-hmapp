@@ -381,7 +381,7 @@ struct Debugsetting {
                   right: 12
                 })
               Row() {
-                Text('转储当前线程虚拟机原始堆快照')
+                Text('转储虚拟机原始堆快照')
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .margin({

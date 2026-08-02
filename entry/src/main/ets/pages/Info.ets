@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction, uiMaterial } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsEffect } from '@kit.UIDesignKit'
@@ -202,12 +202,13 @@ export default struct InfoPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(() => {
               this.multipleSelect = false
@@ -236,12 +237,13 @@ export default struct InfoPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
@@ -304,12 +306,13 @@ export default struct InfoPage {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .width(40)
               .onClick(async () => {
                 if (this.multipleSelectArray.length === 0) {
@@ -409,11 +412,14 @@ export default struct InfoPage {
 
             Button('AI 识别新增')
               .buttonStyle(ButtonStyleMode.NORMAL)
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.CONTENT
-                })
                 .shaderEffect({
                   effectType: hdsEffect.EffectType.DUAL_EDGE_FLOW_LIGHT,
                   animation: {
@@ -522,12 +528,13 @@ export default struct InfoPage {
                             right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                           })
                           .onChange(isOn => {
-                            if (!isOn) {
+                            const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
+                            if (!isOn && exist) {
                               this.multipleSelectArray.splice(
                                 this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
                                   item.id), 1)
                             }
-                            if (isOn) {
+                            if (isOn && !exist) {
                               this.multipleSelectArray.push(item)
                             }
                           })
@@ -588,6 +595,15 @@ export default struct InfoPage {
                     })
                     .onClick(async () => {
                       if (this.multipleSelect) {
+                        const exist = this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+                        if (exist) {
+                          this.multipleSelectArray.splice(
+                            this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                              item.id), 1)
+                        }
+                        if (!exist) {
+                          this.multipleSelectArray.push(item)
+                        }
                         return
                       }
                       if (item.type === '图标') {

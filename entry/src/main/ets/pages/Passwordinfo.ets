@@ -378,10 +378,14 @@ export default struct Passwordinfo {
             floatingBallController.on('click', async () => {
               await copy(this.context, this.UIContext, this.mfaValue)
             })
-            this.context.eventHub.on('stopFloatingBall', async () => {
+            floatingBallController.onDestroy(() => {
+              floatingBallController.offDestroy()
               floatingBallController.off('click')
-              await floatingBallController.stopFloatingBall()
               this.context.eventHub.off('stopFloatingBall')
+              this.floatingBall = false
+            })
+            this.context.eventHub.on('stopFloatingBall', async () => {
+              await floatingBallController.stopFloatingBall()
             })
             this.intervalId = setInterval(async () => {
               const mfaInfoArray = mfaInfo.value.split('\0')
@@ -418,8 +422,10 @@ export default struct Passwordinfo {
               }
               if (res.value === 'fail') {
                 clearInterval(this.intervalId)
-                await floatingBallController.stopFloatingBall()
-                this.floatingBall = false
+                this.intervalId = -1
+                if (this.floatingBall) {
+                  await floatingBallController.stopFloatingBall()
+                }
               }
             }, 500)
           }
@@ -434,6 +440,7 @@ export default struct Passwordinfo {
     .onDisAppear(() => {
       if (this.intervalId !== -1) {
         clearInterval(this.intervalId)
+        this.intervalId = -1
         if (this.floatingBall) {
           this.context.eventHub.emit('stopFloatingBall')
         }

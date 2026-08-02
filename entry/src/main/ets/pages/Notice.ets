@@ -50,7 +50,7 @@ export default struct Notice {
               .fontColor($r('sys.color.font_emphasize'))
               .fontWeight(FontWeight.Medium)
               .onClick(async () => {
-                await notificationManager.openNotificationSettings(this.context)
+                await notificationManager.openNotificationSettingsWithResult(this.context)
               })
             Span('管理此开关。')
               .fontColor($r('sys.color.font_secondary'))

@@ -1,8 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { FunctionComponent } from '@kit.AgentFrameworkKit'
-import { LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction, uiMaterial, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
-import { hdsEffect } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
@@ -255,12 +254,13 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(() => {
               this.multipleSelect = false
@@ -289,12 +289,13 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
@@ -357,12 +358,13 @@ export default struct PasswordPage {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .width(40)
               .onClick(async () => {
                 if (this.multipleSelectArray.length === 0) {
@@ -486,12 +488,13 @@ export default struct PasswordPage {
               .margin({
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .width(40)
             }
             Column() {
@@ -511,12 +514,13 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .bindMenu([
               {
@@ -552,12 +556,13 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(() => {
               this.isShowFilterSheet = true
@@ -611,6 +616,10 @@ export default struct PasswordPage {
             value: this.nameKeyword!!
           })
             .searchButton('搜索')
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true
+            }))
             .onChange(value => {
               setTempPreference(this.context, 'filterPassword', 'nameKeyword', value)
             })
@@ -697,12 +706,13 @@ export default struct PasswordPage {
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
                         .onChange(isOn => {
-                          if (!isOn) {
+                          const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
+                          if (!isOn && exist) {
                             this.multipleSelectArray.splice(
                               this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
                                 item.id), 1)
                           }
-                          if (isOn) {
+                          if (isOn && !exist) {
                             this.multipleSelectArray.push(item)
                           }
                         })
@@ -808,6 +818,15 @@ export default struct PasswordPage {
                   })
                   .onClick(() => {
                     if (this.multipleSelect) {
+                      const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
+                      if (exist) {
+                        this.multipleSelectArray.splice(
+                          this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                            item.id), 1)
+                      }
+                      if (!exist) {
+                        this.multipleSelectArray.push(item)
+                      }
                       return
                     }
                     this.passwordId = item.id

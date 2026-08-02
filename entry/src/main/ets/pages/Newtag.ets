@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
 import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { HdsColorPicker } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { newTag } from '../common/Datachange'
@@ -9,131 +10,33 @@ import { getFlushPreference } from '../common/Preference'
 export default struct Newtag {
   @Consumer() isShowNewSheet: boolean = false
   @Local tagValue: string = ''
-  @Local tagColor: string = ''
-  @Local red: number = 0
-  @Local green: number = 0
-  @Local blue: number = 0
-  @Local alpha: number = 1
+  @Local tagColor: string = '#000000'
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  colorArray: string[] = [
-    '#000000',
-    '#0000FF',
-    '#A52A2A',
-    '#808080',
-    '#008000',
-    '#FFA500',
-    '#FFC0CB',
-    '#FF0000',
-    '#FFFFFF',
-    '#FFFF00',
-    'rgba(0,0,0,0)'
-  ]
 
   build() {
     List() {
       ListItem() {
-        Column() {
+        Row() {
+          HdsColorPicker({
+            initialColor: this.tagColor,
+            onColorSelected: (color) => {
+              this.tagColor = color
+            }
+          })
+            .margin({
+              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+            })
           TextInput({
             placeholder: '请输入内容',
             text: this.tagValue!!
           })
             .defaultFocus(true)
             .enableAutoSpacing(true)
-          Row() {
-            ForEach(this.colorArray, (item: string) => {
-              Circle({
-                height: 20,
-                width: 20
-              })
-                .fill(item)
-                .margin({
-                  right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                })
-                .onClick(() => {
-                  this.tagColor = item
-                })
-            })
-          }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-
-          Row() {
-            Circle({
-              height: 20,
-              width: 20
-            })
-              .fill(this.tagColor)
-              .margin({
-                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-              })
-            TextInput({
-              placeholder: '请输入颜色',
-              text: this.tagColor!!
-            })
-              .enableAutoSpacing(true)
-              .layoutWeight(1)
-          }
-          .margin({
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-          })
-
-          Text('颜色示例：#FFFFFF、#FF000000、rgb(255,100,255)、rgba(255,100,255,0.5)')
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
-          Slider({
-            value: this.red!!,
-            max: 255
-          })
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
-            .selectedColor(Color.Red)
-            .trackColor(Color.Red)
-            .onChange(() => {
-              this.tagColor = 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')'
-            })
-          Slider({
-            value: this.green!!,
-            max: 255
-          })
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
-            .selectedColor(Color.Green)
-            .trackColor(Color.Green)
-            .onChange(() => {
-              this.tagColor = 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')'
-            })
-          Slider({
-            value: this.blue!!,
-            max: 255
-          })
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
-            .selectedColor(Color.Blue)
-            .trackColor(Color.Blue)
-            .onChange(() => {
-              this.tagColor = 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')'
-            })
-          Slider({
-            value: this.alpha!!,
-            max: 1,
-            step: 0.01
-          })
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
-            .onChange(() => {
-              this.tagColor = 'rgba(' + this.red + ',' + this.green + ',' + this.blue + ',' + this.alpha + ')'
-            })
+            .layoutWeight(1)
         }
-        .alignItems(HorizontalAlign.Start)
       }
       .margin({
         top: $r('sys.float.ohos_id_elements_margin_vertical_m')

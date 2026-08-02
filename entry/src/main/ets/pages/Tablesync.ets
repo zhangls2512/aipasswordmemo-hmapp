@@ -103,7 +103,8 @@ struct Tablesync {
               { text: '暂停' },
               { text: '邻近' }
             ]),
-            selectedIndex: this.selectedIndex!!
+            selectedIndex: this.selectedIndex!!,
+            enableStateAnimation: true
           })
             .margin({
               bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
