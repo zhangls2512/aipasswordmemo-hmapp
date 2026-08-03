@@ -9,6 +9,11 @@ interface UrlTrustList {
   UrlPermissionList: UrlPermissionItem[]
 }
 
+export interface Param {
+  url: string,
+  trust: boolean
+}
+
 interface UrlPermissionItem {
   scheme: string,
   host: string,
@@ -29,6 +34,7 @@ struct Webview {
   @Local title: string = ''
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   controller = new webview.WebviewController()
+  trust = false
 
   build() {
     HdsNavDestination() {
@@ -56,27 +62,29 @@ struct Webview {
           this.controller.enableIntelligentTrackingPrevention(true)
           this.controller.enableSafeBrowsing(true)
           this.controller.setErrorPageEnabled(true)
-          const urlTrustList = {
-            UrlPermissionList: []
-          } as UrlTrustList
-          const uriobject = new uri.URI(this.url)
-          const port = Number(uriobject.port)
-          if (port !== -1) {
-            urlTrustList.UrlPermissionList.push({
-              scheme: uriobject.scheme,
-              host: uriobject.host,
-              port: port,
-              path: uriobject.path.substring(1)
-            })
+          if (this.trust) {
+            const urlTrustList = {
+              UrlPermissionList: []
+            } as UrlTrustList
+            const uriobject = new uri.URI(this.url)
+            const port = Number(uriobject.port)
+            if (port !== -1) {
+              urlTrustList.UrlPermissionList.push({
+                scheme: uriobject.scheme,
+                host: uriobject.host,
+                port: port,
+                path: uriobject.path.substring(1)
+              })
+            }
+            if (port === -1) {
+              urlTrustList.UrlPermissionList.push({
+                scheme: uriobject.scheme,
+                host: uriobject.host,
+                path: uriobject.path.substring(1)
+              })
+            }
+            this.controller.setUrlTrustList(JSON.stringify(urlTrustList), true, false)
           }
-          if (port === -1) {
-            urlTrustList.UrlPermissionList.push({
-              scheme: uriobject.scheme,
-              host: uriobject.host,
-              path: uriobject.path.substring(1)
-            })
-          }
-          this.controller.setUrlTrustList(JSON.stringify(urlTrustList), true, false)
           this.controller.loadUrl(this.url)
         })
         .onErrorReceive(async (event) => {
@@ -122,7 +130,9 @@ struct Webview {
     })
     .titleMode(HdsNavDestinationTitleMode.MODAL)
     .onReady(context => {
-      this.url = context.pathInfo.param as string
+      const param = context.pathInfo.param as Param
+      this.url = param.url
+      this.trust = param.trust
       const colorMode = getFlushPreference(this.context, 'commonSetting', 'colorMode', 0)
       if (colorMode === 0) {
         this.darkMode = WebDarkMode.Auto

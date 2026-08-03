@@ -5,6 +5,7 @@ import { call } from '@kit.TelephonyKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import openLink from '../common/Openlink'
 import copy from '../common/Pasteboard'
+import { Param } from './Webview'
 
 @Builder
 export function AboutBuilder() {
@@ -135,8 +136,10 @@ struct About {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
-                  $r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              hovered: {
+                .backgroundColor($r('sys.color.interactive_hover'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
@@ -272,7 +275,10 @@ struct About {
             .onClick(() => {
               this.pageInfos.pushPath({
                 name: 'Webview',
-                param: 'https://www.zhangls2512.cn/product/updatelog/aipasswordmemo'
+                param: {
+                  url: 'https://www.zhangls2512.cn/product/updatelog/aipasswordmemo',
+                  trust: true
+                } as Param
               })
             })
 

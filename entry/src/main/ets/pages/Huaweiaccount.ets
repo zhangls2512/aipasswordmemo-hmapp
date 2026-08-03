@@ -4,6 +4,7 @@ import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken, getAccountInfo } from '../common/Account'
 import { request } from '../common/Request'
+import { Param } from './Webview'
 
 export interface Account {
   platform: string,
@@ -296,7 +297,10 @@ struct Huaweiaccount {
                       .onClick(() => {
                         this.pageInfos.pushPath({
                           name: 'Webview',
-                          param: 'https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN'
+                          param: {
+                            url: 'https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN',
+                            trust: true
+                          } as Param
                         })
                       })
                     Span('《关于华为账号与隐私的声明》')
@@ -304,7 +308,10 @@ struct Huaweiaccount {
                       .onClick(() => {
                         this.pageInfos.pushPath({
                           name: 'Webview',
-                          param: 'https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN'
+                          param: {
+                            url: 'https://legal.cloud.huawei.com/terms/scope/huawei/id-hmos/privacy-statement.htm?code=CN&language=zh-CN',
+                            trust: false
+                          } as Param
                         })
                       })
                     Span('。')

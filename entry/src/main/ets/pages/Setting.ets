@@ -11,6 +11,7 @@ import { checkPermission } from '../common/Permission'
 import { getFlushPreference, setFlushPreference } from '../common/Preference'
 import { request } from '../common/Request'
 import { Account } from './Huaweiaccount'
+import { Param } from './Webview'
 
 @ComponentV2
 export default struct Setting {
@@ -1070,7 +1071,10 @@ export default struct Setting {
                     .find(item => item.type === privacyManager.AppPrivacyLinkType.PRIVACY_STATEMENT_LINK)
                   this.pageInfos.pushPath({
                     name: 'Webview',
-                    param: appPrivacyLink?.url
+                    param: {
+                      url: appPrivacyLink?.url,
+                      trust: false
+                    } as Param
                   })
                 } catch (err) {
                   await promptAction.openToast({

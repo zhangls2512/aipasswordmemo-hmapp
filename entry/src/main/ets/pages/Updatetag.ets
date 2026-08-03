@@ -5,6 +5,7 @@ import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { updateTag } from '../common/Datachange'
 import { getTagInfo, Tag } from '../common/Dataget'
+import { getFavouriteColor, setFavouriteColor } from '../common/Favouritecolor'
 import { getFlushPreference } from '../common/Preference'
 
 @ComponentV2
@@ -13,6 +14,7 @@ export default struct Updatetag {
   @Param tagId: number = 0
   @Local tagValue: string = ''
   @Local tagColor: string = '#000000'
+  @Local favouriteColor: string[] | undefined = undefined
   @Local cloudBackup: boolean = false
   @Local allowCloudBackup: boolean = false
   @Local alertText: string = ''
@@ -22,15 +24,21 @@ export default struct Updatetag {
     List() {
       ListItem() {
         Row() {
-          HdsColorPicker({
-            initialColor: this.tagColor,
-            onColorSelected: (color) => {
-              this.tagColor = color
-            }
-          })
-            .margin({
-              right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+          if (this.favouriteColor) {
+            HdsColorPicker({
+              initialColor: this.tagColor,
+              initialFavoriteColors: this.favouriteColor,
+              onColorSelected: (color) => {
+                this.tagColor = color
+              },
+              onFavoriteColorsUpdate: async (list: string[]) => {
+                await setFavouriteColor(this.context, list)
+              }
             })
+              .margin({
+                right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+              })
+          }
           TextInput({
             placeholder: '请输入内容',
             text: this.tagValue!!
@@ -85,6 +93,7 @@ export default struct Updatetag {
       right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
     })
     .onAppear(async () => {
+      this.favouriteColor = await getFavouriteColor(this.context)
       const tagInfo = await getTagInfo(this.context, this.tagId) as Tag
       this.tagValue = tagInfo.value
       this.tagColor = tagInfo.color
