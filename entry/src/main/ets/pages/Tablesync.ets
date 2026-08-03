@@ -46,8 +46,6 @@ struct Tablesync {
   value = '始终'
   autoSyncTables: string[] = []
   autoHuaweiCloudSyncTables: string[] = []
-  pauseAutoSyncWhenLowBatteryCapacityLevel = false
-  pauseAutoSyncWhenPowerSave = false
   deviceManager = distributedDeviceManager.createDeviceManager('com.zhangxm.aitodo')
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
@@ -85,10 +83,6 @@ struct Tablesync {
       getFlushPreference(this.context, 'dataSetting', 'huaweiCloudSyncOnTables', []) as string[]
     this.autoHuaweiCloudSyncTables =
       getFlushPreference(this.context, 'dataSetting', 'autoHuaweiCloudSyncTables', []) as string[]
-    this.pauseAutoSyncWhenLowBatteryCapacityLevel =
-      getFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false) as boolean
-    this.pauseAutoSyncWhenPowerSave =
-      getFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false) as boolean
   }
 
   build() {
@@ -99,7 +93,6 @@ struct Tablesync {
             items: new SegmentButtonV2Items([
               { text: '可信' },
               { text: '云空间' },
-              { text: '暂停' },
               { text: '邻近' }
             ]),
             selectedIndex: this.selectedIndex!!,
@@ -1537,71 +1530,6 @@ struct Tablesync {
               })
             }
             if (this.selectedIndex === 2) {
-              ListItem() {
-                Column() {
-                  Text('暂停自动同步')
-                    .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                    .fontWeight(FontWeight.Medium)
-                    .margin({
-                      bottom: 6,
-                      left: 12,
-                      right: 12
-                    })
-                  Column() {
-                    Row() {
-                      Text('电池电量低')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Toggle({
-                        type: ToggleType.Switch,
-                        isOn: this.pauseAutoSyncWhenLowBatteryCapacityLevel!!
-                      })
-                        .onChange(isOn => {
-                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel',
-                            isOn)
-                        })
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('系统开启 (超级) 省电模式')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Toggle({
-                        type: ToggleType.Switch,
-                        isOn: this.pauseAutoSyncWhenPowerSave!!
-                      })
-                        .onChange(isOn => {
-                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', isOn)
-                        })
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                  }
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
-                }
-                .alignItems(HorizontalAlign.Start)
-              }
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-              })
-            }
-            if (this.selectedIndex === 3) {
               ListItem() {
                 Column() {
                   Row() {

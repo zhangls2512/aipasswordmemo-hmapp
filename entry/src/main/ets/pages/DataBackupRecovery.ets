@@ -40,8 +40,6 @@ struct DataBackupRecovery {
   accountDataSync = false
   encryptWebdavBackup = true
   autoWebdavBackupTables: string[] = []
-  pauseAutoBackupWhenLowBatteryCapacityLevel = false
-  pauseAutoBackupWhenPowerSave = false
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'
@@ -78,10 +76,6 @@ struct DataBackupRecovery {
     this.encryptWebdavBackup = getFlushPreference(this.context, 'dataSetting', 'encryptWebdavBackup', true) as boolean
     this.autoWebdavBackupTables =
       getFlushPreference(this.context, 'dataSetting', 'autoWebdavBackupTables', ['password', 'info', 'tag']) as string[]
-    this.pauseAutoBackupWhenLowBatteryCapacityLevel =
-      getFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenLowBatteryCapacityLevel', false) as boolean
-    this.pauseAutoBackupWhenPowerSave =
-      getFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenPowerSave', false) as boolean
     const webdavServerInfo = await getWebdavServerInfo()
     if (!webdavServerInfo.path) {
       this.accountDataSyncEnabled = false
@@ -180,8 +174,7 @@ struct DataBackupRecovery {
             items: new SegmentButtonV2Items([
               { text: '数据库' },
               { text: '文件' },
-              { text: 'WebDAV' },
-              { text: '暂停' }
+              { text: 'WebDAV' }
             ]),
             selectedIndex: this.selectedIndex!!,
             enableStateAnimation: true
@@ -1255,71 +1248,6 @@ struct DataBackupRecovery {
               }
               .margin({
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
-              })
-            }
-            if (this.selectedIndex === 3) {
-              ListItem() {
-                Column() {
-                  Text('暂停自动备份')
-                    .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                    .fontWeight(FontWeight.Medium)
-                    .margin({
-                      bottom: 6,
-                      left: 12,
-                      right: 12
-                    })
-                  Column() {
-                    Row() {
-                      Text('电池电量低')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Toggle({
-                        type: ToggleType.Switch,
-                        isOn: this.pauseAutoBackupWhenLowBatteryCapacityLevel!!
-                      })
-                        .onChange(isOn => {
-                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenLowBatteryCapacityLevel',
-                            isOn)
-                        })
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('系统开启 (超级) 省电模式')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Toggle({
-                        type: ToggleType.Switch,
-                        isOn: this.pauseAutoBackupWhenPowerSave!!
-                      })
-                        .onChange(isOn => {
-                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoBackupWhenPowerSave', isOn)
-                        })
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                  }
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
-                }
-                .alignItems(HorizontalAlign.Start)
-              }
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
             }
             ListItem()

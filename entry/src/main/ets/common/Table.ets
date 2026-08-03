@@ -1,7 +1,6 @@
 import { relationalStore } from '@kit.ArkData'
 import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
-import { batteryInfo, power } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
 import { encrypt, EncryptData, getKeyAlg } from './Crypto'
@@ -21,19 +20,6 @@ interface Item {
 }
 
 export async function autoSyncTable(context: Context, table: string, fromDeviceId?: string) {
-  const pauseAutoSyncWhenLowBatteryCapacityLevel =
-    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-  const pauseAutoSyncWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
-  const lowBatteryCapacityLevel =
-    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
-  if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    return
-  }
-  const currentPowerMode = power.getPowerMode()
-  if (pauseAutoSyncWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
-    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
-    return
-  }
   const autoSyncTables = getFlushPreference(context, 'dataSetting', 'autoSyncTables', []) as string[]
   if (autoSyncTables.includes(table)) {
     const autoSyncDevices: Item[] = getFlushPreference(context, 'dataSetting', 'autoSyncDevices', []) as Item[]
@@ -107,19 +93,6 @@ async function huaweiCloudSyncTable(context: Context, table: string) {
 }
 
 export async function autoBackupTable(context: Context, table: string) {
-  const pauseAutoBackupWhenLowBatteryCapacityLevel =
-    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-  const pauseAutoBackupWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
-  const lowBatteryCapacityLevel =
-    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
-  if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    return
-  }
-  const currentPowerMode = power.getPowerMode()
-  if (pauseAutoBackupWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
-    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
-    return
-  }
   const autoBackupTables =
     getFlushPreference(context, 'dataSetting', 'autoBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoBackupTables.includes(table)) {

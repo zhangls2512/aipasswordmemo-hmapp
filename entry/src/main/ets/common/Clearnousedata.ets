@@ -15,10 +15,9 @@ export async function clearNouseData(context: Context) {
     }
   })
   const nousePasswordIconFilePathArray = await getNousePasswordIconFilePathArray(context)
-  const promises = nousePasswordIconFilePathArray.map(async (item) => {
+  nousePasswordIconFilePathArray.forEach(async (item) => {
     await fileIo.unlink(item)
   })
-  await Promise.all(promises)
 }
 
 async function getNousePasswordIconFilePathArray(context: Context) {
