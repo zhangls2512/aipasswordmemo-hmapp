@@ -50,8 +50,6 @@ export default struct PasswordPage {
   @Local hideTag: boolean = false
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Password[] = []
-  @Local hoverId: number = -1
-  @Local buttonHoverId: number = -1
   @Local mfaArray: MfaItem[] = []
   @Local quickBarPasswordIdArray: number[] = []
   UIContext = this.getUIContext()
@@ -414,21 +412,16 @@ export default struct PasswordPage {
             .padding(11)
             .stateStyles({
               normal: {
-                .backgroundColor(this.buttonHoverId === 0 ? '#0754EB' : $r('sys.color.background_emphasize'))
+                .backgroundColor($r('sys.color.background_emphasize'))
+              },
+              hovered: {
+                .backgroundColor('#0754EB')
               },
               pressed: {
                 .backgroundColor('#0A50DE')
               }
             })
             .width(40)
-            .onHover(isHover => {
-              if (!isHover) {
-                this.buttonHoverId = -1
-              }
-              if (isHover) {
-                this.buttonHoverId = 0
-              }
-            })
             .onClick(() => {
               this.isShowNewSheet = true
             })
@@ -693,7 +686,7 @@ export default struct PasswordPage {
           refreshing: $$this.loading
         }) {
           List() {
-            ForEach(this.passwordArray, (item: Password, index) => {
+            ForEach(this.passwordArray, (item: Password) => {
               ListItem() {
                 Column() {
                   Row() {
@@ -801,19 +794,13 @@ export default struct PasswordPage {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.comp_background_primary'))
+                      .backgroundColor($r('sys.color.comp_background_primary'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.comp_background_secondary'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = index
                     }
                   })
                   .onClick(() => {

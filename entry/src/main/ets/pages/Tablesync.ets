@@ -40,7 +40,6 @@ struct Tablesync {
   @Local passwordHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
   @Local infoHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
   @Local tagHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
-  @Local hoverId: number | string = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   index = 0
@@ -252,7 +251,7 @@ struct Tablesync {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
 
-              ForEach(this.autoSyncDevices, (item: Item, index) => {
+              ForEach(this.autoSyncDevices, (item: Item) => {
                 ListItem() {
                   Column() {
                     Row() {
@@ -354,19 +353,13 @@ struct Tablesync {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === '0,' + index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = '0,' + index
                       }
                     })
                     .onClick(async () => {
@@ -420,7 +413,7 @@ struct Tablesync {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
 
-              ForEach(this.availableDeviceArray, (item: Item, index) => {
+              ForEach(this.availableDeviceArray, (item: Item) => {
                 ListItem() {
                   Column() {
                     Row() {
@@ -523,19 +516,13 @@ struct Tablesync {
                       .padding(12)
                       .stateStyles({
                         normal: {
-                          .backgroundColor(this.hoverId === '1,' + index ? $r('sys.color.interactive_hover') :
-                            $r('sys.color.ohos_id_color_card_bg'))
+                          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        hovered: {
+                          .backgroundColor($r('sys.color.interactive_hover'))
                         },
                         pressed: {
                           .backgroundColor($r('sys.color.interactive_pressed'))
-                        }
-                      })
-                      .onHover(isHover => {
-                        if (!isHover) {
-                          this.hoverId = -1
-                        }
-                        if (isHover) {
-                          this.hoverId = '1,' + index
                         }
                       })
                       .onClick(async () => {
@@ -567,19 +554,13 @@ struct Tablesync {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === '2,' + index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = '2,' + index
                       }
                     })
                     .onClick(async () => {
@@ -658,19 +639,13 @@ struct Tablesync {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === '3,' + index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = '3,' + index
                       }
                     })
                     .onClick(async () => {
@@ -1457,19 +1432,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 0
                     }
                   })
                   .onClick(async () => {
@@ -1651,19 +1620,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 1
                     }
                   })
                   .onClick(async () => {
@@ -1721,19 +1684,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 2
                     }
                   })
                   .onClick(async () => {
@@ -1805,19 +1762,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 3
                     }
                   })
                   .onClick(async () => {
@@ -1875,19 +1826,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 4
                     }
                   })
                   .onClick(async () => {

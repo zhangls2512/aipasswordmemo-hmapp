@@ -11,7 +11,6 @@ export default struct Passwordgenerate {
   @Local uppercaseLetter: boolean = true
   @Local specialCharacter: boolean = false
   @Local password: string = ''
-  @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
 
@@ -182,22 +181,16 @@ export default struct Passwordgenerate {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
-                  $r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              hovered: {
+                .backgroundColor($r('sys.color.interactive_hover'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
             .width('100%')
-            .onHover(isHover => {
-              if (!isHover) {
-                this.hoverId = -1
-              }
-              if (isHover) {
-                this.hoverId = 0
-              }
-            })
             .onClick(async () => {
               await copy(this.context, this.UIContext, this.password)
             })

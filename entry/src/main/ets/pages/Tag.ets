@@ -19,8 +19,6 @@ export default struct TagPage {
   @Local enableCloudBackup: boolean = false
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Tag[] = []
-  @Local hoverId: number = -1
-  @Local buttonHoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
@@ -322,21 +320,16 @@ export default struct TagPage {
             .padding(11)
             .stateStyles({
               normal: {
-                .backgroundColor(this.buttonHoverId === 0 ? '#0754EB' : $r('sys.color.background_emphasize'))
+                .backgroundColor($r('sys.color.background_emphasize'))
+              },
+              hovered: {
+                .backgroundColor('#0754EB')
               },
               pressed: {
                 .backgroundColor('#0A50DE')
               }
             })
             .width(40)
-            .onHover(isHover => {
-              if (!isHover) {
-                this.buttonHoverId = -1
-              }
-              if (isHover) {
-                this.buttonHoverId = 0
-              }
-            })
             .onClick(() => {
               this.isShowNewSheet = true
             })
@@ -435,7 +428,7 @@ export default struct TagPage {
                   cross: LengthMetrics.vp(8)
                 }
               }) {
-                ForEach(this.tagArray, (item: Tag, index) => {
+                ForEach(this.tagArray, (item: Tag) => {
                   Column() {
                     Row() {
                       if (this.multipleSelect) {
@@ -475,19 +468,13 @@ export default struct TagPage {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.comp_background_primary'))
+                        .backgroundColor($r('sys.color.comp_background_primary'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.comp_background_secondary'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = index
                       }
                     })
                     .onClick(() => {

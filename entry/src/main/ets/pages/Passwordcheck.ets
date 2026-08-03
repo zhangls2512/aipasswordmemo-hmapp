@@ -20,7 +20,6 @@ export default struct Passwordcheck {
   @Local highStrengthPasswordArray: ListItem[] = []
   @Local repeatArray: RepeatItem[] = []
   @Local oldArray: ListItem[] = []
-  @Local hoverId: number | string = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   passwordId = 0
@@ -92,19 +91,13 @@ export default struct Passwordcheck {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === 'low' + index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 'low' + index
                       }
                     })
                     .onClick(() => {
@@ -158,19 +151,13 @@ export default struct Passwordcheck {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === 'medium' + index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 'medium' + index
                       }
                     })
                     .onClick(() => {
@@ -224,19 +211,13 @@ export default struct Passwordcheck {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === 'high' + index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = 'high' + index
                       }
                     })
                     .onClick(() => {
@@ -265,7 +246,7 @@ export default struct Passwordcheck {
               })
               .width('100%')
             }
-            ForEach(this.repeatArray, (item: RepeatItem, index) => {
+            ForEach(this.repeatArray, (item: RepeatItem) => {
               ListItem() {
                 Column() {
                   Text('使用 ' + item.password + ' 的 ' + item.count + ' 账号')
@@ -303,20 +284,13 @@ export default struct Passwordcheck {
                       .padding(12)
                       .stateStyles({
                         normal: {
-                          .backgroundColor(this.hoverId === index + ',' + itemIndex ?
-                            $r('sys.color.interactive_hover') :
-                            $r('sys.color.ohos_id_color_card_bg'))
+                          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        hovered: {
+                          .backgroundColor($r('sys.color.interactive_hover'))
                         },
                         pressed: {
                           .backgroundColor($r('sys.color.interactive_pressed'))
-                        }
-                      })
-                      .onHover(isHover => {
-                        if (!isHover) {
-                          this.hoverId = -1
-                        }
-                        if (isHover) {
-                          this.hoverId = index + ',' + itemIndex
                         }
                       })
                       .onClick(() => {
@@ -346,7 +320,7 @@ export default struct Passwordcheck {
               })
               .width('100%')
             }
-            ForEach(this.oldArray, (item: ListItem, index) => {
+            ForEach(this.oldArray, (item: ListItem) => {
               ListItem() {
                 Column() {
                   Row() {
@@ -366,19 +340,13 @@ export default struct Passwordcheck {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = index
                     }
                   })
                   .onClick(() => {

@@ -33,7 +33,6 @@ export default struct Me {
   @Local endDate: string = ''
   @Local cloudService: boolean = false
   @Local cloudServiceLoading: boolean = false
-  @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
 
@@ -125,19 +124,13 @@ export default struct Me {
           .padding(12)
           .stateStyles({
             normal: {
-              .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
-                $r('sys.color.comp_background_primary'))
+              .backgroundColor($r('sys.color.comp_background_primary'))
+            },
+            hovered: {
+              .backgroundColor($r('sys.color.interactive_hover'))
             },
             pressed: {
               .backgroundColor($r('sys.color.comp_background_secondary'))
-            }
-          })
-          .onHover(isHover => {
-            if (!isHover) {
-              this.hoverId = -1
-            }
-            if (isHover) {
-              this.hoverId = 0
             }
           })
           .onClick(() => {
@@ -176,19 +169,13 @@ export default struct Me {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.comp_background_primary'))
+                  .backgroundColor($r('sys.color.comp_background_primary'))
+                },
+                hovered: {
+                  .backgroundColor($r('sys.color.interactive_hover'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.comp_background_secondary'))
-                }
-              })
-              .onHover(isHover => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 1
                 }
               })
               .onClick(async () => {
@@ -309,19 +296,13 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
-                  $r('sys.color.comp_background_primary'))
+                .backgroundColor($r('sys.color.comp_background_primary'))
+              },
+              hovered: {
+                .backgroundColor($r('sys.color.interactive_hover'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
-              }
-            })
-            .onHover(isHover => {
-              if (!isHover) {
-                this.hoverId = -1
-              }
-              if (isHover) {
-                this.hoverId = 2
               }
             })
             .onClick(async () => {
@@ -355,19 +336,13 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
-                  $r('sys.color.comp_background_primary'))
+                .backgroundColor($r('sys.color.comp_background_primary'))
+              },
+              hovered: {
+                .backgroundColor($r('sys.color.interactive_hover'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
-              }
-            })
-            .onHover(isHover => {
-              if (!isHover) {
-                this.hoverId = -1
-              }
-              if (isHover) {
-                this.hoverId = 3
               }
             })
             .onClick(async () => {
@@ -422,19 +397,13 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
-                  $r('sys.color.comp_background_primary'))
+                .backgroundColor($r('sys.color.comp_background_primary'))
+              },
+              hovered: {
+                .backgroundColor($r('sys.color.interactive_hover'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
-              }
-            })
-            .onHover(isHover => {
-              if (!isHover) {
-                this.hoverId = -1
-              }
-              if (isHover) {
-                this.hoverId = 4
               }
             })
             .onClick(() => {
@@ -470,19 +439,13 @@ export default struct Me {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 5 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.comp_background_primary'))
+                  .backgroundColor($r('sys.color.comp_background_primary'))
+                },
+                hovered: {
+                  .backgroundColor($r('sys.color.interactive_hover'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.comp_background_secondary'))
-                }
-              })
-              .onHover(isHover => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 5
                 }
               })
               .onClick(() => {
@@ -533,19 +496,13 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 6 ? $r('sys.color.interactive_hover') :
-                  $r('sys.color.comp_background_primary'))
+                .backgroundColor($r('sys.color.comp_background_primary'))
+              },
+              hovered: {
+                .backgroundColor($r('sys.color.interactive_hover'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
-              }
-            })
-            .onHover(isHover => {
-              if (!isHover) {
-                this.hoverId = -1
-              }
-              if (isHover) {
-                this.hoverId = 6
               }
             })
             .onClick(() => {
@@ -598,19 +555,13 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 7 ? $r('sys.color.interactive_hover') :
-                  $r('sys.color.comp_background_primary'))
+                .backgroundColor($r('sys.color.comp_background_primary'))
+              },
+              hovered: {
+                .backgroundColor($r('sys.color.interactive_hover'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
-              }
-            })
-            .onHover(isHover => {
-              if (!isHover) {
-                this.hoverId = -1
-              }
-              if (isHover) {
-                this.hoverId = 7
               }
             })
             .onClick(() => {
@@ -680,19 +631,13 @@ export default struct Me {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === 8 ? $r('sys.color.interactive_hover') :
-                  $r('sys.color.comp_background_primary'))
+                .backgroundColor($r('sys.color.comp_background_primary'))
+              },
+              hovered: {
+                .backgroundColor($r('sys.color.interactive_hover'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.comp_background_secondary'))
-              }
-            })
-            .onHover(isHover => {
-              if (!isHover) {
-                this.hoverId = -1
-              }
-              if (isHover) {
-                this.hoverId = 8
               }
             })
             .onClick(() => {
@@ -740,19 +685,13 @@ export default struct Me {
           .padding(12)
           .stateStyles({
             normal: {
-              .backgroundColor(this.hoverId === 9 ? $r('sys.color.interactive_hover') :
-                $r('sys.color.comp_background_primary'))
+              .backgroundColor($r('sys.color.comp_background_primary'))
+            },
+            hovered: {
+              .backgroundColor($r('sys.color.interactive_hover'))
             },
             pressed: {
               .backgroundColor($r('sys.color.comp_background_secondary'))
-            }
-          })
-          .onHover(isHover => {
-            if (!isHover) {
-              this.hoverId = -1
-            }
-            if (isHover) {
-              this.hoverId = 9
             }
           })
           .onClick(() => {
