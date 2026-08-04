@@ -346,6 +346,35 @@ export default class EntryAbility extends UIAbility {
         }
       }
     })
+    const entryLowPowerModeWhenLowBatteryLevel =
+      getFlushPreference(this.context, 'debugSetting', 'entryLowPowerModeWhenLowBatteryLevel', true) as boolean
+    if (entryLowPowerModeWhenLowBatteryLevel && batteryInfo.batteryCapacityLevel >= 4) {
+      netBoost.setLowPowerMode(true)
+      await promptAction.openToast({
+        message: '网络传输进入低功耗模式成功'
+      })
+    }
+    const subscriber = commonEventManager.createSubscriberSync({
+      events: ['usual.event.BATTERY_LOW', 'usual.event.BATTERY_OKAY']
+    })
+    await commonEventManager.subscribeToEvent(subscriber, async (data) => {
+      const entryLowPowerModeWhenLowBatteryLevel =
+        getFlushPreference(this.context, 'debugSetting', 'entryLowPowerModeWhenLowBatteryLevel', true) as boolean
+      if (entryLowPowerModeWhenLowBatteryLevel) {
+        if (data.event === 'usual.event.BATTERY_LOW') {
+          netBoost.setLowPowerMode(true)
+          await promptAction.openToast({
+            message: '网络传输进入低功耗模式成功'
+          })
+        }
+        if (data.event === 'usual.event.BATTERY_OKAY') {
+          netBoost.setLowPowerMode(false)
+          await promptAction.openToast({
+            message: '网络传输退出低功耗模式成功'
+          })
+        }
+      }
+    })
     if (getFlushPreference(this.context, 'debugSetting', 'deleteErrorLogBeforeUpdateTimeWhenAppLaunch', true)) {
       const bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT)
       const updateTime = bundleInfo.updateTime
@@ -789,35 +818,6 @@ export default class EntryAbility extends UIAbility {
     }
     const allowRestore = getFlushPreference(this.context, 'commonSetting', 'allowRestore', true) as boolean
     this.context.setRestoreEnabled(allowRestore)
-    const entryLowPowerModeWhenLowBatteryLevel =
-      getFlushPreference(this.context, 'debugSetting', 'entryLowPowerModeWhenLowBatteryLevel', true) as boolean
-    if (entryLowPowerModeWhenLowBatteryLevel && batteryInfo.batteryCapacityLevel >= 4) {
-      netBoost.setLowPowerMode(true)
-      await promptAction.openToast({
-        message: '网络传输进入低功耗模式'
-      })
-    }
-    const subscribera = commonEventManager.createSubscriberSync({
-      events: ['usual.event.BATTERY_LOW', 'usual.event.BATTERY_OKAY']
-    })
-    await commonEventManager.subscribeToEvent(subscribera, async (data) => {
-      const entryLowPowerModeWhenLowBatteryLevel =
-        getFlushPreference(this.context, 'debugSetting', 'entryLowPowerModeWhenLowBatteryLevel', true) as boolean
-      if (entryLowPowerModeWhenLowBatteryLevel) {
-        if (data.event === 'usual.event.BATTERY_LOW') {
-          netBoost.setLowPowerMode(true)
-          await promptAction.openToast({
-            message: '网络传输进入低功耗模式成功'
-          })
-        }
-        if (data.event === 'usual.event.BATTERY_OKAY') {
-          netBoost.setLowPowerMode(false)
-          await promptAction.openToast({
-            message: '网络传输退出低功耗模式成功'
-          })
-        }
-      }
-    })
     if (deviceInfo.deviceType === '2in1') {
       const statusBarContent = getFlushPreference(this.context, 'commonSetting', 'statusBarContent', 0)
       if (statusBarContent === 1) {
@@ -830,10 +830,10 @@ export default class EntryAbility extends UIAbility {
         const eventData = JSON.parse(datastring) as MenuCodeEventData
         this.context.eventHub.emit(eventData.data.menuCode)
       })
-      const subscriberb = commonEventManager.createSubscriberSync({
+      const subscriber = commonEventManager.createSubscriberSync({
         events: ['BACKGROUNDABILITY_EVENT_DESTROY']
       })
-      await commonEventManager.subscribeToEvent(subscriberb, async (data) => {
+      await commonEventManager.subscribeToEvent(subscriber, async (data) => {
         if (data.event === 'BACKGROUNDABILITY_EVENT_DESTROY') {
           statusBarManager.removeFromStatusBar(this.context)
           setTempPreference(this.context, 'statusBar', 'exist', false)
