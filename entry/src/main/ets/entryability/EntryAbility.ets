@@ -1,6 +1,5 @@
 import {
   AbilityConstant,
-  appRecovery,
   bundleManager,
   ConfigurationConstant,
   contextConstant,
@@ -12,11 +11,11 @@ import {
 import { appInfoManager, updateManager } from '@kit.AppGalleryKit'
 import { relationalStore, uniformTypeDescriptor } from '@kit.ArkData'
 import { promptAction, uiAppearance, window } from '@kit.ArkUI'
-import { commonEventManager, deviceInfo } from '@kit.BasicServicesKit'
+import { batteryInfo, commonEventManager, deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { statusBarManager } from '@kit.DeskTopExtensionKit'
 import { image } from '@kit.ImageKit'
-import { netQuality } from '@kit.NetworkBoostKit'
+import { netBoost, netQuality } from '@kit.NetworkBoostKit'
 import { connection } from '@kit.NetworkKit'
 import { notificationManager } from '@kit.NotificationKit'
 import { hiAppEvent } from '@kit.PerformanceAnalysisKit'
@@ -781,7 +780,6 @@ export default class EntryAbility extends UIAbility {
           }
         })
       })
-    appRecovery.enableAppRecovery(appRecovery.RestartFlag.RESTART_WHEN_APP_FREEZE)
     const allowContinue = getFlushPreference(this.context, 'commonSetting', 'allowContinue', true)
     if (!allowContinue) {
       await this.context.setMissionContinueState(AbilityConstant.ContinueState.INACTIVE)
@@ -791,6 +789,35 @@ export default class EntryAbility extends UIAbility {
     }
     const allowRestore = getFlushPreference(this.context, 'commonSetting', 'allowRestore', true) as boolean
     this.context.setRestoreEnabled(allowRestore)
+    const entryLowPowerModeWhenLowBatteryLevel =
+      getFlushPreference(this.context, 'debugSetting', 'entryLowPowerModeWhenLowBatteryLevel', true) as boolean
+    if (entryLowPowerModeWhenLowBatteryLevel && batteryInfo.batteryCapacityLevel >= 4) {
+      netBoost.setLowPowerMode(true)
+      await promptAction.openToast({
+        message: '网络传输进入低功耗模式'
+      })
+    }
+    const subscribera = commonEventManager.createSubscriberSync({
+      events: ['usual.event.BATTERY_LOW', 'usual.event.BATTERY_OKAY']
+    })
+    await commonEventManager.subscribeToEvent(subscribera, async (data) => {
+      const entryLowPowerModeWhenLowBatteryLevel =
+        getFlushPreference(this.context, 'debugSetting', 'entryLowPowerModeWhenLowBatteryLevel', true) as boolean
+      if (entryLowPowerModeWhenLowBatteryLevel) {
+        if (data.event === 'usual.event.BATTERY_LOW') {
+          netBoost.setLowPowerMode(true)
+          await promptAction.openToast({
+            message: '网络传输进入低功耗模式成功'
+          })
+        }
+        if (data.event === 'usual.event.BATTERY_OKAY') {
+          netBoost.setLowPowerMode(false)
+          await promptAction.openToast({
+            message: '网络传输退出低功耗模式成功'
+          })
+        }
+      }
+    })
     if (deviceInfo.deviceType === '2in1') {
       const statusBarContent = getFlushPreference(this.context, 'commonSetting', 'statusBarContent', 0)
       if (statusBarContent === 1) {
@@ -803,10 +830,10 @@ export default class EntryAbility extends UIAbility {
         const eventData = JSON.parse(datastring) as MenuCodeEventData
         this.context.eventHub.emit(eventData.data.menuCode)
       })
-      const subscriber = commonEventManager.createSubscriberSync({
+      const subscriberb = commonEventManager.createSubscriberSync({
         events: ['BACKGROUNDABILITY_EVENT_DESTROY']
       })
-      await commonEventManager.subscribeToEvent(subscriber, async (data) => {
+      await commonEventManager.subscribeToEvent(subscriberb, async (data) => {
         if (data.event === 'BACKGROUNDABILITY_EVENT_DESTROY') {
           statusBarManager.removeFromStatusBar(this.context)
           setTempPreference(this.context, 'statusBar', 'exist', false)

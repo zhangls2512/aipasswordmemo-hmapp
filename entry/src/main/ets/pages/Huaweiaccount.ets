@@ -19,16 +19,16 @@ export function HuaweiaccountBuilder() {
 @ComponentV2
 struct Huaweiaccount {
   @Local email: string = ''
+  @Local mfa: string = ''
+  @Local emailcode: string = ''
+  @Local buttonEnabled: boolean = true
+  @Local agree: boolean = false
   @Local loading: boolean = false
   @Local isBind: boolean = false
   @Local type: string = 'mfa'
   @Local buttonText: string = '获取验证码'
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-  mfa = ''
-  emailcode = ''
-  buttonEnabled = true
-  agree = false
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'

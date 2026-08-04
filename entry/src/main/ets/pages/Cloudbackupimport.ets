@@ -20,9 +20,9 @@ export function CloudbackupimportBuilder() {
 struct Cloudbackupimport {
   @Local index: number = 0
   @Local value: string = '保留'
+  @Local autoImport: string[] = []
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
-  autoImport: string[] = []
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'

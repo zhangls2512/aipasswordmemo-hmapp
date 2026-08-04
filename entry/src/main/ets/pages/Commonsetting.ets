@@ -45,13 +45,13 @@ struct Commonsetting {
   @Local windowRectAutoSave: boolean = false
   @Local windowTopmost: boolean = false
   @Local keepScreenOn: boolean = false
-  @Local disallowScreenshot: boolean = true
+  @Local disallowScreenshot: boolean = false
   @Local showPasswordInIndex: boolean = false
   @Local hideTagInIndex: boolean = false
   @Local mfaSecondsRemainingStyleIndex: number = 0
   @Local mfaSecondsRemainingStyleValue: string = 'progress'
-  @Local passwordInfoValueDataDetector: boolean = true
-  @Local showMfaInFloatingBall: boolean = true
+  @Local passwordInfoValueDataDetector: boolean = false
+  @Local showMfaInFloatingBall: boolean = false
   @Local pushItemWhenBlur: boolean = false
   @Local checkVersionUpdateIndex: number = 1
   @Local checkVersionUpdateValue: string = '非流量下'

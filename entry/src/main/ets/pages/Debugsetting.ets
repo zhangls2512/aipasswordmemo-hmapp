@@ -2,7 +2,8 @@ import { appRecovery, common } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { webview } from '@kit.ArkWeb'
-import { deviceInfo } from '@kit.BasicServicesKit'
+import { batteryInfo, deviceInfo } from '@kit.BasicServicesKit'
+import { netBoost } from '@kit.NetworkBoostKit'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getFlushPreference, setFlushPreference } from '../common/Preference'
 import { restartApp } from '../common/Restartapp'
@@ -24,6 +25,7 @@ struct Debugsetting {
   @Local deleteErrorLogBeforeUpdateTimeWhenAppLaunch: boolean = false
   @Local autoUploadErrorLog: boolean = false
   @Local showMemoryLevelChange: boolean = false
+  @Local processCache: boolean = false
   @Local showNetAvailableStatusChange: boolean = false
   @Local showNetBlockStatusChange: boolean = false
   @Local showNetLost: boolean = false
@@ -32,14 +34,14 @@ struct Debugsetting {
   @Local showNetSceneChange: boolean = false
   @Local autoReportHighLatency: boolean = false
   @Local highLatencyThreshold: string = '200'
-  @Local optimizeParserBudget: boolean = true
+  @Local entryLowPowerModeWhenLowBatteryLevel: boolean = false
+  @Local optimizeParserBudget: boolean = false
   @Local destroyModeIndex: webview.WebDestroyMode = webview.WebDestroyMode.NORMAL_MODE
   @Local destroyModeValue: string = '普通'
   @Local allService: boolean = false
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-  processCache = false
 
   getSetting() {
     const globalErrorShowType = getFlushPreference(this.context, 'debugSetting', 'globalErrorShowType', 0)
@@ -69,6 +71,8 @@ struct Debugsetting {
     this.showNetQosChange = getFlushPreference(this.context, 'debugSetting', 'showNetQosChange', false) as boolean
     this.showNetSceneChange = getFlushPreference(this.context, 'debugSetting', 'showNetSceneChange', false) as boolean
     this.highLatencyThreshold = String(getFlushPreference(this.context, 'debugSetting', 'highLatencyThreshold', 200))
+    this.entryLowPowerModeWhenLowBatteryLevel =
+      getFlushPreference(this.context, 'debugSetting', 'entryLowPowerModeWhenLowBatteryLevel', true) as boolean
     this.optimizeParserBudget =
       getFlushPreference(this.context, 'debugSetting', 'optimizeParserBudget', true) as boolean
     const destroyMode =
@@ -942,6 +946,35 @@ struct Debugsetting {
                   .layoutWeight(1)
                   .margin({
                     left: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+              }
+              .borderRadius(12)
+              .padding(12)
+
+              Divider()
+                .padding({
+                  left: 12,
+                  right: 12
+                })
+              Row() {
+                Text('低电量时进入低功耗模式')
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .margin({
+                    right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                  })
+                Toggle({
+                  type: ToggleType.Switch,
+                  isOn: this.entryLowPowerModeWhenLowBatteryLevel!!
+                })
+                  .onChange(isOn => {
+                    if (!isOn) {
+                      netBoost.setLowPowerMode(false)
+                    }
+                    if (isOn) {
+                      netBoost.setLowPowerMode(batteryInfo.batteryCapacityLevel >= 4)
+                    }
+                    setFlushPreference(this.context, 'debugSetting', 'entryLowPowerModeWhenLowBatteryLevel', isOn)
                   })
               }
               .borderRadius(12)

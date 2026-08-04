@@ -24,11 +24,11 @@ export default struct Setting {
   @Local cloudService: boolean = false
   @Local accountLoading: boolean = false
   @Local accountDataSyncEnabled: boolean = false
+  @Local accountDataSync: boolean = false
   @Local accessToken: string = ''
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-  accountDataSync = false
 
   async getSetting() {
     this.allService = getFlushPreference(this.context, 'commonSetting', 'allService', true) as boolean

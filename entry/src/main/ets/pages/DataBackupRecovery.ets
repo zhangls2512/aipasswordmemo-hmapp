@@ -28,18 +28,18 @@ export function DataBackupRecoveryBuilder() {
 struct DataBackupRecovery {
   @Local selectedIndex: number = 0
   @Local isBackupTables: string[] = []
+  @Local autoBackupTables: string[] = []
+  @Local index: number = 0
+  @Local value: string = '保留'
+  @Local encryptFileBackup: boolean = true
+  @Local autoFileBackupTables: string[] = []
+  @Local accountDataSync: boolean = false
+  @Local encryptWebdavBackup: boolean = true
+  @Local autoWebdavBackupTables: string[] = []
   @Local accountDataSyncEnabled: boolean = false
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-  autoBackupTables: string[] = []
-  index = 0
-  value = '保留'
-  encryptFileBackup = true
-  autoFileBackupTables: string[] = []
-  accountDataSync = false
-  encryptWebdavBackup = true
-  autoWebdavBackupTables: string[] = []
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
       content: '请求中...'

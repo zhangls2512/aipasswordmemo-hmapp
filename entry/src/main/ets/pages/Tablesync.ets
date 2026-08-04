@@ -33,6 +33,10 @@ export function TablesyncBuilder() {
 @ComponentV2
 struct Tablesync {
   @Local selectedIndex: number = 0
+  @Local index: number = 0
+  @Local value: string = '始终'
+  @Local autoSyncTables: string[] = []
+  @Local autoHuaweiCloudSyncTables: string[] = []
   @Local onTables: string[] = []
   @Local huaweiCloudSyncOnTables: string[] = []
   @Local autoSyncDevices: Item[] = []
@@ -42,10 +46,6 @@ struct Tablesync {
   @Local tagHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
-  index = 0
-  value = '始终'
-  autoSyncTables: string[] = []
-  autoHuaweiCloudSyncTables: string[] = []
   deviceManager = distributedDeviceManager.createDeviceManager('com.zhangxm.aitodo')
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({

@@ -19,12 +19,12 @@ export default struct Passwordinfo {
   @Local mfaValue: string = ''
   @Local mfaSecondsRemaining: number = 0
   @Local mfaSecondsRemainingStyle: string = ''
+  @Local mfaSecondsRemainingColor: Color = Color.Transparent
   @Local passwordTag: PasswordTagItem[] = []
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   mfaStep = 30
   mfaOtpauthUri = ''
-  mfaSecondsRemainingColor = Color.Transparent
   intervalId = -1
   floatingBall = false
 
