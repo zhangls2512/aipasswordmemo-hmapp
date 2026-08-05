@@ -33,6 +33,10 @@ export function TablesyncBuilder() {
 @ComponentV2
 struct Tablesync {
   @Local selectedIndex: number = 0
+  @Local index: number = 0
+  @Local value: string = '始终'
+  @Local autoSyncTables: string[] = []
+  @Local autoHuaweiCloudSyncTables: string[] = []
   @Local onTables: string[] = []
   @Local huaweiCloudSyncOnTables: string[] = []
   @Local autoSyncDevices: Item[] = []
@@ -40,15 +44,8 @@ struct Tablesync {
   @Local passwordHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
   @Local infoHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
   @Local tagHuaweiCloudSyncProgressDetails: relationalStore.ProgressDetails | undefined = undefined
-  @Local hoverId: number | string = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
-  index = 0
-  value = '始终'
-  autoSyncTables: string[] = []
-  autoHuaweiCloudSyncTables: string[] = []
-  pauseAutoSyncWhenLowBatteryCapacityLevel = false
-  pauseAutoSyncWhenPowerSave = false
   deviceManager = distributedDeviceManager.createDeviceManager('com.zhangxm.aitodo')
   dialogControllerProgress = new CustomDialogController({
     builder: LoadingDialog({
@@ -86,10 +83,6 @@ struct Tablesync {
       getFlushPreference(this.context, 'dataSetting', 'huaweiCloudSyncOnTables', []) as string[]
     this.autoHuaweiCloudSyncTables =
       getFlushPreference(this.context, 'dataSetting', 'autoHuaweiCloudSyncTables', []) as string[]
-    this.pauseAutoSyncWhenLowBatteryCapacityLevel =
-      getFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false) as boolean
-    this.pauseAutoSyncWhenPowerSave =
-      getFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false) as boolean
   }
 
   build() {
@@ -100,10 +93,10 @@ struct Tablesync {
             items: new SegmentButtonV2Items([
               { text: '可信' },
               { text: '云空间' },
-              { text: '暂停' },
               { text: '邻近' }
             ]),
-            selectedIndex: this.selectedIndex!!
+            selectedIndex: this.selectedIndex!!,
+            enableStateAnimation: true
           })
             .margin({
               bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
@@ -165,6 +158,7 @@ struct Tablesync {
                                   relationalStore.DistributedType.DISTRIBUTED_DEVICE, {
                                     autoSync: false
                                   })
+                                await rdbStore.close()
                                 this.onTables = Array.from(new Set([...this.onTables, item.value]))
                                 setFlushPreference(this.context, 'dataSetting', 'onTables', this.onTables)
                               }
@@ -250,7 +244,7 @@ struct Tablesync {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
 
-              ForEach(this.autoSyncDevices, (item: Item, index) => {
+              ForEach(this.autoSyncDevices, (item: Item) => {
                 ListItem() {
                   Column() {
                     Row() {
@@ -352,19 +346,13 @@ struct Tablesync {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === '0,' + index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = '0,' + index
                       }
                     })
                     .onClick(async () => {
@@ -418,7 +406,7 @@ struct Tablesync {
                 top: $r('sys.float.ohos_id_elements_margin_vertical_l')
               })
 
-              ForEach(this.availableDeviceArray, (item: Item, index) => {
+              ForEach(this.availableDeviceArray, (item: Item) => {
                 ListItem() {
                   Column() {
                     Row() {
@@ -521,19 +509,13 @@ struct Tablesync {
                       .padding(12)
                       .stateStyles({
                         normal: {
-                          .backgroundColor(this.hoverId === '1,' + index ? $r('sys.color.interactive_hover') :
-                            $r('sys.color.ohos_id_color_card_bg'))
+                          .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                        },
+                        hovered: {
+                          .backgroundColor($r('sys.color.interactive_hover'))
                         },
                         pressed: {
                           .backgroundColor($r('sys.color.interactive_pressed'))
-                        }
-                      })
-                      .onHover(isHover => {
-                        if (!isHover) {
-                          this.hoverId = -1
-                        }
-                        if (isHover) {
-                          this.hoverId = '1,' + index
                         }
                       })
                       .onClick(async () => {
@@ -565,19 +547,13 @@ struct Tablesync {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === '2,' + index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = '2,' + index
                       }
                     })
                     .onClick(async () => {
@@ -656,19 +632,13 @@ struct Tablesync {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === '3,' + index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = '3,' + index
                       }
                     })
                     .onClick(async () => {
@@ -827,6 +797,7 @@ struct Tablesync {
                                 relationalStore.DistributedType.DISTRIBUTED_CLOUD, {
                                   autoSync: false
                                 })
+                              await rdbStore.close()
                               this.huaweiCloudSyncOnTables =
                                 Array.from(new Set([...this.huaweiCloudSyncOnTables, item.value]))
                               setFlushPreference(this.context, 'dataSetting', 'huaweiCloudSyncOnTables',
@@ -1048,6 +1019,7 @@ struct Tablesync {
                             ['password'], (progressDetails) => {
                               this.passwordHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.down'))
                         .height(24)
@@ -1071,6 +1043,7 @@ struct Tablesync {
                             ['password'], (progressDetails) => {
                               this.passwordHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.time'))
                         .height(24)
@@ -1094,6 +1067,7 @@ struct Tablesync {
                             ['password'], (progressDetails) => {
                               this.passwordHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                     }
                     .borderRadius(12)
@@ -1207,6 +1181,7 @@ struct Tablesync {
                             ['info'], (progressDetails) => {
                               this.infoHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.down'))
                         .height(24)
@@ -1230,6 +1205,7 @@ struct Tablesync {
                             ['info'], (progressDetails) => {
                               this.infoHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.time'))
                         .height(24)
@@ -1253,6 +1229,7 @@ struct Tablesync {
                             ['info'], (progressDetails) => {
                               this.infoHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                     }
                     .borderRadius(12)
@@ -1366,6 +1343,7 @@ struct Tablesync {
                             ['tag'], (progressDetails) => {
                               this.tagHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.down'))
                         .height(24)
@@ -1389,6 +1367,7 @@ struct Tablesync {
                             ['tag'], (progressDetails) => {
                               this.tagHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                       Image($r('app.media.time'))
                         .height(24)
@@ -1412,6 +1391,7 @@ struct Tablesync {
                             ['tag'], (progressDetails) => {
                               this.tagHuaweiCloudSyncProgressDetails = progressDetails
                             })
+                          await huaweiCloudSyncRdbStore.close()
                         })
                     }
                     .borderRadius(12)
@@ -1445,19 +1425,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 0
                     }
                   })
                   .onClick(async () => {
@@ -1492,6 +1466,7 @@ struct Tablesync {
                       }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
                     }
                     resultSetPassword.close()
+                    await passwordRdbStore.close()
                     const infoRdbStore = await relationalStore.getRdbStore(this.context, {
                       name: 'info',
                       securityLevel: relationalStore.SecurityLevel.S4,
@@ -1515,6 +1490,7 @@ struct Tablesync {
                       }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
                     }
                     resultSetInfo.close()
+                    await infoRdbStore.close()
                     const tagRdbStore = await relationalStore.getRdbStore(this.context, {
                       name: 'tag',
                       securityLevel: relationalStore.SecurityLevel.S1,
@@ -1538,6 +1514,8 @@ struct Tablesync {
                       }, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
                     }
                     resultSetTag.close()
+                    await tagRdbStore.close()
+                    await rdbStore.close()
                     await promptAction.openToast({
                       message: '迁移成功'
                     })
@@ -1552,71 +1530,6 @@ struct Tablesync {
               })
             }
             if (this.selectedIndex === 2) {
-              ListItem() {
-                Column() {
-                  Text('暂停自动同步')
-                    .fontColor($r('sys.color.font_secondary'))
-                    .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                    .fontWeight(FontWeight.Medium)
-                    .margin({
-                      bottom: 6,
-                      left: 12,
-                      right: 12
-                    })
-                  Column() {
-                    Row() {
-                      Text('电池电量低')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Toggle({
-                        type: ToggleType.Switch,
-                        isOn: this.pauseAutoSyncWhenLowBatteryCapacityLevel!!
-                      })
-                        .onChange(isOn => {
-                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel',
-                            isOn)
-                        })
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-
-                    Divider()
-                      .padding({
-                        left: 12,
-                        right: 12
-                      })
-                    Row() {
-                      Text('系统开启 (超级) 省电模式')
-                        .fontWeight(FontWeight.Medium)
-                        .layoutWeight(1)
-                        .margin({
-                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                        })
-                      Toggle({
-                        type: ToggleType.Switch,
-                        isOn: this.pauseAutoSyncWhenPowerSave!!
-                      })
-                        .onChange(isOn => {
-                          setFlushPreference(this.context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', isOn)
-                        })
-                    }
-                    .borderRadius(12)
-                    .padding(12)
-                  }
-                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
-                }
-                .alignItems(HorizontalAlign.Start)
-              }
-              .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-              })
-            }
-            if (this.selectedIndex === 3) {
               ListItem() {
                 Column() {
                   Row() {
@@ -1635,19 +1548,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 1
                     }
                   })
                   .onClick(async () => {
@@ -1705,19 +1612,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 2
                     }
                   })
                   .onClick(async () => {
@@ -1789,19 +1690,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 3
                     }
                   })
                   .onClick(async () => {
@@ -1859,19 +1754,13 @@ struct Tablesync {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === 4 ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.ohos_id_color_card_bg'))
+                      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
                       .backgroundColor($r('sys.color.interactive_pressed'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = 4
                     }
                   })
                   .onClick(async () => {

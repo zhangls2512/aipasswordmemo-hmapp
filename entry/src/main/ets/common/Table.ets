@@ -1,7 +1,6 @@
 import { relationalStore } from '@kit.ArkData'
 import { util } from '@kit.ArkTS'
 import { promptAction } from '@kit.ArkUI'
-import { batteryInfo, power } from '@kit.BasicServicesKit'
 import { fileIo } from '@kit.CoreFileKit'
 import { rcp } from '@kit.RemoteCommunicationKit'
 import { encrypt, EncryptData, getKeyAlg } from './Crypto'
@@ -21,19 +20,6 @@ interface Item {
 }
 
 export async function autoSyncTable(context: Context, table: string, fromDeviceId?: string) {
-  const pauseAutoSyncWhenLowBatteryCapacityLevel =
-    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-  const pauseAutoSyncWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
-  const lowBatteryCapacityLevel =
-    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
-  if (pauseAutoSyncWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    return
-  }
-  const currentPowerMode = power.getPowerMode()
-  if (pauseAutoSyncWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
-    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
-    return
-  }
   const autoSyncTables = getFlushPreference(context, 'dataSetting', 'autoSyncTables', []) as string[]
   if (autoSyncTables.includes(table)) {
     const autoSyncDevices: Item[] = getFlushPreference(context, 'dataSetting', 'autoSyncDevices', []) as Item[]
@@ -70,6 +56,7 @@ export async function syncTable(context: Context, table: string, networkId: stri
     predicates.inDevices([networkId])
     try {
       const res = await rdbStore.sync(syncMode, predicates)
+      await rdbStore.close()
       if (res[0][1] !== 0) {
         await promptAction.openToast({
           message: '同步失败，设备 ID：' + res[0][0] + '，错误码：' + res[0][1]
@@ -81,6 +68,7 @@ export async function syncTable(context: Context, table: string, networkId: stri
         })
       }
     } catch (err) {
+      await rdbStore.close()
       await promptAction.openToast({
         message: '发生错误，错误码：' + err.code + (err.message ? '，错误信息：' + err.message : '')
       })
@@ -100,23 +88,11 @@ async function huaweiCloudSyncTable(context: Context, table: string) {
     })
     await huaweiCloudSyncRdbStore.cloudSync(relationalStore.SyncMode.SYNC_MODE_TIME_FIRST, [table], () => {
     })
+    await huaweiCloudSyncRdbStore.close()
   }
 }
 
 export async function autoBackupTable(context: Context, table: string) {
-  const pauseAutoBackupWhenLowBatteryCapacityLevel =
-    getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenLowBatteryCapacityLevel', false)
-  const pauseAutoBackupWhenPowerSave = getFlushPreference(context, 'dataSetting', 'pauseAutoSyncWhenPowerSave', false)
-  const lowBatteryCapacityLevel =
-    getFlushPreference(context, 'debugSetting', 'lowBatteryCapacityLevel', batteryInfo.BatteryCapacityLevel.LEVEL_LOW)
-  if (pauseAutoBackupWhenLowBatteryCapacityLevel && batteryInfo.batteryCapacityLevel >= lowBatteryCapacityLevel) {
-    return
-  }
-  const currentPowerMode = power.getPowerMode()
-  if (pauseAutoBackupWhenPowerSave && currentPowerMode !== power.DevicePowerMode.MODE_NORMAL &&
-    currentPowerMode !== power.DevicePowerMode.MODE_PERFORMANCE) {
-    return
-  }
   const autoBackupTables =
     getFlushPreference(context, 'dataSetting', 'autoBackupTables', ['password', 'info', 'tag']) as string[]
   if (autoBackupTables.includes(table)) {
@@ -160,6 +136,7 @@ export async function backupTable(context: Context, table: string) {
     allowRebuild: true
   })
   await rdbStore.backup(table + 'backup.db')
+  await rdbStore.close()
   const oldFilePath = context.databaseDir + '/rdb/' + table + 'Backup.db'
   if (fileIo.accessSync(oldFilePath)) {
     await fileIo.unlink(oldFilePath)
@@ -291,4 +268,5 @@ export async function recoveryTable(context: Context, table: string) {
     allowRebuild: true
   })
   await rdbStore.restore(table + 'backup.db')
+  await rdbStore.close()
 }

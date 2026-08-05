@@ -19,13 +19,12 @@ export default struct Passwordinfo {
   @Local mfaValue: string = ''
   @Local mfaSecondsRemaining: number = 0
   @Local mfaSecondsRemainingStyle: string = ''
+  @Local mfaSecondsRemainingColor: Color = Color.Transparent
   @Local passwordTag: PasswordTagItem[] = []
-  @Local hoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   mfaStep = 30
   mfaOtpauthUri = ''
-  mfaSecondsRemainingColor = Color.Transparent
   intervalId = -1
   floatingBall = false
 
@@ -161,19 +160,13 @@ export default struct Passwordinfo {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                hovered: {
+                  .backgroundColor($r('sys.color.interactive_hover'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .onHover(isHover => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 0
                 }
               })
               .onClick(async () => {
@@ -243,19 +236,13 @@ export default struct Passwordinfo {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                hovered: {
+                  .backgroundColor($r('sys.color.interactive_hover'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .onHover(isHover => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 1
                 }
               })
               .onClick(async () => {
@@ -378,10 +365,14 @@ export default struct Passwordinfo {
             floatingBallController.on('click', async () => {
               await copy(this.context, this.UIContext, this.mfaValue)
             })
-            this.context.eventHub.on('stopFloatingBall', async () => {
+            floatingBallController.onDestroy(() => {
+              floatingBallController.offDestroy()
               floatingBallController.off('click')
-              await floatingBallController.stopFloatingBall()
               this.context.eventHub.off('stopFloatingBall')
+              this.floatingBall = false
+            })
+            this.context.eventHub.on('stopFloatingBall', async () => {
+              await floatingBallController.stopFloatingBall()
             })
             this.intervalId = setInterval(async () => {
               const mfaInfoArray = mfaInfo.value.split('\0')
@@ -418,8 +409,10 @@ export default struct Passwordinfo {
               }
               if (res.value === 'fail') {
                 clearInterval(this.intervalId)
-                await floatingBallController.stopFloatingBall()
-                this.floatingBall = false
+                this.intervalId = -1
+                if (this.floatingBall) {
+                  await floatingBallController.stopFloatingBall()
+                }
               }
             }, 500)
           }
@@ -434,6 +427,7 @@ export default struct Passwordinfo {
     .onDisAppear(() => {
       if (this.intervalId !== -1) {
         clearInterval(this.intervalId)
+        this.intervalId = -1
         if (this.floatingBall) {
           this.context.eventHub.emit('stopFloatingBall')
         }

@@ -100,6 +100,8 @@ export async function importPassword(context: Context, data: string, conflict: r
             JSON.stringify([])
         }, conflict)
       })
+      await rdbStore.close()
+      await huaweiCloudSyncRdbStore.close()
       await autoSyncTable(context, 'password')
       await autoBackupTable(context, 'password')
       return 'success'
@@ -154,6 +156,8 @@ export async function importInfo(context: Context, data: string, conflict: relat
             JSON.stringify([])
         }, conflict)
       })
+      await rdbStore.close()
+      await huaweiCloudSyncRdbStore.close()
       await autoSyncTable(context, 'info')
       await autoBackupTable(context, 'info')
       return 'success'
@@ -208,6 +212,8 @@ export async function importTag(context: Context, data: string, conflict: relati
             JSON.stringify([])
         }, conflict)
       })
+      await rdbStore.close()
+      await huaweiCloudSyncRdbStore.close()
       await autoSyncTable(context, 'tag')
       await autoBackupTable(context, 'tag')
       return 'success'

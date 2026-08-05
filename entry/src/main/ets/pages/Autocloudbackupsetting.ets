@@ -15,8 +15,8 @@ export function AutocloudbackupsettingBuilder() {
 
 @ComponentV2
 struct Autocloudbackupsetting {
+  @Local autoOn: string[] = []
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
-  autoOn: string[] = []
   typeArray: Type[] = [
     {
       name: '密码',

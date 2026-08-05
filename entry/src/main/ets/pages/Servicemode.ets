@@ -3,6 +3,7 @@ import { privacyManager } from '@kit.AppGalleryKit'
 import { LengthMetrics, promptAction } from '@kit.ArkUI'
 import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getFlushPreference, setFlushPreference } from '../common/Preference'
+import { Param } from './Webview'
 
 @Builder
 export function ServicemodeBuilder() {
@@ -40,6 +41,7 @@ struct Servicemode {
                   .onChange(isOn => {
                     this.allService = isOn
                     setFlushPreference(this.context, 'commonSetting', 'allService', isOn)
+                    this.context.eventHub.emit('refreshSetting')
                   })
               }
               .borderRadius(12)
@@ -62,7 +64,10 @@ struct Servicemode {
                       .find(item => item.type === privacyManager.AppPrivacyLinkType.PRIVACY_STATEMENT_LINK)
                     this.pageInfos.pushPath({
                       name: 'Webview',
-                      param: appPrivacyLink?.url
+                      param: {
+                        url: appPrivacyLink?.url,
+                        trust: false
+                      } as Param
                     })
                   } catch (err) {
                     await promptAction.openToast({
@@ -104,6 +109,7 @@ struct Servicemode {
                   .onChange(isOn => {
                     this.allService = !isOn
                     setFlushPreference(this.context, 'commonSetting', 'allService', !isOn)
+                    this.context.eventHub.emit('refreshSetting')
                   })
               }
               .borderRadius(12)
@@ -175,9 +181,6 @@ struct Servicemode {
     .onReady(context => {
       this.pageInfos = context.pathStack
       this.allService = getFlushPreference(this.context, 'commonSetting', 'allService', true) as boolean
-    })
-    .onDisAppear(() => {
-      this.context.eventHub.emit('refreshSetting')
     })
   }
 }

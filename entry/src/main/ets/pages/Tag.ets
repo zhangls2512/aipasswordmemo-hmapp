@@ -1,6 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LengthMetrics, LoadingDialog, promptAction } from '@kit.ArkUI'
-import { hdsEffect } from '@kit.UIDesignKit'
+import { LengthMetrics, LoadingDialog, promptAction, uiMaterial } from '@kit.ArkUI'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
@@ -20,8 +19,6 @@ export default struct TagPage {
   @Local enableCloudBackup: boolean = false
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Tag[] = []
-  @Local hoverId: number = -1
-  @Local buttonHoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   orderColumn = 'updateTime'
@@ -164,12 +161,13 @@ export default struct TagPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(() => {
               this.multipleSelect = false
@@ -198,12 +196,13 @@ export default struct TagPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
@@ -266,12 +265,13 @@ export default struct TagPage {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .width(40)
               .onClick(async () => {
                 if (this.multipleSelectArray.length === 0) {
@@ -320,21 +320,16 @@ export default struct TagPage {
             .padding(11)
             .stateStyles({
               normal: {
-                .backgroundColor(this.buttonHoverId === 0 ? '#0754EB' : $r('sys.color.background_emphasize'))
+                .backgroundColor($r('sys.color.background_emphasize'))
+              },
+              hovered: {
+                .backgroundColor('#0754EB')
               },
               pressed: {
                 .backgroundColor('#0A50DE')
               }
             })
             .width(40)
-            .onHover(isHover => {
-              if (!isHover) {
-                this.buttonHoverId = -1
-              }
-              if (isHover) {
-                this.buttonHoverId = 0
-              }
-            })
             .onClick(() => {
               this.isShowNewSheet = true
             })
@@ -343,9 +338,6 @@ export default struct TagPage {
               preferType: this.preferType,
               title: {
                 title: '新增标签'
-              },
-              onDisappear: () => {
-                this.loading = true
               },
               onWillDismiss: async (DismissSheetAction) => {
                 const promptAction = this.UIContext.getPromptAction()
@@ -384,12 +376,13 @@ export default struct TagPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .bindMenu([
               {
@@ -435,7 +428,7 @@ export default struct TagPage {
                   cross: LengthMetrics.vp(8)
                 }
               }) {
-                ForEach(this.tagArray, (item: Tag, index) => {
+                ForEach(this.tagArray, (item: Tag) => {
                   Column() {
                     Row() {
                       if (this.multipleSelect) {
@@ -447,12 +440,13 @@ export default struct TagPage {
                             right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                           })
                           .onChange(isOn => {
-                            if (!isOn) {
+                            const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
+                            if (!isOn && exist) {
                               this.multipleSelectArray.splice(
                                 this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
                                   item.id), 1)
                             }
-                            if (isOn) {
+                            if (isOn && !exist) {
                               this.multipleSelectArray.push(item)
                             }
                           })
@@ -474,23 +468,26 @@ export default struct TagPage {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.comp_background_primary'))
+                        .backgroundColor($r('sys.color.comp_background_primary'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
-                        .backgroundColor($r('sys.color.comp_background_secondary'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = index
+                        .backgroundColor($r('sys.color.interactive_pressed'))
                       }
                     })
                     .onClick(() => {
                       if (this.multipleSelect) {
+                        const exist = this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+                        if (exist) {
+                          this.multipleSelectArray.splice(
+                            this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                              item.id), 1)
+                        }
+                        if (!exist) {
+                          this.multipleSelectArray.push(item)
+                        }
                         return
                       }
                       this.tagId = item.id
@@ -561,9 +558,6 @@ export default struct TagPage {
       preferType: this.preferType,
       title: {
         title: '修改标签'
-      },
-      onDisappear: () => {
-        this.loading = true
       },
       onWillDismiss: async (DismissSheetAction) => {
         const promptAction = this.UIContext.getPromptAction()
