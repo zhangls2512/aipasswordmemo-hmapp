@@ -6,13 +6,7 @@ import { image } from '@kit.ImageKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { generateBarcode, scanCore } from '@kit.ScanKit'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
-import {
-  hdsEffect,
-  hdsMaterial,
-  HdsNavDestination,
-  HdsNavDestinationTitleMode,
-  ScrollEffectType
-} from '@kit.UIDesignKit'
+import { hdsMaterial, HdsNavDestination, HdsNavDestinationTitleMode, ScrollEffectType } from '@kit.UIDesignKit'
 import { getAccountAccessToken } from '../common/Account'
 import getDeviceToken from '../common/Devicetoken'
 import copy from '../common/Pasteboard'
@@ -126,12 +120,6 @@ struct Invite {
                   })
                 Button('保存')
                   .buttonStyle(ButtonStyleMode.NORMAL)
-                  .visualEffect(new hdsEffect.HdsEffectBuilder()
-                    .pointLight({
-                      sourceType: hdsEffect.PointLightSourceType.SOFT,
-                      illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                    })
-                    .buildEffect())
                   .onClick(async () => {
                     const qrcodeDir = this.context.cacheDir + '/media/invitationqrcode/'
                     const qrcodePath = qrcodeDir + this.invitationcode + '.png'

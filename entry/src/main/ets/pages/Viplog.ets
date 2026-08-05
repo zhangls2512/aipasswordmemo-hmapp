@@ -22,11 +22,10 @@ export function ViplogBuilder() {
 struct Viplog {
   @Local viplogArray: Item[] = []
   @Local loading: boolean = false
-  @Local hoverId: number | string = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   accessToken = ''
-  empty: boolean | undefined = undefined
+  lastCount = -1
 
   build() {
     HdsNavDestination() {
@@ -44,7 +43,7 @@ struct Viplog {
           })
           .width('100%')
         }
-        ForEach(this.viplogArray, (item: Item, index) => {
+        ForEach(this.viplogArray, (item: Item) => {
           ListItem() {
             Column() {
               Row() {
@@ -148,19 +147,13 @@ struct Viplog {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor(this.hoverId === index + ',0' ? $r('sys.color.interactive_hover') :
-                      $r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  hovered: {
+                    .backgroundColor($r('sys.color.interactive_hover'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
-                  }
-                })
-                .onHover(isHover => {
-                  if (!isHover) {
-                    this.hoverId = -1
-                  }
-                  if (isHover) {
-                    this.hoverId = index + ',0'
                   }
                 })
                 .onClick(async () => {
@@ -191,19 +184,13 @@ struct Viplog {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor(this.hoverId === index + ',1' ? $r('sys.color.interactive_hover') :
-                      $r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  hovered: {
+                    .backgroundColor($r('sys.color.interactive_hover'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
-                  }
-                })
-                .onHover(isHover => {
-                  if (!isHover) {
-                    this.hoverId = -1
-                  }
-                  if (isHover) {
-                    this.hoverId = index + ',1'
                   }
                 })
                 .onClick(async () => {
@@ -242,7 +229,7 @@ struct Viplog {
         right: $r('sys.float.ohos_id_elements_margin_horizontal_l')
       })
       .onReachEnd(async () => {
-        if (this.accessToken && this.empty === false && this.viplogArray.length > 0) {
+        if (this.accessToken && this.viplogArray.length > 0 && this.lastCount === 10) {
           this.loading = true
           const res = await request(this.context, '/product/getViplogList', {
             accessToken: this.accessToken,
@@ -252,9 +239,7 @@ struct Viplog {
           this.loading = false
           if (res !== 'fail') {
             const array = JSON.parse(res).data as Item[]
-            if (array.length === 0) {
-              this.empty = true
-            }
+            this.lastCount = array.length
             this.viplogArray = this.viplogArray.concat(array)
           }
         }
@@ -304,7 +289,7 @@ struct Viplog {
         this.loading = false
         if (res !== 'fail') {
           this.viplogArray = JSON.parse(res).data
-          this.empty = false
+          this.lastCount = this.viplogArray.length
         }
       }
     })

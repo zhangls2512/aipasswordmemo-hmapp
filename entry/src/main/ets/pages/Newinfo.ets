@@ -46,9 +46,12 @@ export default struct Newinfo {
             const photoPicker = new photoAccessHelper.PhotoViewPicker()
             const pickerres = await photoPicker.select({
               MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+              showDateOnScrollbar: true,
+              preferredCompatibleMode: photoAccessHelper.PreferredCompatibleMode.CURRENT,
               maxSelectNumber: 1,
               isPhotoTakingSupported: false,
-              isOriginalSupported: false
+              isOriginalSupported: false,
+              isDestroyedWithNavigation: true
             })
             const fileSource = fileIo.openSync(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)
@@ -56,6 +59,7 @@ export default struct Newinfo {
             await imageSource.release()
             const imageSize = imagePixelMap.getImageInfoSync().size
             if (imageSize.width !== imageSize.height) {
+              await imagePixelMap.release()
               await promptAction.openToast({
                 message: '请选择宽高比为 1:1 的图片'
               })
@@ -405,6 +409,7 @@ export default struct Newinfo {
             })
             if (res === 'success') {
               this.isShowNewSheet = false
+              this.context.eventHub.emit('refreshInfo')
             }
           })
       }

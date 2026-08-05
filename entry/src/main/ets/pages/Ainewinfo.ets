@@ -28,7 +28,6 @@ export default struct Ainewinfo {
   @Local list: Item[] = []
   @Local text: string = ''
   @Local showCard: boolean = false
-  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   cloudBackup = false
   dialogControllerProgress = new CustomDialogController({
@@ -87,7 +86,9 @@ export default struct Ainewinfo {
   @Builder
   ChooseImageMenu() {
     Menu() {
-      MenuItem({ content: '拍照' })
+      MenuItem({
+        content: '拍照'
+      })
         .onClick(async () => {
           try {
             const pickerres = await cameraPicker.pick(this.context, [cameraPicker.PickerMediaType.PHOTO], {
@@ -97,47 +98,47 @@ export default struct Ainewinfo {
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
             await imageSource.release()
-            const initres = await textRecognition.init()
-            if (initres) {
-              this.dialogControllerProgress.open()
-              const textrecognitionres = await textRecognition.recognizeText({
-                pixelMap: imagePixelMap
-              })
-              await textRecognition.release()
-              await imagePixelMap.release()
-              this.dialogControllerProgress.close()
-              this.text = textrecognitionres.value
-              await this.getList(this.text)
-            }
+            await textRecognition.init()
+            this.dialogControllerProgress.open()
+            const textrecognitionres = await textRecognition.recognizeText({
+              pixelMap: imagePixelMap
+            })
+            await textRecognition.release()
+            await imagePixelMap.release()
+            this.dialogControllerProgress.close()
+            this.text = textrecognitionres.value
+            await this.getList(this.text)
           } catch {
           }
         })
-      MenuItem({ content: '从图库中选择' })
+      MenuItem({
+        content: '从图库中选择'
+      })
         .onClick(async () => {
           try {
             const photoPicker = new photoAccessHelper.PhotoViewPicker()
             const pickerres = await photoPicker.select({
               MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+              showDateOnScrollbar: true,
+              preferredCompatibleMode: photoAccessHelper.PreferredCompatibleMode.CURRENT,
               maxSelectNumber: 1,
-              isPhotoTakingSupported: false,
-              isOriginalSupported: false
+              isOriginalSupported: false,
+              isDestroyedWithNavigation: true
             })
             const fileSource = fileIo.openSync(pickerres.photoUris[0])
             const imageSource = image.createImageSource(fileSource.fd)
             const imagePixelMap = await imageSource.createPixelMap()
             await imageSource.release()
-            const initres = await textRecognition.init()
-            if (initres) {
-              this.dialogControllerProgress.open()
-              const textrecognitionres = await textRecognition.recognizeText({
-                pixelMap: imagePixelMap
-              })
-              await textRecognition.release()
-              await imagePixelMap.release()
-              this.dialogControllerProgress.close()
-              this.text = textrecognitionres.value
-              await this.getList(this.text)
-            }
+            await textRecognition.init()
+            this.dialogControllerProgress.open()
+            const textrecognitionres = await textRecognition.recognizeText({
+              pixelMap: imagePixelMap
+            })
+            await textRecognition.release()
+            await imagePixelMap.release()
+            this.dialogControllerProgress.close()
+            this.text = textrecognitionres.value
+            await this.getList(this.text)
           } catch {
           }
         })
@@ -179,18 +180,16 @@ export default struct Ainewinfo {
               const imageSource = image.createImageSource(buffer)
               const imagePixelMap = await imageSource.createPixelMap()
               await imageSource.release()
-              const initres = await textRecognition.init()
-              if (initres) {
-                this.dialogControllerProgress.open()
-                const textrecognitionres = await textRecognition.recognizeText({
-                  pixelMap: imagePixelMap
-                })
-                await textRecognition.release()
-                await imagePixelMap.release()
-                this.dialogControllerProgress.close()
-                this.text = textrecognitionres.value
-                await this.getList(this.text)
-              }
+              await textRecognition.init()
+              this.dialogControllerProgress.open()
+              const textrecognitionres = await textRecognition.recognizeText({
+                pixelMap: imagePixelMap
+              })
+              await textRecognition.release()
+              await imagePixelMap.release()
+              this.dialogControllerProgress.close()
+              this.text = textrecognitionres.value
+              await this.getList(this.text)
             }
           })
           Row() {
@@ -291,7 +290,7 @@ export default struct Ainewinfo {
         })
         .width('100%')
       }
-      ForEach(this.list, (item: Item, index) => {
+      ForEach(this.list, (item: Item) => {
         ListItem() {
           Column() {
             Row() {
@@ -351,19 +350,13 @@ export default struct Ainewinfo {
             .padding(12)
             .stateStyles({
               normal: {
-                .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
-                  $r('sys.color.ohos_id_color_card_bg'))
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              },
+              hovered: {
+                .backgroundColor($r('sys.color.interactive_hover'))
               },
               pressed: {
                 .backgroundColor($r('sys.color.interactive_pressed'))
-              }
-            })
-            .onHover(isHover => {
-              if (!isHover) {
-                this.hoverId = -1
-              }
-              if (isHover) {
-                this.hoverId = index
               }
             })
             .onClick(async () => {
@@ -382,6 +375,9 @@ export default struct Ainewinfo {
               await promptAction.openToast({
                 message: '新增' + (res === 'success' ? '成功' : '失败，原因：已存在')
               })
+              if (res === 'success') {
+                this.context.eventHub.emit('refreshInfo')
+              }
             })
           }
           .backgroundColor($r('sys.color.ohos_id_color_card_bg'))

@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LoadingDialog, promptAction } from '@kit.ArkUI'
+import { LoadingDialog, promptAction, uiMaterial } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsEffect } from '@kit.UIDesignKit'
@@ -27,8 +27,6 @@ export default struct InfoPage {
   @Local types: string[] = []
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Info[] = []
-  @Local hoverId: number = -1
-  @Local buttonHoverId: number = -1
   UIContext = this.getUIContext()
   context = this.UIContext.getHostContext() as common.UIAbilityContext
   infoId = 0
@@ -202,12 +200,13 @@ export default struct InfoPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(() => {
               this.multipleSelect = false
@@ -236,12 +235,13 @@ export default struct InfoPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
@@ -304,12 +304,13 @@ export default struct InfoPage {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .width(40)
               .onClick(async () => {
                 if (this.multipleSelectArray.length === 0) {
@@ -361,21 +362,16 @@ export default struct InfoPage {
             .padding(11)
             .stateStyles({
               normal: {
-                .backgroundColor(this.buttonHoverId === 0 ? '#0754EB' : $r('sys.color.background_emphasize'))
+                .backgroundColor($r('sys.color.background_emphasize'))
+              },
+              hovered: {
+                .backgroundColor('#0754EB')
               },
               pressed: {
                 .backgroundColor('#0A50DE')
               }
             })
             .width(40)
-            .onHover(isHover => {
-              if (!isHover) {
-                this.buttonHoverId = -1
-              }
-              if (isHover) {
-                this.buttonHoverId = 0
-              }
-            })
             .onClick(() => {
               this.isShowNewSheet = true
             })
@@ -384,9 +380,6 @@ export default struct InfoPage {
               preferType: this.preferType,
               title: {
                 title: '新增常用信息'
-              },
-              onDisappear: () => {
-                this.loading = true
               },
               onWillDismiss: async (DismissSheetAction) => {
                 const promptAction = this.UIContext.getPromptAction()
@@ -412,11 +405,14 @@ export default struct InfoPage {
 
             Button('AI 识别新增')
               .buttonStyle(ButtonStyleMode.NORMAL)
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.CONTENT
-                })
                 .shaderEffect({
                   effectType: hdsEffect.EffectType.DUAL_EDGE_FLOW_LIGHT,
                   animation: {
@@ -444,9 +440,6 @@ export default struct InfoPage {
                 preferType: this.preferType,
                 title: {
                   title: 'AI 识别新增常用信息'
-                },
-                onDisappear: () => {
-                  this.loading = true
                 }
               })
           }
@@ -497,7 +490,7 @@ export default struct InfoPage {
           .edgeEffect(EdgeEffect.Spring)
           .margin({
             bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
-            top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            top: this.types.length === 0 ? 0 : $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .scrollable(ScrollDirection.Horizontal)
           .scrollBar(BarState.Off)
@@ -514,7 +507,7 @@ export default struct InfoPage {
           refreshing: $$this.loading
         }) {
           List() {
-            ForEach(this.infoArray, (item: Info, index) => {
+            ForEach(this.infoArray, (item: Info) => {
               if (!this.selectType || item.type === this.selectType) {
                 ListItem() {
                   Column() {
@@ -528,12 +521,13 @@ export default struct InfoPage {
                             right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                           })
                           .onChange(isOn => {
-                            if (!isOn) {
+                            const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
+                            if (!isOn && exist) {
                               this.multipleSelectArray.splice(
                                 this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
                                   item.id), 1)
                             }
-                            if (isOn) {
+                            if (isOn && !exist) {
                               this.multipleSelectArray.push(item)
                             }
                           })
@@ -577,23 +571,26 @@ export default struct InfoPage {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.comp_background_primary'))
+                        .backgroundColor($r('sys.color.comp_background_primary'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
-                        .backgroundColor($r('sys.color.comp_background_secondary'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = index
+                        .backgroundColor($r('sys.color.interactive_pressed'))
                       }
                     })
                     .onClick(async () => {
                       if (this.multipleSelect) {
+                        const exist = this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+                        if (exist) {
+                          this.multipleSelectArray.splice(
+                            this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                              item.id), 1)
+                        }
+                        if (!exist) {
+                          this.multipleSelectArray.push(item)
+                        }
                         return
                       }
                       if (item.type === '图标') {
@@ -690,9 +687,6 @@ export default struct InfoPage {
       preferType: this.preferType,
       title: {
         title: '修改常用信息'
-      },
-      onDisappear: () => {
-        this.loading = true
       },
       onWillDismiss: async (DismissSheetAction) => {
         const promptAction = this.UIContext.getPromptAction()

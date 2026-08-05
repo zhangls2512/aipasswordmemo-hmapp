@@ -17,16 +17,15 @@ interface VipItem {
 
 @ComponentV2
 export default struct Vip {
+  @Local vipStatus: string = '未开通'
+  @Local vipStatusColor: string = 'red'
+  @Local agree: boolean = false
   @Local vipStatusLoading: boolean = false
   @Local vipEndDate: string = ''
   @Local iapStatus: boolean = false
   @Local iapStatusLoading: boolean = false
-  @Local hoverId: number = -1
   context = this.getUIContext().getHostContext() as common.UIAbilityContext
   pageInfos = new NavPathStack()
-  vipStatus = '未开通'
-  vipStatusColor = 'red'
-  agree = false
   accessToken = ''
   uid = ''
   vipArray: VipItem[] = [
@@ -243,19 +242,13 @@ export default struct Vip {
                     .padding(12)
                     .stateStyles({
                       normal: {
-                        .backgroundColor(this.hoverId === index + 4 ? $r('sys.color.interactive_hover') :
-                          $r('sys.color.ohos_id_color_card_bg'))
+                        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                      },
+                      hovered: {
+                        .backgroundColor($r('sys.color.interactive_hover'))
                       },
                       pressed: {
                         .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onHover(isHover => {
-                      if (!isHover) {
-                        this.hoverId = -1
-                      }
-                      if (isHover) {
-                        this.hoverId = index + 4
                       }
                     })
                     .onClick(async () => {
@@ -352,19 +345,13 @@ export default struct Vip {
                 .padding(12)
                 .stateStyles({
                   normal: {
-                    .backgroundColor(this.hoverId === 0 ? $r('sys.color.interactive_hover') :
-                      $r('sys.color.ohos_id_color_card_bg'))
+                    .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  },
+                  hovered: {
+                    .backgroundColor($r('sys.color.interactive_hover'))
                   },
                   pressed: {
                     .backgroundColor($r('sys.color.interactive_pressed'))
-                  }
-                })
-                .onHover(isHover => {
-                  if (!isHover) {
-                    this.hoverId = -1
-                  }
-                  if (isHover) {
-                    this.hoverId = 0
                   }
                 })
                 .onClick(async () => {
@@ -397,19 +384,13 @@ export default struct Vip {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 1 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                hovered: {
+                  .backgroundColor($r('sys.color.interactive_hover'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .onHover(isHover => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 1
                 }
               })
               .onClick(() => {
@@ -440,19 +421,13 @@ export default struct Vip {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 2 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                hovered: {
+                  .backgroundColor($r('sys.color.interactive_hover'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .onHover(isHover => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 2
                 }
               })
               .onClick(() => {
@@ -482,19 +457,13 @@ export default struct Vip {
               .padding(12)
               .stateStyles({
                 normal: {
-                  .backgroundColor(this.hoverId === 3 ? $r('sys.color.interactive_hover') :
-                    $r('sys.color.ohos_id_color_card_bg'))
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                },
+                hovered: {
+                  .backgroundColor($r('sys.color.interactive_hover'))
                 },
                 pressed: {
                   .backgroundColor($r('sys.color.interactive_pressed'))
-                }
-              })
-              .onHover(isHover => {
-                if (!isHover) {
-                  this.hoverId = -1
-                }
-                if (isHover) {
-                  this.hoverId = 3
                 }
               })
               .onClick(() => {

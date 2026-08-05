@@ -1,8 +1,7 @@
 import { common } from '@kit.AbilityKit'
 import { FunctionComponent } from '@kit.AgentFrameworkKit'
-import { LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction, uiMaterial, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
-import { hdsEffect } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
@@ -51,8 +50,6 @@ export default struct PasswordPage {
   @Local hideTag: boolean = false
   @Local multipleSelect: boolean = false
   @Local multipleSelectArray: Password[] = []
-  @Local hoverId: number = -1
-  @Local buttonHoverId: number = -1
   @Local mfaArray: MfaItem[] = []
   @Local quickBarPasswordIdArray: number[] = []
   UIContext = this.getUIContext()
@@ -255,12 +252,13 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(() => {
               this.multipleSelect = false
@@ -289,12 +287,13 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
@@ -357,12 +356,13 @@ export default struct PasswordPage {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .width(40)
               .onClick(async () => {
                 if (this.multipleSelectArray.length === 0) {
@@ -412,21 +412,16 @@ export default struct PasswordPage {
             .padding(11)
             .stateStyles({
               normal: {
-                .backgroundColor(this.buttonHoverId === 0 ? '#0754EB' : $r('sys.color.background_emphasize'))
+                .backgroundColor($r('sys.color.background_emphasize'))
+              },
+              hovered: {
+                .backgroundColor('#0754EB')
               },
               pressed: {
                 .backgroundColor('#0A50DE')
               }
             })
             .width(40)
-            .onHover(isHover => {
-              if (!isHover) {
-                this.buttonHoverId = -1
-              }
-              if (isHover) {
-                this.buttonHoverId = 0
-              }
-            })
             .onClick(() => {
               this.isShowNewSheet = true
             })
@@ -449,7 +444,6 @@ export default struct PasswordPage {
                   const lastWindow = await window.getLastWindow(this.context)
                   await lastWindow.setWindowPrivacyMode(false)
                 }
-                this.loading = true
               },
               onWillDismiss: async (DismissSheetAction) => {
                 const promptAction = this.UIContext.getPromptAction()
@@ -487,12 +481,13 @@ export default struct PasswordPage {
               .margin({
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
-              .visualEffect(new hdsEffect.HdsEffectBuilder()
-                .pointLight({
-                  sourceType: hdsEffect.PointLightSourceType.SOFT,
-                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-                })
-                .buildEffect())
+              .systemMaterial(new uiMaterial.ImmersiveMaterial({
+                style: uiMaterial.ImmersiveStyle.REGULAR,
+                interactive: true,
+                lightEffect: {
+                  color: Color.White
+                }
+              }))
               .width(40)
             }
             Column() {
@@ -512,12 +507,13 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .bindMenu([
               {
@@ -553,12 +549,13 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .visualEffect(new hdsEffect.HdsEffectBuilder()
-              .pointLight({
-                sourceType: hdsEffect.PointLightSourceType.SOFT,
-                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
-              })
-              .buildEffect())
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true,
+              lightEffect: {
+                color: Color.White
+              }
+            }))
             .width(40)
             .onClick(() => {
               this.isShowFilterSheet = true
@@ -612,6 +609,10 @@ export default struct PasswordPage {
             value: this.nameKeyword!!
           })
             .searchButton('搜索')
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.REGULAR,
+              interactive: true
+            }))
             .onChange(value => {
               setTempPreference(this.context, 'filterPassword', 'nameKeyword', value)
             })
@@ -668,7 +669,7 @@ export default struct PasswordPage {
           }
           .edgeEffect(EdgeEffect.Spring)
           .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            bottom: this.tags.length === 0 ? 0 : $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .scrollable(ScrollDirection.Horizontal)
           .scrollBar(BarState.Off)
@@ -685,7 +686,7 @@ export default struct PasswordPage {
           refreshing: $$this.loading
         }) {
           List() {
-            ForEach(this.passwordArray, (item: Password, index) => {
+            ForEach(this.passwordArray, (item: Password) => {
               ListItem() {
                 Column() {
                   Row() {
@@ -698,12 +699,13 @@ export default struct PasswordPage {
                           right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
                         .onChange(isOn => {
-                          if (!isOn) {
+                          const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
+                          if (!isOn && exist) {
                             this.multipleSelectArray.splice(
                               this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
                                 item.id), 1)
                           }
-                          if (isOn) {
+                          if (isOn && !exist) {
                             this.multipleSelectArray.push(item)
                           }
                         })
@@ -792,23 +794,26 @@ export default struct PasswordPage {
                   .padding(12)
                   .stateStyles({
                     normal: {
-                      .backgroundColor(this.hoverId === index ? $r('sys.color.interactive_hover') :
-                        $r('sys.color.comp_background_primary'))
+                      .backgroundColor($r('sys.color.comp_background_primary'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
                     },
                     pressed: {
-                      .backgroundColor($r('sys.color.comp_background_secondary'))
-                    }
-                  })
-                  .onHover(isHover => {
-                    if (!isHover) {
-                      this.hoverId = -1
-                    }
-                    if (isHover) {
-                      this.hoverId = index
+                      .backgroundColor($r('sys.color.interactive_pressed'))
                     }
                   })
                   .onClick(() => {
                     if (this.multipleSelect) {
+                      const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
+                      if (exist) {
+                        this.multipleSelectArray.splice(
+                          this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                            item.id), 1)
+                      }
+                      if (!exist) {
+                        this.multipleSelectArray.push(item)
+                      }
                       return
                     }
                     this.passwordId = item.id
@@ -1011,7 +1016,6 @@ export default struct PasswordPage {
           const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(false)
         }
-        this.loading = true
       },
       onWillDismiss: async (DismissSheetAction) => {
         const promptAction = this.UIContext.getPromptAction()
