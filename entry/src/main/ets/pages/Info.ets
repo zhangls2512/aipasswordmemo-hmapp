@@ -19,7 +19,7 @@ export default struct InfoPage {
   @Provider() isShowNewSheet: boolean = false
   @Provider() isShowUpdateSheet: boolean = false
   @Local isShowAinewSheet: boolean = false
-  @Local preferType: number = 1
+  @Local preferType: SheetType = SheetType.CENTER
   @Local infoArray: Info[] = []
   @Local loading: boolean = false
   @Local enableCloudBackup: boolean = false
@@ -185,6 +185,7 @@ export default struct InfoPage {
             Column() {
               Image($r('app.media.cancel'))
             }
+            .bindTips('退出多选')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut(FunctionKey.ESC, [])
@@ -223,6 +224,7 @@ export default struct InfoPage {
             Column() {
               Image($r('app.media.delete'))
             }
+            .bindTips('删除')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut('D', [ModifierKey.CTRL])
@@ -290,6 +292,7 @@ export default struct InfoPage {
               Column() {
                 Image($r('app.media.cloud'))
               }
+              .bindTips('云备份')
               .borderRadius(20)
               .height(40)
               .margin({
@@ -353,6 +356,7 @@ export default struct InfoPage {
             Column() {
               Image($r('app.media.new_white'))
             }
+            .bindTips('新增')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut('N', [ModifierKey.CTRL, ModifierKey.SHIFT])
@@ -661,7 +665,7 @@ export default struct InfoPage {
     .padding({
       left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
       right: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
-      top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
+      top: this.preferType === SheetType.BOTTOM ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)

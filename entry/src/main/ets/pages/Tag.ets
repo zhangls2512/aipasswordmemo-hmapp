@@ -13,7 +13,7 @@ import UpdateTag from './Updatetag'
 export default struct TagPage {
   @Provider() isShowNewSheet: boolean = false
   @Provider() isShowUpdateSheet: boolean = false
-  @Local preferType: number = 1
+  @Local preferType: SheetType = SheetType.CENTER
   @Local tagArray: Tag[] = []
   @Local loading: boolean = false
   @Local enableCloudBackup: boolean = false
@@ -146,6 +146,7 @@ export default struct TagPage {
             Column() {
               Image($r('app.media.cancel'))
             }
+            .bindTips('退出多选')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut(FunctionKey.ESC, [])
@@ -184,6 +185,7 @@ export default struct TagPage {
             Column() {
               Image($r('app.media.delete'))
             }
+            .bindTips('删除')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut('D', [ModifierKey.CTRL])
@@ -251,6 +253,7 @@ export default struct TagPage {
               Column() {
                 Image($r('app.media.cloud'))
               }
+              .bindTips('云备份')
               .borderRadius(20)
               .height(40)
               .margin({
@@ -314,6 +317,7 @@ export default struct TagPage {
             Column() {
               Image($r('app.media.new_white'))
             }
+            .bindTips('新增')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut('N', [ModifierKey.CTRL, ModifierKey.SHIFT])
@@ -365,6 +369,7 @@ export default struct TagPage {
             Column() {
               Image($r('app.media.sort'))
             }
+            .bindTips('排序')
             .borderRadius(20)
             .height(40)
             .padding(11)
@@ -509,7 +514,7 @@ export default struct TagPage {
 
             ListItem()
               .margin({
-                bottom: this.preferType === 0 ? 80 : 0
+                bottom: this.preferType === SheetType.BOTTOM ? 80 : 0
               })
           }
         }
@@ -532,7 +537,7 @@ export default struct TagPage {
     .padding({
       left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
       right: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
-      top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
+      top: this.preferType === SheetType.BOTTOM ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)
