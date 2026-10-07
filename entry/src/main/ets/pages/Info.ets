@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit'
-import { LoadingDialog, promptAction, uiMaterial } from '@kit.ArkUI'
+import { LoadingDialog, promptAction } from '@kit.ArkUI'
 import { fileIo } from '@kit.CoreFileKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { hdsEffect } from '@kit.UIDesignKit'
@@ -201,13 +201,12 @@ export default struct InfoPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .systemMaterial(new uiMaterial.ImmersiveMaterial({
-              style: uiMaterial.ImmersiveStyle.REGULAR,
-              interactive: true,
-              lightEffect: {
-                color: Color.White
-              }
-            }))
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
             .width(40)
             .onClick(() => {
               this.multipleSelect = false
@@ -237,13 +236,12 @@ export default struct InfoPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .systemMaterial(new uiMaterial.ImmersiveMaterial({
-              style: uiMaterial.ImmersiveStyle.REGULAR,
-              interactive: true,
-              lightEffect: {
-                color: Color.White
-              }
-            }))
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
@@ -307,13 +305,12 @@ export default struct InfoPage {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .systemMaterial(new uiMaterial.ImmersiveMaterial({
-                style: uiMaterial.ImmersiveStyle.REGULAR,
-                interactive: true,
-                lightEffect: {
-                  color: Color.White
-                }
-              }))
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
               .width(40)
               .onClick(async () => {
                 if (this.multipleSelectArray.length === 0) {
@@ -409,14 +406,11 @@ export default struct InfoPage {
 
             Button('AI 识别新增')
               .buttonStyle(ButtonStyleMode.NORMAL)
-              .systemMaterial(new uiMaterial.ImmersiveMaterial({
-                style: uiMaterial.ImmersiveStyle.REGULAR,
-                interactive: true,
-                lightEffect: {
-                  color: Color.White
-                }
-              }))
               .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
                 .shaderEffect({
                   effectType: hdsEffect.EffectType.DUAL_EDGE_FLOW_LIGHT,
                   animation: {
