@@ -1,7 +1,8 @@
 import { common } from '@kit.AbilityKit'
 import { FunctionComponent } from '@kit.AgentFrameworkKit'
-import { LengthMetrics, LoadingDialog, promptAction, uiMaterial, window } from '@kit.ArkUI'
+import { LengthMetrics, LoadingDialog, promptAction, window } from '@kit.ArkUI'
 import { deviceInfo } from '@kit.BasicServicesKit'
+import { hdsEffect } from '@kit.UIDesignKit'
 import getCloudServiceStatus from '../common/Cloudservice'
 import { getKeyAlg } from '../common/Crypto'
 import { deleteCloudBackup, deleteData, setCloudBackup } from '../common/Datachange'
@@ -38,7 +39,7 @@ export default struct PasswordPage {
   @Provider() isShowUpdateSheet: boolean = false
   @Provider() isShowFilterSheet: boolean = false
   @Local isShowInfoSheet: boolean = false
-  @Local preferType: number = 1
+  @Local preferType: SheetType = SheetType.CENTER
   @Local passwordArray: Password[] = []
   @Local loading: boolean = false
   @Local enableCloudBackup: boolean = false
@@ -237,6 +238,7 @@ export default struct PasswordPage {
             Column() {
               Image($r('app.media.cancel'))
             }
+            .bindTips('退出多选')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut(FunctionKey.ESC, [])
@@ -252,13 +254,12 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .systemMaterial(new uiMaterial.ImmersiveMaterial({
-              style: uiMaterial.ImmersiveStyle.REGULAR,
-              interactive: true,
-              lightEffect: {
-                color: Color.White
-              }
-            }))
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
             .width(40)
             .onClick(() => {
               this.multipleSelect = false
@@ -275,6 +276,7 @@ export default struct PasswordPage {
             Column() {
               Image($r('app.media.delete'))
             }
+            .bindTips('删除')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut('D', [ModifierKey.CTRL])
@@ -287,13 +289,12 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .systemMaterial(new uiMaterial.ImmersiveMaterial({
-              style: uiMaterial.ImmersiveStyle.REGULAR,
-              interactive: true,
-              lightEffect: {
-                color: Color.White
-              }
-            }))
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
             .width(40)
             .onClick(async () => {
               const promptAction = this.UIContext.getPromptAction()
@@ -342,6 +343,7 @@ export default struct PasswordPage {
               Column() {
                 Image($r('app.media.cloud'))
               }
+              .bindTips('云备份')
               .borderRadius(20)
               .height(40)
               .margin({
@@ -356,13 +358,12 @@ export default struct PasswordPage {
                   .backgroundColor($r('sys.color.interactive_pressed'))
                 }
               })
-              .systemMaterial(new uiMaterial.ImmersiveMaterial({
-                style: uiMaterial.ImmersiveStyle.REGULAR,
-                interactive: true,
-                lightEffect: {
-                  color: Color.White
-                }
-              }))
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
               .width(40)
               .onClick(async () => {
                 if (this.multipleSelectArray.length === 0) {
@@ -406,6 +407,7 @@ export default struct PasswordPage {
             Column() {
               Image($r('app.media.new_white'))
             }
+            .bindTips('新增')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut('N', [ModifierKey.CTRL, ModifierKey.SHIFT])
@@ -476,23 +478,24 @@ export default struct PasswordPage {
                   }
                 })
               }
+              .bindTips('AI 助手')
               .borderRadius(20)
               .height(40)
               .margin({
                 right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
               })
-              .systemMaterial(new uiMaterial.ImmersiveMaterial({
-                style: uiMaterial.ImmersiveStyle.REGULAR,
-                interactive: true,
-                lightEffect: {
-                  color: Color.White
-                }
-              }))
+              .visualEffect(new hdsEffect.HdsEffectBuilder()
+                .pointLight({
+                  sourceType: hdsEffect.PointLightSourceType.SOFT,
+                  illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+                })
+                .buildEffect())
               .width(40)
             }
             Column() {
               Image($r('app.media.sort'))
             }
+            .bindTips('排序')
             .borderRadius(20)
             .height(40)
             .margin({
@@ -507,13 +510,12 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .systemMaterial(new uiMaterial.ImmersiveMaterial({
-              style: uiMaterial.ImmersiveStyle.REGULAR,
-              interactive: true,
-              lightEffect: {
-                color: Color.White
-              }
-            }))
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
             .width(40)
             .bindMenu([
               {
@@ -537,6 +539,7 @@ export default struct PasswordPage {
             Column() {
               Image($r('app.media.search_icon'))
             }
+            .bindTips('搜索')
             .borderRadius(20)
             .height(40)
             .keyboardShortcut('F', [ModifierKey.CTRL])
@@ -549,13 +552,12 @@ export default struct PasswordPage {
                 .backgroundColor($r('sys.color.interactive_pressed'))
               }
             })
-            .systemMaterial(new uiMaterial.ImmersiveMaterial({
-              style: uiMaterial.ImmersiveStyle.REGULAR,
-              interactive: true,
-              lightEffect: {
-                color: Color.White
-              }
-            }))
+            .visualEffect(new hdsEffect.HdsEffectBuilder()
+              .pointLight({
+                sourceType: hdsEffect.PointLightSourceType.SOFT,
+                illuminatedType: hdsEffect.PointLightIlluminatedType.BORDER_CONTENT
+              })
+              .buildEffect())
             .width(40)
             .onClick(() => {
               this.isShowFilterSheet = true
@@ -609,10 +611,6 @@ export default struct PasswordPage {
             value: this.nameKeyword!!
           })
             .searchButton('搜索')
-            .systemMaterial(new uiMaterial.ImmersiveMaterial({
-              style: uiMaterial.ImmersiveStyle.REGULAR,
-              interactive: true
-            }))
             .onChange(value => {
               setTempPreference(this.context, 'filterPassword', 'nameKeyword', value)
             })
@@ -902,7 +900,7 @@ export default struct PasswordPage {
     .padding({
       left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
       right: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
-      top: this.preferType === 0 ? 0 : $r('sys.float.ohos_id_default_padding_top')
+      top: this.preferType === SheetType.BOTTOM ? 0 : $r('sys.float.ohos_id_default_padding_top')
     })
     .onAppear(async () => {
       this.preferType = getPreferType(this.UIContext)

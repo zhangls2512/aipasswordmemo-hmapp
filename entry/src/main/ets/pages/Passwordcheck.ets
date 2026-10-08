@@ -13,7 +13,7 @@ import UpdatePassword from './Updatepassword'
 @ComponentV2
 export default struct Passwordcheck {
   @Provider() isShowUpdateSheet: boolean = false
-  @Local preferType: number = 1
+  @Local preferType: SheetType = SheetType.CENTER
   @Local selectedIndex: number = 0
   @Local lowStrengthPasswordArray: ListItem[] = []
   @Local mediumStrengthPasswordArray: ListItem[] = []
