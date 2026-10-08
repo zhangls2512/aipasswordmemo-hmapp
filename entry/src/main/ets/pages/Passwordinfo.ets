@@ -386,7 +386,7 @@ export default struct Passwordinfo {
               if (res.value !== 'fail') {
                 this.mfaValue = res.value
                 this.mfaSecondsRemaining = res.secondsRemaining
-                if (showMfaInFloatingBall) {
+                if (this.floatingBall) {
                   await floatingBallController.updateFloatingBall({
                     template: floatingBall.FloatingBallTemplate.NORMAL,
                     title: res.value,

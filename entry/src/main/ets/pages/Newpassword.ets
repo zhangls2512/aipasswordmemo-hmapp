@@ -28,7 +28,7 @@ export interface SelectItem {
 export default struct Newpassword {
   @Consumer() isShowNewSheet: boolean = false
   @Provider() isShowPasswordgenerateSheet: boolean = false
-  @Local preferType: number = 1
+  @Local preferType: SheetType = SheetType.CENTER
   @Local passwordName: string = ''
   @Local passwordInfoArray: PasswordInfoItem[] = []
   @Local infoType: string = ''
