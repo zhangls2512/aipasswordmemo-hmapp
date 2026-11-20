@@ -610,6 +610,7 @@ export default struct PasswordPage {
             placeholder: '请输入名称关键词',
             value: this.nameKeyword!!
           })
+            .enableAutoSpacing(true)
             .searchButton('搜索')
             .onChange(value => {
               setTempPreference(this.context, 'filterPassword', 'nameKeyword', value)
