@@ -345,7 +345,7 @@ export default struct InfoPage {
             }
           }
           .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
         }
         if (!this.multipleSelect) {
@@ -455,6 +455,7 @@ export default struct InfoPage {
                     .padding(12)
                     .onClick(() => {
                       this.selectType = item
+                      this.loading = true
                     })
                   }
                   .backgroundColor($r('sys.color.comp_background_primary'))
@@ -474,6 +475,7 @@ export default struct InfoPage {
                     .padding(12)
                     .onClick(() => {
                       this.selectType = ''
+                      this.loading = true
                     })
                   }
                   .backgroundColor($r('sys.color.background_emphasize'))
@@ -487,147 +489,143 @@ export default struct InfoPage {
           }
           .edgeEffect(EdgeEffect.Spring)
           .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m'),
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_l'),
             top: this.types.length === 0 ? 0 : $r('sys.float.ohos_id_elements_margin_vertical_m')
           })
           .scrollable(ScrollDirection.Horizontal)
           .scrollBar(BarState.Off)
         }
-        if (this.infoArray.length === 0 && !this.loading) {
-          Text('无数据')
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
-            .textAlign(TextAlign.Center)
-            .width('100%')
-        }
         Refresh({
           refreshing: $$this.loading
         }) {
           List() {
-            ForEach(this.infoArray, (item: Info) => {
-              if (!this.selectType || item.type === this.selectType) {
-                ListItem() {
-                  Column() {
-                    Row() {
-                      if (this.multipleSelect) {
-                        Toggle({
-                          type: ToggleType.Checkbox,
-                          isOn: this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+            if (this.infoArray.length === 0 && !this.loading) {
+              ListItem() {
+                Text('无数据')
+              }
+              .width('100%')
+            }
+            ForEach(this.infoArray, (item: Info, index) => {
+              ListItem() {
+                Column() {
+                  Row() {
+                    if (this.multipleSelect) {
+                      Toggle({
+                        type: ToggleType.Checkbox,
+                        isOn: this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+                      })
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
                         })
-                          .margin({
-                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                          })
-                          .onChange(isOn => {
-                            const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
-                            if (!isOn && exist) {
-                              this.multipleSelectArray.splice(
-                                this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                                  item.id), 1)
-                            }
-                            if (isOn && !exist) {
-                              this.multipleSelectArray.push(item)
-                            }
-                          })
-                      }
-                      if (item.isCloudBackup) {
-                        Image($r('app.media.cloud'))
-                          .margin({
-                            right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
-                          })
-                          .width('5%')
-                      }
-                      Column() {
-                        if (item.type !== '图标') {
-                          Text(item.value)
-                            .enableAutoSpacing(true)
-                            .fontWeight(FontWeight.Medium)
-                        }
-                        if (item.type === '图标') {
-                          Image(item.value)
-                            .autoResize(true)
-                            .copyOption(CopyOptions.LocalDevice)
-                            .width('10%')
-                            .onError(async (err) => {
-                              await promptAction.openToast({
-                                message: '发生错误，错误信息：' + err.message
-                              })
-                            })
-                        }
-                        Text(item.type)
-                          .enableAutoSpacing(true)
-                          .fontColor($r('sys.color.font_secondary'))
-                          .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                          .margin({
-                            top: $r('sys.float.ohos_id_text_margin_vertical')
-                          })
-                      }
-                      .alignItems(HorizontalAlign.Start)
-                      .layoutWeight(1)
+                        .onChange(isOn => {
+                          const exist = this.multipleSelectArray.find(selectItem => selectItem.id === item.id)
+                          if (!isOn && exist) {
+                            this.multipleSelectArray.splice(
+                              this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                                item.id), 1)
+                          }
+                          if (isOn && !exist) {
+                            this.multipleSelectArray.push(item)
+                          }
+                        })
                     }
-                    .borderRadius(12)
-                    .padding(12)
-                    .stateStyles({
-                      normal: {
-                        .backgroundColor($r('sys.color.comp_background_primary'))
-                      },
-                      hovered: {
-                        .backgroundColor($r('sys.color.interactive_hover'))
-                      },
-                      pressed: {
-                        .backgroundColor($r('sys.color.interactive_pressed'))
-                      }
-                    })
-                    .onClick(async () => {
-                      if (this.multipleSelect) {
-                        const exist = this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
-                        if (exist) {
-                          this.multipleSelectArray.splice(
-                            this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
-                              item.id), 1)
-                        }
-                        if (!exist) {
-                          this.multipleSelectArray.push(item)
-                        }
-                        return
+                    if (item.isCloudBackup) {
+                      Image($r('app.media.cloud'))
+                        .margin({
+                          right: $r('sys.float.ohos_id_elements_margin_horizontal_m')
+                        })
+                        .width('5%')
+                    }
+                    Column() {
+                      if (item.type !== '图标') {
+                        Text(item.value)
+                          .enableAutoSpacing(true)
+                          .fontWeight(FontWeight.Medium)
                       }
                       if (item.type === '图标') {
-                        await promptAction.openToast({
-                          message: '图标类型不支持修改'
-                        })
-                        return
+                        Image(item.value)
+                          .autoResize(true)
+                          .copyOption(CopyOptions.LocalDevice)
+                          .width('10%')
+                          .onError(async (err) => {
+                            await promptAction.openToast({
+                              message: '发生错误，错误信息：' + err.message
+                            })
+                          })
                       }
-                      this.infoId = item.id
-                      this.isShowUpdateSheet = true
-                    })
-                    .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
-                      hapticFeedbackMode: HapticFeedbackMode.AUTO
-                    })
-                    .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick, {
-                      hapticFeedbackMode: HapticFeedbackMode.AUTO
-                    })
-                  }
-                  .backgroundColor($r('sys.color.comp_background_primary'))
-                  .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-                  .padding($r('sys.float.ohos_id_corner_radius_mark'))
-                }
-                .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
-                .selected(this.multipleSelectArray.some(selectItem => selectItem.id === item.id))
-                .margin({
-                  top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-                })
-                .onSelect(isSelected => {
-                  if (!isSelected) {
-                    this.multipleSelectArray = this.multipleSelectArray.filter(selectItem => selectItem.id !== item.id)
-                  }
-                  if (isSelected) {
-                    this.multipleSelect = true
-                    if (!this.multipleSelectArray.find(selectItem => selectItem.id === item.id)) {
-                      this.multipleSelectArray.push(item)
+                      Text(item.type)
+                        .enableAutoSpacing(true)
+                        .fontColor($r('sys.color.font_secondary'))
+                        .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                        .margin({
+                          top: $r('sys.float.ohos_id_text_margin_vertical')
+                        })
                     }
+                    .alignItems(HorizontalAlign.Start)
+                    .layoutWeight(1)
                   }
-                })
+                  .borderRadius(12)
+                  .padding(12)
+                  .stateStyles({
+                    normal: {
+                      .backgroundColor($r('sys.color.comp_background_primary'))
+                    },
+                    hovered: {
+                      .backgroundColor($r('sys.color.interactive_hover'))
+                    },
+                    pressed: {
+                      .backgroundColor($r('sys.color.interactive_pressed'))
+                    }
+                  })
+                  .onClick(async () => {
+                    if (this.multipleSelect) {
+                      const exist = this.multipleSelectArray.some(selectItem => selectItem.id === item.id)
+                      if (exist) {
+                        this.multipleSelectArray.splice(
+                          this.multipleSelectArray.findIndex(selectItem => selectItem.id ===
+                            item.id), 1)
+                      }
+                      if (!exist) {
+                        this.multipleSelectArray.push(item)
+                      }
+                      return
+                    }
+                    if (item.type === '图标') {
+                      await promptAction.openToast({
+                        message: '图标类型不支持修改'
+                      })
+                      return
+                    }
+                    this.infoId = item.id
+                    this.isShowUpdateSheet = true
+                  })
+                  .bindContextMenu(this.MenuBuilder(item), ResponseType.LongPress, {
+                    hapticFeedbackMode: HapticFeedbackMode.AUTO
+                  })
+                  .bindContextMenu(this.MenuBuilder(item), ResponseType.RightClick, {
+                    hapticFeedbackMode: HapticFeedbackMode.AUTO
+                  })
+                }
+                .backgroundColor($r('sys.color.comp_background_primary'))
+                .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+                .padding($r('sys.float.ohos_id_corner_radius_mark'))
               }
+              .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
+              .selected(this.multipleSelectArray.some(selectItem => selectItem.id === item.id))
+              .margin({
+                top: index === 0 ? 0 : $r('sys.float.ohos_id_elements_margin_vertical_m')
+              })
+              .onSelect(isSelected => {
+                if (!isSelected) {
+                  this.multipleSelectArray = this.multipleSelectArray.filter(selectItem => selectItem.id !== item.id)
+                }
+                if (isSelected) {
+                  this.multipleSelect = true
+                  if (!this.multipleSelectArray.find(selectItem => selectItem.id === item.id)) {
+                    this.multipleSelectArray.push(item)
+                  }
+                }
+              })
             })
             ListItem()
               .margin({
@@ -645,12 +643,21 @@ export default struct InfoPage {
         })
         .layoutWeight(1)
         .onRefreshing(async () => {
-          this.selectType = ''
           this.multipleSelect = false
           this.multipleSelectArray = []
+          this.types = []
           this.infoArray = []
-          this.infoArray = await getInfoList(this.context)
           this.types = await getInfoTypeList(this.context)
+          if (this.selectType && !this.types.includes(this.selectType)) {
+            this.selectType = ''
+          }
+          const infoArray = await getInfoList(this.context)
+          if (!this.selectType) {
+            this.infoArray = infoArray
+          }
+          if (this.selectType) {
+            this.infoArray = infoArray.filter(item => !this.selectType || item.type === this.selectType)
+          }
           this.loading = false
         })
       }
@@ -685,6 +692,9 @@ export default struct InfoPage {
       preferType: this.preferType,
       title: {
         title: '修改常用信息'
+      },
+      onDisappear: () => {
+        this.infoId = -1
       },
       onWillDismiss: async (DismissSheetAction) => {
         const promptAction = this.UIContext.getPromptAction()

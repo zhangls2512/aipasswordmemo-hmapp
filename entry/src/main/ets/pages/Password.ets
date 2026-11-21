@@ -399,7 +399,7 @@ export default struct PasswordPage {
             }
           }
           .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
         }
         if (!this.multipleSelect) {
@@ -668,24 +668,23 @@ export default struct PasswordPage {
           }
           .edgeEffect(EdgeEffect.Spring)
           .margin({
-            bottom: this.tags.length === 0 ? 0 : $r('sys.float.ohos_id_elements_margin_vertical_m')
+            bottom: this.tags.length === 0 ? $r('sys.float.ohos_id_elements_margin_vertical_m') :
+              $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
           .scrollable(ScrollDirection.Horizontal)
           .scrollBar(BarState.Off)
-        }
-        if (this.passwordArray.length === 0 && !this.loading) {
-          Text('无数据')
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
-            .textAlign(TextAlign.Center)
-            .width('100%')
         }
         Refresh({
           refreshing: $$this.loading
         }) {
           List() {
-            ForEach(this.passwordArray, (item: Password) => {
+            if (this.passwordArray.length === 0 && !this.loading) {
+              ListItem() {
+                Text('无数据')
+              }
+              .width('100%')
+            }
+            ForEach(this.passwordArray, (item: Password, index) => {
               ListItem() {
                 Column() {
                   Row() {
@@ -832,7 +831,7 @@ export default struct PasswordPage {
               .borderRadius($r('sys.float.ohos_id_corner_radius_default_l'))
               .selected(this.multipleSelectArray.some(selectItem => selectItem.id === item.id))
               .margin({
-                top: $r('sys.float.ohos_id_elements_margin_vertical_m')
+                top: index === 0 ? 0 : $r('sys.float.ohos_id_elements_margin_vertical_m')
               })
               .onSelect(isSelected => {
                 if (!isSelected) {
@@ -889,6 +888,7 @@ export default struct PasswordPage {
             }
           },
           onDisappear: async () => {
+            this.passwordId = -1
             if (!this.showPassword) {
               const lastWindow = await window.getLastWindow(this.context)
               await lastWindow.setWindowPrivacyMode(false)
@@ -1011,6 +1011,7 @@ export default struct PasswordPage {
         }
       },
       onDisappear: async () => {
+        this.passwordId = -1
         if (!this.showPassword) {
           const lastWindow = await window.getLastWindow(this.context)
           await lastWindow.setWindowPrivacyMode(false)

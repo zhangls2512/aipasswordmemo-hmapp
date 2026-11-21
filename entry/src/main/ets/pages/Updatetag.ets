@@ -11,7 +11,7 @@ import { getFlushPreference } from '../common/Preference'
 @ComponentV2
 export default struct Updatetag {
   @Consumer() isShowUpdateSheet: boolean = false
-  @Param tagId: number = 0
+  @Param tagId: number = -1
   @Local tagValue: string = ''
   @Local tagColor: string = '#000000'
   @Local favouriteColor: string[] | undefined = undefined

@@ -9,7 +9,7 @@ import { getFlushPreference } from '../common/Preference'
 @ComponentV2
 export default struct Updateinfo {
   @Consumer() isShowUpdateSheet: boolean = false
-  @Param infoId: number = 0
+  @Param infoId: number = -1
   @Local infoType: string = ''
   @Local infoValue: string = ''
   @Local cloudBackup: boolean = false

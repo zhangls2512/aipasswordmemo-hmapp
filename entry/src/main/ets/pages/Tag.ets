@@ -307,7 +307,7 @@ export default struct TagPage {
             }
           }
           .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
         }
         if (!this.multipleSelect) {
@@ -406,22 +406,20 @@ export default struct TagPage {
             })
           }
           .margin({
-            bottom: $r('sys.float.ohos_id_elements_margin_vertical_m')
+            bottom: $r('sys.float.ohos_id_elements_margin_vertical_l')
           })
           .width('100%')
-        }
-        if (this.tagArray.length === 0 && !this.loading) {
-          Text('无数据')
-            .margin({
-              top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-            })
-            .textAlign(TextAlign.Center)
-            .width('100%')
         }
         Refresh({
           refreshing: $$this.loading
         }) {
           List() {
+            if (this.tagArray.length === 0 && !this.loading) {
+              ListItem() {
+                Text('无数据')
+              }
+              .width('100%')
+            }
             ListItem() {
               Flex({
                 wrap: FlexWrap.Wrap,
@@ -519,9 +517,6 @@ export default struct TagPage {
           this.loading = true
         })
         .layoutWeight(1)
-        .margin({
-          top: $r('sys.float.ohos_id_elements_margin_vertical_m')
-        })
         .onRefreshing(async () => {
           this.multipleSelect = false
           this.multipleSelectArray = []
@@ -560,6 +555,9 @@ export default struct TagPage {
       preferType: this.preferType,
       title: {
         title: '修改标签'
+      },
+      onDisappear: () => {
+        this.tagId = -1
       },
       onWillDismiss: async (DismissSheetAction) => {
         const promptAction = this.UIContext.getPromptAction()

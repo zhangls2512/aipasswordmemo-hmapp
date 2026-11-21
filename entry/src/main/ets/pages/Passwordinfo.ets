@@ -11,7 +11,7 @@ import getTotp from '../common/Totp'
 
 @ComponentV2
 export default struct Passwordinfo {
-  @Param passwordId: number = 0
+  @Param passwordId: number = -1
   @Local passwordName: string = ''
   @Local passwordInfo: PasswordInfoItem[] = []
   @Local hidePasswordInfoType: string[] = []

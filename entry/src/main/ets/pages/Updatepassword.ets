@@ -25,7 +25,7 @@ import Passwordgenerate from './Passwordgenerate'
 export default struct Updatepassword {
   @Consumer() isShowUpdateSheet: boolean = false
   @Provider() isShowPasswordgenerateSheet: boolean = false
-  @Param passwordId: number = 0
+  @Param passwordId: number = -1
   @Local preferType: SheetType = SheetType.CENTER
   @Local passwordName: string = ''
   @Local passwordInfoArray: PasswordInfoItem[] = []
